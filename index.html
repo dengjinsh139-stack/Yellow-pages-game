@@ -135,6 +135,78 @@
             margin: 0 15px;
         }
         
+        /* 音乐播放器 */
+        .music-player {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .music-player:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .music-icon {
+            font-size: 1.8rem;
+            animation: musicPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes musicPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .music-waves {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .music-waves.playing {
+            opacity: 1;
+        }
+        
+        .music-waves span {
+            width: 3px;
+            background: linear-gradient(to top, #ff6b9d, #feca57);
+            border-radius: 3px;
+            animation: wave 1s ease-in-out infinite;
+        }
+        
+        .music-waves span:nth-child(1) { height: 8px; animation-delay: 0s; }
+        .music-waves span:nth-child(2) { height: 15px; animation-delay: 0.1s; }
+        .music-waves span:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+        .music-waves span:nth-child(4) { height: 18px; animation-delay: 0.3s; }
+        
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1); }
+        }
+        
+        .music-text {
+            font-size: 0.85rem;
+            color: white;
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
         /* 主容器 */
         .container {
             max-width: 1400px;
@@ -340,6 +412,15 @@
                 display: none;
             }
             
+            .music-player {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                margin-top: 20px;
+                padding: 12px 20px;
+            }
+            
             .games-grid {
                 grid-template-columns: 1fr;
             }
@@ -353,6 +434,18 @@
     <header>
         <h1 class="main-title">昭羽的快乐空间</h1>
         <p class="subtitle">快乐游戏每一天</p>
+        
+        <!-- 音乐播放器 -->
+        <div class="music-player" id="musicPlayer" onclick="toggleMusic()">
+            <div class="music-icon" id="musicIcon">🎵</div>
+            <div class="music-waves" id="musicWaves">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="music-text" id="musicText">点击播放音乐</div>
+        </div>
     </header>
     
     <div class="container">
@@ -402,10 +495,143 @@
     </div>
     
     <footer>
-        <p>昭羽的快乐空间 v2.1 | 让音乐带来快乐</p>
+        <p>昭羽的快乐空间 v2.2 | 让音乐带来快乐</p>
     </footer>
     
     <script>
+        // 音乐播放器
+        let musicAudioCtx = null;
+        let musicOscillators = [];
+        let isMusicPlaying = false;
+        let musicInterval = null;
+        
+        // 治愈风格音符频率 (C大调五声音阶)
+        const healingNotes = [
+            523.25, // C5
+            587.33, // D5
+            659.25, // E5
+            783.99, // G5
+            880.00, // A5
+            1046.50 // C6
+        ];
+        
+        // 治愈旋律序列
+        const melody = [
+            0, 2, 4, 2, 0, 2, 1, 3,
+            2, 4, 5, 4, 2, 0, 2, 4
+        ];
+        let melodyIndex = 0;
+        
+        function initMusic() {
+            if (!musicAudioCtx) {
+                musicAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        function playHealingNote() {
+            if (!isMusicPlaying || !musicAudioCtx) return;
+            
+            const noteIndex = melody[melodyIndex % melody.length];
+            const frequency = healingNotes[noteIndex];
+            
+            // 创建主音
+            const osc = musicAudioCtx.createOscillator();
+            const gain = musicAudioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(musicAudioCtx.destination);
+            
+            // 使用正弦波，柔和音色
+            osc.type = 'sine';
+            osc.frequency.value = frequency;
+            
+            // 轻柔的包络
+            gain.gain.setValueAtTime(0, musicAudioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.08, musicAudioCtx.currentTime + 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.01, musicAudioCtx.currentTime + 1.5);
+            
+            osc.start(musicAudioCtx.currentTime);
+            osc.stop(musicAudioCtx.currentTime + 1.5);
+            
+            musicOscillators.push(osc);
+            
+            // 添加和弦音，增加丰富度
+            if (melodyIndex % 2 === 0) {
+                const chordOsc = musicAudioCtx.createOscillator();
+                const chordGain = musicAudioCtx.createGain();
+                
+                chordOsc.connect(chordGain);
+                chordGain.connect(musicAudioCtx.destination);
+                
+                chordOsc.type = 'triangle';
+                chordOsc.frequency.value = frequency * 1.5; // 五度音程
+                
+                chordGain.gain.setValueAtTime(0, musicAudioCtx.currentTime);
+                chordGain.gain.linearRampToValueAtTime(0.03, musicAudioCtx.currentTime + 0.1);
+                chordGain.gain.exponentialRampToValueAtTime(0.01, musicAudioCtx.currentTime + 1.2);
+                
+                chordOsc.start(musicAudioCtx.currentTime);
+                chordOsc.stop(musicAudioCtx.currentTime + 1.2);
+                
+                musicOscillators.push(chordOsc);
+            }
+            
+            melodyIndex++;
+            
+            // 清理已停止的oscillator
+            musicOscillators = musicOscillators.filter(o => {
+                try {
+                    return o.context.currentTime < o.context.currentTime + 2;
+                } catch(e) {
+                    return false;
+                }
+            });
+        }
+        
+        function toggleMusic() {
+            const musicIcon = document.getElementById('musicIcon');
+            const musicWaves = document.getElementById('musicWaves');
+            const musicText = document.getElementById('musicText');
+            
+            if (!isMusicPlaying) {
+                // 开始播放
+                initMusic();
+                if (musicAudioCtx.state === 'suspended') {
+                    musicAudioCtx.resume();
+                }
+                
+                isMusicPlaying = true;
+                musicIcon.textContent = '🔊';
+                musicWaves.classList.add('playing');
+                musicText.textContent = '点击暂停音乐';
+                
+                // 立即播放第一个音符
+                playHealingNote();
+                
+                // 设置循环播放 (每800ms一个音符，治愈风格慢节奏)
+                musicInterval = setInterval(playHealingNote, 800);
+            } else {
+                // 暂停播放
+                isMusicPlaying = false;
+                musicIcon.textContent = '🎵';
+                musicWaves.classList.remove('playing');
+                musicText.textContent = '点击播放音乐';
+                
+                if (musicInterval) {
+                    clearInterval(musicInterval);
+                    musicInterval = null;
+                }
+                
+                // 停止所有oscillator
+                musicOscillators.forEach(osc => {
+                    try {
+                        osc.stop();
+                    } catch(e) {}
+                });
+                musicOscillators = [];
+            }
+        }
+        
         // 生成星星背景
         function createStars() {
             const starsContainer = document.getElementById('stars');
