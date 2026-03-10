@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 音游原型 #1 - 下落式节奏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+        h1 { margin: 10px 0; font-size: 1.5rem; text-shadow: 0 0 20px #e94560; }
+        #gameCanvas {
+            border: 3px solid #e94560;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #e94560;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        button:hover { background: #ff6b6b; transform: scale(1.05); }
+        .keys {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .score {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 原型 #1 - 下落式节奏 (4轨)</h1>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div class="score">得分: <span id="score">0</span> | 连击: <span id="combo">0</span></div>
+    <div class="controls">
+        <button onclick="startGame()">▶ 开始</button>
+        <button onclick="resetGame()">↺ 重置</button>
+    </div>
+    <div class="keys">按键: D F J K 或 ← ↓ ↑ →</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const LANE_COUNT = 4;
+const LANE_WIDTH = canvas.width / LANE_COUNT;
+const HIT_LINE_Y = 520;
+const NOTE_SPEED = 4;
+const PERFECT_RANGE = 20;
+const GOOD_RANGE = 40;
+
+let notes = [];
+let score = 0;
+let combo = 0;
+let maxCombo = 0;
+let gameRunning = false;
+let animationId;
+
+const keyMap = { 'KeyD': 0, 'KeyF': 1, 'KeyJ': 2, 'KeyK': 3 };
+const arrowMap = { 'ArrowLeft': 0, 'ArrowDown': 1, 'ArrowUp': 2, 'ArrowRight': 3 };
+
+class Note {
+    constructor(lane) {
+        this.lane = lane;
+        this.x = lane * LANE_WIDTH + LANE_WIDTH / 2;
+        this.y = 0;
+        this.hit = false;
+        this.missed = false;
+        this.color = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'][lane];
+    }
+
+    update() {
+        this.y += NOTE_SPEED;
+        if (this.y > canvas.height + 30) {
+            this.missed = true;
+            combo = 0;
+            updateScore();
+        }
+    }
+
+    draw() {
+        if (this.hit || this.missed) return;
+        
+        // 发光效果
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 20;
+        
+        // 音符主体
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.roundRect(this.x - 35, this.y - 15, 70, 30, 10);
+        ctx.fill();
+        
+        // 内部高光
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.beginPath();
+        ctx.roundRect(this.x - 25, this.y - 10, 50, 12, 5);
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+    }
+}
+
+function drawLanes() {
+    // 背景
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 轨道分隔线
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 2;
+    for (let i = 1; i < LANE_COUNT; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * LANE_WIDTH, 0);
+        ctx.lineTo(i * LANE_WIDTH, canvas.height);
+        ctx.stroke();
+    }
+    
+    // 判定线
+    ctx.strokeStyle = '#e94560';
+    ctx.lineWidth = 4;
+    ctx.shadowColor = '#e94560';
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.moveTo(0, HIT_LINE_Y);
+    ctx.lineTo(canvas.width, HIT_LINE_Y);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    // 判定线区域
+    ctx.fillStyle = 'rgba(233, 69, 96, 0.1)';
+    ctx.fillRect(0, HIT_LINE_Y - PERFECT_RANGE, canvas.width, PERFECT_RANGE * 2);
+}
+
+function drawLaneGlow(lane) {
+    ctx.fillStyle = `rgba(${[255,107,107,78,220,196,69,183,209,150,206,180][lane*3]}, ${[255,107,107,78,220,196,69,183,209,150,206,180][lane*3+1]}, ${[255,107,107,78,220,196,69,183,209,150,206,180][lane*3+2]}, 0.3)`;
+    ctx.fillRect(lane * LANE_WIDTH, 0, LANE_WIDTH, canvas.height);
+}
+
+function spawnNote() {
+    if (Math.random() < 0.03) {
+        const lane = Math.floor(Math.random() * LANE_COUNT);
+        notes.push(new Note(lane));
+    }
+}
+
+function checkHit(lane) {
+    const hitNotes = notes.filter(n => n.lane === lane && !n.hit && !n.missed);
+    if (hitNotes.length === 0) return;
+    
+    const note = hitNotes[0];
+    const dist = Math.abs(note.y - HIT_LINE_Y);
+    
+    if (dist <= PERFECT_RANGE) {
+        note.hit = true;
+        score += 100;
+        combo++;
+        showHitEffect(lane, 'PERFECT!', '#ffd700');
+    } else if (dist <= GOOD_RANGE) {
+        note.hit = true;
+        score += 50;
+        combo++;
+        showHitEffect(lane, 'GOOD', '#4ecdc4');
+    }
+    
+    updateScore();
+}
+
+let hitEffects = [];
+function showHitEffect(lane, text, color) {
+    hitEffects.push({
+        x: lane * LANE_WIDTH + LANE_WIDTH / 2,
+        y: HIT_LINE_Y - 50,
+        text, color, alpha: 1, scale: 1
+    });
+}
+
+function drawHitEffects() {
+    hitEffects = hitEffects.filter(eff => {
+        ctx.save();
+        ctx.globalAlpha = eff.alpha;
+        ctx.fillStyle = eff.color;
+        ctx.font = `bold ${20 * eff.scale}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText(eff.text, eff.x, eff.y);
+        ctx.restore();
+        
+        eff.alpha -= 0.02;
+        eff.y -= 1;
+        eff.scale += 0.02;
+        return eff.alpha > 0;
+    });
+}
+
+function updateScore() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('combo').textContent = combo;
+    if (combo > maxCombo) maxCombo = combo;
+}
+
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawLanes();
+    
+    spawnNote();
+    
+    notes = notes.filter(n => !n.hit && !n.missed);
+    notes.forEach(note => {
+        note.update();
+        note.draw();
+    });
+    
+    drawHitEffects();
+    
+    animationId = requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+    if (gameRunning) return;
+    gameRunning = true;
+    notes = [];
+    score = 0;
+    combo = 0;
+    updateScore();
+    gameLoop();
+}
+
+function resetGame() {
+    gameRunning = false;
+    cancelAnimationFrame(animationId);
+    notes = [];
+    score = 0;
+    combo = 0;
+    hitEffects = [];
+    updateScore();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawLanes();
+}
+
+document.addEventListener('keydown', (e) => {
+    if (!gameRunning) return;
+    
+    let lane = keyMap[e.code] ?? arrowMap[e.code];
+    if (lane !== undefined) {
+        e.preventDefault();
+        drawLaneGlow(lane);
+        checkHit(lane);
+        setTimeout(() => {
+            ctx.clearRect(lane * LANE_WIDTH, 0, LANE_WIDTH, canvas.height);
+        }, 100);
+    }
+});
+
+drawLanes();
+</script>
+</body>
+</html>
