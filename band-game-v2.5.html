@@ -1,0 +1,666 @@
+
+<script>
+// ==================== 关卡配置 ====================
+const levelConfig = {
+    1: { name: '车库练习', bpm: 80, stars: '⭐', color: '#00ff99' },
+    2: { name: '俱乐部之夜', bpm: 100, stars: '⭐⭐', color: '#66ccff' },
+    3: { name: '音乐节现场', bpm: 120, stars: '⭐⭐⭐', color: '#ffcc00' },
+    4: { name: '体育馆巡演', bpm: 140, stars: '⭐⭐⭐⭐', color: '#ff9966' },
+    5: { name: '传奇演唱会', bpm: 160, stars: '⭐⭐⭐⭐⭐', color: '#ff0066' }
+};
+
+// 和弦进行（每关不同）
+const levelChords = {
+    1: [ // 清新流行 C-Am-F-G
+        { root: 261.63, notes: [261.63, 329.63, 392.00] },
+        { root: 220.00, notes: [220.00, 261.63, 329.63] },
+        { root: 349.23, notes: [349.23, 440.00, 261.63] },
+        { root: 392.00, notes: [392.00, 293.66, 349.23] }
+    ],
+    2: [ // 放克摇滚 G-Em-C-D
+        { root: 392.00, notes: [392.00, 293.66, 349.23] },
+        { root: 329.63, notes: [329.63, 392.00, 246.94] },
+        { root: 261.63, notes: [261.63, 329.63, 392.00] },
+        { root: 293.66, notes: [293.66, 369.99, 220.00] }
+    ],
+    3: [ // 硬摇滚 D-Bm-G-A
+        { root: 293.66, notes: [293.66, 369.99, 220.00] },
+        { root: 246.94, notes: [246.94, 293.66, 369.99] },
+        { root: 196.00, notes: [196.00, 246.94, 293.66] },
+        { root: 220.00, notes: [220.00, 277.18, 329.63] }
+    ],
+    4: [ // 重金属 E-C#m-A-B
+        { root: 329.63, notes: [329.63, 415.30, 246.94] },
+        { root: 277.18, notes: [277.18, 349.23, 207.65] },
+        { root: 220.00, notes: [220.00, 277.18, 329.63] },
+        { root: 246.94, notes: [246.94, 311.13, 369.99] }
+    ],
+    5: [ // 史诗摇滚 复杂和弦
+        { root: 261.63, notes: [261.63, 329.63, 392.00, 493.88] },
+        { root: 233.08, notes: [233.08, 293.66, 349.23, 466.16] },
+        { root: 311.13, notes: [311.13, 392.00, 466.16, 622.25] },
+        { root: 349.23, notes: [349.23, 440.00, 523.25, 698.46] }
+    ]
+};
+
+// 游戏状态
+let gameState = {
+    currentLevel: 1,
+    unlockedLevel: 1,
+    instrument: null,
+    score: 0,
+    combo: 0,
+    maxCombo: 0,
+    perfectCount: 0,
+    goodCount: 0,
+    missCount: 0,
+    bandEnergy: 0,
+    isRockMode: false,
+    isPlaying: false,
+    notes: [],
+    gameStartTime: 0,
+    laneCount: 4
+};
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let tracks = { drum: [], guitar: [], bass: [], keyboard: [] };
+let gameLoop = null;
+let lastBeat = -1;
+
+// ==================== 音频系统 ====================
+function playDrumSound(type) {
+    const t = audioCtx.currentTime;
+    if (type === 'kick') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(150, t);
+        osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
+        gain.gain.setValueAtTime(0.8, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+        osc.start(t);
+        osc.stop(t + 0.3);
+    } else if (type === 'snare') {
+        const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.2, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 1000;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.4, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start(t);
+        noise.stop(t + 0.2);
+    } else if (type === 'hihat') {
+        const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 8000;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.15, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start(t);
+        noise.stop(t + 0.05);
+    }
+}
+
+function playGuitarSound(note, level) {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    osc.type = level >= 3 ? 'sawtooth' : 'square';
+    osc.frequency.value = note;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = level >= 4 ? 3000 : 2000;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.4);
+}
+
+function playBassSound(note) {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    osc.type = 'square';
+    osc.frequency.value = note / 2;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 500;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.3, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.5);
+}
+
+function playKeyboardSound(note) {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = note;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.6);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.6);
+}
+
+// ==================== 生成音轨 ====================
+function generateTracks(playerInstrument, level) {
+    const config = levelConfig[level];
+    const chords = levelChords[level];
+    const duration = 20000;
+    const beatInterval = 60000 / config.bpm;
+    const totalBeats = Math.floor(duration / beatInterval);
+    
+    tracks = { drum: [], guitar: [], bass: [], keyboard: [] };
+    
+    // 根据关卡生成不同节奏复杂度
+    const complexity = level; // 1-5
+    
+    for (let beat = 0; beat < totalBeats; beat++) {
+        const time = beat * beatInterval + 2000;
+        const beatInBar = beat % 4;
+        const chord = chords[Math.floor(beat / 4) % chords.length];
+        
+        // 鼓音轨 - 随关卡增加复杂度
+        if (playerInstrument !== 'drum') {
+            tracks.drum.push({ time, sound: 'hihat' });
+            
+            // 关卡1: 基础动次打次
+            // 关卡2+: 加入更多底鼓
+            // 关卡4+: 双踩
+            if (beatInBar === 0 || (level >= 2 && beatInBar === 2) || (level >= 4 && beatInBar === 3)) {
+                tracks.drum.push({ time, sound: 'kick' });
+            }
+            if (beatInBar === 1 || beatInBar === 3) {
+                tracks.drum.push({ time: time + 10, sound: 'snare' });
+            }
+        }
+        
+        // 吉他音轨
+        if (playerInstrument !== 'guitar') {
+            if (beatInBar === 0 || (level >= 3 && beat % 2 === 0)) {
+                tracks.guitar.push({ time, note: chord.notes[0] });
+            }
+            if (level >= 2 && beat % 2 === 1) {
+                tracks.guitar.push({ time: time + 50, note: chord.notes[1] });
+            }
+        }
+        
+        // 贝斯音轨
+        if (playerInstrument !== 'bass') {
+            if (beatInBar === 0) {
+                tracks.bass.push({ time, note: chord.root });
+            } else if (level >= 3 && beatInBar === 2) {
+                tracks.bass.push({ time, note: chord.notes[2] });
+            }
+        }
+        
+        // 键盘音轨
+        if (playerInstrument !== 'keyboard') {
+            if (beatInBar === 0) {
+                tracks.keyboard.push({ time, note: chord.notes[0] });
+                if (level >= 2) tracks.keyboard.push({ time: time + 100, note: chord.notes[1] });
+                if (level >= 3) tracks.keyboard.push({ time: time + 200, note: chord.notes[2] });
+            }
+        }
+    }
+}
+
+// ==================== 屏幕切换 ====================
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+}
+
+function selectLevel(level) {
+    if (level > gameState.unlockedLevel) return;
+    gameState.currentLevel = level;
+    document.getElementById('selectedLevelInfo').textContent = `关卡 ${level}: ${levelConfig[level].name}`;
+    document.getElementById('levelIndicator').textContent = `关卡 ${level}: ${levelConfig[level].name}`;
+    showScreen('instrumentScreen');
+}
+
+function selectInstrument(inst) {
+    gameState.instrument = inst;
+    gameState.laneCount = (inst === 'drum' || inst === 'keyboard') ? 4 : 2;
+    
+    document.querySelectorAll('.track-item').forEach(el => {
+        el.classList.remove('active', 'player');
+    });
+    
+    ['drum', 'guitar', 'bass', 'keyboard'].forEach(key => {
+        const el = document.getElementById(`track-${key}`);
+        if (key === inst) {
+            el.classList.add('player');
+        } else {
+            el.classList.add('active');
+        }
+    });
+    
+    startCountdown();
+}
+
+function backToLevel() {
+    gameState.isPlaying = false;
+    clearInterval(gameLoop);
+    document.getElementById('rockOverlay').classList.remove('active');
+    updateLevelScreen();
+    showScreen('levelScreen');
+}
+
+function updateLevelScreen() {
+    for (let i = 1; i <= 5; i++) {
+        const card = document.getElementById(`level-${i}`);
+        card.classList.remove('locked', 'cleared');
+        
+        if (i > gameState.unlockedLevel) {
+            card.classList.add('locked');
+        } else if (i < gameState.unlockedLevel) {
+            card.classList.add('cleared');
+        }
+    }
+}
+
+function goToNextLevel() {
+    if (gameState.currentLevel < 5) {
+        selectLevel(gameState.currentLevel + 1);
+    }
+}
+
+// ==================== 倒计时 ====================
+function startCountdown() {
+    showScreen('gameScreen');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const countSound = (freq) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    };
+    
+    let count = 3;
+    const doCount = () => {
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = 'bold 120px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        if (count > 0) {
+            ctx.fillStyle = '#ffcc00';
+            ctx.shadowColor = '#ffcc00';
+            ctx.shadowBlur = 30;
+            ctx.fillText(count, canvas.width/2, canvas.height/2);
+            ctx.shadowBlur = 0;
+            countSound(440 + (4-count) * 110);
+            count--;
+            setTimeout(doCount, 1000);
+        } else {
+            ctx.fillStyle = '#00ff99';
+            ctx.shadowColor = '#00ff99';
+            ctx.shadowBlur = 30;
+            ctx.fillText('GO!', canvas.width/2, canvas.height/2);
+            ctx.shadowBlur = 0;
+            countSound(880);
+            setTimeout(startGame, 500);
+        }
+    };
+    
+    doCount();
+}
+
+// ==================== 生成玩家谱面 ====================
+function generatePlayerNotes(level) {
+    const notes = [];
+    const config = levelConfig[level];
+    const duration = 20000;
+    const beatInterval = 60000 / config.bpm;
+    const totalBeats = Math.floor(duration / beatInterval);
+    const inst = gameState.instrument;
+    
+    // 随关卡增加音符密度
+    const density = Math.min(level + 1, 4); 
+    
+    for (let beat = 0; beat < totalBeats; beat++) {
+        const time = beat * beatInterval + 2000;
+        const beatInBar = beat % 4;
+        
+        if (inst === 'drum') {
+            // 关卡越高，鼓点越多
+            if (beat % (6 - density) === 0) {
+                notes.push({ time, lane: beatInBar % 4, hit: false });
+            }
+        } else if (inst === 'guitar') {
+            if (beatInBar === 0 || (level >= 3 && beatInBar === 2)) {
+                notes.push({ time, lane: 0, hit: false });
+            } else if (level >= 2 && beatInBar === 1) {
+                notes.push({ time, lane: 1, hit: false });
+            }
+        } else if (inst === 'bass') {
+            if (beat % 2 === 0) {
+                notes.push({ time, lane: 0, hit: false });
+            }
+        } else if (inst === 'keyboard') {
+            if (beatInBar === 0) {
+                notes.push({ time, lane: 0, hit: false });
+                if (level >= 2) notes.push({ time: time + 150, lane: 1, hit: false });
+                if (level >= 4) notes.push({ time: time + 300, lane: 2, hit: false });
+            }
+        }
+    }
+    
+    return notes;
+}
+
+// ==================== 游戏主循环 ====================
+function startGame() {
+    gameState.score = 0;
+    gameState.combo = 0;
+    gameState.maxCombo = 0;
+    gameState.perfectCount = 0;
+    gameState.goodCount = 0;
+    gameState.missCount = 0;
+    gameState.bandEnergy = 0;
+    gameState.isRockMode = false;
+    gameState.isPlaying = true;
+    gameState.notes = generatePlayerNotes(gameState.currentLevel);
+    gameState.gameStartTime = Date.now();
+    lastBeat = -1;
+    
+    generateTracks(gameState.instrument, gameState.currentLevel);
+    
+    document.getElementById('rockModeText').classList.remove('active');
+    document.getElementById('rockOverlay').classList.remove('active');
+    document.getElementById('energyBar').style.width = '0%';
+    
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const laneCount = gameState.laneCount;
+    const laneWidth = canvas.width / laneCount;
+    const hitLineY = 400;
+    const config = levelConfig[gameState.currentLevel];
+    const noteSpeed = config.bpm * 2; // 随BPM调整速度
+    
+    updateHUD();
+    
+    const keyMap = laneCount === 4 
+        ? {'KeyD': 0, 'KeyF': 1, 'KeyJ': 2, 'KeyK': 3}
+        : {'KeyD': 0, 'KeyK': 1};
+    
+    const keyHandler = (e) => {
+        if (!gameState.isPlaying) return;
+        const lane = keyMap[e.code];
+        if (lane === undefined) return;
+        e.preventDefault();
+        
+        const currentTime = Date.now() - gameState.gameStartTime;
+        const chords = levelChords[gameState.currentLevel];
+        const chord = chords[Math.floor((currentTime / 1000) / (240 / config.bpm)) % chords.length];
+        
+        // 播放对应乐器声音
+        if (gameState.instrument === 'drum') {
+            const sounds = ['kick', 'hihat', 'snare', 'hihat'];
+            playDrumSound(sounds[lane] || 'kick');
+        } else {
+            const note = chord.notes[lane % chord.notes.length];
+            if (gameState.instrument === 'guitar') playGuitarSound(note, gameState.currentLevel);
+            else if (gameState.instrument === 'bass') playBassSound(note);
+            else if (gameState.instrument === 'keyboard') playKeyboardSound(note);
+        }
+        
+        let nearestNote = null;
+        let minTimeDiff = Infinity;
+        
+        gameState.notes.forEach(note => {
+            if (note.hit || note.lane !== lane) return;
+            const timeDiff = Math.abs(note.time - currentTime);
+            if (timeDiff < minTimeDiff && timeDiff < 250) {
+                minTimeDiff = timeDiff;
+                nearestNote = note;
+            }
+        });
+        
+        if (nearestNote) {
+            const x = nearestNote.lane * laneWidth + laneWidth / 2;
+            if (minTimeDiff <= 100) {
+                nearestNote.hit = true;
+                gameState.combo++;
+                gameState.perfectCount++;
+                gameState.score += 100 * (gameState.isRockMode ? 2 : 1);
+                addEnergy(10);
+                showJudgment('PERFECT', x, hitLineY);
+            } else if (minTimeDiff <= 180) {
+                nearestNote.hit = true;
+                gameState.combo++;
+                gameState.goodCount++;
+                gameState.score += 50 * (gameState.isRockMode ? 2 : 1);
+                addEnergy(5);
+                showJudgment('GOOD', x, hitLineY);
+            }
+            if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+            updateHUD();
+        }
+    };
+    
+    document.addEventListener('keydown', keyHandler);
+    window.gameKeyHandler = keyHandler;
+    
+    gameLoop = setInterval(() => {
+        if (!gameState.isPlaying) {
+            clearInterval(gameLoop);
+            return;
+        }
+        
+        const currentTime = Date.now() - gameState.gameStartTime;
+        const currentBeat = Math.floor(currentTime / (60000 / config.bpm));
+        
+        // 播放伴奏
+        if (currentBeat !== lastBeat) {
+            lastBeat = currentBeat;
+            
+            tracks.drum.forEach(evt => {
+                if (Math.abs(evt.time - currentTime) < 50) playDrumSound(evt.sound);
+            });
+            tracks.guitar.forEach(evt => {
+                if (Math.abs(evt.time - currentTime) < 50) playGuitarSound(evt.note, gameState.currentLevel);
+            });
+            tracks.bass.forEach(evt => {
+                if (Math.abs(evt.time - currentTime) < 50) playBassSound(evt.note);
+            });
+            tracks.keyboard.forEach(evt => {
+                if (Math.abs(evt.time - currentTime) < 50) playKeyboardSound(evt.note);
+            });
+        }
+        
+        // 更新进度条
+        const progress = Math.min(100, (currentTime / 22000) * 100);
+        document.getElementById('progressFill').style.width = progress + '%';
+        
+        // 绘制
+        ctx.fillStyle = gameState.isRockMode ? '#1a0510' : '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        if (gameState.isRockMode && Math.floor(currentTime / 100) % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 0, 102, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // 轨道线
+        ctx.strokeStyle = gameState.isRockMode ? '#ff0066' : '#333';
+        ctx.lineWidth = 2;
+        for (let i = 1; i < laneCount; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * laneWidth, 0);
+            ctx.lineTo(i * laneWidth, canvas.height);
+            ctx.stroke();
+        }
+        
+        // 判定线
+        ctx.strokeStyle = gameState.isRockMode ? '#ffcc00' : '#ff0066';
+        ctx.lineWidth = 4;
+        ctx.shadowColor = ctx.strokeStyle;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(0, hitLineY);
+        ctx.lineTo(canvas.width, hitLineY);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        
+        // 按键提示
+        ctx.font = '16px "Press Start 2P"';
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        const keyLabels = laneCount === 4 ? ['D', 'F', 'J', 'K'] : ['D', 'K'];
+        keyLabels.forEach((key, i) => {
+            ctx.fillText(key, i * laneWidth + laneWidth / 2, hitLineY + 30);
+        });
+        
+        // 绘制音符
+        gameState.notes.forEach(note => {
+            if (note.hit) return;
+            
+            const timeDiff = note.time - currentTime;
+            const y = hitLineY - (timeDiff / 1000) * noteSpeed;
+            
+            if (y > -50 && y < canvas.height + 50) {
+                const x = note.lane * laneWidth + laneWidth / 2;
+                const color = levelConfig[gameState.currentLevel].color;
+                ctx.shadowColor = gameState.isRockMode ? '#ffcc00' : color;
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = gameState.isRockMode ? '#ffcc00' : color;
+                const w = laneWidth * 0.7;
+                ctx.fillRect(x - w/2, y - 10, w, 20);
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.fillRect(x - w/2 + 4, y - 6, w - 8, 4);
+                ctx.shadowBlur = 0;
+            }
+            
+            if (y > canvas.height + 30) {
+                note.hit = true;
+                gameState.combo = 0;
+                gameState.missCount++;
+                addEnergy(-10);
+                showJudgment('MISS', note.lane * laneWidth + laneWidth / 2, hitLineY);
+                updateHUD();
+            }
+        });
+        
+        if (currentTime > 23000) endGame();
+    }, 1000/60);
+}
+
+function addEnergy(amount) {
+    gameState.bandEnergy = Math.max(0, Math.min(100, gameState.bandEnergy + amount));
+    document.getElementById('energyBar').style.width = gameState.bandEnergy + '%';
+    
+    if (gameState.bandEnergy >= 80 && !gameState.isRockMode) {
+        gameState.isRockMode = true;
+        document.getElementById('rockModeText').classList.add('active');
+        document.getElementById('rockOverlay').classList.add('active');
+    } else if (gameState.bandEnergy < 50 && gameState.isRockMode) {
+        gameState.isRockMode = false;
+        document.getElementById('rockModeText').classList.remove('active');
+        document.getElementById('rockOverlay').classList.remove('active');
+    }
+}
+
+function showJudgment(text, x, y) {
+    const el = document.createElement('div');
+    el.className = `judgment ${text.toLowerCase()}`;
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = (y - 50) + 'px';
+    document.getElementById('gameScreen').appendChild(el);
+    setTimeout(() => el.remove(), 400);
+}
+
+function updateHUD() {
+    document.getElementById('scoreDisplay').textContent = Math.floor(gameState.score).toString().padStart(6, '0');
+    document.getElementById('comboDisplay').textContent = gameState.combo;
+    
+    const comboDisplay = document.getElementById('comboDisplay');
+    if (gameState.combo >= 5) {
+        comboDisplay.classList.add('active');
+        document.getElementById('comboNumber').textContent = gameState.combo;
+    } else {
+        comboDisplay.classList.remove('active');
+    }
+}
+
+function endGame() {
+    gameState.isPlaying = false;
+    clearInterval(gameLoop);
+    if (window.gameKeyHandler) document.removeEventListener('keydown', window.gameKeyHandler);
+    document.getElementById('rockOverlay').classList.remove('active');
+    
+    const total = gameState.perfectCount + gameState.goodCount + gameState.missCount;
+    const accuracy = total > 0 ? ((gameState.perfectCount + gameState.goodCount * 0.5) / total * 100) : 0;
+    
+    let rank = 'C';
+    let rankColor = '#ff6666';
+    if (accuracy >= 95) { rank = 'S'; rankColor = '#ffcc00'; }
+    else if (accuracy >= 85) { rank = 'A'; rankColor = '#00ff99'; }
+    else if (accuracy >= 70) { rank = 'B'; rankColor = '#66ccff'; }
+    
+    // 解锁下一关
+    if (rank !== 'C' && gameState.currentLevel >= gameState.unlockedLevel && gameState.currentLevel < 5) {
+        gameState.unlockedLevel = gameState.currentLevel + 1;
+        document.getElementById('nextLevelBtn').style.display = 'block';
+        document.getElementById('resultTitle').textContent = '演出成功! 解锁下一关!';
+    } else {
+        document.getElementById('nextLevelBtn').style.display = 'none';
+        document.getElementById('resultTitle').textContent = '演出结束!';
+    }
+    
+    document.getElementById('finalScore').textContent = Math.floor(gameState.score);
+    document.getElementById('finalRank').textContent = rank;
+    document.getElementById('finalRank').style.color = rankColor;
+    document.getElementById('perfectCount').textContent = gameState.perfectCount;
+    document.getElementById('goodCount').textContent = gameState.goodCount;
+    document.getElementById('missCount').textContent = gameState.missCount;
+    document.getElementById('finalMaxCombo').textContent = gameState.maxCombo;
+    
+    updateLevelScreen();
+    showScreen('resultScreen');
+}
+
+// 初始化
+updateLevelScreen();
+console.log('🎸 来组乐队吧 v2.5 - 5关卡版已加载');
+</script>
+</body>
+</html>
