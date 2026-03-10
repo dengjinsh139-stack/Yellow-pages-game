@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎹 音游原型 #3 - 钢琴瀑布流</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+        h1 { margin: 10px 0; font-size: 1.5rem; text-shadow: 0 0 20px #00d4ff; }
+        #gameCanvas {
+            border: 3px solid #00d4ff;
+            border-radius: 5px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+        }
+        button {
+            padding: 12px 25px;
+            background: #00d4ff;
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover { background: #00ffff; transform: scale(1.05); }
+        .keys-display {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+        .score {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎹 原型 #3 - 钢琴瀑布流 (Synthesia风)</h1>
+    <canvas id="gameCanvas" width="560" height="500"></canvas>
+    <div class="score">得分: <span id="score">0</span> | 连击: <span id="combo">0</span></div>
+    <div class="controls">
+        <button onclick="startGame()">▶ 开始</button>
+        <button onclick="resetGame()">↺ 重置</button>
+    </div>
+    <div class="keys-display">白键: A S D F G H J K L ; | 黑键: W E T Y U O P</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const WHITE_KEYS = 8;
+const KEY_WIDTH = canvas.width / WHITE_KEYS;
+const KEY_HEIGHT = 100;
+const NOTE_SPEED = 3;
+const HIT_ZONE_Y = canvas.height - KEY_HEIGHT;
+
+// 钢琴键布局 (1 = 白键, 0 = 黑键位置)
+const KEY_LAYOUT = [
+    { type: 'white', note: 'C', hasBlack: true, blackNote: 'C#' },
+    { type: 'white', note: 'D', hasBlack: true, blackNote: 'D#' },
+    { type: 'white', note: 'E', hasBlack: false },
+    { type: 'white', note: 'F', hasBlack: true, blackNote: 'F#' },
+    { type: 'white', note: 'G', hasBlack: true, blackNote: 'G#' },
+    { type: 'white', note: 'A', hasBlack: true, blackNote: 'A#' },
+    { type: 'white', note: 'B', hasBlack: false },
+    { type: 'white', note: 'C2', hasBlack: true, blackNote: 'C#2' }
+];
+
+const WHITE_KEY_MAP = {
+    'KeyA': 0, 'KeyS': 1, 'KeyD': 2, 'KeyF': 3,
+    'KeyG': 4, 'KeyH': 5, 'KeyJ': 6, 'KeyK': 7
+};
+
+const BLACK_KEY_MAP = {
+    'KeyW': 0, 'KeyE': 1, 'KeyT': 3, 'KeyY': 4, 'KeyU': 5, 'KeyO': 6, 'KeyP': 7
+};
+
+let fallingNotes = [];
+let score = 0;
+let combo = 0;
+let gameRunning = false;
+let animationId;
+let pressedKeys = new Set();
+
+class FallingNote {
+    constructor(keyIndex, isBlack) {
+        this.keyIndex = keyIndex;
+        this.isBlack = isBlack;
+        this.y = -50;
+        this.height = 60;
+        this.hit = false;
+        this.missed = false;
+        this.color = isBlack ? '#ff6b6b' : '#4ecdc4';
+    }
+
+    update() {
+        this.y += NOTE_SPEED;
+        if (this.y > canvas.height) {
+            this.missed = true;
+            combo = 0;
+        }
+    }
+
+    draw() {
+        if (this.hit || this.missed) return;
+        
+        const x = this.isBlack 
+            ? this.keyIndex * KEY_WIDTH + KEY_WIDTH * 0.7
+            : this.keyIndex * KEY_WIDTH;
+        const width = this.isBlack ? KEY_WIDTH * 0.6 : KEY_WIDTH - 2;
+        
+        // 发光效果
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 15;
+        
+        // 渐变填充
+        const grad = ctx.createLinearGradient(0, this.y, 0, this.y + this.height);
+        grad.addColorStop(0, this.color);
+        grad.addColorStop(1, this.color + '80');
+        ctx.fillStyle = grad;
+        
+        if (this.isBlack) {
+            ctx.beginPath();
+            ctx.roundRect(x - width/2, this.y, width, this.height, 5);
+            ctx.fill();
+        } else {
+            ctx.fillRect(x + 1, this.y, width, this.height);
+        }
+        
+        ctx.shadowBlur = 0;
+    }
+
+    checkHit() {
+        return this.y + this.height >= HIT_ZONE_Y && this.y <= HIT_ZONE_Y + KEY_HEIGHT;
+    }
+}
+
+function drawPiano() {
+    // 背景
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 白键
+    for (let i = 0; i < WHITE_KEYS; i++) {
+        const x = i * KEY_WIDTH;
+        const isPressed = pressedKeys.has(`white_${i}`);
+        
+        ctx.fillStyle = isPressed ? '#4ecdc4' : '#f0f0f0';
+        ctx.fillRect(x, HIT_ZONE_Y, KEY_WIDTH - 1, KEY_HEIGHT);
+        
+        // 键边框
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, HIT_ZONE_Y, KEY_WIDTH - 1, KEY_HEIGHT);
+        
+        // 字母标签
+        ctx.fillStyle = '#333';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        const keyChar = ['A','S','D','F','G','H','J','K'][i];
+        ctx.fillText(keyChar, x + KEY_WIDTH/2, HIT_ZONE_Y + KEY_HEIGHT - 15);
+    }
+    
+    // 黑键
+    const blackKeyIndices = [0, 1, 3, 4, 5, 6, 7];
+    const blackKeyChars = ['W','E','T','Y','U','O','P'];
+    let blackKeyIdx = 0;
+    
+    for (let i = 0; i < WHITE_KEYS; i++) {
+        if (KEY_LAYOUT[i].hasBlack) {
+            const x = i * KEY_WIDTH + KEY_WIDTH * 0.7;
+            const isPressed = pressedKeys.has(`black_${i}`);
+            
+            ctx.fillStyle = isPressed ? '#ff6b6b' : '#222';
+            ctx.fillRect(x - KEY_WIDTH * 0.3, HIT_ZONE_Y, KEY_WIDTH * 0.6, KEY_HEIGHT * 0.6);
+            
+            // 标签
+            ctx.fillStyle = '#888';
+            ctx.font = '12px Arial';
+            ctx.fillText(blackKeyChars[blackKeyIdx], x, HIT_ZONE_Y + KEY_HEIGHT * 0.6 - 8);
+            
+            blackKeyIdx++;
+        }
+    }
+    
+    // 判定线
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, HIT_ZONE_Y);
+    ctx.lineTo(canvas.width, HIT_ZONE_Y);
+    ctx.stroke();
+}
+
+function spawnNote() {
+    if (Math.random() < 0.025) {
+        const isBlack = Math.random() < 0.3;
+        if (isBlack) {
+            const blackIndices = [0, 1, 3, 4, 5, 6, 7];
+            const idx = blackIndices[Math.floor(Math.random() * blackIndices.length)];
+            fallingNotes.push(new FallingNote(idx, true));
+        } else {
+            fallingNotes.push(new FallingNote(Math.floor(Math.random() * WHITE_KEYS), false));
+        }
+    }
+}
+
+function checkKeyHit(keyType, keyIndex) {
+    const targetY = HIT_ZONE_Y;
+    const perfectRange = 20;
+    const goodRange = 40;
+    
+    for (let note of fallingNotes) {
+        if (note.hit || note.missed) continue;
+        if (note.isBlack !== (keyType === 'black')) continue;
+        if (note.keyIndex !== keyIndex) continue;
+        
+        const dist = Math.abs(note.y + note.height - targetY);
+        
+        if (dist <= perfectRange) {
+            note.hit = true;
+            score += 100;
+            combo++;
+            showEffect(keyIndex, note.isBlack, 'PERFECT!', '#ffd700');
+            return;
+        } else if (dist <= goodRange) {
+            note.hit = true;
+            score += 50;
+            combo++;
+            showEffect(keyIndex, note.isBlack, 'GOOD', '#4ecdc4');
+            return;
+        }
+    }
+}
+
+let effects = [];
+function showEffect(keyIndex, isBlack, text, color) {
+    const x = isBlack 
+        ? keyIndex * KEY_WIDTH + KEY_WIDTH * 0.7
+        : keyIndex * KEY_WIDTH + KEY_WIDTH / 2;
+    effects.push({ x, y: HIT_ZONE_Y - 30, text, color, alpha: 1, scale: 1 });
+}
+
+function updateScore() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('combo').textContent = combo;
+}
+
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    spawnNote();
+    
+    fallingNotes = fallingNotes.filter(n => !n.hit && !n.missed);
+    fallingNotes.forEach(note => {
+        note.update();
+        note.draw();
+    });
+    
+    drawPiano();
+    
+    effects = effects.filter(e => {
+        ctx.save();
+        ctx.globalAlpha = e.alpha;
+        ctx.fillStyle = e.color;
+        ctx.font = `bold ${20 * e.scale}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText(e.text, e.x, e.y);
+        ctx.restore();
+        e.alpha -= 0.03;
+        e.y -= 2;
+        e.scale += 0.02;
+        return e.alpha > 0;
+    });
+    
+    updateScore();
+    animationId = requestAnimationFrame(gameLoop);
+}
+
+document.addEventListener('keydown', (e) => {
+    if (!gameRunning) return;
+    
+    if (WHITE_KEY_MAP[e.code] !== undefined) {
+        e.preventDefault();
+        const idx = WHITE_KEY_MAP[e.code];
+        pressedKeys.add(`white_${idx}`);
+        checkKeyHit('white', idx);
+    }
+    
+    const blackIndices = [0, 1, 3, 4, 5, 6, 7];
+    const blackChars = ['KeyW', 'KeyE', 'KeyT', 'KeyY', 'KeyU', 'KeyO', 'KeyP'];
+    const blackIdx = blackChars.indexOf(e.code);
+    if (blackIdx !== -1) {
+        e.preventDefault();
+        const idx = blackIndices[blackIdx];
+        pressedKeys.add(`black_${idx}`);
+        checkKeyHit('black', idx);
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (WHITE_KEY_MAP[e.code] !== undefined) {
+        pressedKeys.delete(`white_${WHITE_KEY_MAP[e.code]}`);
+    }
+    const blackChars = ['KeyW', 'KeyE', 'KeyT', 'KeyY', 'KeyU', 'KeyO', 'KeyP'];
+    const blackIndices = [0, 1, 3, 4, 5, 6, 7];
+    const idx = blackChars.indexOf(e.code);
+    if (idx !== -1) {
+        pressedKeys.delete(`black_${blackIndices[idx]}`);
+    }
+});
+
+function startGame() {
+    if (gameRunning) return;
+    gameRunning = true;
+    fallingNotes = [];
+    score = 0;
+    combo = 0;
+    updateScore();
+    gameLoop();
+}
+
+function resetGame() {
+    gameRunning = false;
+    cancelAnimationFrame(animationId);
+    fallingNotes = [];
+    score = 0;
+    combo = 0;
+    effects = [];
+    pressedKeys.clear();
+    updateScore();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPiano();
+}
+
+drawPiano();
+</script>
+</body>
+</html>
