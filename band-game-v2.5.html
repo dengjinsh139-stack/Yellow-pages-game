@@ -1,203 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>来组乐队吧 v2.5 | 5关卡版</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Press Start 2P', cursive;
-            background: #0a0a0a;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-        }
-        .title {
-            font-size: 1.2rem;
-            color: #ff0066;
-            text-shadow: 4px 4px 0 #660033;
-            margin: 20px 0 15px;
-            text-align: center;
-        }
-        .screen {
-            width: 900px;
-            max-width: 95vw;
-            height: 650px;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 4px solid #333;
-            position: relative;
-            display: none;
-        }
-        .screen.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .subtitle {
-            font-size: 0.7rem;
-            color: #00ff99;
-            margin-bottom: 20px;
-        }
-        .level-select {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .level-card {
-            width: 150px;
-            height: 200px;
-            background: linear-gradient(145deg, #2a2a4e, #1a1a3e);
-            border: 4px solid #444;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .level-card:hover:not(.locked) {
-            border-color: #ff0066;
-            transform: scale(1.05);
-        }
-        .level-card.locked {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .level-num { font-size: 2.5rem; color: #ffcc00; margin-bottom: 10px; }
-        .level-card.locked .level-num { color: #444; }
-        .level-name { font-size: 0.55rem; color: #fff; text-align: center; }
-        .level-bpm { font-size: 0.45rem; color: #888; }
-        .level-stars { font-size: 0.6rem; color: #ffcc00; margin-top: 10px; }
-        .instrument-select { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-        .instrument-card {
-            width: 160px; height: 200px;
-            background: linear-gradient(145deg, #2a2a4e, #1a1a3e);
-            border: 4px solid #444;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
-        .instrument-card:hover { border-color: #ff0066; transform: scale(1.05); }
-        .instrument-icon { font-size: 3rem; margin-bottom: 10px; }
-        .instrument-name { font-size: 0.65rem; color: #fff; }
-        .instrument-keys { font-size: 0.4rem; color: #00ff99; margin-top: 8px; padding: 4px 8px; border: 1px solid #00ff99; }
-        #gameCanvas { background: #0a0a1a; border: 2px solid #333; }
-        .hud { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; font-size: 0.6rem; }
-        .hud-item { display: flex; flex-direction: column; }
-        .hud-label { color: #888; font-size: 0.45rem; }
-        .hud-value { color: #ffcc00; font-size: 0.9rem; }
-        .energy-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: 400px; height: 25px; background: #1a1a3e; border: 3px solid #444; border-radius: 12px; overflow: hidden; }
-        .energy-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff0066, #ffcc00, #00ff99); }
-        .energy-label { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 0.5rem; color: #ffcc00; }
-        .level-indicator { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; background: rgba(255,0,102,0.3); padding: 8px 20px; border: 2px solid #ff0066; }
-        .btn { padding: 15px 40px; background: linear-gradient(145deg, #ff0066, #cc0052); border: 4px solid #fff; color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.7rem; cursor: pointer; margin-top: 20px; }
-        .back-btn { position: absolute; top: 15px; left: 15px; padding: 10px 20px; background: #333; border: 3px solid #555; color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1 class="title">🎸 来组乐队吧 v2.5</h1>
-    
-    <div id="levelScreen" class="screen active">
-        <p class="subtitle">▼ 选择演出场地 ▼</p>
-        <div class="level-select">
-            <div class="level-card" id="level-1" onclick="selectLevel(1)">
-                <div class="level-num">1</div>
-                <div class="level-name">车库练习</div>
-                <div class="level-bpm">BPM 80</div>
-                <div class="level-stars">⭐</div>
-            </div>
-            <div class="level-card locked" id="level-2" onclick="selectLevel(2)">
-                <div class="level-num">2</div>
-                <div class="level-name">俱乐部之夜</div>
-                <div class="level-bpm">BPM 100</div>
-                <div class="level-stars">⭐⭐</div>
-            </div>
-            <div class="level-card locked" id="level-3" onclick="selectLevel(3)">
-                <div class="level-num">3</div>
-                <div class="level-name">音乐节现场</div>
-                <div class="level-bpm">BPM 120</div>
-                <div class="level-stars">⭐⭐⭐</div>
-            </div>
-            <div class="level-card locked" id="level-4" onclick="selectLevel(4)">
-                <div class="level-num">4</div>
-                <div class="level-name">体育馆巡演</div>
-                <div class="level-bpm">BPM 140</div>
-                <div class="level-stars">⭐⭐⭐⭐</div>
-            </div>
-            <div class="level-card locked" id="level-5" onclick="selectLevel(5)">
-                <div class="level-num">5</div>
-                <div class="level-name">传奇演唱会</div>
-                <div class="level-bpm">BPM 160</div>
-                <div class="level-stars">⭐⭐⭐⭐⭐</div>
-            </div>
-        </div>
-        <p style="font-size: 0.45rem; color: #666; margin-top: 20px;">通关后解锁下一关</p>
-    </div>
 
-    <div id="instrumentScreen" class="screen">
-        <button class="back-btn" onclick="backToLevel()">← 返回</button>
-        <p class="subtitle">▼ 选择乐器 ▼</p>
-        <div class="instrument-select">
-            <div class="instrument-card" onclick="selectInstrument('drum')">
-                <div class="instrument-icon">🥁</div>
-                <div class="instrument-name">鼓手</div>
-                <div class="instrument-keys">D F J K</div>
-            </div>
-            <div class="instrument-card" onclick="selectInstrument('guitar')">
-                <div class="instrument-icon">🎸</div>
-                <div class="instrument-name">吉他</div>
-                <div class="instrument-keys">D J</div>
-            </div>
-            <div class="instrument-card" onclick="selectInstrument('bass')">
-                <div class="instrument-icon">🎸</div>
-                <div class="instrument-name">贝斯</div>
-                <div class="instrument-keys">D J</div>
-            </div>
-            <div class="instrument-card" onclick="selectInstrument('keyboard')">
-                <div class="instrument-icon">🎹</div>
-                <div class="instrument-name">键盘</div>
-                <div class="instrument-keys">D F J K</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="gameScreen" class="screen">
-        <button class="back-btn" onclick="backToLevel()">← 退出</button>
-        <div class="level-indicator" id="levelIndicator">关卡 1</div>
-        <div class="hud">
-            <div class="hud-item">
-                <div class="hud-label">SCORE</div>
-                <div class="hud-value" id="scoreDisplay">000000</div>
-            </div>
-            <div class="hud-item">
-                <div class="hud-label">COMBO</div>
-                <div class="hud-value" id="comboDisplay">0</div>
-            </div>
-        </div>
-        <div class="energy-container">
-            <div class="energy-label">BAND ENERGY</div>
-            <div class="energy-bar" id="energyBar"></div>
-        </div>
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
-    </div>
-
-    <div id="resultScreen" class="screen">
-        <div class="result-title" style="font-size: 1.5rem; color: #ffcc00; margin-bottom: 15px;">演出结束!</div>
-        <div class="result-score" id="finalScore" style="font-size: 3rem;">0</div>
-        <div class="result-rank" id="finalRank" style="font-size: 4rem;">S</div>
-        <div id="nextLevelBtn" style="display: none;">
-            <button class="btn" onclick="goToNextLevel()">下一关 →</button>
-        </div>
-        <button class="btn" onclick="backToLevel()">返回关卡选择</button>
-    </div>
-
-<script>
 const levelConfig = {
     1: { name: '车库练习', bpm: 80 },
     2: { name: '俱乐部之夜', bpm: 100 },
@@ -206,10 +7,15 @@ const levelConfig = {
     5: { name: '传奇演唱会', bpm: 160 }
 };
 
+const chords = [
+    [261.63, 329.63, 392.00], // C
+    [220.00, 261.63, 329.63], // Am
+    [349.23, 440.00, 261.63], // F
+    [392.00, 293.66, 349.23]  // G
+];
+
 let gameState = {
-    currentLevel: 1,
-    unlockedLevel: 1,
-    instrument: null,
+    currentLevel: 1, unlockedLevel: 1, instrument: null,
     score: 0, combo: 0, maxCombo: 0,
     perfectCount: 0, goodCount: 0, missCount: 0,
     bandEnergy: 0, isRockMode: false, isPlaying: false,
@@ -217,6 +23,146 @@ let gameState = {
 };
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let lastBeatTime = 0;
+let currentBeat = 0;
+
+// 鼓声
+function playDrum(type) {
+    const t = audioCtx.currentTime;
+    if (type === 'kick') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(150, t);
+        osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
+        gain.gain.setValueAtTime(0.8, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+        osc.start(t);
+        osc.stop(t + 0.3);
+    } else if (type === 'snare') {
+        const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.2, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 1000;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.4, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start(t);
+        noise.stop(t + 0.2);
+    } else if (type === 'hihat') {
+        const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 8000;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.15, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start(t);
+        noise.stop(t + 0.05);
+    }
+}
+
+// 吉他声
+function playGuitar(note) {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = note;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 2500;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.4);
+}
+
+// 贝斯声
+function playBass(note) {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    osc.type = 'square';
+    osc.frequency.value = note / 2;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 500;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.3, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.5);
+}
+
+// 键盘声
+function playKeyboard(note) {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = note;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.6);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.6);
+}
+
+// 播放伴奏（其他3个乐器）
+function playBackingTrack(beat, level) {
+    const beatInBar = beat % 4;
+    const chordIdx = Math.floor(beat / 4) % 4;
+    const chord = chords[chordIdx];
+    
+    // 鼓 - 总是播放（除非玩家是鼓手）
+    if (gameState.instrument !== 'drum') {
+        playDrum('hihat');
+        if (beatInBar === 0 || beatInBar === 2) playDrum('kick');
+        if (beatInBar === 1 || beatInBar === 3) setTimeout(() => playDrum('snare'), 50);
+    }
+    
+    // 吉他 - 除非玩家是吉他手
+    if (gameState.instrument !== 'guitar') {
+        if (beatInBar === 0) playGuitar(chord[0]);
+        if (level >= 2 && beatInBar === 2) playGuitar(chord[1]);
+    }
+    
+    // 贝斯 - 除非玩家是贝斯手
+    if (gameState.instrument !== 'bass') {
+        if (beatInBar === 0) playBass(chord[0]);
+        if (beatInBar === 2) playBass(chord[2]);
+    }
+    
+    // 键盘 - 除非玩家是键盘手
+    if (gameState.instrument !== 'keyboard') {
+        if (beatInBar === 0) {
+            playKeyboard(chord[0]);
+            setTimeout(() => playKeyboard(chord[1]), 100);
+        }
+    }
+}
 
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -233,6 +179,17 @@ function selectLevel(level) {
 function selectInstrument(inst) {
     gameState.instrument = inst;
     gameState.laneCount = (inst === 'drum' || inst === 'keyboard') ? 4 : 2;
+    
+    // 更新音轨指示器
+    document.querySelectorAll('.track-item').forEach(el => {
+        el.classList.remove('active', 'player');
+    });
+    ['drum', 'guitar', 'bass', 'keyboard'].forEach(key => {
+        const el = document.getElementById('track-' + key);
+        if (key === inst) el.classList.add('player');
+        else el.classList.add('active');
+    });
+    
     showScreen('gameScreen');
     startGame();
 }
@@ -255,6 +212,31 @@ function goToNextLevel() {
     if (gameState.currentLevel < 5) selectLevel(gameState.currentLevel + 1);
 }
 
+function generateNotes(level, instrument) {
+    const notes = [];
+    const bpm = levelConfig[level].bpm;
+    const beatInterval = 60000 / bpm;
+    
+    for (let beat = 0; beat < 32; beat++) {
+        const time = beat * beatInterval + 2000;
+        const beatInBar = beat % 4;
+        
+        if (instrument === 'drum') {
+            if (beat % 2 === 0) notes.push({ time, lane: beatInBar % 4, hit: false });
+        } else if (instrument === 'guitar') {
+            if (beatInBar === 0 || beatInBar === 2) notes.push({ time, lane: 0, hit: false });
+        } else if (instrument === 'bass') {
+            if (beat % 2 === 0) notes.push({ time, lane: 0, hit: false });
+        } else if (instrument === 'keyboard') {
+            if (beatInBar === 0) {
+                notes.push({ time, lane: 0, hit: false });
+                if (level >= 3) notes.push({ time: time + 150, lane: 1, hit: false });
+            }
+        }
+    }
+    return notes;
+}
+
 function startGame() {
     gameState.score = 0; gameState.combo = 0; gameState.maxCombo = 0;
     gameState.perfectCount = 0; gameState.goodCount = 0; gameState.missCount = 0;
@@ -262,6 +244,8 @@ function startGame() {
     gameState.isPlaying = true;
     gameState.notes = generateNotes(gameState.currentLevel, gameState.instrument);
     gameState.gameStartTime = Date.now();
+    currentBeat = 0;
+    lastBeatTime = 0;
     
     if (audioCtx.state === 'suspended') audioCtx.resume();
     
@@ -272,6 +256,7 @@ function startGame() {
     const hitLineY = 400;
     const bpm = levelConfig[gameState.currentLevel].bpm;
     const noteSpeed = bpm * 2;
+    const beatInterval = 60000 / bpm;
     
     updateHUD();
     
@@ -284,6 +269,19 @@ function startGame() {
         e.preventDefault();
         
         const currentTime = Date.now() - gameState.gameStartTime;
+        const chord = chords[Math.floor((currentTime / 1000) / (240 / bpm)) % 4];
+        
+        // 播放玩家乐器声音
+        if (gameState.instrument === 'drum') {
+            const sounds = ['kick', 'hihat', 'snare', 'hihat'];
+            playDrum(sounds[lane] || 'kick');
+        } else if (gameState.instrument === 'guitar') {
+            playGuitar(chord[lane % 3]);
+        } else if (gameState.instrument === 'bass') {
+            playBass(chord[lane % 3]);
+        } else if (gameState.instrument === 'keyboard') {
+            playKeyboard(chord[lane % 3]);
+        }
         
         let nearestNote = null, minTimeDiff = Infinity;
         gameState.notes.forEach(function(note) {
@@ -301,12 +299,10 @@ function startGame() {
                 gameState.combo++;
                 gameState.perfectCount++;
                 gameState.score += 100;
-                showJudgment('PERFECT', nearestNote.lane * laneWidth + laneWidth / 2, hitLineY);
             } else {
                 gameState.combo++;
                 gameState.goodCount++;
                 gameState.score += 50;
-                showJudgment('GOOD', nearestNote.lane * laneWidth + laneWidth / 2, hitLineY);
             }
             if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
             updateHUD();
@@ -321,6 +317,14 @@ function startGame() {
         
         const currentTime = Date.now() - gameState.gameStartTime;
         
+        // 检查是否需要播放伴奏
+        const beat = Math.floor(currentTime / beatInterval);
+        if (beat > currentBeat) {
+            currentBeat = beat;
+            playBackingTrack(beat, gameState.currentLevel);
+        }
+        
+        // 绘制
         ctx.fillStyle = '#0a0a1a';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
@@ -375,44 +379,6 @@ function startGame() {
     }, 1000/60);
 }
 
-function generateNotes(level, instrument) {
-    const notes = [];
-    const bpm = levelConfig[level].bpm;
-    const beatInterval = 60000 / bpm;
-    const totalBeats = 30;
-    
-    for (let beat = 0; beat < totalBeats; beat++) {
-        const time = beat * beatInterval + 2000;
-        const beatInBar = beat % 4;
-        
-        if (instrument === 'drum') {
-            if (beat % 2 === 0) notes.push({ time, lane: beatInBar % 4, hit: false });
-        } else if (instrument === 'guitar') {
-            if (beatInBar === 0 || beatInBar === 2) notes.push({ time, lane: 0, hit: false });
-        } else if (instrument === 'bass') {
-            if (beat % 2 === 0) notes.push({ time, lane: 0, hit: false });
-        } else if (instrument === 'keyboard') {
-            if (beatInBar === 0) {
-                notes.push({ time, lane: 0, hit: false });
-                if (level >= 3) notes.push({ time: time + 150, lane: 1, hit: false });
-            }
-        }
-    }
-    return notes;
-}
-
-function showJudgment(text, x, y) {
-    const el = document.createElement('div');
-    el.className = 'judgment ' + text.toLowerCase();
-    el.textContent = text;
-    el.style.cssText = 'position:absolute;left:' + x + 'px;top:' + (y-50) + 'px;font-size:1.5rem;font-weight:bold;animation:fadeOut 0.4s;';
-    if (text === 'PERFECT') el.style.color = '#ffcc00';
-    else if (text === 'GOOD') el.style.color = '#00ff99';
-    else el.style.color = '#ff3333';
-    document.getElementById('gameScreen').appendChild(el);
-    setTimeout(function() { el.remove(); }, 400);
-}
-
 function updateHUD() {
     document.getElementById('scoreDisplay').textContent = Math.floor(gameState.score).toString().padStart(6, '0');
     document.getElementById('comboDisplay').textContent = gameState.combo;
@@ -444,7 +410,7 @@ function endGame() {
 }
 
 updateLevelScreen();
-console.log('v2.5 loaded');
+console.log('v2.5 with backing track loaded');
 </script>
 </body>
 </html>
