@@ -178,21 +178,13 @@ function generateTracks(playerInstrument, level) {
     
     tracks = { drum: [], guitar: [], bass: [], keyboard: [] };
     
-    // 根据关卡生成不同节奏复杂度
-    const complexity = level; // 1-5
-    
     for (let beat = 0; beat < totalBeats; beat++) {
         const time = beat * beatInterval + 2000;
         const beatInBar = beat % 4;
         const chord = chords[Math.floor(beat / 4) % chords.length];
         
-        // 鼓音轨 - 随关卡增加复杂度
         if (playerInstrument !== 'drum') {
             tracks.drum.push({ time, sound: 'hihat' });
-            
-            // 关卡1: 基础动次打次
-            // 关卡2+: 加入更多底鼓
-            // 关卡4+: 双踩
             if (beatInBar === 0 || (level >= 2 && beatInBar === 2) || (level >= 4 && beatInBar === 3)) {
                 tracks.drum.push({ time, sound: 'kick' });
             }
@@ -201,7 +193,6 @@ function generateTracks(playerInstrument, level) {
             }
         }
         
-        // 吉他音轨
         if (playerInstrument !== 'guitar') {
             if (beatInBar === 0 || (level >= 3 && beat % 2 === 0)) {
                 tracks.guitar.push({ time, note: chord.notes[0] });
@@ -211,7 +202,6 @@ function generateTracks(playerInstrument, level) {
             }
         }
         
-        // 贝斯音轨
         if (playerInstrument !== 'bass') {
             if (beatInBar === 0) {
                 tracks.bass.push({ time, note: chord.root });
@@ -220,7 +210,6 @@ function generateTracks(playerInstrument, level) {
             }
         }
         
-        // 键盘音轨
         if (playerInstrument !== 'keyboard') {
             if (beatInBar === 0) {
                 tracks.keyboard.push({ time, note: chord.notes[0] });
@@ -350,7 +339,6 @@ function generatePlayerNotes(level) {
     const totalBeats = Math.floor(duration / beatInterval);
     const inst = gameState.instrument;
     
-    // 随关卡增加音符密度
     const density = Math.min(level + 1, 4); 
     
     for (let beat = 0; beat < totalBeats; beat++) {
@@ -358,7 +346,6 @@ function generatePlayerNotes(level) {
         const beatInBar = beat % 4;
         
         if (inst === 'drum') {
-            // 关卡越高，鼓点越多
             if (beat % (6 - density) === 0) {
                 notes.push({ time, lane: beatInBar % 4, hit: false });
             }
@@ -413,7 +400,7 @@ function startGame() {
     const laneWidth = canvas.width / laneCount;
     const hitLineY = 400;
     const config = levelConfig[gameState.currentLevel];
-    const noteSpeed = config.bpm * 2; // 随BPM调整速度
+    const noteSpeed = config.bpm * 2;
     
     updateHUD();
     
@@ -431,7 +418,6 @@ function startGame() {
         const chords = levelChords[gameState.currentLevel];
         const chord = chords[Math.floor((currentTime / 1000) / (240 / config.bpm)) % chords.length];
         
-        // 播放对应乐器声音
         if (gameState.instrument === 'drum') {
             const sounds = ['kick', 'hihat', 'snare', 'hihat'];
             playDrumSound(sounds[lane] || 'kick');
@@ -488,7 +474,6 @@ function startGame() {
         const currentTime = Date.now() - gameState.gameStartTime;
         const currentBeat = Math.floor(currentTime / (60000 / config.bpm));
         
-        // 播放伴奏
         if (currentBeat !== lastBeat) {
             lastBeat = currentBeat;
             
@@ -506,11 +491,9 @@ function startGame() {
             });
         }
         
-        // 更新进度条
         const progress = Math.min(100, (currentTime / 22000) * 100);
         document.getElementById('progressFill').style.width = progress + '%';
         
-        // 绘制
         ctx.fillStyle = gameState.isRockMode ? '#1a0510' : '#0a0a1a';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
@@ -519,7 +502,6 @@ function startGame() {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         
-        // 轨道线
         ctx.strokeStyle = gameState.isRockMode ? '#ff0066' : '#333';
         ctx.lineWidth = 2;
         for (let i = 1; i < laneCount; i++) {
@@ -529,7 +511,6 @@ function startGame() {
             ctx.stroke();
         }
         
-        // 判定线
         ctx.strokeStyle = gameState.isRockMode ? '#ffcc00' : '#ff0066';
         ctx.lineWidth = 4;
         ctx.shadowColor = ctx.strokeStyle;
@@ -540,7 +521,6 @@ function startGame() {
         ctx.stroke();
         ctx.shadowBlur = 0;
         
-        // 按键提示
         ctx.font = '16px "Press Start 2P"';
         ctx.fillStyle = '#666';
         ctx.textAlign = 'center';
@@ -549,7 +529,6 @@ function startGame() {
             ctx.fillText(key, i * laneWidth + laneWidth / 2, hitLineY + 30);
         });
         
-        // 绘制音符
         gameState.notes.forEach(note => {
             if (note.hit) return;
             
@@ -636,7 +615,6 @@ function endGame() {
     else if (accuracy >= 85) { rank = 'A'; rankColor = '#00ff99'; }
     else if (accuracy >= 70) { rank = 'B'; rankColor = '#66ccff'; }
     
-    // 解锁下一关
     if (rank !== 'C' && gameState.currentLevel >= gameState.unlockedLevel && gameState.currentLevel < 5) {
         gameState.unlockedLevel = gameState.currentLevel + 1;
         document.getElementById('nextLevelBtn').style.display = 'block';
@@ -658,7 +636,6 @@ function endGame() {
     showScreen('resultScreen');
 }
 
-// 初始化
 updateLevelScreen();
 console.log('🎸 来组乐队吧 v2.5 - 5关卡版已加载');
 </script>
