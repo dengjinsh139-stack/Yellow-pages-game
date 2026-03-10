@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎸 来组乐队吧 v2.3 | Let's Start a Band</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            image-rendering: pixelated;
+        }
+        
+        /* CRT扫描线效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.15) 2px,
+                rgba(0,0,0,0.15) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        /* 标题 */
+        .title {
+            font-size: 1.2rem;
+            color: #ff0066;
+            text-shadow: 4px 4px 0 #660033, -2px -2px 0 #ffcc00;
+            margin: 20px 0 15px;
+            text-align: center;
+            animation: glitch 3s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-2px, -2px); }
+            98% { transform: translate(2px, 2px); }
+        }
+        
+        /* 屏幕容器 */
+        .screen {
+            width: 900px;
+            max-width: 95vw;
+            height: 650px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 4px solid #333;
+            box-shadow: 0 0 50px rgba(255,0,102,0.2);
+            position: relative;
+            display: none;
+        }
+        
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 乐器选择 */
+        .subtitle {
+            font-size: 0.7rem;
+            color: #00ff99;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0,255,153,0.5);
+        }
+        
+        .instrument-select {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .instrument-card {
+            width: 180px;
+            height: 220px;
+            background: linear-gradient(145deg, #2a2a4e, #1a1a3e);
+            border: 4px solid #444;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .instrument-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+        
+        .instrument-card:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+        
+        .instrument-card:hover {
+            border-color: #ff0066;
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,0,102,0.5);
+        }
+        
+        .instrument-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        
+        .instrument-name {
+            font-size: 0.7rem;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .instrument-desc {
+            font-size: 0.45rem;
+            color: #888;
+            text-align: center;
+            line-height: 1.8;
+        }
+        
+        .instrument-keys {
+            font-size: 0.4rem;
+            color: #00ff99;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background: rgba(0,255,153,0.1);
+            border: 1px solid #00ff99;
+        }
+        
+        /* 游戏区域 */
+        #gameCanvas {
+            background: #0a0a1a;
+            border: 2px solid #333;
+        }
+        
+        /* HUD */
+        .hud {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.6rem;
+        }
+        
+        .hud-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .hud-label {
+            color: #888;
+            font-size: 0.45rem;
+        }
+        
+        .hud-value {
+            color: #ffcc00;
+            font-size: 0.9rem;
+            text-shadow: 0 0 10px rgba(255,204,0,0.5);
+        }
+        
+        /* Band Energy Bar */
+        .energy-container {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 25px;
+            background: #1a1a3e;
+            border: 3px solid #444;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .energy-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff0066, #ffcc00, #00ff99);
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 20px currentColor;
+        }
+        
+        .energy-label {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5rem;
+            color: #ffcc00;
+            text-shadow: 0 0 5px rgba(255,204,0,0.5);
+        }
+        
+        .rock-mode-text {
+            position: absolute;
+            top: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #ff0066;
+            text-shadow: 0 0 20px #ff0066;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .rock-mode-text.active {
+            opacity: 1;
+            animation: rockPulse 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes rockPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+        
+        /* 判定显示 */
+        .judgment {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 30px currentColor;
+            animation: judgmentAnim 0.4s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        @keyframes judgmentAnim {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            30% { transform: scale(1.3) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 0; }
+        }
+        
+        .judgment.perfect { color: #ffcc00; }
+        .judgment.good { color: #00ff99; }
+        .judgment.miss { color: #ff3333; }
+        
+        /* 按钮 */
+        .btn {
+            padding: 15px 40px;
+            background: linear-gradient(145deg, #ff0066, #cc0052);
+            border: 4px solid #fff;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255,0,102,0.6);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 结果屏幕 */
+        .result-title {
+            font-size: 1.5rem;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255,204,0,0.5);
+        }
+        
+        .result-score {
+            font-size: 3.5rem;
+            color: #fff;
+            margin: 20px 0;
+            text-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+        
+        .result-rank {
+            font-size: 5rem;
+            margin: 20px 0;
+            text-shadow: 0 0 40px currentColor;
+        }
+        
+        .result-stats {
+            display: flex;
+            gap: 40px;
+            margin: 30px 0;
+            font-size: 0.6rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #333;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* 倒计时 */
+        .countdown-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .countdown-number {
+            font-size: 8rem;
+            color: #ffcc00;
+            text-shadow: 0 0 50px rgba(255,204,0,0.8);
+            animation: countPulse 0.9s ease-out;
+        }
+        
+        @keyframes countPulse {
+            0% { transform: scale(2); opacity: 0; }
+            50% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.5); opacity: 0; }
+        }
+        
+        .countdown-go {
+            font-size: 6rem;
+            color: #00ff99;
+            text-shadow: 0 0 50px rgba(0,255,153,0.8);
+            animation: goPulse 0.5s ease-out;
+        }
+        
+        @keyframes goPulse {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 10px 20px;
+            background: #333;
+            border: 3px solid #555;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: #ff0066;
+            border-color: #ff0066;
+        }
+        
+        /* 连击显示 */
+        .combo-display {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .combo-display.active {
+            opacity: 1;
+        }
+        
+        .combo-number {
+            font-size: 3rem;
+            color: #ffcc00;
+            text-shadow: 0 0 20px rgba(255,204,0,0.8);
+        }
+        
+        .combo-text {
+            font-size: 0.6rem;
+            color: #fff;
+        }
+        
+        /* ROCK MODE 特效 */
+        .rock-mode-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,0,102,0.2) 0%, transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 999;
+        }
+        
+        .rock-mode-overlay.active {
+            opacity: 1;
+            animation: rockFlash 0.2s ease-in-out infinite;
+        }
+        
+        @keyframes rockFlash {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">🎸 来组乐队吧 v2.3</h1>
+    
+    <!-- ROCK MODE 特效层 -->
+    <div class="rock-mode-overlay" id="rockOverlay"></div>
+    
+    <!-- 乐器选择屏幕 -->
+    <div id="instrumentScreen" class="screen active">
+        <p class="subtitle">▼ 选择你的乐器 ▼</p>
+        
+        <div class="instrument-select">
+            <div class="instrument-card" onclick="selectInstrument('drum')">
+                <div class="instrument-icon">🥁</div>
+                <div class="instrument-name">鼓手</div>
+                <div class="instrument-desc">x-x-x-x<br>密集节奏型</div>
+                <div class="instrument-keys">D F J K</div>
+            </div>
+            
+            <div class="instrument-card" onclick="selectInstrument('guitar')">
+                <div class="instrument-icon">🎸</div>
+                <div class="instrument-name">吉他</div>
+                <div class="instrument-desc">--x---x<br>切分节奏型</div>
+                <div class="instrument-keys">D K</div>
+            </div>
+            
+            <div class="instrument-card" onclick="selectInstrument('bass')">
+                <div class="instrument-icon">🎸</div>
+                <div class="instrument-name">贝斯</div>
+                <div class="instrument-desc">x---x-x<br>稳重低音型</div>
+                <div class="instrument-keys">D K</div>
+            </div>
+            
+            <div class="instrument-card" onclick="selectInstrument('keyboard')">
+                <div class="instrument-icon">🎹</div>
+                <div class="instrument-name">键盘</div>
+                <div class="instrument-desc">x-xx-x<br>复合和弦型</div>
+                <div class="instrument-keys">D F J K</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 游戏屏幕 -->
+    <div id="gameScreen" class="screen">
+        <button class="back-btn" onclick="backToMenu()">← 退出</button>
+        
+        <div class="hud">
+            <div class="hud-item">
+                <div class="hud-label">SCORE</div>
+                <div class="hud-value" id="scoreDisplay">000000</div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">MAX COMBO</div>
+                <div class="hud-value" id="maxComboDisplay">0</div>
+            </div>
+        </div>
+        
+        <div class="energy-container">
+            <div class="energy-label">BAND ENERGY</div>
+            <div class="energy-bar" id="energyBar"></div>
+        </div>
+        
+        <div class="rock-mode-text" id="rockModeText">🤘 ROCK MODE! 🤘</div>
+        
+        <div class="combo-display" id="comboDisplay">
+            <div class="combo-number" id="comboNumber">0</div>
+            <div class="combo-text">COMBO!</div>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="520"></canvas>
+    </div>
+    
+    <!-- 结果屏幕 -->
+    <div id="resultScreen" class="screen">
+        <div class="result-title">演出结束!</div>
+        <div class="result-score" id="finalScore">0</div>
+        <div class="result-rank" id="finalRank">S</div>
+        
+        <div class="result-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="perfectCount" style="color: #ffcc00;">0</div>
+                <div>PERFECT</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="goodCount" style="color: #00ff99;">0</div>
+                <div>GOOD</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="missCount" style="color: #ff3333;">0</div>
+                <div>MISS</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="finalMaxCombo" style="color: #66ccff;">0</div>
+                <div>MAX COMBO</div>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="backToMenu()">再来一次</button>
+    </div>
+    
+    <script>
+// ==================== 游戏状态 ====================
+let gameState = {
+    instrument: null,
+    score: 0,
+    combo: 0,
+    maxCombo: 0,
+    perfectCount: 0,
+    goodCount: 0,
+    missCount: 0,
+    bandEnergy: 0,
+    isRockMode: false,
+    isPlaying: false,
+    notes: [],
+    gameStartTime: 0,
+    laneCount: 4
+};
+
+// ==================== 音频系统 ====================
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// 乐器声音合成
+const instrumentSounds = {
+    // 鼓声 - 噪声+低频
+    drum: (freq = 100) => {
+        const t = audioCtx.currentTime;
+        
+        // 噪声部分 (嘶嘶声)
+        const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseBuffer.length; i++) {
+            output[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        noiseFilter.frequency.value = 1000;
+        
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.3, t);
+        noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+        
+        noise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+        
+        // 低频部分 (咚声)
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
+        
+        const oscGain = audioCtx.createGain();
+        oscGain.gain.setValueAtTime(0.8, t);
+        oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+        
+        osc.connect(oscGain);
+        oscGain.connect(audioCtx.destination);
+        
+        noise.start(t);
+        noise.stop(t + 0.1);
+        osc.start(t);
+        osc.stop(t + 0.2);
+    },
+    
+    // 吉他声 - 锯齿波+失真
+    guitar: (freq = 330) => {
+        const t = audioCtx.currentTime;
+        
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.value = freq;
+        
+        // 失真效果
+        const distortion = audioCtx.createWaveShaper();
+        distortion.curve = makeDistortionCurve(50);
+        
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 2000;
+        
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+        
+        osc.connect(distortion);
+        distortion.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start(t);
+        osc.stop(t + 0.4);
+    },
+    
+    // 贝斯声 - 方波低频
+    bass: (freq = 110) => {
+        const t = audioCtx.currentTime;
+        
+        const osc = audioCtx.createOscillator();
+        osc.type = 'square';
+        osc.frequency.value = freq;
+        
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 800;
+        
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.4, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+        
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start(t);
+        osc.stop(t + 0.5);
+    },
+    
+    // 键盘声 - 正弦波清脆
+    keyboard: (freq = 523) => {
+        const t = audioCtx.currentTime;
+        
+        // 主音
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        
+        // 泛音
+        const osc2 = audioCtx.createOscillator();
+        osc2.type = 'triangle';
+        osc2.frequency.value = freq * 2;
+        
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.6);
+        
+        const gain2 = audioCtx.createGain();
+        gain2.gain.setValueAtTime(0.1, t);
+        gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+        
+        osc.connect(gain);
+        osc2.connect(gain2);
+        gain.connect(audioCtx.destination);
+        gain2.connect(audioCtx.destination);
+        
+        osc.start(t);
+        osc2.start(t);
+        osc.stop(t + 0.6);
+        osc2.stop(t + 0.4);
+    }
+};
+
+function makeDistortionCurve(amount) {
+    const k = typeof amount === 'number' ? amount : 50;
+    const n_samples = 44100;
+    const curve = new Float32Array(n_samples);
+    const deg = Math.PI / 180;
+    for (let i = 0; i < n_samples; ++i) {
+        const x = i * 2 / n_samples - 1;
+        curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
+}
+
+// 播放当前乐器声音
+function playInstrumentSound() {
+    if (!gameState.instrument) return;
+    
+    const baseFreqs = {
+        drum: 100,
+        guitar: 330,
+        bass: 110,
+        keyboard: 523
+    };
+    
+    const soundFunc = instrumentSounds[gameState.instrument];
+    if (soundFunc) {
+        soundFunc(baseFreqs[gameState.instrument]);
+    }
+}
+
+// ==================== 屏幕切换 ====================
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+}
+
+function selectInstrument(inst) {
+    gameState.instrument = inst;
+    gameState.laneCount = (inst === 'drum' || inst === 'keyboard') ? 4 : 2;
+    startCountdown();
+}
+
+function backToMenu() {
+    gameState.isPlaying = false;
+    document.getElementById('rockOverlay').classList.remove('active');
+    showScreen('instrumentScreen');
+}
+
+// ==================== 倒计时 ====================
+function startCountdown() {
+    showScreen('gameScreen');
+    
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // 播放预备音
+    const countSound = (freq) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    };
+    
+    let count = 3;
+    const doCount = () => {
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.font = 'bold 120px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        if (count > 0) {
+            ctx.fillStyle = '#ffcc00';
+            ctx.shadowColor = '#ffcc00';
+            ctx.shadowBlur = 30;
+            ctx.fillText(count, canvas.width/2, canvas.height/2);
+            ctx.shadowBlur = 0;
+            countSound(440 + (4-count) * 110);
+            count--;
+            setTimeout(doCount, 1000);
+        } else {
+            ctx.fillStyle = '#00ff99';
+            ctx.shadowColor = '#00ff99';
+            ctx.shadowBlur = 30;
+            ctx.fillText('GO!', canvas.width/2, canvas.height/2);
+            ctx.shadowBlur = 0;
+            countSound(880);
+            setTimeout(startGame, 500);
+        }
+    };
+    
+    doCount();
+}
+
+// ==================== 谱面生成 ====================
+function generateNotes() {
+    const notes = [];
+    const duration = 20000; // 20秒
+    const bpm = 128;
+    const beatInterval = 60000 / bpm;
+    
+    const patterns = {
+        drum: [[0], [1], [2], [3], [0,2], [1,3], [0], [1,2,3]],
+        guitar: [[0], [], [1], [], [0], [0,1], [], [1]],
+        bass: [[0], [], [], [1], [0], [], [1], [0]],
+        keyboard: [[0,2], [1], [2,3], [0], [1,3], [2], [0,1], [3]]
+    };
+    
+    const pattern = patterns[gameState.instrument];
+    let patternIdx = 0;
+    
+    for (let t = 2000; t < duration - 2000; t += beatInterval) {
+        const lanes = pattern[patternIdx % pattern.length];
+        lanes.forEach(lane => {
+            notes.push({
+                time: t,
+                lane: lane,
+                hit: false,
+                missed: false
+            });
+        });
+        patternIdx++;
+    }
+    
+    return notes;
+}
+
+// ==================== 游戏核心 ====================
+let gameLoop = null;
+
+function startGame() {
+    // 重置状态
+    gameState.score = 0;
+    gameState.combo = 0;
+    gameState.maxCombo = 0;
+    gameState.perfectCount = 0;
+    gameState.goodCount = 0;
+    gameState.missCount = 0;
+    gameState.bandEnergy = 0;
+    gameState.isRockMode = false;
+    gameState.isPlaying = true;
+    gameState.notes = generateNotes();
+    gameState.gameStartTime = Date.now();
+    
+    document.getElementById('rockModeText').classList.remove('active');
+    document.getElementById('rockOverlay').classList.remove('active');
+    
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const laneCount = gameState.laneCount;
+    const laneWidth = canvas.width / laneCount;
+    const hitLineY = 420;
+    const noteSpeed = 250;
+    
+    updateHUD();
+    
+    // 键盘映射
+    const keyMap = laneCount === 4 
+        ? {'KeyD': 0, 'KeyF': 1, 'KeyJ': 2, 'KeyK': 3}
+        : {'KeyD': 0, 'KeyK': 1};
+    
+    const keyHandler = (e) => {
+        if (!gameState.isPlaying) return;
+        
+        const lane = keyMap[e.code];
+        if (lane === undefined) return;
+        
+        e.preventDefault();
+        
+        const currentTime = Date.now() - gameState.gameStartTime;
+        
+        // 找最近的音符
+        let nearestNote = null;
+        let minTimeDiff = Infinity;
+        
+        gameState.notes.forEach(note => {
+            if (note.hit || note.missed || note.lane !== lane) return;
+            
+            const timeDiff = Math.abs(note.time - currentTime);
+            if (timeDiff < minTimeDiff && timeDiff < 300) {
+                minTimeDiff = timeDiff;
+                nearestNote = note;
+            }
+        });
+        
+        if (nearestNote) {
+            const x = nearestNote.lane * laneWidth + laneWidth / 2;
+            
+            if (minTimeDiff <= 80) {
+                // Perfect
+                nearestNote.hit = true;
+                gameState.combo++;
+                gameState.perfectCount++;
+                gameState.score += 100 * (gameState.isRockMode ? 2 : 1) * (1 + gameState.combo * 0.01);
+                addEnergy(8);
+                showJudgment('PERFECT', x, hitLineY);
+                playInstrumentSound();
+            } else if (minTimeDiff <= 150) {
+                // Good
+                nearestNote.hit = true;
+                gameState.combo++;
+                gameState.goodCount++;
+                gameState.score += 50 * (gameState.isRockMode ? 2 : 1);
+                addEnergy(4);
+                showJudgment('GOOD', x, hitLineY);
+                playInstrumentSound();
+            }
+            
+            if (gameState.combo > gameState.maxCombo) {
+                gameState.maxCombo = gameState.combo;
+            }
+            
+            updateHUD();
+        }
+    };
+    
+    document.addEventListener('keydown', keyHandler);
+    window.gameKeyHandler = keyHandler;
+    
+    // 游戏循环
+    gameLoop = setInterval(() => {
+        if (!gameState.isPlaying) {
+            clearInterval(gameLoop);
+            return;
+        }
+        
+        const currentTime = Date.now() - gameState.gameStartTime;
+        
+        // 清空画布
+        ctx.fillStyle = gameState.isRockMode ? '#1a0510' : '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // ROCK MODE 背景闪烁
+        if (gameState.isRockMode && Math.floor(currentTime / 100) % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 0, 102, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // 绘制轨道
+        ctx.strokeStyle = gameState.isRockMode ? '#ff0066' : '#333';
+        ctx.lineWidth = 2;
+        for (let i = 1; i < laneCount; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * laneWidth, 0);
+            ctx.lineTo(i * laneWidth, canvas.height);
+            ctx.stroke();
+        }
+        
+        // 绘制判定线
+        ctx.strokeStyle = gameState.isRockMode ? '#ffcc00' : '#ff0066';
+        ctx.lineWidth = 4;
+        ctx.shadowColor = ctx.strokeStyle;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(0, hitLineY);
+        ctx.lineTo(canvas.width, hitLineY);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        
+        // 轨道按键提示
+        ctx.font = '16px "Press Start 2P"';
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        const keyLabels = laneCount === 4 ? ['D', 'F', 'J', 'K'] : ['D', 'K'];
+        keyLabels.forEach((key, i) => {
+            ctx.fillText(key, i * laneWidth + laneWidth / 2, hitLineY + 30);
+        });
+        
+        // 绘制和更新音符
+        gameState.notes.forEach(note => {
+            if (note.hit || note.missed) return;
+            
+            const timeDiff = note.time - currentTime;
+            const y = hitLineY - (timeDiff / 1000) * noteSpeed;
+            
+            if (y > -50 && y < canvas.height + 50) {
+                const x = note.lane * laneWidth + laneWidth / 2;
+                
+                // 音符光晕
+                ctx.shadowColor = gameState.isRockMode ? '#ffcc00' : '#00ff99';
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = gameState.isRockMode ? '#ffcc00' : '#00ff99';
+                
+                // 绘制像素风格音符
+                const w = laneWidth * 0.7;
+                const h = 20;
+                ctx.fillRect(x - w/2, y - h/2, w, h);
+                
+                // 内部高光
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.fillRect(x - w/2 + 4, y - h/2 + 4, w - 8, 6);
+                
+                ctx.shadowBlur = 0;
+            }
+            
+            // Miss判定
+            if (y > canvas.height + 30) {
+                note.missed = true;
+                gameState.combo = 0;
+                gameState.missCount++;
+                addEnergy(-10);
+                showJudgment('MISS', note.lane * laneWidth + laneWidth / 2, hitLineY);
+                updateHUD();
+            }
+        });
+        
+        // 检查游戏结束
+        if (currentTime > 22000) {
+            endGame();
+        }
+        
+    }, 1000/60);
+}
+
+function addEnergy(amount) {
+    gameState.bandEnergy = Math.max(0, Math.min(100, gameState.bandEnergy + amount));
+    document.getElementById('energyBar').style.width = gameState.bandEnergy + '%';
+    
+    // ROCK MODE 触发
+    if (gameState.bandEnergy >= 80 && !gameState.isRockMode) {
+        gameState.isRockMode = true;
+        document.getElementById('rockModeText').classList.add('active');
+        document.getElementById('rockOverlay').classList.add('active');
+    } else if (gameState.bandEnergy < 50 && gameState.isRockMode) {
+        gameState.isRockMode = false;
+        document.getElementById('rockModeText').classList.remove('active');
+        document.getElementById('rockOverlay').classList.remove('active');
+    }
+}
+
+function showJudgment(text, x, y) {
+    const el = document.createElement('div');
+    el.className = `judgment ${text.toLowerCase()}`;
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = (y - 50) + 'px';
+    document.getElementById('gameScreen').appendChild(el);
+    setTimeout(() => el.remove(), 400);
+}
+
+function updateHUD() {
+    document.getElementById('scoreDisplay').textContent = Math.floor(gameState.score).toString().padStart(6, '0');
+    document.getElementById('maxComboDisplay').textContent = gameState.maxCombo;
+    
+    // 连击显示
+    const comboDisplay = document.getElementById('comboDisplay');
+    const comboNumber = document.getElementById('comboNumber');
+    
+    if (gameState.combo >= 5) {
+        comboDisplay.classList.add('active');
+        comboNumber.textContent = gameState.combo;
+    } else {
+        comboDisplay.classList.remove('active');
+    }
+}
+
+function endGame() {
+    gameState.isPlaying = false;
+    clearInterval(gameLoop);
+    
+    if (window.gameKeyHandler) {
+        document.removeEventListener('keydown', window.gameKeyHandler);
+    }
+    
+    document.getElementById('rockOverlay').classList.remove('active');
+    
+    // 计算评分
+    const total = gameState.perfectCount + gameState.goodCount + gameState.missCount;
+    const accuracy = total > 0 ? ((gameState.perfectCount + gameState.goodCount * 0.5) / total * 100) : 0;
+    
+    let rank = 'C';
+    let rankColor = '#ff6666';
+    if (accuracy >= 95) { rank = 'S'; rankColor = '#ffcc00'; }
+    else if (accuracy >= 85) { rank = 'A'; rankColor = '#00ff99'; }
+    else if (accuracy >= 70) { rank = 'B'; rankColor = '#66ccff'; }
+    
+    // 显示结果
+    document.getElementById('finalScore').textContent = Math.floor(gameState.score);
+    document.getElementById('finalRank').textContent = rank;
+    document.getElementById('finalRank').style.color = rankColor;
+    document.getElementById('perfectCount').textContent = gameState.perfectCount;
+    document.getElementById('goodCount').textContent = gameState.goodCount;
+    document.getElementById('missCount').textContent = gameState.missCount;
+    document.getElementById('finalMaxCombo').textContent = gameState.maxCombo;
+    
+    showScreen('resultScreen');
+}
+
+console.log('🎸 来组乐队吧 v2.3 - 已加载');
+console.log('选择乐器，开始你的摇滚之旅！');
+    </script>
+</body>
+</html>
