@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💎 宝石消消乐</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #1a1a3e, #2d1b4e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .ui { margin-bottom: 20px; font-size: 24px; color: #ffd700; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(6, 60px);
+            gap: 5px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .gem {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .gem:hover { transform: scale(1.1); }
+        .gem.selected { box-shadow: 0 0 0 4px #fff, 0 0 20px #fff; }
+        .instructions { margin-top: 20px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="ui">得分: <span id="score">0</span> | 目标: <span id="target">1000</span></div>
+    <div class="grid" id="grid"></div>
+    <p class="instructions">点击两个相邻宝石交换位置，3个或以上相同宝石消除！</p>
+    
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const gems = ['💎', '🔷', '🔶', '💠', '💍'];
+        const gemColors = ['#e94560', '#4ecdc4', '#ffe66d', '#a855f7', '#4ade80'];
+        
+        let grid = [];
+        let score = 0;
+        let selected = null;
+        let target = 1000;
+        
+        function playBGM() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 150 + Math.random() * 150;
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+        
+        function playMatch() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+        
+        function playSwap() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 300;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+        
+        function init() {
+            grid = [];
+            for(let r = 0; r < 8; r++) {
+                grid[r] = [];
+                for(let c = 0; c < 6; c++) {
+                    grid[r][c] = Math.floor(Math.random() * gems.length);
+                }
+            }
+            render();
+        }
+        
+        function render() {
+            const gridEl = document.getElementById('grid');
+            gridEl.innerHTML = '';
+            for(let r = 0; r < 8; r++) {
+                for(let c = 0; c < 6; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'gem';
+                    cell.style.background = gemColors[grid[r][c]];
+                    cell.textContent = gems[grid[r][c]];
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    if(selected && selected.r === r && selected.c === c) {
+                        cell.classList.add('selected');
+                    }
+                    cell.onclick = () => selectGem(r, c);
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+        
+        function selectGem(r, c) {
+            if(!selected) {
+                selected = {r, c};
+                render();
+            } else {
+                const dr = Math.abs(selected.r - r);
+                const dc = Math.abs(selected.c - c);
+                
+                if(dr + dc === 1) {
+                    // 相邻，交换
+                    playSwap();
+                    const temp = grid[selected.r][selected.c];
+                    grid[selected.r][selected.c] = grid[r][c];
+                    grid[r][c] = temp;
+                    
+                    const matches = findMatches();
+                    if(matches.length > 0) {
+                        removeMatches(matches);
+                    } else {
+                        // 没有匹配，换回来
+                        setTimeout(() => {
+                            grid[r][c] = grid[selected.r][selected.c];
+                            grid[selected.r][selected.c] = temp;
+                            render();
+                        }, 200);
+                    }
+                }
+                selected = null;
+                render();
+            }
+        }
+        
+        function findMatches() {
+            const matches = new Set();
+            
+            // 水平匹配
+            for(let r = 0; r < 8; r++) {
+                for(let c = 0; c < 4; c++) {
+                    if(grid[r][c] === grid[r][c+1] && grid[r][c] === grid[r][c+2]) {
+                        matches.add(`${r},${c}`);
+                        matches.add(`${r},${c+1}`);
+                        matches.add(`${r},${c+2}`);
+                    }
+                }
+            }
+            
+            // 垂直匹配
+            for(let c = 0; c < 6; c++) {
+                for(let r = 0; r < 6; r++) {
+                    if(grid[r][c] === grid[r+1][c] && grid[r][c] === grid[r+2][c]) {
+                        matches.add(`${r},${c}`);
+                        matches.add(`${r+1},${c}`);
+                        matches.add(`${r+2},${c}`);
+                    }
+                }
+            }
+            
+            return Array.from(matches).map(s => {
+                const [r, c] = s.split(',').map(Number);
+                return {r, c};
+            });
+        }
+        
+        function removeMatches(matches) {
+            playMatch();
+            score += matches.length * 50;
+            document.getElementById('score').textContent = score;
+            
+            if(score >= target) {
+                target *= 2;
+                document.getElementById('target').textContent = target;
+                alert(`🎉 目标达成！\n新目标: ${target}`);
+            }
+            
+            matches.forEach(({r, c}) => grid[r][c] = -1);
+            render();
+            
+            setTimeout(() => {
+                // 下落
+                for(let c = 0; c < 6; c++) {
+                    let writeRow = 7;
+                    for(let r = 7; r >= 0; r--) {
+                        if(grid[r][c] !== -1) {
+                            grid[writeRow][c] = grid[r][c];
+                            if(writeRow !== r) grid[r][c] = -1;
+                            writeRow--;
+                        }
+                    }
+                    // 填充新宝石
+                    for(let r = writeRow; r >= 0; r--) {
+                        grid[r][c] = Math.floor(Math.random() * gems.length);
+                    }
+                }
+                render();
+                
+                // 连锁消除
+                const newMatches = findMatches();
+                if(newMatches.length > 0) {
+                    setTimeout(() => removeMatches(newMatches), 300);
+                }
+            }, 300);
+        }
+        
+        init();
+        setInterval(playBGM, 500);
+        
+        if(audioCtx.state === 'suspended') {
+            document.addEventListener('click', ()=>audioCtx.resume(),{once:true});
+        }
+    </script>
+</body>
+</html>
