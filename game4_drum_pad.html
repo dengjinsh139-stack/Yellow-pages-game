@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥁 电子打击垫</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #111;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #0f0;
+        }
+        .pad-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .pad {
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            transition: all 0.1s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            border: 3px solid transparent;
+        }
+        .pad:hover { transform: scale(1.05); }
+        .pad.active {
+            transform: scale(0.95);
+            box-shadow: 0 0 30px currentColor;
+            border-color: #fff;
+        }
+        .pad1 { background: linear-gradient(135deg, #ff0066, #ff3366); color: #ff0066; }
+        .pad2 { background: linear-gradient(135deg, #ff6600, #ff9900); color: #ff6600; }
+        .pad3 { background: linear-gradient(135deg, #ffcc00, #ffff00); color: #ffcc00; }
+        .pad4 { background: linear-gradient(135deg, #00ff66, #00cc66); color: #00ff66; }
+        .pad5 { background: linear-gradient(135deg, #00ccff, #0099ff); color: #00ccff; }
+        .pad6 { background: linear-gradient(135deg, #6600ff, #3300ff); color: #6600ff; }
+        .pad7 { background: linear-gradient(135deg, #ff00ff, #cc00cc); color: #ff00ff; }
+        .pad8 { background: linear-gradient(135deg, #00ffff, #00cccc); color: #00ffff; }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #333, #555);
+            color: #fff;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,255,255,0.2);
+        }
+        .loop-indicator {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #222;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .recording { color: #f00; animation: blink 0.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+    <h1>🥁 电子打击垫</h1>
+    
+    <div class="pad-container">
+        <div class="pad pad1" data-index="0"><span>Q</span><span>底鼓</span></div>
+        <div class="pad pad2" data-index="1"><span>W</span><span>军鼓</span></div>
+        <div class="pad pad3" data-index="2"><span>E</span><span>踩镲</span></div>
+        <div class="pad pad4" data-index="3"><span>R</span><span>开镲</span></div>
+        <div class="pad pad5" data-index="4"><span>A</span><span>Tom1</span></div>
+        <div class="pad pad6" data-index="5"><span>S</span><span>Tom2</span></div>
+        <div class="pad pad7" data-index="6"><span>D</span><span>Clap</span></div>
+        <div class="pad pad8" data-index="7"><span>F</span><span>特效</span></div>
+    </div>
+    
+    <div class="controls">
+        <button onclick="toggleAutoPlay()">🎵 自动演奏: <span id="autoStatus">关</span></button>
+        <button onclick="toggleRecord()">⏺️ 录制</span></button>
+        <button onclick="playRecording()">▶️ 播放录制</span></button>
+    </div>
+    
+    <div class="loop-indicator" id="status">点击打击垫或使用键盘 Q W E R A S D F</div>
+    
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const pads = document.querySelectorAll('.pad');
+        let autoPlayInterval = null;
+        let isRecording = false;
+        let recording = [];
+        let recordStartTime = 0;
+        
+        // 音效生成
+        const sounds = [
+            // 0: 底鼓
+            () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            },
+            // 1: 军鼓
+            () => {
+                const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.2, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 1000;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start();
+            },
+            // 2: 踩镲
+            () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'square';
+                osc.frequency.value = 8000;
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            },
+            // 3: 开镲
+            () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'square';
+                osc.frequency.value = 6000;
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            },
+            // 4: Tom1
+            () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            },
+            // 5: Tom2
+            () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(75, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            },
+            // 6: Clap
+            () => {
+                const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1500;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start();
+            },
+            // 7: 特效
+            () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(1600, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        ];
+        
+        // 播放打击垫
+        function playPad(index) {
+            sounds[index]();
+            pads[index].classList.add('active');
+            setTimeout(() => pads[index].classList.remove('active'), 100);
+            
+            if (isRecording) {
+                recording.push({ index, time: Date.now() - recordStartTime });
+            }
+        }
+        
+        // 点击事件
+        pads.forEach((pad, i) => {
+            pad.addEventListener('mousedown', () => playPad(i));
+        });
+        
+        // 键盘事件
+        const keyMap = { 'q': 0, 'w': 1, 'e': 2, 'r': 3, 'a': 4, 's': 5, 'd': 6, 'f': 7 };
+        document.addEventListener('keydown', e => {
+            const index = keyMap[e.key.toLowerCase()];
+            if (index !== undefined) playPad(index);
+        });
+        
+        // 自动演奏
+        function toggleAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+                document.getElementById('autoStatus').textContent = '关';
+                document.getElementById('status').textContent = '自动演奏已停止';
+            } else {
+                document.getElementById('autoStatus').textContent = '开';
+                document.getElementById('status').textContent = '正在自动演奏...';
+                
+                // EDM节奏型
+                const pattern = [0, 2, 1, 2, 0, 2, 1, 3, 0, 2, 1, 2, 0, 2, 1, 2];
+                let step = 0;
+                autoPlayInterval = setInterval(() => {
+                    playPad(pattern[step % pattern.length]);
+                    step++;
+                }, 250);
+            }
+        }
+        
+        // 录制
+        function toggleRecord() {
+            if (isRecording) {
+                isRecording = false;
+                document.getElementById('status').textContent = `录制完成: ${recording.length} 个音符`;
+            } else {
+                isRecording = true;
+                recording = [];
+                recordStartTime = Date.now();
+                document.getElementById('status').textContent = '🔴 录制中...';
+                document.getElementById('status').classList.add('recording');
+            }
+        }
+        
+        // 播放录制
+        function playRecording() {
+            if (recording.length === 0) {
+                document.getElementById('status').textContent = '没有录制内容';
+                return;
+            }
+            document.getElementById('status').textContent = '▶️ 播放录制中...';
+            recording.forEach(note => {
+                setTimeout(() => playPad(note.index), note.time);
+            });
+        }
+        
+        // 启动音频上下文
+        if (audioCtx.state === 'suspended') {
+            document.addEventListener('click', () => audioCtx.resume(), { once: true });
+        }
+    </script>
+</body>
+</html>
