@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 颜色闪电战</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .ui { margin-bottom: 20px; font-size: 24px; text-align: center; }
+        .target-color {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 30px;
+            border: 5px solid #fff;
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            gap: 20px;
+        }
+        .color-btn {
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .color-btn:hover { transform: scale(1.1); }
+        .color-btn:active { transform: scale(0.95); }
+        .timer-bar {
+            width: 400px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecca3, #00d4ff);
+            transition: width 0.1s linear;
+        }
+        .combo { font-size: 32px; color: #ffe66d; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="ui">
+        <div>得分: <span id="score">0</span></div>
+        <div class="combo">连击: <span id="combo">0</span> 🔥</div>
+    </div>
+    
+    <div class="target-color" id="target"></div>
+    
+    <div class="grid" id="grid"></div>
+    
+    <div class="timer-bar">
+        <div class="timer-fill" id="timer"></div>
+    </div>
+    
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const colors = [
+            {name: '红', value: '#e94560'},
+            {name: '青', value: '#4ecdc4'},
+            {name: '黄', value: '#ffe66d'},
+            {name: '紫', value: '#a855f7'},
+            {name: '绿', value: '#4ade80'},
+            {name: '橙', value: '#fb923c'}
+        ];
+        
+        let score = 0, combo = 0;
+        let targetColor = null;
+        let maxTime = 3000;
+        let currentTime = maxTime;
+        let lastTime = Date.now();
+        let gameActive = true;
+        
+        function playBGM() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'triangle';
+            osc.frequency.value = 220 + Math.random() * 200;
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+        
+        function playCorrect() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+        
+        function playWrong() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.value = 200;
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        function newRound() {
+            targetColor = colors[Math.floor(Math.random() * colors.length)];
+            document.getElementById('target').style.background = targetColor.value;
+            
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            const shuffled = [...colors].sort(() => Math.random() - 0.5).slice(0, 6);
+            if(!shuffled.includes(targetColor)) {
+                shuffled[Math.floor(Math.random() * 6)] = targetColor;
+            }
+            
+            shuffled.forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'color-btn';
+                btn.style.background = color.value;
+                btn.onclick = () => checkColor(color);
+                grid.appendChild(btn);
+            });
+            
+            currentTime = maxTime;
+            maxTime = Math.max(1000, maxTime - 50);
+        }
+        
+        function checkColor(color) {
+            if(!gameActive) return;
+            
+            if(color === targetColor) {
+                score += 10 + combo * 2;
+                combo++;
+                playCorrect();
+                newRound();
+            } else {
+                combo = 0;
+                currentTime -= 500;
+                playWrong();
+            }
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('combo').textContent = combo;
+        }
+        
+        function updateTimer() {
+            if(!gameActive) return;
+            
+            const now = Date.now();
+            const delta = now - lastTime;
+            lastTime = now;
+            
+            currentTime -= delta;
+            const percent = (currentTime / 3000) * 100;
+            document.getElementById('timer').style.width = percent + '%';
+            
+            if(currentTime <= 0) {
+                gameActive = false;
+                alert(`游戏结束！\n得分: ${score}\n最高连击: ${combo}`);
+                score = 0;
+                combo = 0;
+                maxTime = 3000;
+                gameActive = true;
+                document.getElementById('score').textContent = score;
+                document.getElementById('combo').textContent = combo;
+                newRound();
+            }
+        }
+        
+        setInterval(playBGM, 400);
+        setInterval(updateTimer, 50);
+        newRound();
+        
+        if(audioCtx.state === 'suspended') {
+            document.addEventListener('click', ()=>audioCtx.resume(),{once:true});
+        }
+    </script>
+</body>
+</html>
