@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>像素跳跃 - Pixel Jump</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #2d1b4e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            image-rendering: pixelated;
+        }
+        #gameCanvas {
+            border: 4px solid #4a4e69;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            image-rendering: pixelated;
+        }
+        .ui {
+            color: #f2e9e4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .score {
+            font-size: 28px;
+            text-shadow: 2px 2px 0 #22223b;
+        }
+        .stats {
+            font-size: 14px;
+            color: #9a8c98;
+            margin-top: 5px;
+        }
+        #startBtn {
+            background: #9a8c98;
+            color: #22223b;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-family: inherit;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #4a4e69;
+        }
+        #startBtn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #4a4e69;
+        }
+        .controls {
+            color: #c9ada7;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .controls span {
+            background: #4a4e69;
+            padding: 2px 8px;
+            margin: 0 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui">
+        <div class="score">距离: <span id="score">0</span>m | 金币: <span id="coins">0</span></div>
+        <div class="stats">最高: <span id="highScore">0</span>m</div>
+    </div>
+    <canvas id="gameCanvas" width="800" height="450"></canvas>
+    <button id="startBtn">开始冒险</button>
+    <div class="controls"><span>SPACE</span> 跳跃 <span>↑</span> 二段跳 <span>P</span> 暂停</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const coinsEl = document.getElementById('coins');
+const highScoreEl = document.getElementById('highScore');
+const startBtn = document.getElementById('startBtn');
+
+// 游戏配置
+const GRAVITY = 0.6;
+const JUMP_FORCE = -12;
+const MOVE_SPEED = 5;
+const PIXEL_SIZE = 4;
+
+// 游戏状态
+let gameRunning = false;
+let gamePaused = false;
+let score = 0;
+let coins = 0;
+let highScore = localStorage.getItem('pixelJumpHighScore') || 0;
+let gameTime = 0;
+let cameraX = 0;
+
+highScoreEl.textContent = highScore;
+
+// 游戏对象
+let player;
+let platforms = [];
+let coinItems = [];
+let particles = [];
+let enemies = [];
+
+// ============ Web Audio API - 像素风格音乐 ============
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let bgmInterval;
+
+function playTone(frequency, duration, type = 'square', volume = 0.15) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = type;
+    osc.frequency.value = frequency;
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+// 8-bit风格音效
+function playJumpSound() {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+}
+
+function playCoinSound() {
+    playTone(987.77, 0.1, 'square', 0.15); // B5
+    setTimeout(() => playTone(1318.51, 0.15, 'square', 0.12), 50); // E6
+}
+
+function playLandSound() {
+    playTone(80, 0.08, 'square', 0.1);
+}
+
+function playEnemyHitSound() {
+    playTone(100, 0.2, 'sawtooth', 0.2);
+    setTimeout(() => playTone(50, 0.3, 'sawtooth', 0.2), 100);
+}
+
+// 背景音乐 - 8位机风格
+const melody = [
+    [330, 0.2], [392, 0.2], [494, 0.2], [523, 0.4],
+    [494, 0.2], [392, 0.2], [330, 0.4],
+    [294, 0.2], [349, 0.2], [440, 0.2], [494, 0.4],
+    [440, 0.2], [349, 0.2], [294, 0.4],
+];
+
+let noteIndex = 0;
+function startBGM() {
+    bgmInterval = setInterval(() => {
+        if (!gameRunning || gamePaused) return;
+        
+        const [freq, dur] = melody[noteIndex % melody.length];
+        playTone(freq, dur, 'pulse', 0.1);
+        
+        // 低音伴奏
+        if (noteIndex % 4 === 0) {
+            playTone(65.41, 0.3, 'square', 0.08); // C2
+        }
+        if (noteIndex % 4 === 2) {
+            playTone(98.00, 0.3, 'square', 0.08); // G2
+        }
+        
+        noteIndex++;
+    }, 250);
+}
+
+function stopBGM() {
+    clearInterval(bgmInterval);
+    noteIndex = 0;
+}
+
+// ============ 游戏类 ============
+class Player {
+    constructor() {
+        this.x = 100;
+        this.y = 200;
+        this.width = 24;
+        this.height = 32;
+        this.vx = 0;
+        this.vy = 0;
+        this.onGround = false;
+        this.jumpCount = 0;
+        this.maxJumps = 2;
+        this.facing = 1;
+        this.animFrame = 0;
+        this.invincible = false;
+    }
+    
+    update() {
+        // 重力
+        this.vy += GRAVITY;
+        
+        // 移动
+        this.vx = MOVE_SPEED;
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        // 平台碰撞
+        this.onGround = false;
+        platforms.forEach(plat => {
+            if (this.x + this.width > plat.x && 
+                this.x < plat.x + plat.width &&
+                this.y + this.height > plat.y &&
+                this.y + this.height < plat.y + plat.height + 20 &&
+                this.vy > 0) {
+                this.y = plat.y - this.height;
+                this.vy = 0;
+                this.onGround = true;
+                this.jumpCount = 0;
+            }
+        });
+        
+        // 掉出屏幕
+        if (this.y > canvas.height) {
+            gameOver();
+        }
+        
+        this.animFrame++;
+    }
+    
+    jump() {
+        if (this.jumpCount < this.maxJumps) {
+            this.vy = JUMP_FORCE;
+            this.jumpCount++;
+            this.onGround = false;
+            playJumpSound();
+            createParticles(this.x + this.width/2, this.y + this.height, '#fff', 5);
+        }
+    }
+    
+    draw() {
+        const x = this.x - cameraX;
+        
+        // 无敌闪烁
+        if (this.invincible && Math.floor(Date.now() / 50) % 2 === 0) return;
+        
+        // 身体
+        ctx.fillStyle = '#e63946';
+        this.drawPixelRect(x, this.y, this.width, this.height);
+        
+        // 眼睛
+        ctx.fillStyle = '#fff';
+        this.drawPixelRect(x + (this.facing > 0 ? 14 : 4), this.y + 6, 6, 8);
+        ctx.fillStyle = '#000';
+        this.drawPixelRect(x + (this.facing > 0 ? 16 : 6), this.y + 8, 3, 4);
+        
+        // 腿部动画
+        ctx.fillStyle = '#1d3557';
+        if (this.onGround && this.animFrame % 20 < 10) {
+            this.drawPixelRect(x + 4, this.y + this.height - 8, 6, 8);
+            this.drawPixelRect(x + 14, this.y + this.height, 6, 4);
+        } else {
+            this.drawPixelRect(x + 4, this.y + this.height, 6, 4);
+            this.drawPixelRect(x + 14, this.y + this.height - 8, 6, 8);
+        }
+    }
+    
+    drawPixelRect(x, y, w, h) {
+        ctx.fillRect(
+            Math.floor(x / PIXEL_SIZE) * PIXEL_SIZE,
+            Math.floor(y / PIXEL_SIZE) * PIXEL_SIZE,
+            Math.floor(w / PIXEL_SIZE) * PIXEL_SIZE,
+            Math.floor(h / PIXEL_SIZE) * PIXEL_SIZE
+        );
+    }
+}
+
+class Platform {
+    constructor(x, y, width) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = 20;
+    }
+    
+    draw() {
+        const drawX = this.x - cameraX;
+        if (drawX < -this.width || drawX > canvas.width) return;
+        
+        // 平台主体
+        ctx.fillStyle = '#4a4e69';
+        ctx.fillRect(drawX, this.y, this.width, this.height);
+        
+        // 顶部高光
+        ctx.fillStyle = '#9a8c98';
+        ctx.fillRect(drawX, this.y, this.width, 4);
+        
+        // 像素纹理
+        ctx.fillStyle = '#22223b';
+        for (let i = 0; i < this.width; i += 16) {
+            if (i % 32 === 0) {
+                ctx.fillRect(drawX + i, this.y + 8, 8, 8);
+            }
+        }
+    }
+}
+
+class Coin {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = 16;
+        this.collected = false;
+        this.bobOffset = Math.random() * Math.PI * 2;
+    }
+    
+    update() {
+        this.bobOffset += 0.1;
+    }
+    
+    draw() {
+        if (this.collected) return;
+        const drawX = this.x - cameraX;
+        if (drawX < -50 || drawX > canvas.width + 50) return;
+        
+        const bobY = Math.sin(this.bobOffset) * 5;
+        
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(drawX + this.size/2, this.y + this.size/2 + bobY, this.size/2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 闪光
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(drawX + 4, this.y + 4 + bobY, 4, 4);
+    }
+}
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = (Math.random() - 0.5) * 4;
+        this.life = 1;
+        this.color = color;
+        this.size = PIXEL_SIZE * 2;
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.2;
+        this.life -= 0.03;
+    }
+    
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.life;
+        ctx.fillRect(this.x - cameraX, this.y, this.size, this.size);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ============ 游戏逻辑 ============
+function createParticles(x, y, color, count = 10) {
+    for (let i = 0; i < count; i++) {
+        particles.push(new Particle(x, y, color));
+    }
+}
+
+function generateWorld() {
+    platforms = [];
+    coinItems = [];
+    
+    // 起始平台
+    platforms.push(new Platform(0, 300, 300));
+    
+    let currentX = 350;
+    let currentY = 300;
+    
+    while (currentX < 10000) {
+        const gap = 80 + Math.random() * 100;
+        const width = 80 + Math.random() * 150;
+        const heightChange = (Math.random() - 0.5) * 150;
+        
+        currentY = Math.max(100, Math.min(350, currentY + heightChange));
+        currentX += gap;
+        
+        platforms.push(new Platform(currentX, currentY, width));
+        
+        // 添加金币
+        if (Math.random() > 0.4) {
+            coinItems.push(new Coin(currentX + width/2, currentY - 40));
+        }
+        
+        currentX += width;
+    }
+}
+
+function initGame() {
+    player = new Player();
+    generateWorld();
+    score = 0;
+    coins = 0;
+    particles = [];
+    cameraX = 0;
+    updateUI();
+}
+
+function updateUI() {
+    scoreEl.textContent = Math.floor(score);
+    coinsEl.textContent = coins;
+}
+
+function update() {
+    if (!gameRunning || gamePaused) return;
+    
+    player.update();
+    coinItems.forEach(coin => coin.update());
+    
+    // 更新粒子
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => p.update());
+    
+    // 相机跟随
+    cameraX = player.x - 150;
+    
+    // 计算分数
+    score = Math.max(score, (player.x - 100) / 10);
+    
+    // 金币收集
+    coinItems.forEach(coin => {
+        if (!coin.collected &&
+            Math.abs(player.x + player.width/2 - coin.x - coin.size/2) < 30 &&
+            Math.abs(player.y + player.height/2 - coin.y - coin.size/2) < 30) {
+            coin.collected = true;
+            coins++;
+            playCoinSound();
+            createParticles(coin.x + 8, coin.y + 8, '#ffd700');
+            updateUI();
+        }
+    });
+}
+
+function draw() {
+    // 天空渐变背景
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(1, '#16213e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 远处的星星
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 50; i++) {
+        const x = ((i * 137 + cameraX * 0.1) % canvas.width + canvas.width) % canvas.width;
+        const y = (i * 53) % (canvas.height * 0.6);
+        ctx.fillRect(x, y, (i % 3) + 1, (i % 3) + 1);
+    }
+    
+    // 远处的山
+    ctx.fillStyle = '#2d1b4e';
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height);
+    for (let x = 0; x <= canvas.width; x += 20) {
+        const height = 150 + Math.sin((x + cameraX * 0.3) * 0.01) * 50 + Math.sin((x + cameraX * 0.3) * 0.03) * 30;
+        ctx.lineTo(x, canvas.height - height);
+    }
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.fill();
+    
+    // 绘制平台
+    platforms.forEach(plat => plat.draw());
+    
+    // 绘制金币
+    coinItems.forEach(coin => coin.draw());
+    
+    // 绘制玩家
+    player.draw();
+    
+    // 绘制粒子
+    particles.forEach(p => p.draw());
+    
+    // 暂停覆盖
+    if (gamePaused) {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f2e9e4';
+        ctx.font = 'bold 30px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', canvas.width/2, canvas.height/2);
+    }
+}
+
+function gameLoop() {
+    update();
+    draw();
+    updateUI();
+    requestAnimationFrame(gameLoop);
+}
+
+function gameOver() {
+    gameRunning = false;
+    stopBGM();
+    playEnemyHitSound();
+    
+    if (score > highScore) {
+        highScore = Math.floor(score);
+        localStorage.setItem('pixelJumpHighScore', highScore);
+        highScoreEl.textContent = highScore;
+    }
+    
+    startBtn.textContent = '重新开始';
+    
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#e63946';
+    ctx.font = 'bold 40px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 40);
+    ctx.fillStyle = '#f2e9e4';
+    ctx.font = '20px monospace';
+    ctx.fillText(`距离: ${Math.floor(score)}m | 金币: ${coins}`, canvas.width/2, canvas.height/2 + 10);
+}
+
+function startGame() {
+    gameRunning = true;
+    gamePaused = false;
+    initGame();
+    startBGM();
+    startBtn.textContent = '游戏中...';
+}
+
+// 控制
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+        if (gameRunning && !gamePaused) {
+            player.jump();
+        } else if (!gameRunning) {
+            startGame();
+        }
+        e.preventDefault();
+    }
+    if ((e.key === 'p' || e.key === 'P') && gameRunning) {
+        gamePaused = !gamePaused;
+    }
+});
+
+startBtn.addEventListener('click', startGame);
+
+// 初始化
+initGame();
+draw();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
