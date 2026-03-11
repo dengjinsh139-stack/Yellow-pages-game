@@ -45,6 +45,35 @@
             letter-spacing: 4px;
         }
         
+        /* 音乐播放按钮 */
+        .music-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .music-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+        .music-btn.playing {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.8); }
+        }
+        
         /* 导航 */
         .nav {
             display: flex;
@@ -217,6 +246,9 @@
     <header>
         <h1 class="main-title">🌐 远程游戏中心</h1>
         <p class="subtitle">云端畅玩 · 即点即玩 · 全平台支持</p>
+        <button class="music-btn" id="musicBtn" onclick="toggleMusic()">
+            <span id="musicIcon">🎵</span> <span id="musicText">播放音乐</span>
+        </button>
     </header>
     
     <nav class="nav">
@@ -500,6 +532,65 @@
     </footer>
     
     <script>
+        let audioCtx;
+        let bgmOscillator;
+        let bgmGain;
+        let isPlaying = false;
+        let bgmNote = 0;
+        const scale = [261.63, 329.63, 392.00, 523.25, 659.25, 523.25, 392.00, 329.63];
+        
+        function initAudio() {
+            if(!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        function playBgmNote() {
+            if(!isPlaying || !audioCtx) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.value = scale[bgmNote % scale.length];
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+            
+            bgmNote++;
+        }
+        
+        function toggleMusic() {
+            initAudio();
+            
+            if(audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('musicBtn');
+            const icon = document.getElementById('musicIcon');
+            const text = document.getElementById('musicText');
+            
+            if(isPlaying) {
+                btn.classList.add('playing');
+                icon.textContent = '🔊';
+                text.textContent = '停止音乐';
+                bgmInterval = setInterval(playBgmNote, 400);
+            } else {
+                btn.classList.remove('playing');
+                icon.textContent = '🎵';
+                text.textContent = '播放音乐';
+                clearInterval(bgmInterval);
+            }
+        }
+        
+        let bgmInterval;
+        
         function openGame(url) {
             window.open(url, '_blank');
         }
