@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌐 远程游戏中心</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
         
         * {
             margin: 0;
@@ -13,180 +13,128 @@
             box-sizing: border-box;
         }
         
-        :root {
-            --rust: #8B4513;
-            --steel: #4a4a4a;
-            --iron: #2c2c2c;
-            --neon-orange: #ff6600;
-            --neon-yellow: #ffcc00;
-            --steam: rgba(255, 255, 255, 0.1);
-        }
-        
         body {
             font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
-            background: 
-                linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%),
-                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23333' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             min-height: 100vh;
-            color: #ccc;
-            overflow-x: hidden;
+            color: #fff;
         }
         
-        /* 工业警示条纹 */
-        .warning-stripe {
-            height: 20px;
-            background: repeating-linear-gradient(
-                45deg,
-                #ffcc00,
-                #ffcc00 10px,
-                #000 10px,
-                #000 20px
-            );
-        }
-        
-        /* 蒸汽效果 */
-        .steam {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 200px;
-            background: linear-gradient(to top, rgba(255,255,255,0.05), transparent);
-            pointer-events: none;
-            animation: steamRise 4s ease-in-out infinite;
-        }
-        
-        @keyframes steamRise {
-            0%, 100% { opacity: 0.3; transform: translateY(0); }
-            50% { opacity: 0.6; transform: translateY(-20px); }
-        }
-        
-        /* 主标题 */
+        /* 头部 */
         header {
             text-align: center;
             padding: 60px 20px 40px;
-            position: relative;
+            background: rgba(0,0,0,0.3);
         }
         
         .main-title {
-            font-family: 'Black Ops One', cursive;
             font-size: 4rem;
-            background: linear-gradient(180deg, #ffcc00 0%, #ff6600 50%, #cc3300 100%);
+            font-weight: 900;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 40px rgba(255, 102, 0, 0.5);
+            text-shadow: 0 0 60px rgba(0, 212, 255, 0.5);
             letter-spacing: 8px;
-            position: relative;
-        }
-        
-        .main-title::before {
-            content: '⚙️ INDUSTRIAL RHYTHM ⚙️';
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8rem;
-            letter-spacing: 15px;
-            color: #666;
-            -webkit-text-fill-color: #666;
         }
         
         .subtitle {
-            font-size: 1rem;
+            font-size: 1.2rem;
             color: #888;
-            margin-top: 20px;
+            margin-top: 15px;
             letter-spacing: 4px;
-            text-transform: uppercase;
         }
         
-        /* 主容器 */
+        /* 导航 */
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            flex-wrap: wrap;
+        }
+        
+        .nav-item {
+            padding: 10px 25px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        /* 容器 */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px 20px;
-            position: relative;
-            z-index: 1;
         }
         
-        /* 区域标题 */
+        /* 分类标题 */
         .section-title {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin: 40px 0 30px;
+            margin: 50px 0 30px;
             padding: 15px 25px;
-            background: linear-gradient(90deg, rgba(255,102,0,0.2), transparent);
-            border-left: 5px solid #ff6600;
+            background: linear-gradient(90deg, rgba(123, 44, 191, 0.3), transparent);
+            border-left: 5px solid #7b2cbf;
         }
         
         .section-title h2 {
-            font-size: 1.5rem;
-            color: #ffcc00;
-            text-transform: uppercase;
+            font-size: 1.8rem;
+            color: #00d4ff;
             letter-spacing: 3px;
         }
         
         .section-title .icon {
-            font-size: 1.8rem;
+            font-size: 2rem;
         }
         
-        /* 游戏卡片 - 工业风格 */
+        /* 游戏网格 */
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
         }
         
         .game-card {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            border: 2px solid #444;
-            border-radius: 0;
-            padding: 0;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            overflow: hidden;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .game-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6600, #ffcc00, #ff6600);
-            transform: scaleX(0);
-            transition: transform 0.3s;
-        }
-        
-        .game-card:hover::before {
-            transform: scaleX(1);
         }
         
         .game-card:hover {
-            border-color: #ff6600;
-            box-shadow: 0 10px 40px rgba(255, 102, 0, 0.3);
-            transform: translateY(-5px);
+            transform: translateY(-10px);
+            border-color: #00d4ff;
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3);
         }
         
         .game-header {
-            padding: 20px;
-            background: linear-gradient(180deg, rgba(255,102,0,0.1), transparent);
-            border-bottom: 1px solid #333;
+            padding: 25px;
+            background: linear-gradient(180deg, rgba(0,212,255,0.2), transparent);
+            text-align: center;
         }
         
         .game-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 10px;
         }
         
         .game-title {
             font-size: 1.3rem;
-            color: #ffcc00;
+            color: #fff;
             letter-spacing: 2px;
-            text-transform: uppercase;
         }
         
         .game-body {
@@ -194,7 +142,7 @@
         }
         
         .game-desc {
-            color: #888;
+            color: #aaa;
             font-size: 0.9rem;
             line-height: 1.6;
             margin-bottom: 15px;
@@ -207,127 +155,141 @@
         }
         
         .tag {
-            padding: 4px 10px;
-            background: #333;
-            border: 1px solid #555;
-            font-size: 0.7rem;
-            color: #aaa;
-            text-transform: uppercase;
+            padding: 5px 12px;
+            background: rgba(123, 44, 191, 0.3);
+            border-radius: 15px;
+            font-size: 0.75rem;
+            color: #c77dff;
         }
         
-        /* 启动按钮 */
+        .tag.bgm {
+            background: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+        
         .launch-btn {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(180deg, #444, #222);
+            background: linear-gradient(180deg, rgba(0,212,255,0.3), rgba(123,44,191,0.3));
             border: none;
-            border-top: 2px solid #555;
-            color: #ffcc00;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
             font-family: inherit;
             font-size: 1rem;
-            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
         }
         
         .launch-btn:hover {
-            background: linear-gradient(180deg, #ff6600, #cc4400);
-            color: #fff;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
         }
         
-        /* 主推游戏特殊样式 */
-        .featured-card {
+        /* 特色推荐 */
+        .featured {
             grid-column: 1 / -1;
             max-width: 600px;
             margin: 0 auto;
-            border: 3px solid #ff6600;
-            box-shadow: 0 0 30px rgba(255, 102, 0, 0.2);
+            border: 3px solid #00d4ff;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
         }
         
-        .featured-card .game-header {
-            background: linear-gradient(180deg, rgba(255,102,0,0.2), transparent);
-        }
-        
-        .featured-card .game-icon {
-            font-size: 4rem;
-        }
-        
-        .featured-card .game-title {
-            font-size: 1.6rem;
-            color: #ff6600;
+        .featured .game-header {
+            background: linear-gradient(180deg, rgba(0,212,255,0.3), transparent);
         }
         
         /* 页脚 */
         footer {
             text-align: center;
-            padding: 40px 20px;
-            margin-top: 60px;
-            border-top: 2px solid #333;
-            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.5));
-        }
-        
-        footer p {
+            padding: 40px;
+            background: rgba(0,0,0,0.3);
             color: #666;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
         }
         
-        /* 响应式 */
         @media (max-width: 768px) {
-            .main-title {
-                font-size: 2.5rem;
-            }
-            .main-title::before {
-                font-size: 0.6rem;
-            }
+            .main-title { font-size: 2.5rem; }
+            .nav { gap: 15px; }
+            .games-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="warning-stripe"></div>
     <header>
-        <h1 class="main-title">远程游戏中心</h1>
-        <p class="subtitle">在线节奏 · 云端畅玩 · 无限游戏</p>
+        <h1 class="main-title">🌐 远程游戏中心</h1>
+        <p class="subtitle">云端畅玩 · 即点即玩 · 全平台支持</p>
     </header>
     
-    <div class="steam"></div>
+    <nav class="nav">
+        <div class="nav-item active" onclick="showAll()">全部</div>
+        <div class="nav-item" onclick="showCategory('rhythm')">🎵 节奏音游</div>
+        <div class="nav-item" onclick="showCategory('shooting')">🔫 射击动作</div>
+        <div class="nav-item" onclick="showCategory('puzzle')">🧩 益智解谜</div>
+        <div class="nav-item" onclick="showCategory('arcade')">🎮 经典街机</div>
+    </nav>
     
     <div class="container">
-        <!-- 主推游戏 -->
+        
+        <!-- 特色推荐 -->
         <div class="section-title">
-            <span class="icon">🔥</span>
-            <h2>核心项目</h2>
+            <span class="icon">⭐</span>
+            <h2>TOP 5 精选推荐</h2>
         </div>
         
         <div class="games-grid">
-            <div class="game-card featured-card" onclick="window.open('band-game-v2.7.html', '_blank')">
+            <!-- 精选1: 来组乐队吧 -->
+            <div class="game-card featured" data-category="rhythm" onclick="openGame('band-game-v2.7.html')">
                 <div class="game-header">
                     <div class="game-icon">🎸</div>
                     <h3 class="game-title">来组乐队吧 v2.9</h3>
                 </div>
                 <div class="game-body">
-                    <p class="game-desc">4种真实乐器演奏体验。架子鼓、吉他扫弦、Walking Bass、键盘伴奏 - 每种乐器都有符合真实演奏逻辑的节奏铺面。</p>
+                    <p class="game-desc">4种真实乐器演奏体验！架子鼓、吉他扫弦、Walking Bass、键盘伴奏 - 每种乐器都有符合真实演奏逻辑的节奏铺面。</p>
                     <div class="game-tags">
+                        <span class="tag bgm">🎵 动态音高</span>
                         <span class="tag">4乐器</span>
                         <span class="tag">5关卡</span>
-                        <span class="tag">动态音高</span>
                         <span class="tag">伴奏系统</span>
                     </div>
                 </div>
-                <button class="launch-btn">⚡ 启动程序</button>
+                <button class="launch-btn">立即演奏</button>
             </div>
-        </div>
-        
-        <!-- 实验项目 -->
-        <div class="section-title">
-            <span class="icon">⚙️</span>
-            <h2>实验项目</h2>
-        </div>
-        
-        <div class="games-grid">
-            <div class="game-card" onclick="window.open('game1_space_shooter.html', '_blank')">
+            
+            <!-- 精选2: 节奏大师 -->
+            <div class="game-card" data-category="rhythm" onclick="openGame('newgame4.html')">
+                <div class="game-header">
+                    <div class="game-icon">🎯</div>
+                    <h3 class="game-title">节奏大师</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">跟随节拍点击圆圈！在完美时机击中目标，连击越高得分越多。</p>
+                    <div class="game-tags">
+                        <span class="tag bgm">🎵 有BGM</span>
+                        <span class="tag">节奏</span>
+                        <span class="tag">连击</span>
+                    </div>
+                </div>
+                <button class="launch-btn">开始游戏</button>
+            </div>
+            
+            <!-- 精选3: 炫舞节拍 -->
+            <div class="game-card" data-category="rhythm" onclick="openGame('game3_dance_beat.html')">
+                <div class="game-header">
+                    <div class="game-icon">💃</div>
+                    <h3 class="game-title">炫舞节拍</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">箭头节奏舞蹈游戏！跟随EDM节拍按下方向键，体验劲舞乐趣。</p>
+                    <div class="game-tags">
+                        <span class="tag bgm">🎵 有BGM</span>
+                        <span class="tag">舞蹈</span>
+                        <span class="tag">EDM</span>
+                    </div>
+                </div>
+                <button class="launch-btn">开始游戏</button>
+            </div>
+            
+            <!-- 精选4: 太空射击 -->
+            <div class="game-card" data-category="shooting" onclick="openGame('game1_space_shooter.html')">
                 <div class="game-header">
                     <div class="game-icon">🚀</div>
                     <h3 class="game-title">太空节奏射击</h3>
@@ -335,158 +297,186 @@
                 <div class="game-body">
                     <p class="game-desc">驾驶战机在星际间穿梭，跟随电子节拍射击目标。</p>
                     <div class="game-tags">
+                        <span class="tag bgm">🎵 有BGM</span>
                         <span class="tag">射击</span>
-                        <span class="tag">太空电子</span>
+                        <span class="tag">太空</span>
                     </div>
                 </div>
-                <button class="launch-btn">启动</button>
+                <button class="launch-btn">开始游戏</button>
             </div>
             
-            <div class="game-card" onclick="window.open('game2_piano_rain.html', '_blank')">
-                <div class="game-header">
-                    <div class="game-icon">🎹</div>
-                    <h3 class="game-title">钢琴瀑布流</h3>
-                </div>
-                <div class="game-body">
-                    <p class="game-desc">经典下落式音游，跟随旋律点击黑块。</p>
-                    <div class="game-tags">
-                        <span class="tag">下落式</span>
-                        <span class="tag">钢琴</span>
-                    </div>
-                </div>
-                <button class="launch-btn">启动</button>
-            </div>
-            
-            <div class="game-card" onclick="window.open('game3_dance_beat.html', '_blank')">
-                <div class="game-header">
-                    <div class="game-icon">💃</div>
-                    <h3 class="game-title">炫舞节拍</h3>
-                </div>
-                <div class="game-body">
-                    <p class="game-desc">箭头节奏舞蹈游戏，跟随EDM节拍按下方向键。</p>
-                    <div class="game-tags">
-                        <span class="tag">舞蹈</span>
-                        <span class="tag">EDM</span>
-                    </div>
-                </div>
-                <button class="launch-btn">启动</button>
-            </div>
-            
-            <div class="game-card" onclick="window.open('game4_drum_pad.html', '_blank')">
+            <!-- 精选5: 电子打击垫 -->
+            <div class="game-card" data-category="rhythm" onclick="openGame('game4_drum_pad.html')">
                 <div class="game-header">
                     <div class="game-icon">🥁</div>
                     <h3 class="game-title">电子打击垫</h3>
                 </div>
                 <div class="game-body">
-                    <p class="game-desc">8轨电子打击垫，支持自动演奏和录制功能。</p>
+                    <p class="game-desc">8轨电子打击垫！支持自动演奏和录制功能，创作你的电子音乐。</p>
                     <div class="game-tags">
+                        <span class="tag bgm">🎵 有BGM</span>
                         <span class="tag">打击垫</span>
                         <span class="tag">录制</span>
                     </div>
                 </div>
-                <button class="launch-btn">启动</button>
-            </div>
-            
-            <div class="game-card" onclick="window.open('game5_sonic_slide.html', '_blank')">
-                <div class="game-header">
-                    <div class="game-icon">🎢</div>
-                    <h3 class="game-title">音速滑行</h3>
-                </div>
-                <div class="game-body">
-                    <p class="game-desc">高速滑行收集音符，避开障碍物。</p>
-                    <div class="game-tags">
-                        <span class="tag">竞速</span>
-                        <span class="tag">收集</span>
-                    </div>
-                </div>
-                <button class="launch-btn">启动</button>
+                <button class="launch-btn">开始游戏</button>
             </div>
         </div>
         
         
-        <!-- 原型项目 -->
+        <!-- 全部游戏 -->
         <div class="section-title">
-            <span class="icon">🔧</span>
-            <h2>原型项目</h2>
+            <span class="icon">🎮</span>
+            <h2>全部游戏</h2>
         </div>
         
-        <div class="games-grid" style="opacity: 0.7;">
-            <div class="game-card" onclick="window.open('proto1_falling.html', '_blank')">
+        <div class="games-grid" id="allGames">
+            
+            <!-- 节奏音游类 -->
+            <div class="game-card" data-category="rhythm" onclick="openGame('band-game-v2.7.html')">
                 <div class="game-header">
-                    <div class="game-icon">🎵</div>
-                    <h3 class="game-title">下落式节奏</h3>
+                    <div class="game-icon">🎸</div>
+                    <h3 class="game-title">来组乐队吧</h3>
                 </div>
                 <div class="game-body">
-                    <p class="game-desc">经典4轨下落</p>
-                    <div class="game-tags">
-                        <span class="tag">原型</span>
-                    </div>
+                    <p class="game-desc">真实乐器演奏体验</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
                 </div>
-                <button class="launch-btn">启动</button>
+                <button class="launch-btn">开始</button>
             </div>
             
-            <div class="game-card" onclick="window.open('proto2_osu.html', '_blank')">
+            <div class="game-card" data-category="rhythm" onclick="openGame('newgame4.html')">
                 <div class="game-header">
                     <div class="game-icon">🎯</div>
-                    <h3 class="game-title">OSU!风格</h3>
+                    <h3 class="game-title">节奏大师</h3>
                 </div>
                 <div class="game-body">
-                    <p class="game-desc">圆圈点击玩法</p>
-                    <div class="game-tags">
-                        <span class="tag">原型</span>
-                    </div>
+                    <p class="game-desc">跟随节拍点击</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
                 </div>
-                <button class="launch-btn">启动</button>
+                <button class="launch-btn">开始</button>
             </div>
             
-            <div class="game-card" onclick="window.open('proto3_piano.html', '_blank')">
+            <div class="game-card" data-category="rhythm" onclick="openGame('game3_dance_beat.html')">
+                <div class="game-header">
+                    <div class="game-icon">💃</div>
+                    <h3 class="game-title">炫舞节拍</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">箭头舞蹈游戏</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
+                </div>
+                <button class="launch-btn">开始</button>
+            </div>
+            
+            <div class="game-card" data-category="rhythm" onclick="openGame('game4_drum_pad.html')">
+                <div class="game-header">
+                    <div class="game-icon">🥁</div>
+                    <h3 class="game-title">电子打击垫</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">8轨电子音乐</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
+                </div>
+                <button class="launch-btn">开始</button>
+            </div>
+            
+            <div class="game-card" data-category="rhythm" onclick="openGame('game2_piano_rain.html')">
                 <div class="game-header">
                     <div class="game-icon">🎹</div>
                     <h3 class="game-title">钢琴瀑布流</h3>
                 </div>
                 <div class="game-body">
-                    <p class="game-desc">键盘演奏</p>
-                    <div class="game-tags">
-                        <span class="tag">原型</span>
-                    </div>
+                    <p class="game-desc">下落式音游</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
                 </div>
-                <button class="launch-btn">启动</button>
+                <button class="launch-btn">开始</button>
             </div>
             
-            <div class="game-card" onclick="window.open('proto4_retro.html', '_blank')">
+            <!-- 射击类 -->
+            <div class="game-card" data-category="shooting" onclick="openGame('game1_space_shooter.html')">
+                <div class="game-header">
+                    <div class="game-icon">🚀</div>
+                    <h3 class="game-title">太空节奏射击</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">星际战机射击</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
+                </div>
+                <button class="launch-btn">开始</button>
+            </div>
+            
+            <div class="game-card" data-category="shooting" onclick="openGame('newgame1.html')">
                 <div class="game-header">
                     <div class="game-icon">👾</div>
-                    <h3 class="game-title">复古像素风</h3>
+                    <h3 class="game-title">星际守卫者</h3>
                 </div>
                 <div class="game-body">
-                    <p class="game-desc">8-bit风格</p>
-                    <div class="game-tags">
-                        <span class="tag">原型</span>
-                    </div>
+                    <p class="game-desc">经典太空射击</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
                 </div>
-                <button class="launch-btn">启动</button>
+                <button class="launch-btn">开始</button>
             </div>
             
-            <div class="game-card" onclick="window.open('proto5_mixed.html', '_blank')">
+            <!-- 益智类 -->
+            <div class="game-card" data-category="puzzle" onclick="openGame('newgame2.html')">
                 <div class="game-header">
-                    <div class="game-icon">🌊</div>
-                    <h3 class="game-title">混合玩法</h3>
+                    <div class="game-icon">🧱</div>
+                    <h3 class="game-title">打砖块</h3>
                 </div>
                 <div class="game-body">
-                    <p class="game-desc">多种模式</p>
-                    <div class="game-tags">
-                        <span class="tag">原型</span>
-                    </div>
+                    <p class="game-desc">经典弹球消除</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
                 </div>
-                <button class="launch-btn">启动</button>
+                <button class="launch-btn">开始</button>
             </div>
+            
+            <div class="game-card" data-category="puzzle" onclick="openGame('newgame3.html')">
+                <div class="game-header">
+                    <div class="game-icon">🐍</div>
+                    <h3 class="game-title">贪吃蛇</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">经典贪吃蛇</p>
+                    <div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div>
+                </div>
+                <button class="launch-btn">开始</button>
+            </div>
+            
+            <!-- 更多游戏可以继续添加 -->
+            
         </div>
     </div>
     
     <footer>
-        <p>⚙️ 工业音游中心 v2.9 | 机械与节奏的完美结合 ⚙️</p>
+        <p>🌐 远程游戏中心 | 在浏览器中畅玩精彩游戏 🌐</p>
     </footer>
     
-    <div class="warning-stripe"></div>
+    <script>
+        function openGame(url) {
+            window.open(url, '_blank');
+        }
+        
+        function showCategory(cat) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.game-card').forEach(card => {
+                if(cat === 'all' || card.dataset.category === cat) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        function showAll() {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.style.display = 'block';
+            });
+        }
+    </script>
 </body>
 </html>
