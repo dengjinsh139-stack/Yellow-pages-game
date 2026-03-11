@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎸 来组乐队吧 v2.7 | 高级音游版</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        :root {
+            --neon-pink: #ff0066;
+            --neon-blue: #00ccff;
+            --neon-purple: #9966ff;
+            --neon-green: #00ff99;
+            --neon-yellow: #ffcc00;
+            --dark-bg: #0d0d1a;
+            --panel-bg: rgba(20, 20, 40, 0.9);
+        }
+        
+        body {
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(ellipse at 20% 80%, rgba(255, 0, 102, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 204, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(153, 102, 255, 0.1) 0%, transparent 70%);
+        }
+        
+        /* 动态背景网格 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 扫描线效果 */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.3) 2px,
+                rgba(0, 0, 0, 0.3) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.5;
+        }
+        
+        /* 标题 */
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 20px 0 10px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(255, 0, 102, 0.5);
+            letter-spacing: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-title::after {
+            content: 'BAND STORY';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            letter-spacing: 8px;
+            color: rgba(255, 255, 255, 0.3);
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* 屏幕容器 */
+        .screen-container {
+            width: 1000px;
+            max-width: 95vw;
+            height: 700px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 屏幕 */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            overflow: hidden;
+        }
+        
+        .screen.active {
+            display: flex;
+        }
+        
+        /* 屏幕标题 */
+        .screen-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+            letter-spacing: 2px;
+        }
+        
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 0, 102, 0.2);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.3);
+        }
+        
+        .back-btn::before {
+            content: '←';
+            font-size: 1.2rem;
+        }
+        
+        /* 乐器选择 - 2x2 网格 */
+        .instrument-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 100%;
+            max-width: 700px;
+            margin-top: 20px;
+        }
+        
+        .instrument-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .instrument-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .instrument-card:hover::before,
+        .instrument-card.selected::before {
+            transform: scaleX(1);
+        }
+        
+        .instrument-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 0, 102, 0.5);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(255, 0, 102, 0.2);
+        }
+        
+        .instrument-card.selected {
+            border-color: var(--neon-pink);
+            box-shadow: 
+                0 0 60px rgba(255, 0, 102, 0.3),
+                inset 0 0 60px rgba(255, 0, 102, 0.1);
+        }
+        
+        .instrument-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+        
+        .instrument-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .instrument-keys {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .key-badge {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+        
+        .instrument-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        /* 关卡选择 - 水平布局 */
+        .level-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .level-card {
+            width: 160px;
+            height: 220px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .level-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-yellow));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .level-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .level-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(0, 255, 153, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 255, 153, 0.2);
+        }
+        
+        .level-card.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .level-card.locked:hover {
+            transform: none;
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+        
+        .level-card.locked::before {
+            background: #666;
+        }
+        
+        .level-num {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .level-name {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        
+        .level-bpm {
+            font-size: 0.75rem;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+        }
+        
+        .level-stars {
+            display: flex;
+            gap: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .level-card.locked .level-stars {
+            color: #666;
+        }
+        
+        /* 游戏界面 */
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* HUD */
+        .game-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.5), transparent);
+        }
+        
+        .hud-left, .hud-right {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .hud-item {
+            text-align: center;
+        }
+        
+        .hud-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .hud-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 20px currentColor;
+        }
+        
+        .hud-value.score { color: var(--neon-yellow); }
+        .hud-value.combo { color: var(--neon-green); }
+        .hud-value.accuracy { color: var(--neon-blue); }
+        
+        .combo-display {
+            text-align: center;
+        }
+        
+        .combo-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 30px rgba(0, 255, 153, 0.8);
+            line-height: 1;
+        }
+        
+        .combo-text {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 4px;
+        }
+        
+        /* 能量条 */
+        .energy-container {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .energy-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-yellow));
+            border-radius: 15px;
+            transition: width 0.2s;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.5);
+            position: relative;
+        }
+        
+        .energy-bar::after {
+            content: 'BAND ENERGY';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+        
+        .energy-bar.rock-mode {
+            animation: energyPulse 0.5s infinite;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+            background-size: 200% 100%;
+        }
+        
+        @keyframes energyPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* 游戏画布容器 */
+        .game-canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        #gameCanvas {
+            border-radius: 10px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 按键区域 */
+        .key-hint-container {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .key-hint {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            transition: all 0.1s;
+        }
+        
+        .key-hint.active {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 30px rgba(255, 0, 102, 0.6);
+            transform: scale(0.95);
+        }
+        
+        .key-hint .finger {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+        
+        /* 判定文字 */
+        .judgment {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: 900;
+            pointer-events: none;
+            animation: judgmentAnim 0.6s ease-out forwards;
+            text-shadow: 0 0 30px currentColor;
+            letter-spacing: 4px;
+        }
+        
+        .judgment.perfect {
+            color: var(--neon-yellow);
+            text-shadow: 
+                0 0 30px var(--neon-yellow),
+                0 0 60px var(--neon-yellow);
+        }
+        
+        .judgment.great {
+            color: var(--neon-blue);
+        }
+        
+        .judgment.good {
+            color: var(--neon-green);
+        }
+        
+        .judgment.miss {
+            color: #ff3366;
+        }
+        
+        @keyframes judgmentAnim {
+            0% {
+                transform: scale(0.3) translateY(0);
+                opacity: 0;
+            }
+            30% {
+                transform: scale(1.3) translateY(-20px);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) translateY(-60px);
+                opacity: 0;
+            }
+        }
+        
+        /* 结果界面 */
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        .result-rank {
+            font-size: 8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-yellow), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 80px rgba(255, 204, 0, 0.5);
+            margin-bottom: 20px;
+            animation: rankPop 0.5s ease-out;
+        }
+        
+        @keyframes rankPop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .result-score {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .stat-value.perfect { color: var(--neon-yellow); }
+        .stat-value.great { color: var(--neon-blue); }
+        .stat-value.good { color: var(--neon-green); }
+        .stat-value.miss { color: #ff3366; }
+        
+        .btn-primary {
+            padding: 18px 50px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 0, 102, 0.4);
+            letter-spacing: 2px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 0, 102, 0.6);
+        }
+        
+        /* 倒计时 */
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            font-weight: 900;
+            color: var(--neon-pink);
+            text-shadow: 0 0 60px rgba(255, 0, 102, 0.8);
+            animation: countdownPulse 0.8s ease-out;
+        }
+        
+        @keyframes countdownPulse {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.3); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-title { font-size: 1.8rem; }
+            .instrument-grid { grid-template-columns: 1fr; gap: 15px; }
+            .level-container { flex-direction: column; align-items: center; }
+            .key-hint { width: 60px; height: 60px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="main-title">🎸 来组乐队吧</h1>
+    
+    <div class="screen-container">
+        <!-- 乐器选择 -->
+        <div id="instrumentScreen" class="screen active">
+            <div class="screen-title">SELECT INSTRUMENT</div>
+            
+            <div class="instrument-grid">
+                <div class="instrument-card" onclick="selectInstrument('drum')">
+                    <div class="instrument-icon">🥁</div>
+                    <div class="instrument-name">DRUMS</div>
+                    <div class="instrument-keys">
+                        <div class="key-badge">D</div>
+                        <div class="key-badge">F</div>
+                        <div class="key-badge">J</div>
+                        <div class="key-badge">K</div>
+                    </div>
+                    <div class="instrument-desc">4轨下落式 · 密集节奏<br>底鼓/军鼓/踩镲组合</div>
+                </div>
+                
+                <div class="instrument-card" onclick="selectInstrument('guitar')">
+                    <div class="instrument-icon">🎸</div>
+                    <div class="instrument-name">GUITAR</div>
+                    <div class="instrument-keys">
+                        <div class="key-badge">D</div>
+                        <div class="key-badge">K</div>
+                    </div>
+                    <div class="instrument-desc">2轨切分式 · 强拍低音<br>和弦根音走向</div>
+                </div>
+                
+                <div class="instrument-card" onclick="selectInstrument('bass')">
+                    <div class="instrument-icon">🎸</div>
+                    <div class="instrument-name">BASS</div>
+                    <div class="instrument-keys">
+                        <div class="key-badge">D</div>
+                        <div class="key-badge">K</div>
+                    </div>
+                    <div class="instrument-desc">2轨行走式 · Walking Bass<br>根音五度循环</div>
+                </div>
+                
+                <div class="instrument-card" onclick="selectInstrument('keyboard')">
+                    <div class="instrument-icon">🎹</div>
+                    <div class="instrument-name">KEYBOARD</div>
+                    <div class="instrument-keys">
+                        <div class="key-badge">D</div>
+                        <div class="key-badge">F</div>
+                        <div class="key-badge">J</div>
+                        <div class="key-badge">K</div>
+                    </div>
+                    <div class="instrument-desc">4轨琶音式 · 和弦分解<br>柱式和弦琶音</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 关卡选择 -->
+        <div id="levelScreen" class="screen">
+            <button class="back-btn" onclick="backToInstrument()">返回</button>
+            <div class="screen-title">SELECT STAGE</div>
+            
+            <div class="level-container">
+                <div class="level-card" id="level-1" onclick="selectLevel(1)">
+                    <div class="level-num">01</div>
+                    <div class="level-name">车库练习</div>
+                    <div class="level-bpm">80 BPM</div>
+                    <div class="level-stars">⭐</div>
+                </div>
+                
+                <div class="level-card" id="level-2" onclick="selectLevel(2)">
+                    <div class="level-num">02</div>
+                    <div class="level-name">俱乐部之夜</div>
+                    <div class="level-bpm">100 BPM</div>
+                    <div class="level-stars">⭐⭐</div>
+                </div>
+                
+                <div class="level-card" id="level-3" onclick="selectLevel(3)">
+                    <div class="level-num">03</div>
+                    <div class="level-name">音乐节现场</div>
+                    <div class="level-bpm">120 BPM</div>
+                    <div class="level-stars">⭐⭐⭐</div>
+                </div>
+                
+                <div class="level-card" id="level-4" onclick="selectLevel(4)">
+                    <div class="level-num">04</div>
+                    <div class="level-name">体育馆巡演</div>
+                    <div class="level-bpm">140 BPM</div>
+                    <div class="level-stars">⭐⭐⭐⭐</div>
+                </div>
+                
+                <div class="level-card" id="level-5" onclick="selectLevel(5)">
+                    <div class="level-num">05</div>
+                    <div class="level-name">传奇演唱会</div>
+                    <div class="level-bpm">160 BPM</div>
+                    <div class="level-stars">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 游戏屏幕 -->
+        <div id="gameScreen" class="screen">
+            <button class="back-btn" onclick="backToMenu()">退出</button>
+            
+            <div class="game-area">
+                <div class="game-hud">
+                    <div class="hud-left">
+                        <div class="hud-item">
+                            <div class="hud-label">SCORE</div>
+                            <div class="hud-value score" id="scoreDisplay">000000</div>
+                        </div>
+                        <div class="hud-item">
+                            <div class="hud-label">ACCURACY</div>
+                            <div class="hud-value accuracy" id="accuracyDisplay">100.00%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="combo-display">
+                        <div class="combo-number" id="comboDisplay">0</div>
+                        <div class="combo-text">COMBO</div>
+                    </div>
+                    
+                    <div class="hud-right">
+                        <div class="hud-item">
+                            <div class="hud-label">PERFECT</div>
+                            <div class="hud-value" id="perfectHud">0</div>
+                        </div>
+                        <div class="hud-item">
+                            <div class="hud-label">MAX COMBO</div>
+                            <div class="hud-value" id="maxComboHud">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="energy-container">
+                    <div class="energy-bar" id="energyBar"></div>
+                </div>
+                
+                <div class="game-canvas-container">
+                    <canvas id="gameCanvas" width="700" height="450"></canvas>
+                </div>
+                
+                <div class="key-hint-container" id="keyHintContainer">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 结果屏幕 -->
+        <div id="resultScreen" class="screen">
+            <div class="result-container">
+                <div class="result-rank" id="finalRank">S</div>
+                
+                <div class="result-score" id="finalScore">0</div>
+                
+                <div class="result-stats">
+                    <div class="stat-box">
+                        <div class="stat-label">PERFECT</div>
+                        <div class="stat-value perfect" id="perfectCount">0</div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-label">GREAT</div>
+                        <div class="stat-value great" id="greatCount">0</div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-label">GOOD</div>
+                        <div class="stat-value good" id="goodCount">0</div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-label">MISS</div>
+                        <div class="stat-value miss" id="missCount">0</div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-label">MAX COMBO</div>
+                        <div class="stat-value" style="color: var(--neon-green);"><span id="maxComboDisplay">0</span></div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-label">ACCURACY</div>
+                        <div class="stat-value" style="color: var(--neon-blue);"><span id="finalAccuracy">0</span>%</div>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="backToMenu()">再来一次</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 游戏状态 ====================
+        let gameState = {
+            instrument: null,
+            level: 1,
+            score: 0,
+            combo: 0,
+            maxCombo: 0,
+            perfectCount: 0,
+            greatCount: 0,
+            goodCount: 0,
+            missCount: 0,
+            totalNotes: 0,
+            accuracy: 100,
+            bandEnergy: 0,
+            isRockMode: false,
+            isPlaying: false,
+            notes: [],
+            gameStartTime: 0,
+            laneCount: 4,
+            unlockedLevel: 1
+        };
+
+        // ==================== 音频系统 ====================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // 判定音效
+        function playJudgmentSound(judgment) {
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            switch(judgment) {
+                case 'PERFECT':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, t);
+                    osc.frequency.exponentialRampToValueAtTime(1760, t + 0.05);
+                    gain.gain.setValueAtTime(0.3, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+                    
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(1320, t);
+                    gain2.gain.setValueAtTime(0.1, t);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+                    osc2.start(t);
+                    osc2.stop(t + 0.2);
+                    break;
+                case 'GREAT':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(659, t);
+                    gain.gain.setValueAtTime(0.25, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+                    break;
+                case 'GOOD':
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, t);
+                    gain.gain.setValueAtTime(0.2, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+                    break;
+                case 'MISS':
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, t);
+                    osc.frequency.exponentialRampToValueAtTime(110, t + 0.3);
+                    gain.gain.setValueAtTime(0.2, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+                    break;
+            }
+            osc.start(t);
+            osc.stop(t + 0.3);
+        }
+
+        // 连击里程碑
+        function playComboMilestone(combo) {
+            const t = audioCtx.currentTime;
+            if (combo === 10 || combo === 50 || combo === 100) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const baseFreq = combo === 10 ? 523 : (combo === 50 ? 659 : 880);
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(baseFreq, t);
+                osc.frequency.setValueAtTime(baseFreq * 1.25, t + 0.1);
+                osc.frequency.setValueAtTime(baseFreq * 1.5, t + 0.2);
+                gain.gain.setValueAtTime(0.15, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+                osc.start(t);
+                osc.stop(t + 0.4);
+            }
+        }
+
+        // 乐器音效
+        function playDrum(type, volume = 0.8) {
+            const t = audioCtx.currentTime;
+            if (type === 'kick') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(150, t);
+                osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
+                gain.gain.setValueAtTime(volume * 0.8, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+                osc.start(t);
+                osc.stop(t + 0.3);
+            } else if (type === 'snare') {
+                const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.2, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 1000;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(volume * 0.4, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start(t);
+                noise.stop(t + 0.2);
+            } else if (type === 'hihat') {
+                const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 8000;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(volume * 0.15, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start(t);
+                noise.stop(t + 0.05);
+            }
+        }
+
+        function playGuitar(note, volume = 0.6) {
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.value = note;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 2500;
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(volume * 0.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(t);
+            osc.stop(t + 0.4);
+        }
+
+        function playBass(note, volume = 0.8) {
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            osc.type = 'square';
+            osc.frequency.value = note / 2;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 500;
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(volume * 0.3, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(t);
+            osc.stop(t + 0.5);
+        }
+
+        function playKeyboard(note, volume = 0.5) {
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = note;
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(volume * 0.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.6);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(t);
+            osc.stop(t + 0.6);
+        }
+
+        function playBackingTrack(beat) {
+            const backingVolume = 0.3 + (gameState.bandEnergy / 100) * 0.4;
+            const beatInBar = beat % 4;
+            
+            if (gameState.instrument !== 'drum') {
+                playDrum('hihat', backingVolume);
+                if (beatInBar === 0 || beatInBar === 2) playDrum('kick', backingVolume);
+                if (beatInBar === 1 || beatInBar === 3) setTimeout(() => playDrum('snare', backingVolume), 50);
+            }
+            
+            if (gameState.instrument !== 'guitar' && (beatInBar === 0 || beatInBar === 2)) {
+                const chord = [261.63, 329.63, 392.00][beat % 3];
+                playGuitar(chord, backingVolume * 0.6);
+            }
+            
+            if (gameState.instrument !== 'bass' && beatInBar === 0) {
+                playBass(261.63, backingVolume * 0.7);
+            }
+            
+            if (gameState.instrument !== 'keyboard' && beatInBar === 0) {
+                playKeyboard(523.25, backingVolume * 0.4);
+                setTimeout(() => playKeyboard(659.25, backingVolume * 0.3), 100);
+            }
+        }
+
+        // ==================== 屏幕切换 ====================
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function selectInstrument(inst) {
+            gameState.instrument = inst;
+            gameState.laneCount = (inst === 'drum' || inst === 'keyboard') ? 4 : 2;
+            
+            document.querySelectorAll('.instrument-card').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            setTimeout(() => {
+                showScreen('levelScreen');
+                updateLevelScreen();
+            }, 300);
+        }
+
+        function backToInstrument() {
+            showScreen('instrumentScreen');
+        }
+
+        function selectLevel(lvl) {
+            if (lvl > gameState.unlockedLevel) return;
+            gameState.level = lvl;
+            startCountdown();
+        }
+
+        function backToMenu() {
+            gameState.isPlaying = false;
+            showScreen('instrumentScreen');
+        }
+
+        function updateLevelScreen() {
+            for (let i = 1; i <= 5; i++) {
+                const card = document.getElementById('level-' + i);
+                card.classList.remove('locked');
+                if (i > gameState.unlockedLevel) card.classList.add('locked');
+            }
+        }
+
+        // ==================== 倒计时 ====================
+        function startCountdown() {
+            showScreen('gameScreen');
+            
+            // 生成按键提示
+            const keyContainer = document.getElementById('keyHintContainer');
+            keyContainer.innerHTML = '';
+            const keys = gameState.laneCount === 4 ? ['D', 'F', 'J', 'K'] : ['D', 'K'];
+            keys.forEach(key => {
+                const hint = document.createElement('div');
+                hint.className = 'key-hint';
+                hint.id = 'key-' + key;
+                hint.innerHTML = key + '<div class="finger"></div>';
+                keyContainer.appendChild(hint);
+            });
+            
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            let count = 3;
+            const countInterval = setInterval(() => {
+                ctx.fillStyle = '#0d0d1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.font = 'bold 120px Orbitron';
+                ctx.fillStyle = '#ff0066';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = '#ff0066';
+                ctx.fillText(count > 0 ? count : 'GO!', canvas.width/2, canvas.height/2);
+                ctx.shadowBlur = 0;
+                
+                if (count === 0) {
+                    clearInterval(countInterval);
+                    setTimeout(startGame, 500);
+                }
+                count--;
+            }, 800);
+        }
+
+        // ==================== 音符生成 ====================
+        function generateNotes(instrument, level) {
+            const notes = [];
+            const duration = 20000;
+            const bpm = 80 + (level * 20);
+            const beatInterval = 60000 / bpm;
+            
+            if (instrument === 'drum') {
+                const density = level === 1 ? 4 : (level === 2 ? 2 : 1);
+                for (let t = 2000; t < duration - 2000; t += beatInterval * density) {
+                    const lane = Math.floor(Math.random() * 4);
+                    notes.push({ time: t, lane, hit: false, missed: false });
+                }
+            } else if (instrument === 'guitar') {
+                const patterns = [[0,0,1,1], [0,1,0,1,1,0], [0,0,1,0,1,1,0,1]];
+                const pattern = patterns[Math.min(level-1, 2)];
+                let idx = 0;
+                for (let t = 2000; t < duration - 2000; t += beatInterval * 1.5) {
+                    notes.push({ time: t, lane: pattern[idx % pattern.length], hit: false, missed: false });
+                    idx++;
+                }
+            } else if (instrument === 'bass') {
+                for (let t = 2000; t < duration - 2000; t += beatInterval * 2) {
+                    const lane = Math.floor((t / beatInterval) / 2) % 2;
+                    notes.push({ time: t, lane, hit: false, missed: false });
+                }
+            } else if (instrument === 'keyboard') {
+                const density = level <= 2 ? 4 : 2;
+                for (let t = 2000; t < duration - 2000; t += beatInterval * density) {
+                    const lane = Math.floor(Math.random() * 4);
+                    notes.push({ time: t, lane, hit: false, missed: false });
+                }
+            }
+            
+            return notes;
+        }
+
+        // ==================== 游戏主循环 ====================
+        function startGame() {
+            gameState.score = 0;
+            gameState.combo = 0;
+            gameState.maxCombo = 0;
+            gameState.perfectCount = 0;
+            gameState.greatCount = 0;
+            gameState.goodCount = 0;
+            gameState.missCount = 0;
+            gameState.totalNotes = 0;
+            gameState.accuracy = 100;
+            gameState.bandEnergy = 0;
+            gameState.isRockMode = false;
+            gameState.isPlaying = true;
+            gameState.notes = generateNotes(gameState.instrument, gameState.level);
+            gameState.totalNotes = gameState.notes.length;
+            gameState.gameStartTime = Date.now();
+            
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const laneCount = gameState.laneCount;
+            const laneWidth = canvas.width / laneCount;
+            const hitLineY = 380;
+            const bpm = 80 + (gameState.level * 20);
+            const noteSpeed = bpm * 2.5;
+            const beatInterval = 60000 / bpm;
+            
+            let currentBeat = 0;
+            let lastBeatTime = 0;
+            
+            updateHUD();
+            
+            const keyMap = laneCount === 4 ? {'KeyD': 0, 'KeyF': 1, 'KeyJ': 2, 'KeyK': 3} : {'KeyD': 0, 'KeyK': 1};
+            const pressedLanes = new Set();
+            const particles = [];
+            
+            function createParticles(x, y, color) {
+                for (let i = 0; i < 10; i++) {
+                    particles.push({
+                        x, y,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
+                        life: 1,
+                        color
+                    });
+                }
+            }
+            
+            function showJudgment(judgment, x, y) {
+                const el = document.createElement('div');
+                el.className = 'judgment ' + judgment.toLowerCase();
+                el.textContent = judgment;
+                el.style.left = (canvas.getBoundingClientRect().left + x) + 'px';
+                el.style.top = (canvas.getBoundingClientRect().top + y) + 'px';
+                document.getElementById('gameScreen').appendChild(el);
+                setTimeout(() => el.remove(), 600);
+            }
+
+            function updateComboDisplay() {
+                const comboEl = document.getElementById('comboDisplay');
+                comboEl.textContent = gameState.combo;
+                document.getElementById('maxComboHud').textContent = gameState.maxCombo;
+                if (gameState.combo > 0 && gameState.combo % 10 === 0) {
+                    comboEl.style.animation = 'none';
+                    setTimeout(() => {
+                        comboEl.style.animation = 'comboFlash 0.3s';
+                    }, 10);
+                    playComboMilestone(gameState.combo);
+                }
+            }
+
+            function judgeNote(timeDiff) {
+                const absDiff = Math.abs(timeDiff);
+                if (absDiff <= 50) return 'PERFECT';
+                if (absDiff <= 100) return 'GREAT';
+                if (absDiff <= 150) return 'GOOD';
+                return 'MISS';
+            }
+
+            function calculateScore(judgment) {
+                const comboMultiplier = 1 + (gameState.combo / 100);
+                switch(judgment) {
+                    case 'PERFECT': return Math.floor(300 * comboMultiplier);
+                    case 'GREAT': return Math.floor(200 * comboMultiplier);
+                    case 'GOOD': return Math.floor(100 * comboMultiplier);
+                    default: return 0;
+                }
+            }
+
+            function updateAccuracy() {
+                const total = gameState.perfectCount + gameState.greatCount + gameState.goodCount + gameState.missCount;
+                if (total === 0) return;
+                const weighted = gameState.perfectCount * 1 + gameState.greatCount * 0.66 + gameState.goodCount * 0.33;
+                gameState.accuracy = (weighted / total) * 100;
+                document.getElementById('accuracyDisplay').textContent = gameState.accuracy.toFixed(2) + '%';
+            }
+
+            const keyHandler = (e) => {
+                if (!gameState.isPlaying) return;
+                const lane = keyMap[e.code];
+                if (lane === undefined || pressedLanes.has(lane)) return;
+                e.preventDefault();
+                pressedLanes.add(lane);
+                
+                // 按键视觉反馈
+                const keys = gameState.laneCount === 4 ? ['D', 'F', 'J', 'K'] : ['D', 'K'];
+                const keyEl = document.getElementById('key-' + keys[lane]);
+                if (keyEl) keyEl.classList.add('active');
+                
+                // 音效
+                if (gameState.instrument === 'drum') {
+                    const sounds = ['kick', 'hihat', 'snare', 'hihat'];
+                    playDrum(sounds[lane] || 'kick', 0.8);
+                } else if (gameState.instrument === 'guitar') {
+                    playGuitar([261.63, 329.63][lane], 0.6);
+                } else if (gameState.instrument === 'bass') {
+                    playBass([130.81, 164.81][lane], 0.8);
+                } else if (gameState.instrument === 'keyboard') {
+                    playKeyboard([523.25, 659.25, 783.99, 1046.50][lane], 0.5);
+                }
+                
+                // 判定
+                const currentTime = Date.now() - gameState.gameStartTime;
+                let nearestNote = null;
+                let minDiff = Infinity;
+                
+                gameState.notes.forEach(note => {
+                    if (note.hit || note.missed || note.lane !== lane) return;
+                    const diff = Math.abs(note.time - currentTime);
+                    if (diff < minDiff && diff < 200) {
+                        minDiff = diff;
+                        nearestNote = note;
+                    }
+                });
+                
+                if (nearestNote) {
+                    nearestNote.hit = true;
+                    const judgment = judgeNote(nearestNote.time - currentTime);
+                    const x = lane * laneWidth + laneWidth / 2;
+                    
+                    switch(judgment) {
+                        case 'PERFECT': gameState.perfectCount++; gameState.combo++; break;
+                        case 'GREAT': gameState.greatCount++; gameState.combo++; break;
+                        case 'GOOD': gameState.goodCount++; gameState.combo++; break;
+                        case 'MISS': gameState.missCount++; gameState.combo = 0; break;
+                    }
+                    
+                    if (judgment !== 'MISS') {
+                        gameState.bandEnergy = Math.min(100, gameState.bandEnergy + 5);
+                        const colors = {PERFECT: '#ffd700', GREAT: '#00ccff', GOOD: '#00ff99'};
+                        createParticles(x, hitLineY, colors[judgment]);
+                    } else {
+                        gameState.bandEnergy = Math.max(0, gameState.bandEnergy - 10);
+                    }
+                    
+                    if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+                    
+                    gameState.score += calculateScore(judgment);
+                    updateComboDisplay();
+                    updateAccuracy();
+                    updateHUD();
+                    playJudgmentSound(judgment);
+                    showJudgment(judgment, x, hitLineY - 50);
+                }
+            };
+
+            const keyUpHandler = (e) => {
+                const lane = keyMap[e.code];
+                if (lane !== undefined) {
+                    pressedLanes.delete(lane);
+                    const keys = gameState.laneCount === 4 ? ['D', 'F', 'J', 'K'] : ['D', 'K'];
+                    const keyEl = document.getElementById('key-' + keys[lane]);
+                    if (keyEl) keyEl.classList.remove('active');
+                }
+            };
+
+            document.addEventListener('keydown', keyHandler);
+            document.addEventListener('keyup', keyUpHandler);
+            window.gameKeyHandler = keyHandler;
+            window.gameKeyUpHandler = keyUpHandler;
+
+            const gameLoop = setInterval(() => {
+                if (!gameState.isPlaying) {
+                    clearInterval(gameLoop);
+                    return;
+                }
+
+                const currentTime = Date.now() - gameState.gameStartTime;
+                
+                const beat = Math.floor(currentTime / beatInterval);
+                if (beat > currentBeat) {
+                    currentBeat = beat;
+                    playBackingTrack(beat);
+                }
+                
+                // 清空画布
+                ctx.fillStyle = '#0d0d1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 轨道背景
+                for (let i = 0; i < laneCount; i++) {
+                    const x = i * laneWidth;
+                    ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)';
+                    ctx.fillRect(x, 0, laneWidth, canvas.height);
+                }
+                
+                // Rock Mode
+                if (gameState.bandEnergy >= 100 && !gameState.isRockMode) {
+                    gameState.isRockMode = true;
+                    document.getElementById('energyBar').classList.add('rock-mode');
+                }
+                
+                // 轨道分隔线
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 2;
+                for (let i = 1; i < laneCount; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * laneWidth, 0);
+                    ctx.lineTo(i * laneWidth, canvas.height);
+                    ctx.stroke();
+                }
+                
+                // 按键高亮
+                pressedLanes.forEach(lane => {
+                    const x = lane * laneWidth;
+                    const gradient = ctx.createLinearGradient(x, 0, x, canvas.height);
+                    gradient.addColorStop(0, 'rgba(255,0,102,0)');
+                    gradient.addColorStop(0.5, 'rgba(255,0,102,0.3)');
+                    gradient.addColorStop(1, 'rgba(255,0,102,0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, 0, laneWidth, canvas.height);
+                });
+                
+                // 判定线
+                ctx.strokeStyle = '#ff0066';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#ff0066';
+                ctx.beginPath();
+                ctx.moveTo(0, hitLineY);
+                ctx.lineTo(canvas.width, hitLineY);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                
+                // 判定线发光
+                ctx.fillStyle = 'rgba(255,0,102,0.2)';
+                ctx.fillRect(0, hitLineY - 10, canvas.width, 20);
+                
+                // 绘制音符
+                gameState.notes.forEach(note => {
+                    if (note.hit || note.missed) return;
+                    const timeDiff = note.time - currentTime;
+                    const y = hitLineY - (timeDiff / 1000) * noteSpeed;
+                    
+                    if (y > -50 && y < canvas.height + 50) {
+                        const x = note.lane * laneWidth + laneWidth / 2;
+                        const w = laneWidth * 0.7;
+                        
+                        // 音符发光
+                        ctx.shadowBlur = 20;
+                        ctx.shadowColor = gameState.isRockMode ? 
+                            `hsl(${(currentTime / 5 + note.lane * 90) % 360}, 100%, 50%)` : '#00ff99';
+                        
+                        // 音符主体
+                        const gradient = ctx.createLinearGradient(x - w/2, y - 15, x - w/2, y + 15);
+                        gradient.addColorStop(0, gameState.isRockMode ? 
+                            `hsl(${(currentTime / 5 + note.lane * 90) % 360}, 100%, 70%)` : '#00ff99');
+                        gradient.addColorStop(1, gameState.isRockMode ? 
+                            `hsl(${(currentTime / 5 + note.lane * 90) % 360}, 100%, 40%)` : '#00cc66');
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(x - w/2, y - 15, w, 30);
+                        
+                        // 音符边框
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x - w/2, y - 15, w, 30);
+                        
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    if (y > canvas.height + 30 && !note.hit && !note.missed) {
+                        note.missed = true;
+                        gameState.missCount++;
+                        gameState.combo = 0;
+                        gameState.bandEnergy = Math.max(0, gameState.bandEnergy - 10);
+                        updateComboDisplay();
+                        updateAccuracy();
+                        updateHUD();
+                        playJudgmentSound('MISS');
+                        const x = note.lane * laneWidth + laneWidth / 2;
+                        showJudgment('MISS', x, hitLineY - 50);
+                    }
+                });
+                
+                // 粒子
+                particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.05;
+                    if (p.life <= 0) particles.splice(i, 1);
+                    else {
+                        ctx.globalAlpha = p.life;
+                        ctx.fillStyle = p.color;
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                        ctx.globalAlpha = 1;
+                    }
+                });
+                
+                if (currentTime > 22000) {
+                    clearInterval(gameLoop);
+                    endGame();
+                }
+            }, 1000/60);
+        }
+
+        function updateHUD() {
+            document.getElementById('scoreDisplay').textContent = gameState.score.toString().padStart(6, '0');
+            document.getElementById('perfectHud').textContent = gameState.perfectCount;
+            document.getElementById('energyBar').style.width = gameState.bandEnergy + '%';
+        }
+
+        function endGame() {
+            gameState.isPlaying = false;
+            if (window.gameKeyHandler) {
+                document.removeEventListener('keydown', window.gameKeyHandler);
+                document.removeEventListener('keyup', window.gameKeyUpHandler);
+            }
+            
+            const total = gameState.perfectCount + gameState.greatCount + gameState.goodCount + gameState.missCount;
+            let rank = 'D';
+            if (gameState.accuracy >= 95) rank = 'SS';
+            else if (gameState.accuracy >= 90) rank = 'S';
+            else if (gameState.accuracy >= 80) rank = 'A';
+            else if (gameState.accuracy >= 70) rank = 'B';
+            else if (gameState.accuracy >= 60) rank = 'C';
+            
+            if (rank !== 'D' && gameState.level >= gameState.unlockedLevel && gameState.level < 5) {
+                gameState.unlockedLevel = gameState.level + 1;
+            }
+            
+            document.getElementById('finalScore').textContent = gameState.score.toLocaleString();
+            document.getElementById('finalRank').textContent = rank;
+            document.getElementById('perfectCount').textContent = gameState.perfectCount;
+            document.getElementById('greatCount').textContent = gameState.greatCount;
+            document.getElementById('goodCount').textContent = gameState.goodCount;
+            document.getElementById('missCount').textContent = gameState.missCount;
+            document.getElementById('maxComboDisplay').textContent = gameState.maxCombo;
+            document.getElementById('finalAccuracy').textContent = gameState.accuracy.toFixed(2);
+            
+            showScreen('resultScreen');
+        }
+
+        gameState.unlockedLevel = 5;
+    </script>
+</body>
+</html>
