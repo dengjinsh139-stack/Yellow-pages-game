@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>射击靶心 - 神枪手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+        }
+        .game-container {
+            text-align: center;
+        }
+        h1 {
+            color: #e94560;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #e94560;
+        }
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .score-item {
+            background: rgba(233, 69, 96, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #e94560;
+        }
+        canvas {
+            border: 3px solid #e94560;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.3);
+            cursor: crosshair;
+            background: radial-gradient(ellipse at center, #2d3561 0%, #1a1a2e 100%);
+        }
+        .controls {
+            margin-top: 15px;
+            color: #fff;
+        }
+        button {
+            background: #e94560;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #ff6b6b;
+            transform: scale(1.05);
+        }
+        .music-btn {
+            background: #0f3460;
+        }
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #e94560;
+            color: #fff;
+            display: none;
+            z-index: 100;
+            text-align: center;
+        }
+        .hit-feedback {
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎯 神枪手射击</h1>
+        <div class="score-board">
+            <div class="score-item">得分: <span id="score">0</span></div>
+            <div class="score-item">命中率: <span id="accuracy">100</span>%</div>
+            <div class="score-item">时间: <span id="time">60</span>s</div>
+        </div>
+        <canvas id="gameCanvas" width="700" height="500"></canvas>
+        <div class="controls">
+            <p>🖱️ 点击射击靶心 | 越接近中心得分越高!</p>
+            <button onclick="startGame()">开始游戏</button>
+            <button class="music-btn" onclick="toggleMusic()">🎵 音乐</button>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2>🎉 游戏结束!</h2>
+        <p>最终得分: <span id="finalScore">0</span></p>
+        <p>命中率: <span id="finalAccuracy">0</span>%</p>
+        <p>评级: <span id="rating">-</span></p>
+        <button onclick="restartGame()">再来一局</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let score = 0;
+        let shotsFired = 0;
+        let shotsHit = 0;
+        let timeLeft = 60;
+        let gameRunning = false;
+        let musicEnabled = true;
+        let targets = [];
+        let particles = [];
+        let bullets = [];
+        
+        // Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playBackgroundMusic() {
+            if (!musicEnabled) return;
+            
+            const playNote = (freq, duration, delay, type = 'sine') => {
+                setTimeout(() => {
+                    if (!musicEnabled || !gameRunning) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = type;
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                }, delay);
+            };
+            
+            const loop = () => {
+                if (!gameRunning || !musicEnabled) return;
+                // 紧张的节奏
+                [110, 130, 146, 164].forEach((freq, i) => {
+                    playNote(freq, 0.3, i * 200, 'square');
+                });
+                setTimeout(loop, 1500);
+            };
+            loop();
+        }
+        
+        function playShootSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            filter.type = 'lowpass';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+            filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+        
+        function playHitSound(points) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            // 分数越高音调越高
+            osc.frequency.value = 400 + points * 10;
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+        
+        function playMissSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 150;
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        // 靶子类
+        class Target {
+            constructor() {
+                this.radius = 30 + Math.random() * 20;
+                this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
+                this.y = this.radius + Math.random() * (canvas.height - this.radius * 2 - 100) + 50;
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                this.appearTime = Date.now();
+                this.lifeTime = 2000 + Math.random() * 2000;
+                this.scale = 0;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // 边界反弹
+                if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
+                    this.vx = -this.vx;
+                }
+                if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
+                    this.vy = -this.vy;
+                }
+                
+                // 出现动画
+                if (this.scale < 1) {
+                    this.scale += 0.1;
+                }
+                
+                // 即将消失时闪烁
+                const age = Date.now() - this.appearTime;
+                if (age > this.lifeTime - 500) {
+                    this.scale = 1 + Math.sin(age * 0.05) * 0.1;
+                }
+                
+                return age < this.lifeTime;
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(this.scale, this.scale);
+                
+                // 靶环
+                const rings = [
+                    { r: 1, color: '#fff' },
+                    { r: 0.8, color: '#000' },
+                    { r: 0.6, color: '#3498db' },
+                    { r: 0.4, color: '#e74c3c' },
+                    { r: 0.2, color: '#f1c40f' }
+                ];
+                
+                rings.forEach(ring => {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius * ring.r, 0, Math.PI * 2);
+                    ctx.fillStyle = ring.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+                
+                ctx.restore();
+            }
+            
+            checkHit(x, y) {
+                const dx = x - this.x;
+                const dy = y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > this.radius) return 0;
+                
+                // 计算得分
+                const ratio = dist / this.radius;
+                if (ratio < 0.2) return 50; // 黄金靶心
+                if (ratio < 0.4) return 30; // 红心
+                if (ratio < 0.6) return 20; // 蓝环
+                if (ratio < 0.8) return 10; // 黑环
+                return 5; // 白环
+            }
+        }
+        
+        // 子弹轨迹
+        class Bullet {
+            constructor(x, y, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.progress = 0;
+                this.speed = 0.2;
+            }
+            
+            update() {
+                this.progress += this.speed;
+                return this.progress < 1;
+            }
+            
+            draw() {
+                const x = this.x + (this.targetX - this.x) * this.progress;
+                const y = this.y + (this.targetY - this.y) * this.progress;
+                
+                ctx.strokeStyle = '#f1c40f';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // 弹丸
+                ctx.fillStyle = '#f1c40f';
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // 粒子效果
+        function createParticles(x, y, color, count = 10) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    dx: (Math.random() - 0.5) * 10,
+                    dy: (Math.random() - 0.5) * 10,
+                    life: 1,
+                    color: color,
+                    size: 3 + Math.random() * 3
+                });
+            }
+        }
+        
+        function showHitFeedback(x, y, points) {
+            const feedback = document.createElement('div');
+            feedback.className = 'hit-feedback';
+            feedback.textContent = points >= 50 ? '完美!' : `+${points}`;
+            feedback.style.left = (canvas.getBoundingClientRect().left + x) + 'px';
+            feedback.style.top = (canvas.getBoundingClientRect().top + y) + 'px';
+            feedback.style.color = points >= 50 ? '#f1c40f' : points >= 30 ? '#e74c3c' : '#3498db';
+            document.body.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 1000);
+        }
+        
+        function updateParticles() {
+            particles = particles.filter(p => {
+                p.x += p.dx;
+                p.y += p.dy;
+                p.dy += 0.3;
+                p.life -= 0.03;
+                return p.life > 0;
+            });
+        }
+        
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+        
+        // 射击处理
+        canvas.addEventListener('mousedown', (e) => {
+            if (!gameRunning) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            playShootSound();
+            shotsFired++;
+            
+            // 添加子弹轨迹
+            bullets.push(new Bullet(canvas.width / 2, canvas.height + 20, x, y));
+            
+            // 检查命中
+            let hit = false;
+            for (let i = targets.length - 1; i >= 0; i--) {
+                const points = targets[i].checkHit(x, y);
+                if (points > 0) {
+                    hit = true;
+                    shotsHit++;
+                    score += points;
+                    document.getElementById('score').textContent = score;
+                    playHitSound(points);
+                    createParticles(targets[i].x, targets[i].y, '#f1c40f', 15);
+                    showHitFeedback(x, y, points);
+                    targets.splice(i, 1);
+                    break;
+                }
+            }
+            
+            if (!hit) {
+                playMissSound();
+                createParticles(x, y, '#999', 5);
+            }
+            
+            updateAccuracy();
+        });
+        
+        function updateAccuracy() {
+            const accuracy = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 100;
+            document.getElementById('accuracy').textContent = accuracy;
+        }
+        
+        function spawnTarget() {
+            if (targets.length < 5) {
+                targets.push(new Target());
+            }
+        }
+        
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 生成新靶子
+            if (Math.random() < 0.03) {
+                spawnTarget();
+            }
+            
+            // 更新和绘制靶子
+            targets = targets.filter(target => {
+                if (target.update()) {
+                    target.draw();
+                    return true;
+                }
+                return false;
+            });
+            
+            // 更新和绘制子弹
+            bullets = bullets.filter(bullet => {
+                if (bullet.update()) {
+                    bullet.draw();
+                    return true;
+                }
+                return false;
+            });
+            
+            updateParticles();
+            drawParticles();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function startGame() {
+            if (gameRunning) return;
+            
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            gameRunning = true;
+            score = 0;
+            shotsFired = 0;
+            shotsHit = 0;
+            timeLeft = 60;
+            targets = [];
+            particles = [];
+            bullets = [];
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('accuracy').textContent = 100;
+            document.getElementById('time').textContent = timeLeft;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            playBackgroundMusic();
+            gameLoop();
+            
+            // 计时器
+            const timer = setInterval(() => {
+                if (!gameRunning) {
+                    clearInterval(timer);
+                    return;
+                }
+                timeLeft--;
+                document.getElementById('time').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endGame();
+                }
+            }, 1000);
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            
+            const accuracy = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0;
+            let rating = '新手';
+            if (score >= 1000 && accuracy >= 80) rating = '神射手';
+            else if (score >= 800 && accuracy >= 70) rating = '狙击手';
+            else if (score >= 500 && accuracy >= 60) rating = '射手';
+            else if (score >= 300) rating = '见习';
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalAccuracy').textContent = accuracy;
+            document.getElementById('rating').textContent = rating;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            startGame();
+        }
+        
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+        }
+        
+        // 初始绘制
+        ctx.fillStyle = '#0f3460';
+        ctx.font = '30px Microsoft YaHei';
+        ctx.textAlign = 'center';
+        ctx.fillText('点击开始游戏', canvas.width / 2, canvas.height / 2);
+    </script>
+</body>
+</html>
