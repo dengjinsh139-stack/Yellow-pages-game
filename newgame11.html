@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弹球游戏 - 物理反弹</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+        }
+        .game-container {
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #e94560;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+            color: #fff;
+            font-size: 18px;
+        }
+        .score-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid #e94560;
+        }
+        canvas {
+            border: 3px solid #e94560;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+            background: #0a0a0a;
+        }
+        .controls {
+            margin-top: 15px;
+            color: #fff;
+        }
+        button {
+            background: #e94560;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #ff6b6b;
+            transform: scale(1.05);
+        }
+        .music-toggle {
+            background: #533483;
+        }
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #e94560;
+            color: #fff;
+            display: none;
+            z-index: 100;
+        }
+        .game-over h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎱 弹球游戏</h1>
+        <div class="score-board">
+            <div class="score-item">得分: <span id="score">0</span></div>
+            <div class="score-item">生命: <span id="lives">3</span></div>
+            <div class="score-item">最高分: <span id="highScore">0</span></div>
+        </div>
+        <canvas id="gameCanvas" width="600" height="500"></canvas>
+        <div class="controls">
+            <p>🖱️ 移动鼠标控制挡板 | 点击开始游戏</p>
+            <button onclick="startGame()">开始游戏</button>
+            <button class="music-toggle" onclick="toggleMusic()">🎵 音乐开关</button>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2>游戏结束!</h2>
+        <p>最终得分: <span id="finalScore">0</span></p>
+        <button onclick="restartGame()">重新开始</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let score = 0;
+        let lives = 3;
+        let highScore = localStorage.getItem('pinballHighScore') || 0;
+        let gameRunning = false;
+        let musicEnabled = true;
+        let animationId;
+        
+        document.getElementById('highScore').textContent = highScore;
+        
+        // Web Audio API 背景音乐
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let musicOscillator = null;
+        let musicGain = null;
+        
+        function playBackgroundMusic() {
+            if (!musicEnabled || musicOscillator) return;
+            
+            const playNote = (freq, duration, delay) => {
+                setTimeout(() => {
+                    if (!musicEnabled || !gameRunning) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                }, delay);
+            };
+            
+            // 循环播放简单的背景音乐
+            const loop = () => {
+                if (!gameRunning || !musicEnabled) return;
+                [220, 277, 330, 440].forEach((freq, i) => playNote(freq, 0.5, i * 500));
+                setTimeout(loop, 2000);
+            };
+            loop();
+        }
+        
+        function playBounceSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 400 + Math.random() * 200;
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+        
+        function playBrickSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 600 + Math.random() * 400;
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+        
+        function playLifeLostSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 150;
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+        
+        // 游戏对象
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height - 100,
+            dx: 4,
+            dy: -4,
+            radius: 8,
+            speed: 5,
+            trail: []
+        };
+        
+        const paddle = {
+            width: 100,
+            height: 15,
+            x: canvas.width / 2 - 50,
+            y: canvas.height - 30,
+            speed: 8
+        };
+        
+        // 砖块设置
+        const brickRowCount = 5;
+        const brickColumnCount = 8;
+        const brickWidth = 60;
+        const brickHeight = 20;
+        const brickPadding = 10;
+        const brickOffsetTop = 60;
+        const brickOffsetLeft = 35;
+        
+        let bricks = [];
+        
+        function initBricks() {
+            bricks = [];
+            const colors = ['#e94560', '#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1'];
+            for (let c = 0; c < brickColumnCount; c++) {
+                bricks[c] = [];
+                for (let r = 0; r < brickRowCount; r++) {
+                    bricks[c][r] = { 
+                        x: 0, 
+                        y: 0, 
+                        status: 1, 
+                        color: colors[r % colors.length],
+                        points: (5 - r) * 10
+                    };
+                }
+            }
+        }
+        
+        // 粒子效果
+        let particles = [];
+        
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    dx: (Math.random() - 0.5) * 4,
+                    dy: (Math.random() - 0.5) * 4,
+                    life: 1,
+                    color: color
+                });
+            }
+        }
+        
+        function updateParticles() {
+            particles = particles.filter(p => {
+                p.x += p.dx;
+                p.y += p.dy;
+                p.life -= 0.02;
+                return p.life > 0;
+            });
+        }
+        
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+        
+        // 绘制函数
+        function drawBall() {
+            // 绘制轨迹
+            ball.trail.forEach((pos, i) => {
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, ball.radius * (i / ball.trail.length), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(233, 69, 96, ${i / ball.trail.length * 0.5})`;
+                ctx.fill();
+            });
+            
+            // 绘制球
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            const gradient = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 0, ball.x, ball.y, ball.radius);
+            gradient.addColorStop(0, '#fff');
+            gradient.addColorStop(0.5, '#e94560');
+            gradient.addColorStop(1, '#8b0000');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.closePath();
+            
+            // 发光效果
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#e94560';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+        
+        function drawPaddle() {
+            ctx.fillStyle = '#533483';
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            
+            // 高光效果
+            const gradient = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y + paddle.height);
+            gradient.addColorStop(0, 'rgba(255,255,255,0.3)');
+            gradient.addColorStop(0.5, 'rgba(255,255,255,0)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0.3)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            
+            // 边框
+            ctx.strokeStyle = '#e94560';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        }
+        
+        function drawBricks() {
+            for (let c = 0; c < brickColumnCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    if (bricks[c][r].status === 1) {
+                        const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                        const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+                        bricks[c][r].x = brickX;
+                        bricks[c][r].y = brickY;
+                        
+                        ctx.fillStyle = bricks[c][r].color;
+                        ctx.fillRect(brickX, brickY, brickWidth, brickHeight);
+                        
+                        // 3D效果
+                        const gradient = ctx.createLinearGradient(brickX, brickY, brickX, brickY + brickHeight);
+                        gradient.addColorStop(0, 'rgba(255,255,255,0.4)');
+                        gradient.addColorStop(0.5, 'rgba(255,255,255,0)');
+                        gradient.addColorStop(1, 'rgba(0,0,0,0.2)');
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(brickX, brickY, brickWidth, brickHeight);
+                        
+                        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                        ctx.strokeRect(brickX, brickY, brickWidth, brickHeight);
+                    }
+                }
+            }
+        }
+        
+        // 碰撞检测
+        function collisionDetection() {
+            for (let c = 0; c < brickColumnCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    const b = bricks[c][r];
+                    if (b.status === 1) {
+                        if (ball.x > b.x && ball.x < b.x + brickWidth &&
+                            ball.y > b.y && ball.y < b.y + brickHeight) {
+                            ball.dy = -ball.dy;
+                            b.status = 0;
+                            score += b.points;
+                            document.getElementById('score').textContent = score;
+                            playBrickSound();
+                            createParticles(b.x + brickWidth/2, b.y + brickHeight/2, b.color);
+                            
+                            // 检查胜利
+                            if (score > 0 && bricks.every(col => col.every(brick => brick.status === 0))) {
+                                nextLevel();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        function nextLevel() {
+            ball.speed *= 1.1;
+            ball.dx = ball.speed * (Math.random() > 0.5 ? 1 : -1);
+            ball.dy = -ball.speed;
+            initBricks();
+        }
+        
+        // 鼠标控制
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const relativeX = e.clientX - rect.left;
+            if (relativeX > 0 && relativeX < canvas.width) {
+                paddle.x = relativeX - paddle.width / 2;
+            }
+        });
+        
+        // 触摸控制
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const relativeX = e.touches[0].clientX - rect.left;
+            if (relativeX > 0 && relativeX < canvas.width) {
+                paddle.x = relativeX - paddle.width / 2;
+            }
+        });
+        
+        function update() {
+            if (!gameRunning) return;
+            
+            // 更新球轨迹
+            ball.trail.push({x: ball.x, y: ball.y});
+            if (ball.trail.length > 10) ball.trail.shift();
+            
+            // 移动球
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+            
+            // 左右墙壁碰撞
+            if (ball.x + ball.dx > canvas.width - ball.radius || ball.x + ball.dx < ball.radius) {
+                ball.dx = -ball.dx;
+                playBounceSound();
+            }
+            
+            // 顶部墙壁碰撞
+            if (ball.y + ball.dy < ball.radius) {
+                ball.dy = -ball.dy;
+                playBounceSound();
+            }
+            
+            // 挡板碰撞
+            if (ball.y + ball.dy > paddle.y - ball.radius &&
+                ball.y < paddle.y + paddle.height &&
+                ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
+                ball.dy = -Math.abs(ball.dy);
+                // 根据击中位置改变角度
+                const hitPos = (ball.x - paddle.x) / paddle.width;
+                ball.dx = 8 * (hitPos - 0.5);
+                playBounceSound();
+            }
+            
+            // 掉落检测
+            if (ball.y + ball.dy > canvas.height - ball.radius) {
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                playLifeLostSound();
+                
+                if (lives === 0) {
+                    gameOver();
+                } else {
+                    resetBall();
+                }
+            }
+            
+            // 限制挡板
+            if (paddle.x < 0) paddle.x = 0;
+            if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+            
+            collisionDetection();
+            updateParticles();
+        }
+        
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height - 100;
+            ball.dx = ball.speed * (Math.random() > 0.5 ? 1 : -1);
+            ball.dy = -ball.speed;
+            ball.trail = [];
+        }
+        
+        function draw() {
+            // 清空画布（带拖尾效果）
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawBricks();
+            drawBall();
+            drawPaddle();
+            drawParticles();
+        }
+        
+        function gameLoop() {
+            if (!gameRunning) return;
+            update();
+            draw();
+            animationId = requestAnimationFrame(gameLoop);
+        }
+        
+        function startGame() {
+            if (gameRunning) return;
+            
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            gameRunning = true;
+            score = 0;
+            lives = 3;
+            ball.speed = 5;
+            document.getElementById('score').textContent = score;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            initBricks();
+            resetBall();
+            playBackgroundMusic();
+            gameLoop();
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('pinballHighScore', highScore);
+                document.getElementById('highScore').textContent = highScore;
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            startGame();
+        }
+        
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+        }
+        
+        // 初始绘制
+        initBricks();
+        draw();
+    </script>
+</body>
+</html>
