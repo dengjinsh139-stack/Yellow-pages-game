@@ -1139,87 +1139,64 @@
             }
         }
 
+        // ==================== 倒计时音效 ====================
+        function playCountdownSound(number) {
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if (number === 0) {
+                // GO! 音效 - 上升音阶
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, t);
+                osc.frequency.linearRampToValueAtTime(880, t + 0.1);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+            } else {
+                // 倒计时数字音效
+                const freq = 600 + (4 - number) * 100;
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, t);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+            }
+            
+            osc.start(t);
+            osc.stop(t + 0.4);
+        }
+
         // ==================== 倒计时 ====================
         function startCountdown() {
             showScreen('gameScreen');
             
-            // 生成按键提示
-            const keyContainer = document.getElementById('keyHintContainer');
-            keyContainer.innerHTML = '';
-            const keys = gameState.laneCount === 4 ? ['D', 'F', 'J', 'K'] : ['D', 'K'];
-            keys.forEach(key => {
-                const hint = document.createElement('div');
-                hint.className = 'key-hint';
-                hint.id = 'key-' + key;
-                hint.innerHTML = key + '<div class="finger"></div>';
-                keyContainer.appendChild(hint);
-            });
-            
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             
-            // 显示操作提示
-            ctx.fillStyle = '#0d0d1a';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.font = 'bold 30px Orbitron';
-            ctx.fillStyle = '#00ccff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('HOW TO PLAY', canvas.width/2, 80);
-            
-            ctx.font = '20px "Noto Sans SC"';
-            ctx.fillStyle = '#fff';
-            const keyText = gameState.laneCount === 4 ? 'D  F  J  K' : 'D        K';
-            ctx.fillText('按键: ' + keyText, canvas.width/2, 150);
-            ctx.fillText('当音符到达红线时按下对应按键', canvas.width/2, 190);
-            
-            // 绘制示例
-            ctx.fillStyle = 'rgba(0,255,153,0.8)';
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = '#00ff99';
-            ctx.fillRect(canvas.width/2 - 40, 230, 80, 30);
-            ctx.shadowBlur = 0;
-            
-            ctx.strokeStyle = '#ff0066';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2 - 60, 300);
-            ctx.lineTo(canvas.width/2 + 60, 300);
-            ctx.stroke();
-            
-            ctx.font = '16px "Noto Sans SC"';
-            ctx.fillStyle = '#888';
-            ctx.fillText('↑ 音符', canvas.width/2, 220);
-            ctx.fillText('↓ 判定线', canvas.width/2, 330);
-            
-            ctx.font = 'bold 24px Orbitron';
-            ctx.fillStyle = '#ff0066';
-            ctx.fillText('准备开始...', canvas.width/2, 380);
-            
-            // 延迟后开始倒计时
-            setTimeout(() => {
-                let count = 3;
-                const countInterval = setInterval(() => {
-                    ctx.fillStyle = '#0d0d1a';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    
-                    ctx.font = 'bold 120px Orbitron';
-                    ctx.fillStyle = '#ff0066';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.shadowBlur = 40;
-                    ctx.shadowColor = '#ff0066';
-                    ctx.fillText(count > 0 ? count : 'GO!', canvas.width/2, canvas.height/2);
-                    ctx.shadowBlur = 0;
-                    
-                    if (count === 0) {
-                        clearInterval(countInterval);
-                        setTimeout(startGame, 500);
-                    }
-                    count--;
-                }, 800);
-            }, 2500);
+            let count = 3;
+            const countInterval = setInterval(() => {
+                ctx.fillStyle = '#0d0d1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.font = 'bold 120px Orbitron';
+                ctx.fillStyle = '#ff0066';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = '#ff0066';
+                ctx.fillText(count > 0 ? count : 'GO!', canvas.width/2, canvas.height/2);
+                ctx.shadowBlur = 0;
+                
+                // 播放倒计时音效
+                playCountdownSound(count);
+                
+                if (count === 0) {
+                    clearInterval(countInterval);
+                    setTimeout(startGame, 500);
+                }
+                count--;
+            }, 800);
         }
 
         // ==================== 真实乐器演奏模式音符生成 ====================
@@ -1230,129 +1207,172 @@
             const beatInterval = 60000 / bpm;
             const startTime = 2000;
             
+            // 定义和弦进行 C - Am - F - G (1645进行)
+            const chordProgression = [
+                { root: 261.63, third: 329.63, fifth: 392.00, name: 'C' },    // C大调
+                { root: 220.00, third: 261.63, fifth: 329.63, name: 'Am' },   // Am小调
+                { root: 349.23, third: 440.00, fifth: 261.63, name: 'F' },    // F大调
+                { root: 392.00, third: 293.66, fifth: 349.23, name: 'G' }     // G大调
+            ];
+            
             if (instrument === 'drum') {
-                // 架子鼓真实节奏型
-                // 轨道映射: 0=踩镲(Hi-hat), 1=军鼓(Snare), 2=底鼓(Kick), 3=Tom/Crash
-                // 基础"动次打次": Kick(1,3拍) + Snare(2,4拍) + Hi-hat(每拍)
-                
+                // 架子鼓真实节奏型 - 鼓不需要音高
                 for (let t = startTime; t < duration - 2000; t += beatInterval) {
                     const beatInBar = Math.floor((t - startTime) / beatInterval) % 4;
+                    const barIndex = Math.floor((t - startTime) / (beatInterval * 4)) % 4;
                     
-                    // 每拍都有踩镲 (轨道0)
-                    notes.push({ time: t, lane: 0, hit: false, missed: false, type: 'hihat' });
+                    // 每拍都有踩镲
+                    notes.push({ time: t, lane: 0, hit: false, missed: false, type: 'hihat', freq: null });
                     
-                    // 第1、3拍: 底鼓 (轨道2)
+                    // 第1、3拍: 底鼓
                     if (beatInBar === 0 || beatInBar === 2) {
-                        notes.push({ time: t, lane: 2, hit: false, missed: false, type: 'kick' });
+                        notes.push({ time: t, lane: 2, hit: false, missed: false, type: 'kick', freq: null });
                     }
                     
-                    // 第2、4拍: 军鼓 (轨道1)
+                    // 第2、4拍: 军鼓
                     if (beatInBar === 1 || beatInBar === 3) {
-                        notes.push({ time: t + 50, lane: 1, hit: false, missed: false, type: 'snare' });
+                        notes.push({ time: t + 50, lane: 1, hit: false, missed: false, type: 'snare', freq: null });
                     }
                     
-                    // 高难度: 加入Tom鼓加花 (轨道3)
+                    // 高难度: 加入Tom鼓加花
                     if (level >= 3 && beatInBar === 3) {
-                        notes.push({ time: t + beatInterval * 0.5, lane: 3, hit: false, missed: false, type: 'tom' });
+                        notes.push({ time: t + beatInterval * 0.5, lane: 3, hit: false, missed: false, type: 'tom', freq: null });
                     }
                     
                     // 地狱难度: 十六分音符踩镲
                     if (level >= 5 && beatInBar % 2 === 0) {
-                        notes.push({ time: t + beatInterval * 0.25, lane: 0, hit: false, missed: false, type: 'hihat' });
-                        notes.push({ time: t + beatInterval * 0.5, lane: 0, hit: false, missed: false, type: 'hihat' });
-                        notes.push({ time: t + beatInterval * 0.75, lane: 0, hit: false, missed: false, type: 'hihat' });
+                        notes.push({ time: t + beatInterval * 0.25, lane: 0, hit: false, missed: false, type: 'hihat', freq: null });
+                        notes.push({ time: t + beatInterval * 0.5, lane: 0, hit: false, missed: false, type: 'hihat', freq: null });
+                        notes.push({ time: t + beatInterval * 0.75, lane: 0, hit: false, missed: false, type: 'hihat', freq: null });
                     }
                 }
                 
             } else if (instrument === 'guitar') {
-                // 吉他真实扫弦/分解模式
-                // 2轨: 0=低音弦(根音), 1=高音弦(三音/五音)
-                // 典型民谣扫弦: "下 下上 上下上" 或分解 "低-高-中-高"
-                
+                // 吉他真实扫弦/分解模式 - 根据和弦进行变化音高
                 const patterns = [
-                    // Level 1-2: 简单分解 低-高-低-高
-                    [{time: 0, lane: 0}, {time: 0.5, lane: 1}, {time: 1, lane: 0}, {time: 1.5, lane: 1}],
-                    // Level 3-4: 民谣扫弦 下-下上-上-下上
-                    [{time: 0, lane: 0}, {time: 0.5, lane: 0}, {time: 0.5, lane: 1}, {time: 1.5, lane: 1}, {time: 2, lane: 0}, {time: 2.5, lane: 1}],
+                    // Level 1-2: 简单分解 根音-三音
+                    [
+                        { time: 0, lane: 0, degree: 'root' },
+                        { time: 0.5, lane: 1, degree: 'third' },
+                        { time: 1, lane: 0, degree: 'root' },
+                        { time: 1.5, lane: 1, degree: 'fifth' }
+                    ],
+                    // Level 3-4: 民谣扫弦
+                    [
+                        { time: 0, lane: 0, degree: 'root' },
+                        { time: 0.5, lane: 0, degree: 'root' },
+                        { time: 0.5, lane: 1, degree: 'third' },
+                        { time: 1.5, lane: 1, degree: 'fifth' },
+                        { time: 2, lane: 0, degree: 'root' },
+                        { time: 2.5, lane: 1, degree: 'third' }
+                    ],
                     // Level 5: 复杂切分
-                    [{time: 0, lane: 0}, {time: 0.33, lane: 1}, {time: 0.66, lane: 0}, {time: 1, lane: 1}, {time: 1.5, lane: 0}, {time: 1.75, lane: 1}]
+                    [
+                        { time: 0, lane: 0, degree: 'root' },
+                        { time: 0.33, lane: 1, degree: 'third' },
+                        { time: 0.66, lane: 0, degree: 'fifth' },
+                        { time: 1, lane: 1, degree: 'root' },
+                        { time: 1.5, lane: 0, degree: 'third' },
+                        { time: 1.75, lane: 1, degree: 'fifth' }
+                    ]
                 ];
                 
                 const patternIdx = Math.min(level - 1, 2);
                 const pattern = patterns[patternIdx];
                 
                 for (let barStart = startTime; barStart < duration - 2000; barStart += beatInterval * 2) {
+                    const barIndex = Math.floor((barStart - startTime) / (beatInterval * 2)) % 4;
+                    const currentChord = chordProgression[barIndex];
+                    
                     pattern.forEach(note => {
                         const noteTime = barStart + note.time * beatInterval;
                         if (noteTime < duration - 2000) {
-                            notes.push({ 
-                                time: noteTime, 
-                                lane: note.lane, 
-                                hit: false, 
+                            const freq = currentChord[note.degree];
+                            notes.push({
+                                time: noteTime,
+                                lane: note.lane,
+                                hit: false,
                                 missed: false,
-                                type: note.lane === 0 ? 'bass_string' : 'treble_string'
+                                type: note.lane === 0 ? 'bass_string' : 'treble_string',
+                                freq: freq,
+                                chord: currentChord.name
                             });
                         }
                     });
                 }
                 
             } else if (instrument === 'bass') {
-                // 贝斯真实Walking Bass模式
-                // 2轨: 0=根音, 1=五度/经过音
-                // Walking Bass: 根音 -> 五度 -> 根音 -> 经过音
-                
+                // 贝斯Walking Bass - 根据和弦进行变化音高
                 for (let t = startTime; t < duration - 2000; t += beatInterval) {
                     const beatInBar = Math.floor((t - startTime) / beatInterval) % 4;
+                    const barIndex = Math.floor((t - startTime) / (beatInterval * 4)) % 4;
+                    const currentChord = chordProgression[barIndex];
+                    const nextChord = chordProgression[(barIndex + 1) % 4];
                     
-                    // 每拍一个音 - Walking Bass核心
+                    let freq, type;
+                    
                     if (beatInBar === 0) {
-                        // 第1拍: 根音 (强拍)
-                        notes.push({ time: t, lane: 0, hit: false, missed: false, type: 'root' });
+                        // 第1拍: 根音
+                        freq = currentChord.root;
+                        type = 'root';
+                        notes.push({ time: t, lane: 0, hit: false, missed: false, type, freq, chord: currentChord.name });
                     } else if (beatInBar === 1) {
-                        // 第2拍: 五度 (弱拍)
-                        notes.push({ time: t, lane: 1, hit: false, missed: false, type: 'fifth' });
+                        // 第2拍: 五度音或三度音
+                        freq = currentChord.fifth;
+                        type = 'fifth';
+                        notes.push({ time: t, lane: 1, hit: false, missed: false, type, freq, chord: currentChord.name });
                     } else if (beatInBar === 2) {
-                        // 第3拍: 根音 (次强拍)
-                        notes.push({ time: t, lane: 0, hit: false, missed: false, type: 'root' });
+                        // 第3拍: 根音(高八度)或三度音
+                        freq = currentChord.third;
+                        type = 'third';
+                        notes.push({ time: t, lane: 0, hit: false, missed: false, type, freq, chord: currentChord.name });
                     } else if (beatInBar === 3) {
-                        // 第4拍: 经过音/ approaching note
-                        notes.push({ time: t, lane: 1, hit: false, missed: false, type: 'passing' });
+                        // 第4拍: 经过音(半音接近下一个和弦的根音)
+                        if (level >= 3) {
+                            // 使用半音经过音 approaching tone
+                            freq = (currentChord.root + nextChord.root) / 2;
+                            type = 'passing';
+                        } else {
+                            freq = currentChord.fifth;
+                            type = 'fifth';
+                        }
+                        notes.push({ time: t, lane: 1, hit: false, missed: false, type, freq, chord: currentChord.name });
                     }
                     
                     // 高难度: 加入半音经过音
                     if (level >= 4 && beatInBar === 3) {
-                        notes.push({ time: t + beatInterval * 0.5, lane: 0, hit: false, missed: false, type: 'chromatic' });
+                        const chromaticFreq = nextChord.root * 0.97; // 半音下行
+                        notes.push({ time: t + beatInterval * 0.5, lane: 0, hit: false, missed: false, type: 'chromatic', freq: chromaticFreq, chord: currentChord.name });
                     }
                 }
                 
             } else if (instrument === 'keyboard') {
-                // 键盘真实伴奏模式
-                // 4轨: 0=低音, 1=中音, 2=高音, 3=和弦
-                // 柱式和弦 + 分解琶音
-                
+                // 键盘伴奏 - 根据和弦进行变化音高
                 for (let t = startTime; t < duration - 2000; t += beatInterval * 2) {
+                    const barIndex = Math.floor((t - startTime) / (beatInterval * 2)) % 4;
+                    const currentChord = chordProgression[barIndex];
                     const chordStart = t;
                     
                     if (level <= 2) {
-                        // 简单柱式和弦: 低 + 和弦
-                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass' });
-                        notes.push({ time: chordStart, lane: 3, hit: false, missed: false, type: 'chord' });
+                        // 简单柱式和弦: 低音 + 和弦
+                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass', freq: currentChord.root / 2, chord: currentChord.name });
+                        notes.push({ time: chordStart, lane: 3, hit: false, missed: false, type: 'chord', freq: currentChord.root, chord: currentChord.name });
                         
                     } else if (level <= 4) {
                         // 半分解和弦: 低-中-高-中
-                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass' });
-                        notes.push({ time: chordStart + beatInterval * 0.5, lane: 1, hit: false, missed: false, type: 'mid' });
-                        notes.push({ time: chordStart + beatInterval, lane: 2, hit: false, missed: false, type: 'high' });
-                        notes.push({ time: chordStart + beatInterval * 1.5, lane: 1, hit: false, missed: false, type: 'mid' });
+                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass', freq: currentChord.root / 2, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval * 0.5, lane: 1, hit: false, missed: false, type: 'third', freq: currentChord.third, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval, lane: 2, hit: false, missed: false, type: 'fifth', freq: currentChord.fifth, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval * 1.5, lane: 1, hit: false, missed: false, type: 'third', freq: currentChord.third, chord: currentChord.name });
                         
                     } else {
-                        // 复杂琶音: 低-中-高-中-低-中-高
-                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass' });
-                        notes.push({ time: chordStart + beatInterval * 0.33, lane: 1, hit: false, missed: false, type: 'mid' });
-                        notes.push({ time: chordStart + beatInterval * 0.66, lane: 2, hit: false, missed: false, type: 'high' });
-                        notes.push({ time: chordStart + beatInterval, lane: 1, hit: false, missed: false, type: 'mid' });
-                        notes.push({ time: chordStart + beatInterval * 1.33, lane: 0, hit: false, missed: false, type: 'bass' });
-                        notes.push({ time: chordStart + beatInterval * 1.66, lane: 2, hit: false, missed: false, type: 'high' });
+                        // 复杂琶音: 低-中-高-中-低-高
+                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass', freq: currentChord.root / 2, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval * 0.33, lane: 1, hit: false, missed: false, type: 'third', freq: currentChord.third, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval * 0.66, lane: 2, hit: false, missed: false, type: 'fifth', freq: currentChord.fifth, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval, lane: 1, hit: false, missed: false, type: 'third', freq: currentChord.third, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval * 1.33, lane: 0, hit: false, missed: false, type: 'root', freq: currentChord.root, chord: currentChord.name });
+                        notes.push({ time: chordStart + beatInterval * 1.66, lane: 2, hit: false, missed: false, type: 'high', freq: currentChord.root * 2, chord: currentChord.name });
                     }
                 }
             }
@@ -1471,18 +1491,6 @@
                 const keyEl = document.getElementById('key-' + keys[lane]);
                 if (keyEl) keyEl.classList.add('active');
                 
-                // 音效
-                if (gameState.instrument === 'drum') {
-                    const sounds = ['kick', 'hihat', 'snare', 'hihat'];
-                    playDrum(sounds[lane] || 'kick', 0.8);
-                } else if (gameState.instrument === 'guitar') {
-                    playGuitar([261.63, 329.63][lane], 0.6);
-                } else if (gameState.instrument === 'bass') {
-                    playBass([130.81, 164.81][lane], 0.8);
-                } else if (gameState.instrument === 'keyboard') {
-                    playKeyboard([523.25, 659.25, 783.99, 1046.50][lane], 0.5);
-                }
-                
                 // 判定
                 const currentTime = Date.now() - gameState.gameStartTime;
                 let nearestNote = null;
@@ -1501,6 +1509,25 @@
                     nearestNote.hit = true;
                     const judgment = judgeNote(nearestNote.time - currentTime);
                     const x = lane * laneWidth + laneWidth / 2;
+                    
+                    // 根据乐器播放对应音效 - 使用音符的实际音高
+                    if (gameState.instrument === 'drum') {
+                        // 鼓使用固定音效（根据类型）
+                        const drumType = nearestNote.type || 'kick';
+                        playDrum(drumType, 0.8);
+                    } else if (gameState.instrument === 'guitar') {
+                        // 吉他使用音符的实际频率
+                        const freq = nearestNote.freq || 261.63;
+                        playGuitar(freq, 0.6);
+                    } else if (gameState.instrument === 'bass') {
+                        // 贝斯使用音符的实际频率
+                        const freq = nearestNote.freq || 130.81;
+                        playBass(freq, 0.8);
+                    } else if (gameState.instrument === 'keyboard') {
+                        // 键盘使用音符的实际频率
+                        const freq = nearestNote.freq || 523.25;
+                        playKeyboard(freq, 0.5);
+                    }
                     
                     switch(judgment) {
                         case 'PERFECT': gameState.perfectCount++; gameState.combo++; break;
