@@ -1158,26 +1158,68 @@
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             
-            let count = 3;
-            const countInterval = setInterval(() => {
-                ctx.fillStyle = '#0d0d1a';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.font = 'bold 120px Orbitron';
-                ctx.fillStyle = '#ff0066';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowBlur = 40;
-                ctx.shadowColor = '#ff0066';
-                ctx.fillText(count > 0 ? count : 'GO!', canvas.width/2, canvas.height/2);
-                ctx.shadowBlur = 0;
-                
-                if (count === 0) {
-                    clearInterval(countInterval);
-                    setTimeout(startGame, 500);
-                }
-                count--;
-            }, 800);
+            // 显示操作提示
+            ctx.fillStyle = '#0d0d1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = 'bold 30px Orbitron';
+            ctx.fillStyle = '#00ccff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('HOW TO PLAY', canvas.width/2, 80);
+            
+            ctx.font = '20px "Noto Sans SC"';
+            ctx.fillStyle = '#fff';
+            const keyText = gameState.laneCount === 4 ? 'D  F  J  K' : 'D        K';
+            ctx.fillText('按键: ' + keyText, canvas.width/2, 150);
+            ctx.fillText('当音符到达红线时按下对应按键', canvas.width/2, 190);
+            
+            // 绘制示例
+            ctx.fillStyle = 'rgba(0,255,153,0.8)';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00ff99';
+            ctx.fillRect(canvas.width/2 - 40, 230, 80, 30);
+            ctx.shadowBlur = 0;
+            
+            ctx.strokeStyle = '#ff0066';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2 - 60, 300);
+            ctx.lineTo(canvas.width/2 + 60, 300);
+            ctx.stroke();
+            
+            ctx.font = '16px "Noto Sans SC"';
+            ctx.fillStyle = '#888';
+            ctx.fillText('↑ 音符', canvas.width/2, 220);
+            ctx.fillText('↓ 判定线', canvas.width/2, 330);
+            
+            ctx.font = 'bold 24px Orbitron';
+            ctx.fillStyle = '#ff0066';
+            ctx.fillText('准备开始...', canvas.width/2, 380);
+            
+            // 延迟后开始倒计时
+            setTimeout(() => {
+                let count = 3;
+                const countInterval = setInterval(() => {
+                    ctx.fillStyle = '#0d0d1a';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.font = 'bold 120px Orbitron';
+                    ctx.fillStyle = '#ff0066';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowBlur = 40;
+                    ctx.shadowColor = '#ff0066';
+                    ctx.fillText(count > 0 ? count : 'GO!', canvas.width/2, canvas.height/2);
+                    ctx.shadowBlur = 0;
+                    
+                    if (count === 0) {
+                        clearInterval(countInterval);
+                        setTimeout(startGame, 500);
+                    }
+                    count--;
+                }, 800);
+            }, 2500);
         }
 
         // ==================== 音符生成 ====================
@@ -1466,6 +1508,37 @@
                 // 判定线发光
                 ctx.fillStyle = 'rgba(255,0,102,0.2)';
                 ctx.fillRect(0, hitLineY - 10, canvas.width, 20);
+                
+                // 按键提示（在判定线下方）
+                ctx.font = 'bold 24px Orbitron';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const keyLabels = laneCount === 4 ? ['D', 'F', 'J', 'K'] : ['D', 'K'];
+                keyLabels.forEach((key, i) => {
+                    const x = i * laneWidth + laneWidth / 2;
+                    const y = hitLineY + 35;
+                    
+                    // 按键背景
+                    if (pressedLanes.has(i)) {
+                        ctx.fillStyle = 'rgba(255,0,102,0.8)';
+                        ctx.shadowBlur = 20;
+                        ctx.shadowColor = '#ff0066';
+                    } else {
+                        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    // 按键框
+                    ctx.fillRect(x - 25, y - 20, 50, 40);
+                    ctx.strokeStyle = pressedLanes.has(i) ? '#ff0066' : 'rgba(255,255,255,0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x - 25, y - 20, 50, 40);
+                    
+                    // 按键文字
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(key, x, y);
+                    ctx.shadowBlur = 0;
+                });
                 
                 // 绘制音符
                 gameState.notes.forEach(note => {
