@@ -1072,28 +1072,83 @@
             osc.stop(t + 0.6);
         }
 
+        // ==================== 改进的背景音乐 - 更有节奏感 ====================
         function playBackingTrack(beat) {
-            const backingVolume = 0.3 + (gameState.bandEnergy / 100) * 0.4;
+            const energy = gameState.bandEnergy / 100;
+            const backingVolume = 0.25 + energy * 0.5;
             const beatInBar = beat % 4;
+            const barIndex = Math.floor(beat / 4) % 4;
             
+            // 和弦定义
+            const chords = [
+                { root: 261.63, name: 'C' },
+                { root: 220.00, name: 'Am' },
+                { root: 349.23, name: 'F' },
+                { root: 392.00, name: 'G' }
+            ];
+            const currentChord = chords[barIndex];
+            
+            // 鼓节奏 - 更有律动的"动次打次"
             if (gameState.instrument !== 'drum') {
-                playDrum('hihat', backingVolume);
-                if (beatInBar === 0 || beatInBar === 2) playDrum('kick', backingVolume);
-                if (beatInBar === 1 || beatInBar === 3) setTimeout(() => playDrum('snare', backingVolume), 50);
+                // 第1拍: 底鼓 + 踩镲
+                if (beatInBar === 0) {
+                    playDrum('kick', backingVolume * 0.9);
+                    playDrum('hihat', backingVolume * 0.5);
+                }
+                // 第2拍: 军鼓 + 踩镲
+                else if (beatInBar === 1) {
+                    playDrum('snare', backingVolume * 0.9);
+                    playDrum('hihat', backingVolume * 0.5);
+                    // 第2拍后半拍加底鼓
+                    setTimeout(() => playDrum('kick', backingVolume * 0.5), beatInterval * 0.5);
+                }
+                // 第3拍: 底鼓 + 踩镲
+                else if (beatInBar === 2) {
+                    playDrum('kick', backingVolume * 0.9);
+                    playDrum('hihat', backingVolume * 0.5);
+                }
+                // 第4拍: 军鼓 + 踩镲 + 开镲
+                else if (beatInBar === 3) {
+                    playDrum('snare', backingVolume * 0.9);
+                    playDrum('hihat', backingVolume * 0.7);
+                    // 第4拍后半拍加花
+                    setTimeout(() => playDrum('kick', backingVolume * 0.4), beatInterval * 0.5);
+                }
             }
             
-            if (gameState.instrument !== 'guitar' && (beatInBar === 0 || beatInBar === 2)) {
-                const chord = [261.63, 329.63, 392.00][beat % 3];
-                playGuitar(chord, backingVolume * 0.6);
+            // 贝斯 - Walking Bass风格
+            if (gameState.instrument !== 'bass') {
+                if (beatInBar === 0) {
+                    playBass(currentChord.root, backingVolume * 0.8);
+                } else if (beatInBar === 1) {
+                    playBass(currentChord.root * 1.5, backingVolume * 0.6); // 五度
+                } else if (beatInBar === 2) {
+                    playBass(currentChord.root, backingVolume * 0.8);
+                } else if (beatInBar === 3) {
+                    // 走向下一个和弦
+                    const nextChord = chords[(barIndex + 1) % 4];
+                    const approachNote = nextChord.root * 0.95;
+                    playBass(approachNote, backingVolume * 0.6);
+                }
             }
             
-            if (gameState.instrument !== 'bass' && beatInBar === 0) {
-                playBass(261.63, backingVolume * 0.7);
+            // 吉他和弦 - 在第1和第3拍扫弦
+            if (gameState.instrument !== 'guitar') {
+                if (beatInBar === 0 || beatInBar === 2) {
+                    playGuitar(currentChord.root, backingVolume * 0.5);
+                    setTimeout(() => playGuitar(currentChord.root * 1.25, backingVolume * 0.4), 50);
+                }
             }
             
-            if (gameState.instrument !== 'keyboard' && beatInBar === 0) {
-                playKeyboard(523.25, backingVolume * 0.4);
-                setTimeout(() => playKeyboard(659.25, backingVolume * 0.3), 100);
+            // 键盘 - 琶音或和弦填充
+            if (gameState.instrument !== 'keyboard') {
+                if (beatInBar === 0) {
+                    playKeyboard(currentChord.root * 2, backingVolume * 0.4);
+                } else if (beatInBar === 1) {
+                    playKeyboard(currentChord.root * 2.5, backingVolume * 0.3);
+                } else if (beatInBar === 2) {
+                    playKeyboard(currentChord.root * 3, backingVolume * 0.4);
+                }
             }
         }
 
@@ -1708,7 +1763,7 @@
                         updateComboDisplay();
                         updateAccuracy();
                         updateHUD();
-                        playJudgmentSound('MISS');
+                        // Miss音效已移除 - 保持安静
                         const x = note.lane * laneWidth + laneWidth / 2;
                         showJudgment('MISS', x, hitLineY - 50);
                     }
