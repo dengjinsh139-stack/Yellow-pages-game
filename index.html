@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>昭羽的快乐空间</title>
+    <title>⚙️ 工业音游中心</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
         
         * {
             margin: 0;
@@ -14,197 +14,90 @@
         }
         
         :root {
-            --primary: #ff6b9d;
-            --secondary: #c44569;
-            --accent1: #f8b500;
-            --accent2: #4ecdc4;
-            --accent3: #a8e6cf;
-            --dark: #2c3e50;
-            --light: #fff5f5;
+            --rust: #8B4513;
+            --steel: #4a4a4a;
+            --iron: #2c2c2c;
+            --neon-orange: #ff6600;
+            --neon-yellow: #ffcc00;
+            --steam: rgba(255, 255, 255, 0.1);
         }
         
         body {
-            font-family: 'Noto Sans SC', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+            background: 
+                linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23333' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             min-height: 100vh;
-            color: var(--dark);
+            color: #ccc;
             overflow-x: hidden;
         }
         
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* 工业警示条纹 */
+        .warning-stripe {
+            height: 20px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffcc00,
+                #ffcc00 10px,
+                #000 10px,
+                #000 20px
+            );
         }
         
-        /* 漂浮的星星装饰 */
-        .stars {
+        /* 蒸汽效果 */
+        .steam {
             position: fixed;
-            top: 0;
+            bottom: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, rgba(255,255,255,0.05), transparent);
             pointer-events: none;
-            overflow: hidden;
-            z-index: 0;
+            animation: steamRise 4s ease-in-out infinite;
         }
         
-        .star {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s ease-in-out infinite;
-            box-shadow: 0 0 10px white, 0 0 20px white;
+        @keyframes steamRise {
+            0%, 100% { opacity: 0.3; transform: translateY(0); }
+            50% { opacity: 0.6; transform: translateY(-20px); }
         }
         
-        @keyframes twinkle {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
-        }
-        
-        /* 主标题 - 艺术字体 */
+        /* 主标题 */
         header {
             text-align: center;
-            padding: 80px 20px 50px;
+            padding: 60px 20px 40px;
             position: relative;
-            z-index: 1;
         }
         
         .main-title {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 5rem;
-            background: linear-gradient(45deg, #ff6b9d, #feca57, #48dbfb, #ff9ff3);
-            background-size: 300% 300%;
+            font-family: 'Black Ops One', cursive;
+            font-size: 4rem;
+            background: linear-gradient(180deg, #ffcc00 0%, #ff6600 50%, #cc3300 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: colorShift 5s ease infinite;
-            text-shadow: none;
-            filter: drop-shadow(0 0 30px rgba(255, 107, 157, 0.5));
+            text-shadow: 0 0 40px rgba(255, 102, 0, 0.5);
+            letter-spacing: 8px;
             position: relative;
-            display: inline-block;
-        }
-        
-        @keyframes colorShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
         
         .main-title::before {
-            content: '✨';
+            content: '⚙️ INDUSTRIAL RHYTHM ⚙️';
             position: absolute;
-            left: -60px;
-            top: 0;
-            font-size: 3rem;
-            animation: sparkle 2s ease-in-out infinite;
-            -webkit-text-fill-color: #ffd700;
-        }
-        
-        .main-title::after {
-            content: '🌟';
-            position: absolute;
-            right: -60px;
-            top: 0;
-            font-size: 3rem;
-            animation: sparkle 2s ease-in-out infinite 1s;
-            -webkit-text-fill-color: #ffd700;
-        }
-        
-        @keyframes sparkle {
-            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
-            50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            letter-spacing: 15px;
+            color: #666;
+            -webkit-text-fill-color: #666;
         }
         
         .subtitle {
-            font-family: 'ZCOOL KuaiLe', cursive;
-            font-size: 1.5rem;
-            color: white;
+            font-size: 1rem;
+            color: #888;
             margin-top: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            letter-spacing: 0.2em;
-        }
-        
-        .subtitle::before,
-        .subtitle::after {
-            content: '🎵';
-            margin: 0 15px;
-        }
-        
-        /* 音乐播放器 */
-        .music-player {
-            position: absolute;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        .music-player:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-50%) scale(1.05);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-        
-        .music-icon {
-            font-size: 1.8rem;
-            animation: musicPulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes musicPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .music-waves {
-            display: flex;
-            align-items: flex-end;
-            gap: 3px;
-            height: 20px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .music-waves.playing {
-            opacity: 1;
-        }
-        
-        .music-waves span {
-            width: 3px;
-            background: linear-gradient(to top, #ff6b9d, #feca57);
-            border-radius: 3px;
-            animation: wave 1s ease-in-out infinite;
-        }
-        
-        .music-waves span:nth-child(1) { height: 8px; animation-delay: 0s; }
-        .music-waves span:nth-child(2) { height: 15px; animation-delay: 0.1s; }
-        .music-waves span:nth-child(3) { height: 12px; animation-delay: 0.2s; }
-        .music-waves span:nth-child(4) { height: 18px; animation-delay: 0.3s; }
-        
-        @keyframes wave {
-            0%, 100% { transform: scaleY(0.5); }
-            50% { transform: scaleY(1); }
-        }
-        
-        .music-text {
-            font-size: 0.85rem;
-            color: white;
-            font-weight: 500;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
         
         /* 主容器 */
@@ -216,514 +109,384 @@
             z-index: 1;
         }
         
-        /* 欢迎语 */
-        .welcome {
-            text-align: center;
-            color: white;
-            font-size: 1.1rem;
-            margin-bottom: 50px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        /* 区域标题 */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 40px 0 30px;
+            padding: 15px 25px;
+            background: linear-gradient(90deg, rgba(255,102,0,0.2), transparent);
+            border-left: 5px solid #ff6600;
         }
         
-        .welcome::before {
-            content: '🎮';
-            margin-right: 10px;
+        .section-title h2 {
+            font-size: 1.5rem;
+            color: #ffcc00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
         
-        .welcome::after {
-            content: '🎹';
-            margin-left: 10px;
+        .section-title .icon {
+            font-size: 1.8rem;
         }
         
-        /* 游戏卡片网格 */
+        /* 游戏卡片 - 工业风格 */
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            gap: 25px;
         }
         
-        /* 艺术风格卡片 */
         .game-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            padding: 30px;
-            text-align: center;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #444;
+            border-radius: 0;
+            padding: 0;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s;
             position: relative;
             overflow: hidden;
-            box-shadow: 
-                0 10px 30px rgba(0,0,0,0.1),
-                0 0 0 1px rgba(255,255,255,0.2);
         }
         
         .game-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(
-                from 0deg,
-                transparent 0deg,
-                rgba(255, 107, 157, 0.1) 60deg,
-                transparent 120deg
-            );
-            animation: rotate 4s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6600, #ffcc00, #ff6600);
+            transform: scaleX(0);
+            transition: transform 0.3s;
         }
         
         .game-card:hover::before {
-            opacity: 1;
-        }
-        
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            transform: scaleX(1);
         }
         
         .game-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 
-                0 20px 50px rgba(0,0,0,0.2),
-                0 0 30px rgba(255, 107, 157, 0.3);
+            border-color: #ff6600;
+            box-shadow: 0 10px 40px rgba(255, 102, 0, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .game-header {
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(255,102,0,0.1), transparent);
+            border-bottom: 1px solid #333;
         }
         
         .game-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            display: inline-block;
-            animation: bounce 2s ease infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .game-title {
-            font-family: 'ZCOOL KuaiLe', cursive;
-            font-size: 1.8rem;
-            color: var(--primary);
+            font-size: 3rem;
             margin-bottom: 10px;
         }
         
-        .game-desc {
-            color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-            line-height: 1.6;
+        .game-title {
+            font-size: 1.3rem;
+            color: #ffcc00;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
         
-        /* 启动按钮 - 艺术风格 */
-        .launch-btn {
-            display: inline-flex;
-            align-items: center;
+        .game-body {
+            padding: 20px;
+        }
+        
+        .game-desc {
+            color: #888;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .game-tags {
+            display: flex;
             gap: 8px;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            padding: 4px 10px;
+            background: #333;
+            border: 1px solid #555;
+            font-size: 0.7rem;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+        
+        /* 启动按钮 */
+        .launch-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(180deg, #444, #222);
             border: none;
-            border-radius: 50px;
-            color: white;
-            font-size: 1.1rem;
+            border-top: 2px solid #555;
+            color: #ffcc00;
+            font-family: inherit;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        .launch-btn::before {
-            content: '🚀';
-            font-size: 1.2rem;
-        }
-        
-        .launch-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-            z-index: -1;
-        }
-        
-        .launch-btn:hover::after {
-            width: 300px;
-            height: 300px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
         
         .launch-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(255, 107, 157, 0.6);
+            background: linear-gradient(180deg, #ff6600, #cc4400);
+            color: #fff;
         }
         
-        /* 卡片颜色主题 */
-        .game-card:nth-child(1) .game-title { color: #ff6b6b; }
-        .game-card:nth-child(1) .launch-btn { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); }
+        /* 主推游戏特殊样式 */
+        .featured-card {
+            grid-column: 1 / -1;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 3px solid #ff6600;
+            box-shadow: 0 0 30px rgba(255, 102, 0, 0.2);
+        }
         
-        .game-card:nth-child(2) .game-title { color: #4ecdc4; }
-        .game-card:nth-child(2) .launch-btn { background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%); }
+        .featured-card .game-header {
+            background: linear-gradient(180deg, rgba(255,102,0,0.2), transparent);
+        }
         
-        .game-card:nth-child(3) .game-title { color: #45b7d1; }
-        .game-card:nth-child(3) .launch-btn { background: linear-gradient(135deg, #45b7d1 0%, #3a9bc4 100%); }
+        .featured-card .game-icon {
+            font-size: 4rem;
+        }
         
-        .game-card:nth-child(4) .game-title { color: #f9ca24; }
-        .game-card:nth-child(4) .launch-btn { background: linear-gradient(135deg, #f9ca24 0%, #f0932b 100%); }
-        
-        .game-card:nth-child(5) .game-title { color: #6c5ce7; }
-        .game-card:nth-child(5) .launch-btn { background: linear-gradient(135deg, #6c5ce7 0%, #5b4cdb 100%); }
+        .featured-card .game-title {
+            font-size: 1.6rem;
+            color: #ff6600;
+        }
         
         /* 页脚 */
         footer {
             text-align: center;
-            padding: 50px 20px;
-            color: white;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 2px solid #333;
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.5));
+        }
+        
+        footer p {
+            color: #666;
             font-size: 0.9rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        
-        footer::before {
-            content: '🌈';
-            margin-right: 10px;
-        }
-        
-        footer::after {
-            content: '✨';
-            margin-left: 10px;
+            letter-spacing: 2px;
         }
         
         /* 响应式 */
         @media (max-width: 768px) {
             .main-title {
-                font-size: 3rem;
+                font-size: 2.5rem;
             }
-            
-            .main-title::before,
-            .main-title::after {
-                display: none;
-            }
-            
-            .music-player {
-                position: relative;
-                right: auto;
-                top: auto;
-                transform: none;
-                margin-top: 20px;
-                padding: 12px 20px;
-            }
-            
-            .games-grid {
-                grid-template-columns: 1fr;
+            .main-title::before {
+                font-size: 0.6rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- 星星背景 -->
-    <div class="stars" id="stars"></div>
-    
+    <div class="warning-stripe"></div>
     <header>
-        <h1 class="main-title">昭羽的快乐空间</h1>
-        <p class="subtitle">快乐游戏每一天</p>
-        
-        <!-- 音乐播放器 -->
-        <div class="music-player" id="musicPlayer" onclick="toggleMusic()">
-            <div class="music-icon" id="musicIcon">🎵</div>
-            <div class="music-waves" id="musicWaves">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="music-text" id="musicText">点击播放音乐</div>
-        </div>
+        <h1 class="main-title">工业音游中心</h1>
+        <p class="subtitle">硬核节奏 · 机械美学 · 工业声波</p>
     </header>
     
+    <div class="steam"></div>
+    
     <div class="container">
-        <p class="welcome">欢迎来到快乐空间！选择你喜欢的游戏，开始音乐之旅吧~</p>
+        <!-- 主推游戏 -->
+        <div class="section-title">
+            <span class="icon">🔥</span>
+            <h2>核心项目</h2>
+        </div>
         
         <div class="games-grid">
-            <!-- 主推游戏：来组乐队吧 v2.5 -->
-            <div class="game-card" onclick="window.open('band-game-v2.7.html', '_blank')" style="border: 4px solid #ff0066; grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
-                <div class="game-icon" style="font-size: 5rem;">🎸</div>
-                <h3 class="game-title" style="color: #ff0066; font-size: 2.2rem;">来组乐队吧 v2.7</h3>
-                <p class="game-desc" style="font-size: 1.1rem;">🥁🎸🎹 5关卡渐进难度 | 4乐器合奏<br>选择乐器演奏，其他3种自动伴奏！</p>
-                <button class="launch-btn" style="background: linear-gradient(135deg, #ff0066, #ffcc00); font-size: 1.3rem; padding: 18px 50px;">🎵 开始游戏 🎵</button>
+            <div class="game-card featured-card" onclick="window.open('band-game-v2.7.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🎸</div>
+                    <h3 class="game-title">来组乐队吧 v2.9</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">4种真实乐器演奏体验。架子鼓、吉他扫弦、Walking Bass、键盘伴奏 - 每种乐器都有符合真实演奏逻辑的节奏铺面。</p>
+                    <div class="game-tags">
+                        <span class="tag">4乐器</span>
+                        <span class="tag">5关卡</span>
+                        <span class="tag">动态音高</span>
+                        <span class="tag">伴奏系统</span>
+                    </div>
+                </div>
+                <button class="launch-btn">⚡ 启动程序</button>
             </div>
         </div>
         
-        <!-- 开发中游戏 -->
-        <div style="margin-top: 60px; text-align: center;">
-            <h2 style="font-family: 'ZCOOL KuaiLe', cursive; font-size: 2rem; color: #888; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 15px;">
-                <span>🚧</span>
-                开发中 敬请期待
-                <span>🚧</span>
-            </h2>
+        <!-- 实验项目 -->
+        <div class="section-title">
+            <span class="icon">⚙️</span>
+            <h2>实验项目</h2>
         </div>
         
-        <div class="games-grid" style="opacity: 0.6;">
-            <!-- 游戏1 -->
-            <div class="game-card" onclick="launchGame('proto1_falling.html')">
-                <div class="game-icon">🎵</div>
-                <h3 class="game-title">下落式节奏</h3>
-                <p class="game-desc">经典4轨下落<br>跟着节奏点击</p>
-                <button class="launch-btn">启动程序</button>
+        <div class="games-grid">
+            <div class="game-card" onclick="window.open('game1_space_shooter.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🚀</div>
+                    <h3 class="game-title">太空节奏射击</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">驾驶战机在星际间穿梭，跟随电子节拍射击目标。</p>
+                    <div class="game-tags">
+                        <span class="tag">射击</span>
+                        <span class="tag">太空电子</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
             </div>
             
-            <!-- 游戏2 -->
-            <div class="game-card" onclick="launchGame('proto2_osu.html')">
-                <div class="game-icon">🎯</div>
-                <h3 class="game-title">OSU!风格</h3>
-                <p class="game-desc">圆圈点击玩法<br>精准时机挑战</p>
-                <button class="launch-btn">启动程序</button>
+            <div class="game-card" onclick="window.open('game2_piano_rain.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🎹</div>
+                    <h3 class="game-title">钢琴瀑布流</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">经典下落式音游，跟随旋律点击黑块。</p>
+                    <div class="game-tags">
+                        <span class="tag">下落式</span>
+                        <span class="tag">钢琴</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
             </div>
             
-            <!-- 游戏3 -->
-            <div class="game-card" onclick="launchGame('proto3_piano.html')">
-                <div class="game-icon">🎹</div>
-                <h3 class="game-title">钢琴瀑布流</h3>
-                <p class="game-desc">键盘演奏<br>弹奏美妙旋律</p>
-                <button class="launch-btn">启动程序</button>
+            <div class="game-card" onclick="window.open('game3_dance_beat.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">💃</div>
+                    <h3 class="game-title">炫舞节拍</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">箭头节奏舞蹈游戏，跟随EDM节拍按下方向键。</p>
+                    <div class="game-tags">
+                        <span class="tag">舞蹈</span>
+                        <span class="tag">EDM</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
             </div>
             
-            <!-- 游戏4 -->
-            <div class="game-card" onclick="launchGame('proto4_retro.html')">
-                <div class="game-icon">👾</div>
-                <h3 class="game-title">复古像素风</h3>
-                <p class="game-desc">8-bit风格<br>怀旧游戏时光</p>
-                <button class="launch-btn">启动程序</button>
+            <div class="game-card" onclick="window.open('game4_drum_pad.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🥁</div>
+                    <h3 class="game-title">电子打击垫</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">8轨电子打击垫，支持自动演奏和录制功能。</p>
+                    <div class="game-tags">
+                        <span class="tag">打击垫</span>
+                        <span class="tag">录制</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
             </div>
             
-            <!-- 游戏5 -->
-            <div class="game-card" onclick="launchGame('proto5_mixed.html')">
-                <div class="game-icon">🌊</div>
-                <h3 class="game-title">混合玩法</h3>
-                <p class="game-desc">多种模式<br>全能挑战</p>
-                <button class="launch-btn">启动程序</button>
+            <div class="game-card" onclick="window.open('game5_sonic_slide.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🎢</div>
+                    <h3 class="game-title">音速滑行</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">高速滑行收集音符，避开障碍物。</p>
+                    <div class="game-tags">
+                        <span class="tag">竞速</span>
+                        <span class="tag">收集</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
+            </div>
+        </div>
+        
+        
+        <!-- 原型项目 -->
+        <div class="section-title">
+            <span class="icon">🔧</span>
+            <h2>原型项目</h2>
+        </div>
+        
+        <div class="games-grid" style="opacity: 0.7;">
+            <div class="game-card" onclick="window.open('proto1_falling.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🎵</div>
+                    <h3 class="game-title">下落式节奏</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">经典4轨下落</p>
+                    <div class="game-tags">
+                        <span class="tag">原型</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
+            </div>
+            
+            <div class="game-card" onclick="window.open('proto2_osu.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🎯</div>
+                    <h3 class="game-title">OSU!风格</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">圆圈点击玩法</p>
+                    <div class="game-tags">
+                        <span class="tag">原型</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
+            </div>
+            
+            <div class="game-card" onclick="window.open('proto3_piano.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🎹</div>
+                    <h3 class="game-title">钢琴瀑布流</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">键盘演奏</p>
+                    <div class="game-tags">
+                        <span class="tag">原型</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
+            </div>
+            
+            <div class="game-card" onclick="window.open('proto4_retro.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">👾</div>
+                    <h3 class="game-title">复古像素风</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">8-bit风格</p>
+                    <div class="game-tags">
+                        <span class="tag">原型</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
+            </div>
+            
+            <div class="game-card" onclick="window.open('proto5_mixed.html', '_blank')">
+                <div class="game-header">
+                    <div class="game-icon">🌊</div>
+                    <h3 class="game-title">混合玩法</h3>
+                </div>
+                <div class="game-body">
+                    <p class="game-desc">多种模式</p>
+                    <div class="game-tags">
+                        <span class="tag">原型</span>
+                    </div>
+                </div>
+                <button class="launch-btn">启动</button>
             </div>
         </div>
     </div>
     
     <footer>
-        <p>昭羽的快乐空间 v2.5 | 让音乐带来快乐</p>
+        <p>⚙️ 工业音游中心 v2.9 | 机械与节奏的完美结合 ⚙️</p>
     </footer>
     
-    <script>
-        // 音乐播放器
-        let musicAudioCtx = null;
-        let musicOscillators = [];
-        let isMusicPlaying = false;
-        let musicInterval = null;
-        
-        // 治愈风格音符频率 (C大调五声音阶)
-        const healingNotes = [
-            523.25, // C5
-            587.33, // D5
-            659.25, // E5
-            783.99, // G5
-            880.00, // A5
-            1046.50 // C6
-        ];
-        
-        // 治愈旋律序列
-        const melody = [
-            0, 2, 4, 2, 0, 2, 1, 3,
-            2, 4, 5, 4, 2, 0, 2, 4
-        ];
-        let melodyIndex = 0;
-        
-        function initMusic() {
-            if (!musicAudioCtx) {
-                musicAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-        
-        function playHealingNote() {
-            if (!isMusicPlaying || !musicAudioCtx) return;
-            
-            const noteIndex = melody[melodyIndex % melody.length];
-            const frequency = healingNotes[noteIndex];
-            
-            // 创建主音
-            const osc = musicAudioCtx.createOscillator();
-            const gain = musicAudioCtx.createGain();
-            
-            osc.connect(gain);
-            gain.connect(musicAudioCtx.destination);
-            
-            // 使用正弦波，柔和音色
-            osc.type = 'sine';
-            osc.frequency.value = frequency;
-            
-            // 轻柔的包络
-            gain.gain.setValueAtTime(0, musicAudioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.08, musicAudioCtx.currentTime + 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.01, musicAudioCtx.currentTime + 1.5);
-            
-            osc.start(musicAudioCtx.currentTime);
-            osc.stop(musicAudioCtx.currentTime + 1.5);
-            
-            musicOscillators.push(osc);
-            
-            // 添加和弦音，增加丰富度
-            if (melodyIndex % 2 === 0) {
-                const chordOsc = musicAudioCtx.createOscillator();
-                const chordGain = musicAudioCtx.createGain();
-                
-                chordOsc.connect(chordGain);
-                chordGain.connect(musicAudioCtx.destination);
-                
-                chordOsc.type = 'triangle';
-                chordOsc.frequency.value = frequency * 1.5; // 五度音程
-                
-                chordGain.gain.setValueAtTime(0, musicAudioCtx.currentTime);
-                chordGain.gain.linearRampToValueAtTime(0.03, musicAudioCtx.currentTime + 0.1);
-                chordGain.gain.exponentialRampToValueAtTime(0.01, musicAudioCtx.currentTime + 1.2);
-                
-                chordOsc.start(musicAudioCtx.currentTime);
-                chordOsc.stop(musicAudioCtx.currentTime + 1.2);
-                
-                musicOscillators.push(chordOsc);
-            }
-            
-            melodyIndex++;
-            
-            // 清理已停止的oscillator
-            musicOscillators = musicOscillators.filter(o => {
-                try {
-                    return o.context.currentTime < o.context.currentTime + 2;
-                } catch(e) {
-                    return false;
-                }
-            });
-        }
-        
-        function toggleMusic() {
-            const musicIcon = document.getElementById('musicIcon');
-            const musicWaves = document.getElementById('musicWaves');
-            const musicText = document.getElementById('musicText');
-            
-            if (!isMusicPlaying) {
-                // 开始播放
-                initMusic();
-                if (musicAudioCtx.state === 'suspended') {
-                    musicAudioCtx.resume();
-                }
-                
-                isMusicPlaying = true;
-                musicIcon.textContent = '🔊';
-                musicWaves.classList.add('playing');
-                musicText.textContent = '点击暂停音乐';
-                
-                // 立即播放第一个音符
-                playHealingNote();
-                
-                // 设置循环播放 (每800ms一个音符，治愈风格慢节奏)
-                musicInterval = setInterval(playHealingNote, 800);
-            } else {
-                // 暂停播放
-                isMusicPlaying = false;
-                musicIcon.textContent = '🎵';
-                musicWaves.classList.remove('playing');
-                musicText.textContent = '点击播放音乐';
-                
-                if (musicInterval) {
-                    clearInterval(musicInterval);
-                    musicInterval = null;
-                }
-                
-                // 停止所有oscillator
-                musicOscillators.forEach(osc => {
-                    try {
-                        osc.stop();
-                    } catch(e) {}
-                });
-                musicOscillators = [];
-            }
-        }
-        
-        // 生成星星背景
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-        
-        // 启动游戏 - 全屏模式
-        function launchGame(url) {
-            // 尝试全屏打开
-            const newWindow = window.open(url, '_blank');
-            
-            // 尝试让新窗口全屏（需要用户交互后才能生效）
-            if (newWindow) {
-                setTimeout(() => {
-                    if (newWindow.document.documentElement.requestFullscreen) {
-                        newWindow.document.documentElement.requestFullscreen().catch(() => {
-                            // 全屏失败也没关系，窗口已经打开
-                        });
-                    }
-                }, 100);
-            }
-        }
-        
-        // 页面加载动画
-        document.addEventListener('DOMContentLoaded', () => {
-            createStars();
-            
-            // 卡片入场动画
-            const cards = document.querySelectorAll('.game-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(50px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-        });
-        
-        // 添加卡片悬停音效
-        document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                // 创建简单的音效
-                playHoverSound();
-            });
-        });
-        
-        // 简单的悬停音效
-        function playHoverSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
-        }
-    </script>
+    <div class="warning-stripe"></div>
 </body>
 </html>
