@@ -1222,37 +1222,138 @@
             }, 2500);
         }
 
-        // ==================== 音符生成 ====================
+        // ==================== 真实乐器演奏模式音符生成 ====================
         function generateNotes(instrument, level) {
             const notes = [];
             const duration = 20000;
             const bpm = 80 + (level * 20);
             const beatInterval = 60000 / bpm;
+            const startTime = 2000;
             
             if (instrument === 'drum') {
-                const density = level === 1 ? 4 : (level === 2 ? 2 : 1);
-                for (let t = 2000; t < duration - 2000; t += beatInterval * density) {
-                    const lane = Math.floor(Math.random() * 4);
-                    notes.push({ time: t, lane, hit: false, missed: false });
+                // 架子鼓真实节奏型
+                // 轨道映射: 0=踩镲(Hi-hat), 1=军鼓(Snare), 2=底鼓(Kick), 3=Tom/Crash
+                // 基础"动次打次": Kick(1,3拍) + Snare(2,4拍) + Hi-hat(每拍)
+                
+                for (let t = startTime; t < duration - 2000; t += beatInterval) {
+                    const beatInBar = Math.floor((t - startTime) / beatInterval) % 4;
+                    
+                    // 每拍都有踩镲 (轨道0)
+                    notes.push({ time: t, lane: 0, hit: false, missed: false, type: 'hihat' });
+                    
+                    // 第1、3拍: 底鼓 (轨道2)
+                    if (beatInBar === 0 || beatInBar === 2) {
+                        notes.push({ time: t, lane: 2, hit: false, missed: false, type: 'kick' });
+                    }
+                    
+                    // 第2、4拍: 军鼓 (轨道1)
+                    if (beatInBar === 1 || beatInBar === 3) {
+                        notes.push({ time: t + 50, lane: 1, hit: false, missed: false, type: 'snare' });
+                    }
+                    
+                    // 高难度: 加入Tom鼓加花 (轨道3)
+                    if (level >= 3 && beatInBar === 3) {
+                        notes.push({ time: t + beatInterval * 0.5, lane: 3, hit: false, missed: false, type: 'tom' });
+                    }
+                    
+                    // 地狱难度: 十六分音符踩镲
+                    if (level >= 5 && beatInBar % 2 === 0) {
+                        notes.push({ time: t + beatInterval * 0.25, lane: 0, hit: false, missed: false, type: 'hihat' });
+                        notes.push({ time: t + beatInterval * 0.5, lane: 0, hit: false, missed: false, type: 'hihat' });
+                        notes.push({ time: t + beatInterval * 0.75, lane: 0, hit: false, missed: false, type: 'hihat' });
+                    }
                 }
+                
             } else if (instrument === 'guitar') {
-                const patterns = [[0,0,1,1], [0,1,0,1,1,0], [0,0,1,0,1,1,0,1]];
-                const pattern = patterns[Math.min(level-1, 2)];
-                let idx = 0;
-                for (let t = 2000; t < duration - 2000; t += beatInterval * 1.5) {
-                    notes.push({ time: t, lane: pattern[idx % pattern.length], hit: false, missed: false });
-                    idx++;
+                // 吉他真实扫弦/分解模式
+                // 2轨: 0=低音弦(根音), 1=高音弦(三音/五音)
+                // 典型民谣扫弦: "下 下上 上下上" 或分解 "低-高-中-高"
+                
+                const patterns = [
+                    // Level 1-2: 简单分解 低-高-低-高
+                    [{time: 0, lane: 0}, {time: 0.5, lane: 1}, {time: 1, lane: 0}, {time: 1.5, lane: 1}],
+                    // Level 3-4: 民谣扫弦 下-下上-上-下上
+                    [{time: 0, lane: 0}, {time: 0.5, lane: 0}, {time: 0.5, lane: 1}, {time: 1.5, lane: 1}, {time: 2, lane: 0}, {time: 2.5, lane: 1}],
+                    // Level 5: 复杂切分
+                    [{time: 0, lane: 0}, {time: 0.33, lane: 1}, {time: 0.66, lane: 0}, {time: 1, lane: 1}, {time: 1.5, lane: 0}, {time: 1.75, lane: 1}]
+                ];
+                
+                const patternIdx = Math.min(level - 1, 2);
+                const pattern = patterns[patternIdx];
+                
+                for (let barStart = startTime; barStart < duration - 2000; barStart += beatInterval * 2) {
+                    pattern.forEach(note => {
+                        const noteTime = barStart + note.time * beatInterval;
+                        if (noteTime < duration - 2000) {
+                            notes.push({ 
+                                time: noteTime, 
+                                lane: note.lane, 
+                                hit: false, 
+                                missed: false,
+                                type: note.lane === 0 ? 'bass_string' : 'treble_string'
+                            });
+                        }
+                    });
                 }
+                
             } else if (instrument === 'bass') {
-                for (let t = 2000; t < duration - 2000; t += beatInterval * 2) {
-                    const lane = Math.floor((t / beatInterval) / 2) % 2;
-                    notes.push({ time: t, lane, hit: false, missed: false });
+                // 贝斯真实Walking Bass模式
+                // 2轨: 0=根音, 1=五度/经过音
+                // Walking Bass: 根音 -> 五度 -> 根音 -> 经过音
+                
+                for (let t = startTime; t < duration - 2000; t += beatInterval) {
+                    const beatInBar = Math.floor((t - startTime) / beatInterval) % 4;
+                    
+                    // 每拍一个音 - Walking Bass核心
+                    if (beatInBar === 0) {
+                        // 第1拍: 根音 (强拍)
+                        notes.push({ time: t, lane: 0, hit: false, missed: false, type: 'root' });
+                    } else if (beatInBar === 1) {
+                        // 第2拍: 五度 (弱拍)
+                        notes.push({ time: t, lane: 1, hit: false, missed: false, type: 'fifth' });
+                    } else if (beatInBar === 2) {
+                        // 第3拍: 根音 (次强拍)
+                        notes.push({ time: t, lane: 0, hit: false, missed: false, type: 'root' });
+                    } else if (beatInBar === 3) {
+                        // 第4拍: 经过音/ approaching note
+                        notes.push({ time: t, lane: 1, hit: false, missed: false, type: 'passing' });
+                    }
+                    
+                    // 高难度: 加入半音经过音
+                    if (level >= 4 && beatInBar === 3) {
+                        notes.push({ time: t + beatInterval * 0.5, lane: 0, hit: false, missed: false, type: 'chromatic' });
+                    }
                 }
+                
             } else if (instrument === 'keyboard') {
-                const density = level <= 2 ? 4 : 2;
-                for (let t = 2000; t < duration - 2000; t += beatInterval * density) {
-                    const lane = Math.floor(Math.random() * 4);
-                    notes.push({ time: t, lane, hit: false, missed: false });
+                // 键盘真实伴奏模式
+                // 4轨: 0=低音, 1=中音, 2=高音, 3=和弦
+                // 柱式和弦 + 分解琶音
+                
+                for (let t = startTime; t < duration - 2000; t += beatInterval * 2) {
+                    const chordStart = t;
+                    
+                    if (level <= 2) {
+                        // 简单柱式和弦: 低 + 和弦
+                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass' });
+                        notes.push({ time: chordStart, lane: 3, hit: false, missed: false, type: 'chord' });
+                        
+                    } else if (level <= 4) {
+                        // 半分解和弦: 低-中-高-中
+                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass' });
+                        notes.push({ time: chordStart + beatInterval * 0.5, lane: 1, hit: false, missed: false, type: 'mid' });
+                        notes.push({ time: chordStart + beatInterval, lane: 2, hit: false, missed: false, type: 'high' });
+                        notes.push({ time: chordStart + beatInterval * 1.5, lane: 1, hit: false, missed: false, type: 'mid' });
+                        
+                    } else {
+                        // 复杂琶音: 低-中-高-中-低-中-高
+                        notes.push({ time: chordStart, lane: 0, hit: false, missed: false, type: 'bass' });
+                        notes.push({ time: chordStart + beatInterval * 0.33, lane: 1, hit: false, missed: false, type: 'mid' });
+                        notes.push({ time: chordStart + beatInterval * 0.66, lane: 2, hit: false, missed: false, type: 'high' });
+                        notes.push({ time: chordStart + beatInterval, lane: 1, hit: false, missed: false, type: 'mid' });
+                        notes.push({ time: chordStart + beatInterval * 1.33, lane: 0, hit: false, missed: false, type: 'bass' });
+                        notes.push({ time: chordStart + beatInterval * 1.66, lane: 2, hit: false, missed: false, type: 'high' });
+                    }
                 }
             }
             
