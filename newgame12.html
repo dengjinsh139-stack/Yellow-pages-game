@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>避障游戏 - 左右闪躲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0f0f23 0%, #1a1a3e 50%, #2d1b69 100%);
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+        }
+        .game-container {
+            text-align: center;
+        }
+        h1 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00d4ff;
+        }
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .score-item {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #00d4ff;
+        }
+        canvas {
+            border: 3px solid #00d4ff;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+        .controls {
+            margin-top: 15px;
+            color: #fff;
+        }
+        button {
+            background: #00d4ff;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #00d4ff;
+        }
+        .music-btn {
+            background: #ff00ff;
+            color: #fff;
+        }
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #ff0066;
+            color: #fff;
+            display: none;
+            z-index: 100;
+            text-align: center;
+        }
+        .game-over h2 {
+            color: #ff0066;
+            margin-bottom: 20px;
+        }
+        .difficulty {
+            margin: 10px 0;
+        }
+        .difficulty label {
+            color: #fff;
+            margin-right: 10px;
+        }
+        select {
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: #333;
+            color: #fff;
+            border: 1px solid #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>⚡ 极速避障</h1>
+        <div class="score-board">
+            <div class="score-item">得分: <span id="score">0</span></div>
+            <div class="score-item">时间: <span id="time">0</span>s</div>
+            <div class="score-item">最高分: <span id="highScore">0</span></div>
+        </div>
+        <div class="difficulty">
+            <label>难度:</label>
+            <select id="difficulty" onchange="setDifficulty()">
+                <option value="easy">简单</option>
+                <option value="normal" selected>普通</option>
+                <option value="hard">困难</option>
+                <option value="insane">疯狂</option>
+            </select>
+        </div>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div class="controls">
+            <p>⬅️ ➡️ 左右键或A/D键移动 | 手机触摸左右半屏</p>
+            <button onclick="startGame()">开始游戏</button>
+            <button class="music-btn" onclick="toggleMusic()">🎵 音乐</button>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2>💥 撞毁了!</h2>
+        <p>生存时间: <span id="survivalTime">0</span>秒</p>
+        <p>最终得分: <span id="finalScore">0</span></p>
+        <button onclick="restartGame()">再次挑战</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let score = 0;
+        let gameTime = 0;
+        let highScore = localStorage.getItem('dodgeHighScore') || 0;
+        let gameRunning = false;
+        let musicEnabled = true;
+        let lastTime = 0;
+        let spawnTimer = 0;
+        let difficulty = 'normal';
+        
+        document.getElementById('highScore').textContent = highScore;
+        
+        // 难度设置
+        const difficultySettings = {
+            easy: { spawnRate: 1500, speedMultiplier: 0.7, obstacleWidth: 80 },
+            normal: { spawnRate: 1000, speedMultiplier: 1, obstacleWidth: 100 },
+            hard: { spawnRate: 700, speedMultiplier: 1.3, obstacleWidth: 120 },
+            insane: { spawnRate: 400, speedMultiplier: 1.8, obstacleWidth: 140 }
+        };
+        
+        // Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playBackgroundMusic() {
+            if (!musicEnabled) return;
+            
+            const playNote = (freq, duration, delay, type = 'sine') => {
+                setTimeout(() => {
+                    if (!musicEnabled || !gameRunning) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = type;
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                }, delay);
+            };
+            
+            const bassLoop = () => {
+                if (!gameRunning || !musicEnabled) return;
+                [55, 55, 65, 55].forEach((freq, i) => playNote(freq, 0.4, i * 250, 'sawtooth'));
+                setTimeout(bassLoop, 1000);
+            };
+            
+            const melodyLoop = () => {
+                if (!gameRunning || !musicEnabled) return;
+                const notes = [220, 0, 262, 294, 0, 330, 294, 262];
+                notes.forEach((freq, i) => {
+                    if (freq > 0) playNote(freq, 0.3, i * 250);
+                });
+                setTimeout(melodyLoop, 2000);
+            };
+            
+            bassLoop();
+            melodyLoop();
+        }
+        
+        function playCrashSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+        
+        function playScoreSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+        
+        // 游戏对象
+        const player = {
+            x: canvas.width / 2 - 20,
+            y: canvas.height - 80,
+            width: 40,
+            height: 50,
+            speed: 0,
+            maxSpeed: 8,
+            acceleration: 0.8,
+            friction: 0.9,
+            color: '#00d4ff'
+        };
+        
+        let obstacles = [];
+        let particles = [];
+        let stars = [];
+        
+        // 初始化背景星星
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 50; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speed: Math.random() * 3 + 1
+                });
+            }
+        }
+        
+        // 创建障碍物
+        function spawnObstacle() {
+            const settings = difficultySettings[difficulty];
+            const gap = Math.random() * (canvas.width - settings.obstacleWidth - 60) + 30;
+            obstacles.push({
+                x: gap,
+                y: -50,
+                width: settings.obstacleWidth,
+                height: 30,
+                speed: (3 + Math.random() * 2) * settings.speedMultiplier * (1 + score / 1000),
+                color: `hsl(${Math.random() * 60 + 300}, 100%, 60%)`
+            });
+        }
+        
+        // 创建粒子
+        function createParticles(x, y, color, count = 10) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    dx: (Math.random() - 0.5) * 8,
+                    dy: (Math.random() - 0.5) * 8,
+                    life: 1,
+                    color: color,
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
+        
+        // 输入处理
+        const keys = {};
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        // 触摸控制
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+            if (touchX < canvas.width / 2) {
+                keys['ArrowLeft'] = true;
+                keys['ArrowRight'] = false;
+            } else {
+                keys['ArrowRight'] = true;
+                keys['ArrowLeft'] = false;
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys['ArrowLeft'] = false;
+            keys['ArrowRight'] = false;
+        });
+        
+        function updatePlayer() {
+            // 左右移动
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
+                player.speed -= player.acceleration;
+            }
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) {
+                player.speed += player.acceleration;
+            }
+            
+            // 摩擦力
+            player.speed *= player.friction;
+            
+            // 限制速度
+            player.speed = Math.max(-player.maxSpeed, Math.min(player.maxSpeed, player.speed));
+            
+            player.x += player.speed;
+            
+            // 边界限制
+            if (player.x < 0) {
+                player.x = 0;
+                player.speed = 0;
+            }
+            if (player.x + player.width > canvas.width) {
+                player.x = canvas.width - player.width;
+                player.speed = 0;
+            }
+        }
+        
+        function updateObstacles(deltaTime) {
+            const settings = difficultySettings[difficulty];
+            
+            // 生成新障碍物
+            spawnTimer += deltaTime;
+            if (spawnTimer > settings.spawnRate) {
+                spawnObstacle();
+                spawnTimer = 0;
+            }
+            
+            // 更新障碍物
+            obstacles = obstacles.filter(obs => {
+                obs.y += obs.speed;
+                
+                // 得分
+                if (obs.y > canvas.height && !obs.passed) {
+                    obs.passed = true;
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                    playScoreSound();
+                }
+                
+                return obs.y < canvas.height + 50;
+            });
+        }
+        
+        function updateStars() {
+            stars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+        }
+        
+        function updateParticles() {
+            particles = particles.filter(p => {
+                p.x += p.dx;
+                p.y += p.dy;
+                p.dy += 0.2; // 重力
+                p.life -= 0.02;
+                return p.life > 0;
+            });
+        }
+        
+        function checkCollision() {
+            for (let obs of obstacles) {
+                if (player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        function drawPlayer() {
+            // 喷射火焰
+            ctx.fillStyle = `rgba(255, ${100 + Math.random() * 100}, 0, ${0.5 + Math.random() * 0.5})`;
+            ctx.beginPath();
+            ctx.moveTo(player.x + 5, player.y + player.height);
+            ctx.lineTo(player.x + player.width / 2, player.y + player.height + 15 + Math.random() * 10);
+            ctx.lineTo(player.x + player.width - 5, player.y + player.height);
+            ctx.fill();
+            
+            // 车身
+            const gradient = ctx.createLinearGradient(player.x, player.y, player.x, player.y + player.height);
+            gradient.addColorStop(0, '#00d4ff');
+            gradient.addColorStop(0.5, '#0099cc');
+            gradient.addColorStop(1, '#006699');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width / 2, player.y);
+            ctx.lineTo(player.x + player.width, player.y + 20);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
+            ctx.lineTo(player.x, player.y + player.height);
+            ctx.lineTo(player.x, player.y + 20);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 发光边框
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // 驾驶舱
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.ellipse(player.x + player.width / 2, player.y + 15, 8, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function drawObstacles() {
+            obstacles.forEach(obs => {
+                const gradient = ctx.createLinearGradient(obs.x, obs.y, obs.x, obs.y + obs.height);
+                gradient.addColorStop(0, obs.color);
+                gradient.addColorStop(1, '#330033');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                
+                // 边框
+                ctx.strokeStyle = '#ff00ff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+                
+                // 装饰线
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.fillRect(obs.x + 5, obs.y + 5, obs.width - 10, 3);
+            });
+        }
+        
+        function drawStars() {
+            ctx.fillStyle = '#fff';
+            stars.forEach(star => {
+                ctx.globalAlpha = Math.random() * 0.5 + 0.5;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
+        
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+        
+        function draw() {
+            // 清空画布
+            ctx.fillStyle = 'rgba(15, 15, 35, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawStars();
+            drawParticles();
+            drawObstacles();
+            drawPlayer();
+        }
+        
+        function gameLoop(timestamp) {
+            if (!gameRunning) return;
+            
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+            
+            updatePlayer();
+            updateObstacles(deltaTime);
+            updateStars();
+            updateParticles();
+            
+            // 更新时间
+            gameTime += deltaTime / 1000;
+            document.getElementById('time').textContent = Math.floor(gameTime);
+            
+            // 检查碰撞
+            if (checkCollision()) {
+                createParticles(player.x + player.width / 2, player.y + player.height / 2, '#ff0066', 30);
+                playCrashSound();
+                gameOver();
+                return;
+            }
+            
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function startGame() {
+            if (gameRunning) return;
+            
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            gameRunning = true;
+            score = 0;
+            gameTime = 0;
+            obstacles = [];
+            particles = [];
+            player.x = canvas.width / 2 - 20;
+            player.speed = 0;
+            lastTime = performance.now();
+            spawnTimer = 0;
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('time').textContent = 0;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            initStars();
+            playBackgroundMusic();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('dodgeHighScore', highScore);
+                document.getElementById('highScore').textContent = highScore;
+            }
+            
+            document.getElementById('survivalTime').textContent = Math.floor(gameTime);
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            startGame();
+        }
+        
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+        }
+        
+        function setDifficulty() {
+            difficulty = document.getElementById('difficulty').value;
+        }
+        
+        // 初始绘制
+        initStars();
+        draw();
+    </script>
+</body>
+</html>
