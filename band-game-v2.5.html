@@ -356,6 +356,18 @@
                 <div class="instrument-name">吉他</div>
                 <div class="instrument-desc">--x---x<br>切分节奏</div>
             </div>
+            
+            <div class="instrument-card" onclick="selectInstrument('bass')">
+                <div class="instrument-icon">🎸</div>
+                <div class="instrument-name">贝斯</div>
+                <div class="instrument-desc">根音+行走低音<br>Walking Bass</div>
+            </div>
+            
+            <div class="instrument-card" onclick="selectInstrument('keyboard')">
+                <div class="instrument-icon">🎹</div>
+                <div class="instrument-name">键盘</div>
+                <div class="instrument-desc">分解和弦琶音<br>柱式和弦伴奏</div>
+            </div>
         </div>
     </div>
     
@@ -366,22 +378,34 @@
         <p style="font-size: 0.7rem; color: #888; margin-bottom: 10px;">选择关卡</p>
         
         <div class="level-select">
-            <div class="level-card" onclick="selectLevel(1)">
+            <div class="level-card" id="level-1" onclick="selectLevel(1)">
                 <div class="level-num">1</div>
                 <div class="level-name">热身演出</div>
                 <div class="level-difficulty">⭐ 简单</div>
             </div>
             
-            <div class="level-card" onclick="selectLevel(2)">
+            <div class="level-card" id="level-2" onclick="selectLevel(2)">
                 <div class="level-num">2</div>
                 <div class="level-name">俱乐部之夜</div>
                 <div class="level-difficulty">⭐⭐ 中等</div>
             </div>
             
-            <div class="level-card" onclick="selectLevel(3)">
+            <div class="level-card" id="level-3" onclick="selectLevel(3)">
                 <div class="level-num">3</div>
                 <div class="level-name">摇滚 festival</div>
                 <div class="level-difficulty">⭐⭐⭐ 困难</div>
+            </div>
+            
+            <div class="level-card" id="level-4" onclick="selectLevel(4)">
+                <div class="level-num">4</div>
+                <div class="level-name">体育馆巡演</div>
+                <div class="level-difficulty">⭐⭐⭐⭐ 极难</div>
+            </div>
+            
+            <div class="level-card" id="level-5" onclick="selectLevel(5)">
+                <div class="level-num">5</div>
+                <div class="level-name">传奇演唱会</div>
+                <div class="level-difficulty">⭐⭐⭐⭐⭐ 地狱</div>
             </div>
         </div>
     </div>
@@ -532,9 +556,9 @@ function generateNotes(instrument, level) {
         const patterns = [
             [0, 0, 1, 1],      // 关卡1: 简单
             [0, 1, 0, 1, 1, 0], // 关卡2: 中等
-            [0, 0, 1, 0, 1, 1, 0, 1] // 关卡3: 复杂
+            [0, 0, 1, 0, 1, 1, 0, 1] // 关卡3-5: 复杂
         ];
-        const pattern = patterns[level - 1] || patterns[0];
+        const pattern = patterns[Math.min(level - 1, 2)] || patterns[0];
         let patternIndex = 0;
         
         for (let t = 2000; t < duration - 2000; t += beatInterval * 1.5) {
@@ -546,6 +570,29 @@ function generateNotes(instrument, level) {
                 missed: false
             });
             patternIndex++;
+        }
+    } else if (instrument === 'bass') {
+        // 贝斯 - 2轨道行走低音
+        for (let t = 2000; t < duration - 2000; t += beatInterval * 2) {
+            const lane = Math.floor((t / beatInterval) / 2) % 2;
+            notes.push({
+                time: t,
+                lane: lane,
+                hit: false,
+                missed: false
+            });
+        }
+    } else if (instrument === 'keyboard') {
+        // 键盘 - 4轨道分解和弦
+        const density = level <= 2 ? 4 : (level <= 4 ? 2 : 1);
+        for (let t = 2000; t < duration - 2000; t += beatInterval * density) {
+            const lane = Math.floor(Math.random() * 4);
+            notes.push({
+                time: t,
+                lane: lane,
+                hit: false,
+                missed: false
+            });
         }
     }
     
@@ -560,3 +607,268 @@ function showScreen(screenId) {
 
 function selectInstrument(inst) {
     gameState.instrument = inst;
+    showScreen('levelScreen');
+}
+
+function backToInstrument() {
+    showScreen('instrumentScreen');
+}
+
+function selectLevel(lvl) {
+    gameState.level = lvl;
+    startCountdown();
+}
+
+function backToMenu() {
+    gameState.isPlaying = false;
+    showScreen('instrumentScreen');
+}
+
+// ==================== 倒计时 ====================
+function startCountdown() {
+    showScreen('gameScreen');
+    
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let count = 3;
+    const countInterval = setInterval(() => {
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.font = 'bold 80px "Press Start 2P"';
+        ctx.fillStyle = '#ffcc00';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        if (count > 0) {
+            ctx.fillText(count, canvas.width/2, canvas.height/2);
+            play8BitSound(440 + (3-count)*100, 0.1);
+            count--;
+        } else {
+            ctx.fillText('GO!', canvas.width/2, canvas.height/2);
+            play8BitSound(880, 0.3);
+            clearInterval(countInterval);
+            setTimeout(startGame, 500);
+        }
+    }, 1000);
+}
+
+// ==================== 游戏核心 ====================
+let gameLoop = null;
+
+function startGame() {
+    // 重置状态
+    gameState.score = 0;
+    gameState.combo = 0;
+    gameState.maxCombo = 0;
+    gameState.perfectCount = 0;
+    gameState.missCount = 0;
+    gameState.bandEnergy = 0;
+    gameState.isPlaying = true;
+    gameState.notes = generateNotes(gameState.instrument, gameState.level);
+    gameState.gameStartTime = Date.now();
+    
+    // 解锁音频
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    // 播放背景音乐
+    playBGM();
+    
+    // 开始游戏循环
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const laneCount = gameState.instrument === 'drum' ? 4 : 2;
+    const laneWidth = canvas.width / laneCount;
+    const hitLineY = 400;
+    const noteSpeed = 200; // px/s
+    
+    gameLoop = setInterval(() => {
+        if (!gameState.isPlaying) {
+            clearInterval(gameLoop);
+            return;
+        }
+        
+        const currentTime = Date.now() - gameState.gameStartTime;
+        
+        // 清空画布
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 绘制轨道线
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        for (let i = 1; i < laneCount; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * laneWidth, 0);
+            ctx.lineTo(i * laneWidth, canvas.height);
+            ctx.stroke();
+        }
+        
+        // 绘制判定线
+        ctx.strokeStyle = '#ff0066';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(0, hitLineY);
+        ctx.lineTo(canvas.width, hitLineY);
+        ctx.stroke();
+        
+        // 绘制和更新音符
+        gameState.notes.forEach(note => {
+            if (note.hit || note.missed) return;
+            
+            // 计算音符位置
+            const timeDiff = note.time - currentTime;
+            const y = hitLineY - (timeDiff / 1000) * noteSpeed;
+            
+            // 绘制音符
+            const x = note.lane * laneWidth + laneWidth / 2;
+            
+            // 音符光晕
+            ctx.shadowColor = '#00ff99';
+            ctx.shadowBlur = 10;
+            ctx.fillStyle = '#00ff99';
+            ctx.fillRect(x - 30, y - 15, 60, 30);
+            ctx.shadowBlur = 0;
+            
+            // 检查错过
+            if (y > canvas.height + 50) {
+                note.missed = true;
+                gameState.combo = 0;
+                gameState.missCount++;
+                updateHUD();
+                showJudgment('MISS', x, hitLineY);
+            }
+        });
+        
+        // 检查游戏结束
+        if (currentTime > 22000) {
+            endGame();
+        }
+        
+    }, 16); // ~60fps
+    
+    // 键盘输入
+    setupInput(laneCount, hitLineY, noteSpeed);
+}
+
+function setupInput(laneCount, hitLineY, noteSpeed) {
+    const keys = {
+        'KeyD': 0, 'KeyF': 1, 'KeyJ': 2, 'KeyK': 3, // 鼓
+        'KeyA': 0, 'KeyL': 1 // 吉他简化
+    };
+    
+    const keyHandler = (e) => {
+        if (!gameState.isPlaying) return;
+        
+        let lane = keys[e.code];
+        if (lane === undefined) return;
+        
+        // 吉他只有2轨道
+        if (gameState.instrument === 'guitar' && lane >= 2) return;
+        
+        e.preventDefault();
+        
+        const currentTime = Date.now() - gameState.gameStartTime;
+        
+        // 找最近的音符
+        let nearestNote = null;
+        let minTimeDiff = Infinity;
+        
+        gameState.notes.forEach(note => {
+            if (note.hit || note.missed || note.lane !== lane) return;
+            
+            const timeDiff = Math.abs(note.time - currentTime);
+            if (timeDiff < minTimeDiff) {
+                minTimeDiff = timeDiff;
+                nearestNote = note;
+            }
+        });
+        
+        if (nearestNote) {
+            const canvas = document.getElementById('gameCanvas');
+            const x = lane * (canvas.width / laneCount) + (canvas.width / laneCount) / 2;
+            
+            if (minTimeDiff <= 100) { // Perfect: 100ms内
+                nearestNote.hit = true;
+                gameState.combo++;
+                gameState.perfectCount++;
+                gameState.score += 100 * gameState.combo;
+                gameState.bandEnergy = Math.min(100, gameState.bandEnergy + 10);
+                if (gameState.combo > gameState.maxCombo) {
+                    gameState.maxCombo = gameState.combo;
+                }
+                showJudgment('PERFECT', x, hitLineY);
+                play8BitSound(880, 0.1);
+            } else if (minTimeDiff <= 200) { // Miss: 200ms外
+                // 不判定，等玩家再按或错过
+            }
+            
+            updateHUD();
+        }
+    };
+    
+    document.addEventListener('keydown', keyHandler);
+    
+    // 保存引用以便移除
+    window.gameKeyHandler = keyHandler;
+}
+
+function showJudgment(text, x, y) {
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const el = document.createElement('div');
+    el.className = `judgment ${text === 'PERFECT' ? 'perfect' : 'miss'}`;
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    document.getElementById('gameScreen').appendChild(el);
+    
+    setTimeout(() => el.remove(), 500);
+}
+
+function updateHUD() {
+    document.getElementById('scoreDisplay').textContent = gameState.score.toString().padStart(6, '0');
+    document.getElementById('comboDisplay').textContent = gameState.combo;
+    document.getElementById('energyBar').style.width = gameState.bandEnergy + '%';
+}
+
+function endGame() {
+    gameState.isPlaying = false;
+    clearInterval(gameLoop);
+    
+    if (window.gameKeyHandler) {
+        document.removeEventListener('keydown', window.gameKeyHandler);
+    }
+    
+    // 计算评分
+    const totalNotes = gameState.perfectCount + gameState.missCount;
+    const accuracy = totalNotes > 0 ? (gameState.perfectCount / totalNotes * 100) : 0;
+    
+    let rank = 'C';
+    if (accuracy >= 95) rank = 'S';
+    else if (accuracy >= 85) rank = 'A';
+    else if (accuracy >= 70) rank = 'B';
+    
+    // 显示结果
+    document.getElementById('finalScore').textContent = gameState.score;
+    document.getElementById('finalRank').textContent = rank;
+    document.getElementById('finalRank').style.color = 
+        rank === 'S' ? '#ffcc00' : (rank === 'A' ? '#00ff99' : (rank === 'B' ? '#66ccff' : '#ff6666'));
+    document.getElementById('perfectCount').textContent = gameState.perfectCount;
+    document.getElementById('missCount').textContent = gameState.missCount;
+    document.getElementById('maxCombo').textContent = gameState.maxCombo;
+    
+    showScreen('resultScreen');
+}
+
+// ==================== 初始化 ====================
+console.log('🎸 来组乐队吧 - 8bit版已加载');
+console.log('选择乐器，开始你的摇滚之旅！');
+    </script>
+</body>
+</html>
