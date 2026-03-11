@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI能力中心 | 工业音游中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        /* 工业警示条纹 */
+        .warning-strip {
+            height: 8px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ff6b35 0px,
+                #ff6b35 15px,
+                #1a1a2e 15px,
+                #1a1a2e 30px
+            );
+            animation: warningPulse 2s infinite;
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* 头部 */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%);
+            border-bottom: 3px solid #ff6b35;
+            position: relative;
+        }
+
+        header::before, header::after {
+            content: '⚙️';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 48px;
+            animation: rotate 10s linear infinite;
+        }
+
+        header::before { left: 10%; }
+        header::after { right: 10%; }
+
+        @keyframes rotate {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #ff6b35;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(255,107,53,0.5);
+            position: relative;
+            display: inline-block;
+            padding: 15px 40px;
+            border: 3px solid #ff6b35;
+            background: rgba(0,0,0,0.6);
+        }
+
+        h1::before, h1::after {
+            content: '🔩';
+            position: absolute;
+            font-size: 24px;
+        }
+
+        h1::before { top: -12px; left: -12px; }
+        h1::after { bottom: -12px; right: -12px; }
+
+        .subtitle {
+            color: #888;
+            margin-top: 15px;
+            font-size: 1.1em;
+            letter-spacing: 2px;
+        }
+
+        /* 导航 */
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: #ff6b35;
+            text-decoration: none;
+            padding: 12px 24px;
+            border: 2px solid #ff6b35;
+            background: rgba(255,107,53,0.1);
+            transition: all 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .nav a:hover {
+            background: #ff6b35;
+            color: #1a1a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,107,53,0.4);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 能力概览仪表盘 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(26,26,46,0.8) 100%);
+            border: 2px solid #ff6b35;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6b35, transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            color: #ff6b35;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255,107,53,0.5);
+        }
+
+        .stat-label {
+            color: #888;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* 能力分类 */
+        .section-title {
+            font-size: 1.8em;
+            color: #ff6b35;
+            margin: 50px 0 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ff6b35;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title span {
+            font-size: 1.2em;
+        }
+
+        /* 能力卡片网格 */
+        .abilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .ability-card {
+            background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(26,26,46,0.9) 100%);
+            border: 2px solid #444;
+            padding: 25px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ability-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #ff6b35;
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .ability-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .ability-card:hover {
+            border-color: #ff6b35;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,107,53,0.2);
+        }
+
+        .ability-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ability-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+        }
+
+        .ability-title {
+            flex: 1;
+        }
+
+        .ability-title h3 {
+            color: #ff6b35;
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .ability-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(255,107,53,0.2);
+            color: #ff6b35;
+            font-size: 0.75em;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .ability-desc {
+            color: #aaa;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        /* 流程步骤 */
+        .process-flow {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid #ff6b35;
+            padding: 15px 20px;
+            margin-top: 15px;
+        }
+
+        .process-flow h4 {
+            color: #ff6b35;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px dashed #333;
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .process-step:last-child {
+            border-bottom: none;
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            background: #ff6b35;
+            color: #1a1a2e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        /* 知识库区域 */
+        .knowledge-section {
+            background: linear-gradient(135deg, rgba(255,107,53,0.05) 0%, rgba(0,0,0,0.5) 100%);
+            border: 2px solid #333;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .knowledge-item {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-left: 3px solid #ff6b35;
+        }
+
+        .knowledge-item h4 {
+            color: #ff6b35;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .knowledge-item ul {
+            list-style: none;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .knowledge-item li {
+            padding: 5px 0;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .knowledge-item li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #ff6b35;
+        }
+
+        /* 唤醒词区域 */
+        .wake-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .wake-word {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+            color: #1a1a2e;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            position: relative;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        /* 底部 */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 3px solid #ff6b35;
+            background: rgba(0,0,0,0.5);
+            margin-top: 50px;
+        }
+
+        footer p {
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            header::before, header::after { display: none; }
+            .abilities-grid { grid-template-columns: 1fr; }
+        }
+
+        /* 霓虹效果 */
+        .neon-text {
+            text-shadow: 
+                0 0 5px #ff6b35,
+                0 0 10px #ff6b35,
+                0 0 20px #ff6b35;
+        }
+    </style>
+</head>
+<body>
+    <div class="warning-strip"></div>
+    
+    <header>
+        <h1>⚡ AI能力中心 ⚡</h1>
+        <p class="subtitle">CORE CAPABILITIES & KNOWLEDGE BASE</p>
+    </header>
+
+    <nav class="nav">
+        <a href="index.html">🏭 返回主站</a>
+        <a href="#abilities">能力矩阵</a>
+        <a href="#knowledge">知识库</a>
+        <a href="#process">流程逻辑</a>
+    </nav>
+
+    <div class="container">
+        <!-- 仪表盘统计 -->
+        <div class="dashboard">
+            <div class="stat-card">
+                <div class="stat-icon">🛠️</div>
+                <div class="stat-number">8</div>
+                <div class="stat-label">核心能力模块</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-number">3</div>
+                <div class="stat-label">已学习知识库</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-number">100%</div>
+                <div class="stat-label">任务完成率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">在线状态</div>
+            </div>
+        </div>
+
+        <!-- 唤醒词区域 -->
+        <div class="section-title"><span>🔑</span> 记忆唤醒词</div>
+        <div class="wake-words">
+            <div class="wake-word">音频模块</div>
+            <div class="wake-word">股票模块</div>
+            <div class="wake-word">工业音游中心</div>
+        </div>
+        <p style="color: #666; margin-top: 15px; font-size: 0.9em;">💡 提示：说出唤醒词可立即激活相关记忆上下文</p>
+
+        <!-- 核心能力矩阵 -->
+        <div id="abilities" class="section-title"><span>🎯</span> 核心能力矩阵</div>
+        
+        <div class="abilities-grid">
+            <!-- 能力1: 代码生成 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">💻</div>
+                    <div class="ability-title">
+                        <h3>代码生成引擎</h3>
+                        <span class="ability-tag">核心能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    生成完整、可直接运行的HTML5游戏和应用程序。支持Web Audio API、Canvas动画、响应式设计、游戏循环架构等高级功能。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>解析用户需求与游戏机制</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>设计游戏架构与状态管理</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>编写HTML/CSS/JS代码</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>集成Web Audio背景音乐</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>测试游戏循环与交互逻辑</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力2: 文件操作 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">📁</div>
+                    <div class="ability-title">
+                        <h3>文件系统管理</h3>
+                        <span class="ability-tag">系统能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    完整的文件读写、编辑、创建、部署能力。支持批量文件处理、版本控制集成、GitHub自动化部署。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>创建/读取目标文件</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>精准文本替换（edit）</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>批量文件生成（write）</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>Git提交与版本控制</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>GitHub Pages自动部署</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力3: 网络搜索 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">🔍</div>
+                    <div class="ability-title">
+                        <h3>智能信息检索</h3>
+                        <span class="ability-tag">数据能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    实时搜索网络最新信息，支持网页内容提取、多源数据整合、新闻资讯获取。可用于市场研究、技术调研、动态信息追踪。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>构建精准搜索查询</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>多引擎并行检索</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>网页内容提取与解析</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>信息去重与整合</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>结构化输出报告</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力4: 股票分析 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">📈</div>
+                    <div class="ability-title">
+                        <h3>金融数据分析</h3>
+                        <span class="ability-tag">分析能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    股票市场分析、资金流向追踪、基本面研究、行业轮动判断。整合研报观点与实时数据，提供投资决策支持。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>搜索最新市场研报</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>分析资金流向数据</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>筛选基本面优质标的</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>综合机构观点排名</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>生成投资建议与风险提示</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力5: 音频处理 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">🎵</div>
+                    <div class="ability-title">
+                        <h3>音频生成系统</h3>
+                        <span class="ability-tag">创意能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    Web Audio API音频合成、游戏背景音乐生成、音效设计、节拍同步。无需外部音频文件，纯代码生成动态音乐。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>创建AudioContext上下文</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>设计合成器（Oscillator）</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>配置包络与滤波器</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>编写节奏模式与和弦进行</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>与游戏循环节拍同步</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力6: UI设计 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">🎨</div>
+                    <div class="ability-title">
+                        <h3>视觉设计系统</h3>
+                        <span class="ability-tag">设计能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    工业风格界面设计、响应式布局、动画效果、色彩系统构建。擅长深色主题、科技风、赛博朋克等视觉风格。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>定义设计系统与色彩规范</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>构建CSS动画与过渡效果</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>设计响应式断点布局</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>添加交互反馈效果</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>优化性能与兼容性</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力7: 记忆管理 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">🧠</div>
+                    <div class="ability-title">
+                        <h3>记忆管理系统</h3>
+                        <span class="ability-tag">认知能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    长期记忆存储、模块化知识管理、上下文唤醒。支持跨会话记忆保持、项目状态追踪、个性化配置存储。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>识别关键信息并结构化</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>写入MEMORY.md持久存储</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>设定唤醒词与触发条件</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>会话开始时自动加载</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>按需召回相关记忆</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力8: 项目协调 -->
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">📋</div>
+                    <div class="ability-title">
+                        <h3>项目协调管理</h3>
+                        <span class="ability-tag">管理能力</span>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    多任务并行处理、子代理调度、进度追踪、质量把控。支持复杂项目分解、批量文件生成、自动化工作流。
+                </p>
+                <div class="process-flow">
+                    <h4>⚙️ 执行流程</h4>
+                    <div class="process-step">
+                        <span class="step-num">1</span>
+                        <span>拆解项目为可执行任务</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">2</span>
+                        <span>调度子代理并行处理</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">3</span>
+                        <span>监控任务进度与状态</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">4</span>
+                        <span>整合结果与质量检查</span>
+                    </div>
+                    <div class="process-step">
+                        <span class="step-num">5</span>
+                        <span>输出最终交付物</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 知识库 -->
+        <div id="knowledge" class="section-title"><span>📚</span> 已学习知识库</div>
+        
+        <div class="knowledge-section">
+            <div class="knowledge-grid">
+                <div class="knowledge-item">
+                    <h4>🎵 音频模块</h4>
+                    <ul>
+                        <li>Web Audio API 完整规范</li>
+                        <li>Oscillator 波形合成</li>
+                        <li>Envelope 包络控制</li>
+                        <li>节拍同步算法</li>
+                        <li>游戏音频架构设计</li>
+                        <li>工业音游中心项目全貌</li>
+                    </ul>
+                </div>
+                <div class="knowledge-item">
+                    <h4>📈 股票模块</h4>
+                    <ul>
+                        <li>A股资金流向分析方法</li>
+                        <li>北向资金与主力分层</li>
+                        <li>基本面指标（ROE/PE/PB）</li>
+                        <li>行业轮动规律</li>
+                        <li>机构研报观点整合</li>
+                        <li>2026年市场展望</li>
+                    </ul>
+                </div>
+                <div class="knowledge-item">
+                    <h4>💻 技术栈</h4>
+                    <ul>
+                        <li>HTML5 Canvas 游戏开发</li>
+                        <li>CSS3 动画与响应式</li>
+                        <li>JavaScript ES6+ 特性</li>
+                        <li>Git/GitHub 工作流</li>
+                        <li>GitHub Pages 部署</li>
+                        <li>工业风格 UI 设计</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 流程逻辑 -->
+        <div id="process" class="section-title"><span>🔄</span> 通用工作流程</div>
+        
+        <div class="abilities-grid">
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">🎯</div>
+                    <div class="ability-title">
+                        <h3>需求分析阶段</h3>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    解析用户意图，识别任务类型，检查相关记忆模块，明确交付标准与约束条件。
+                </p>
+            </div>
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">🔧</div>
+                    <div class="ability-title">
+                        <h3>方案设计阶段</h3>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    制定技术方案，选择合适工具，设计数据结构，规划文件组织与部署流程。
+                </p>
+            </div>
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">⚡</div>
+                    <div class="ability-title">
+                        <h3>执行实施阶段</h3>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    并行或串行执行任务，调用相应工具，生成代码/文件，实时监控进度与质量。
+                </p>
+            </div>
+            <div class="ability-card">
+                <div class="ability-header">
+                    <div class="ability-icon">✅</div>
+                    <div class="ability-title">
+                        <h3>验收交付阶段</h3>
+                    </div>
+                </div>
+                <p class="ability-desc">
+                    验证成果完整性，Git提交与部署，更新相关记忆，输出总结报告与使用说明。
+                </p>
+            </div>
+        </div>
+
+        <!-- 技术限制说明 -->
+        <div class="section-title"><span>⚠️</span> 技术边界与限制</div>
+        
+        <div class="knowledge-section">
+            <div class="knowledge-grid">
+                <div class="knowledge-item">
+                    <h4>⏰ 实时数据</h4>
+                    <ul>
+                        <li>股票数据存在延迟（非Level-2）</li>
+                        <li>搜索结果基于爬虫快照</li>
+                        <li>无法访问付费金融终端</li>
+                    </ul>
+                </div>
+                <div class="knowledge-item">
+                    <h4>🔒 系统限制</h4>
+                    <ul>
+                        <li>单次执行时间有限制</li>
+                        <li>无法访问外部API密钥</li>
+                        <li>文件系统沙箱隔离</li>
+                    </ul>
+                </div>
+                <div class="knowledge-item">
+                    <h4>💡 建议用法</h4>
+                    <ul>
+                        <li>代码生成与原型开发</li>
+                        <li>信息整合与研报分析</li>
+                        <li>批量文件处理与部署</li>
+                        <li>创意设计与概念验证</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>⚙️ 工业音游中心 · AI能力中心 ⚙️</p>
+        <p style="margin-top: 10px; font-size: 0.9em;">最后更新: 2026年3月11日 | 版本: v1.0</p>
+    </footer>
+
+    <div class="warning-strip"></div>
+</body>
+</html>
