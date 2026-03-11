@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ 极速赛车</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #gameCanvas { border: 3px solid #e94560; border-radius: 10px; }
+        .ui { margin-bottom: 15px; font-size: 24px; }
+        .controls { margin-top: 15px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="ui">得分: <span id="score">0</span> | 速度: <span id="speed">60</span> km/h</div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <p class="controls">← → 控制方向 | 躲避其他车辆！</p>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        let player = {x: 200, y: 500, width: 40, height: 60};
+        let cars = [];
+        let roadOffset = 0;
+        let score = 0;
+        let speed = 60;
+        let gameOver = false;
+        let keys = {};
+        
+        function playEngine() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.value = 80 + speed * 2;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+        
+        function playCrash() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        function spawnCar() {
+            const lanes = [80, 200, 320];
+            cars.push({
+                x: lanes[Math.floor(Math.random() * lanes.length)],
+                y: -100,
+                width: 40,
+                height: 60,
+                speed: 3 + Math.random() * 3,
+                color: ['#e94560', '#4ecca3', '#ffe66d', '#00d4ff'][Math.floor(Math.random() * 4)]
+            });
+        }
+        
+        function draw() {
+            // 道路
+            ctx.fillStyle = '#2d2d2d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 路面线条
+            ctx.fillStyle = '#fff';
+            roadOffset = (roadOffset + speed/10) % 80;
+            for(let i = -80; i < canvas.height; i += 80) {
+                ctx.fillRect(140, i + roadOffset, 5, 40);
+                ctx.fillRect(260, i + roadOffset, 5, 40);
+            }
+            
+            // 边界
+            ctx.fillStyle = '#e94560';
+            ctx.fillRect(0, 0, 20, canvas.height);
+            ctx.fillRect(canvas.width - 20, 0, canvas.height);
+            
+            // 玩家
+            ctx.fillStyle = '#4ecca3';
+            ctx.fillRect(player.x - player.width/2, player.y, player.width, player.height);
+            ctx.fillStyle = '#00d4ff';
+            ctx.fillRect(player.x - 15, player.y + 5, 30, 15);
+            ctx.fillRect(player.x - 20, player.y + 35, 10, 20);
+            ctx.fillRect(player.x + 10, player.y + 35, 10, 20);
+            
+            // 其他车辆
+            cars.forEach(car => {
+                ctx.fillStyle = car.color;
+                ctx.fillRect(car.x - car.width/2, car.y, car.width, car.height);
+                ctx.fillStyle = '#333';
+                ctx.fillRect(car.x - 15, car.y + 5, 30, 15);
+            });
+            
+            if(gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#e94560';
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('游戏结束', canvas.width/2, canvas.height/2);
+                ctx.font = '20px Arial';
+                ctx.fillText(`最终得分: ${score}`, canvas.width/2, canvas.height/2 + 50);
+                ctx.fillText('按空格重新开始', canvas.width/2, canvas.height/2 + 90);
+            }
+        }
+        
+        function update() {
+            if(gameOver) return;
+            
+            // 玩家移动
+            if(keys['ArrowLeft'] && player.x > 40) player.x -= 5;
+            if(keys['ArrowRight'] && player.x < canvas.width - 40) player.x += 5;
+            
+            // 更新车辆
+            cars.forEach((car, i) => {
+                car.y += car.speed + speed/30;
+                
+                // 碰撞检测
+                if(Math.abs(car.x - player.x) < 35 && 
+                   car.y < player.y + player.height && 
+                   car.y + car.height > player.y) {
+                    gameOver = true;
+                    playCrash();
+                }
+                
+                // 计分
+                if(car.y > canvas.height && !car.passed) {
+                    car.passed = true;
+                    score += 10;
+                    speed += 1;
+                    document.getElementById('score').textContent = score;
+                    document.getElementById('speed').textContent = speed;
+                }
+            });
+            
+            cars = cars.filter(car => car.y < canvas.height + 50);
+        }
+        
+        document.addEventListener('keydown', e => {
+            keys[e.key] = true;
+            if(gameOver && e.key === ' ') {
+                gameOver = false;
+                cars = [];
+                score = 0;
+                speed = 60;
+                player.x = 200;
+                document.getElementById('score').textContent = score;
+                document.getElementById('speed').textContent = speed;
+            }
+        });
+        
+        document.addEventListener('keyup', e => keys[e.key] = false);
+        
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        
+        setInterval(spawnCar, 1500);
+        setInterval(playEngine, 300);
+        loop();
+        
+        if(audioCtx.state === 'suspended') {
+            document.addEventListener('click', ()=>audioCtx.resume(),{once:true});
+        }
+    </script>
+</body>
+</html>
