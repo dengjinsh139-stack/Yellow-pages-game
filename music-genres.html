@@ -405,6 +405,8 @@
             <span class="filter-tag" onclick="filterByMood('宁静')">🧘 宁静</span>
             <span class="filter-tag" onclick="filterByMood('浪漫')">💕 浪漫</span>
             <span class="filter-tag" onclick="filterByMood('神秘')">🔮 神秘</span>
+            <span class="filter-tag" onclick="filterByMood('史诗')">🎬 史诗</span>
+            <span class="filter-tag" onclick="filterByMood('冒险')">⚔️ 冒险</span>
             <span class="filter-tag" onclick="filterByEra('古典')">🏛️ 古典时期</span>
             <span class="filter-tag" onclick="filterByEra('现代')">🎸 现代流派</span>
             <span class="filter-tag" onclick="showAll()">✨ 全部显示</span>
@@ -427,6 +429,9 @@
         </button>
         <button class="category-btn" onclick="filterCategory('rock')">
             🎸 摇滚金属
+        </button>
+        <button class="category-btn" onclick="filterCategory('film')">
+            🎬 影视游戏
         </button>
         <button class="category-btn" onclick="filterCategory('world')">
             🌍 世界音乐
@@ -478,7 +483,7 @@
                     </div>
                     
                     <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=6JQm5aEzXMU" target="_blank" class="youtube-link">
+                        <a href="https://www.youtube.com/watch?v=1fO0R9kiEDo" target="_blank" class="youtube-link">
                             ▶️ 巴赫 - 哥德堡变奏曲
                         </a>
                     </div>
@@ -569,7 +574,7 @@
                     </div>
                     
                     <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=QxHkLdQy5f0" target="_blank" class="youtube-link">
+                        <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="youtube-link">
                             ▶️ 肖邦 - 夜曲 Op.9 No.2
                         </a>
                     </div>
@@ -713,6 +718,237 @@
                 </div>
             </div>
 
+            <!-- 影视游戏配乐 (film分类) -->
+            <div class="genre-card" data-category="film" data-moods="史诗,感人,紧张" data-composers="Hans Zimmer,John Williams,久石让">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">电影配乐</div>
+                            <div class="genre-en">Film Score (1930s-present)</div>
+                        </div>
+                        <span class="genre-origin">🇺🇸 好莱坞</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">🎬 史诗</span>
+                        <span class="mood-tag">😢 感人</span>
+                        <span class="mood-tag">😰 紧张</span>
+                        <span class="mood-tag">✨ 壮丽</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">电影配乐诞生于1920年代末的有声电影时代，Max Steiner的《金刚》(1933)确立了现代电影配乐的基本形式。从古典交响到电子实验，电影音乐已成为20世纪最重要的音乐体裁之一。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">大型交响乐团为基础；结合电子合成器创造特殊音效；世界民族乐器（如二胡、塔布拉、迪吉里杜管）；根据画面情绪灵活变化编制规模。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表作曲家</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">John Williams</span>
+                            <span class="composer-tag">Hans Zimmer</span>
+                            <span class="composer-tag">久石让</span>
+                            <span class="composer-tag">Ennio Morricone</span>
+                            <span class="composer-tag">Danny Elfman</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=_U5HfZ3zFEE" target="_blank" class="youtube-link">
+                            ▶️ Hans Zimmer - Time (盗梦空间)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="genre-card" data-category="film" data-moods="史诗,紧张,冒险,怀旧" data-composers="植松伸夫,下村阳子,Austin Wintory">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">游戏配乐</div>
+                            <div class="genre-en">Video Game Music (1980s-present)</div>
+                        </div>
+                        <span class="genre-origin">🎮 全球</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">🎮 史诗</span>
+                        <span class="mood-tag">😰 紧张</span>
+                        <span class="mood-tag">⚔️ 冒险</span>
+                        <span class="mood-tag">📟 怀旧</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">从1980年代8-bit芯片音乐发展至今，游戏音乐已成为当代最具影响力的音乐形式之一。日本作曲家（植松伸夫、近藤浩治）奠定了JRPG音乐传统，西方管弦乐编制与电子音乐的融合创造了独特的互动音乐体验。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">早期：芯片音源（Square波、Triangle波、噪声）的极简主义；现代：完整交响乐团+电子合成器+世界民族乐器；独特的"循环音乐"（Loop）设计；互动音乐系统（根据游戏状态变化）。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表作曲家</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">植松伸夫</span>
+                            <span class="composer-tag">近藤浩治</span>
+                            <span class="composer-tag">下村阳子</span>
+                            <span class="composer-tag">Jeremy Soule</span>
+                            <span class="composer-tag">Austin Wintory</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=tcHB9yg8D8c" target="_blank" class="youtube-link">
+                            ▶️ 植松伸夫 - One-Winged Angel (FF7)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="genre-card" data-category="film" data-moods="唯美,叙事,东方,治愈" data-composers="久石让,梅林茂,川井宪次">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">日系配乐</div>
+                            <div class="genre-en">Japanese Score</div>
+                        </div>
+                        <span class="genre-origin">🇯🇵 日本</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">🌸 唯美</span>
+                        <span class="mood-tag">📖 叙事</span>
+                        <span class="mood-tag">🎋 东方</span>
+                        <span class="mood-tag">💚 治愈</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">日本配乐深受西方古典与现代电子音乐影响，同时保留了独特的东方美学。从宫崎骏动画到黑泽明电影，从JRPG到视觉小说，日系配乐以其精致的旋律线条和丰富的情感层次闻名世界。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">钢琴与小提琴的对话式旋律；民族乐器（尺八、三味线、太鼓）与西方管弦乐融合；电子合成器的梦幻音色；合唱团营造史诗感；细腻动态变化的编曲。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表作曲家</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">久石让</span>
+                            <span class="composer-tag">梅林茂</span>
+                            <span class="composer-tag">川井宪次</span>
+                            <span class="composer-tag">梶浦由记</span>
+                            <span class="composer-tag">泽野弘之</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=UWM1i30Z3QE" target="_blank" class="youtube-link">
+                            ▶️ 久石让 - 千与千寻 - One Summer's Day
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="genre-card" data-category="film" data-moods="古风,意境,诗意,大气" data-composers="赵季平,谭盾,阿鲲">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">中国风配乐</div>
+                            <div class="genre-en">Chinese Style Score</div>
+                        </div>
+                        <span class="genre-origin">🇨🇳 中国</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">🎋 古风</span>
+                        <span class="mood-tag">🌫️ 意境</span>
+                        <span class="mood-tag">🖋️ 诗意</span>
+                        <span class="mood-tag">🏔️ 大气</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">融合中国传统音乐元素与现代电影配乐技法的独特风格。从赵季平的民族交响到谭盾的"有机音乐"，中国风配乐在电影、游戏、电视剧等领域都有广泛应用。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">民族乐器（古筝、二胡、笛子、琵琶）与西洋管弦乐融合；五声音阶与西方和声结合；打击乐使用中国大鼓、锣、编钟；人声吟唱或戏曲元素；空灵的女声独唱。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表作曲家</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">赵季平</span>
+                            <span class="composer-tag">谭盾</span>
+                            <span class="composer-tag">阿鲲</span>
+                            <span class="composer-tag">林海</span>
+                            <span class="composer-tag">陈致逸</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=1F3OGJnD3Qk" target="_blank" class="youtube-link">
+                            ▶️ 阿鲲 - 流浪地球 主题曲
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="genre-card" data-category="film" data-moods="史诗,庄严,神秘,战斗" data-composers="Two Steps From Hell,Hans Zimmer,Jeremy Soule">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">史诗/中世纪配乐</div>
+                            <div class="genre-en">Epic/Medieval Score</div>
+                        </div>
+                        <span class="genre-origin">🏰 欧洲/现代</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">⚔️ 史诗</span>
+                        <span class="mood-tag">👑 庄严</span>
+                        <span class="mood-tag">🔮 神秘</span>
+                        <span class="mood-tag">⚡ 战斗</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">以中世纪、奇幻、史诗为题材的电影和游戏配乐风格。从《指环王》到《权力的游戏》，从Two Steps From Hell的预告片音乐到各类奇幻RPG，这种风格追求宏大的气势和强烈的情感冲击。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">大型交响乐团+电子音乐混合；合唱（尤其是拉丁文圣咏）；中世纪古乐器（竖琴、鲁特琴、风笛）；战鼓与定音鼓营造紧张感；铜管乐器的辉煌音色；弦乐的急促节奏。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表作曲家</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">Two Steps From Hell</span>
+                            <span class="composer-tag">Audiomachine</span>
+                            <span class="composer-tag">Hans Zimmer</span>
+                            <span class="composer-tag">Howard Shore</span>
+                            <span class="composer-tag">Ramin Djawadi</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=5F1mOQT2DZw" target="_blank" class="youtube-link">
+                            ▶️ Two Steps From Hell - Victory
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- 摇滚金属 -->
             <div class="genre-card" data-category="rock" data-moods="激昂,叛逆,力量" data-composers="Chuck Berry,Elvis,Beatles">
                 <div class="genre-header">
@@ -801,6 +1037,96 @@
                     <div class="info-section">
                         <a href="https://www.youtube.com/watch?v=CD-E-LDc384" target="_blank" class="youtube-link">
                             ▶️ Metallica - Master of Puppets
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="genre-card" data-category="rock" data-moods="叛逆,能量,原始" data-composers="Sex Pistols,Ramones,The Clash">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">朋克摇滚</div>
+                            <div class="genre-en">Punk Rock (1970s-present)</div>
+                        </div>
+                        <span class="genre-origin">🇬🇧 英国/🇺🇸 美国</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">✊ 叛逆</span>
+                        <span class="mood-tag">⚡ 能量</span>
+                        <span class="mood-tag">🎸 原始</span>
+                        <span class="mood-tag">🏙️ 街头</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">1970年代中期在英国和美国兴起，对华丽摇滚和前卫摇滚的过度技术化进行反叛。"三和弦革命"追求最简化的音乐形式，DIY精神和反建制态度是其核心。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">快速、粗糙、高失真度的电吉他；简单直接的鼓点（通常是4/4拍高速进行）；贝斯与底鼓同步推进；人声以呼喊、咆哮为主；歌曲短小精悍（通常2-3分钟）。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表乐队</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">Sex Pistols</span>
+                            <span class="composer-tag">The Ramones</span>
+                            <span class="composer-tag">The Clash</span>
+                            <span class="composer-tag">Green Day</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=2AjKebG8z6c" target="_blank" class="youtube-link">
+                            ▶️ The Ramones - Blitzkrieg Bop
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="genre-card" data-category="rock" data-moods="愤怒,忧郁,力量" data-composers="Nirvana,Pearl Jam,Soundgarden">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">垃圾摇滚</div>
+                            <div class="genre-en">Grunge (1980s-1990s)</div>
+                        </div>
+                        <span class="genre-origin">🇺🇸 西雅图</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">😤 愤怒</span>
+                        <span class="mood-tag">😢 忧郁</span>
+                        <span class="mood-tag">💪 力量</span>
+                        <span class="mood-tag">🌧️ 阴郁</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">1980年代中期诞生于西雅图，融合朋克的愤怒、重金属的厚重和独立摇滚的旋律感。Nirvana的《Nevermind》(1991)将Grunge推向主流，成为90年代美国青年文化的代表。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">厚重的失真吉他（类似金属但更脏）；极端的音量动态变化（从安静到爆发）；旋律化的清音与失真段落对比；贝斯线条突出且黑暗；鼓点有力但不过于复杂。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表乐队</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">Nirvana</span>
+                            <span class="composer-tag">Pearl Jam</span>
+                            <span class="composer-tag">Soundgarden</span>
+                            <span class="composer-tag">Alice in Chains</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=hTWKbfoikeg" target="_blank" class="youtube-link">
+                            ▶️ Nirvana - Smells Like Teen Spirit
                         </a>
                     </div>
                 </div>
@@ -897,7 +1223,7 @@
                 </div>
             </div>
 
-            <div class="genre-card" data-category="electronic" data-moods="氛围,宁静,未来感" data-composers="Brian Eno,Aphex Twin,Tycho">
+            <div class="genre-card" data-category="electronic" data-moods="宁静,未来感,实验" data-composers="Brian Eno,Aphex Twin,Tycho">
                 <div class="genre-header">
                     <div class="genre-title-row">
                         <div>
@@ -935,7 +1261,7 @@
                     </div>
                     
                     <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=bpDz0T_3zHQ" target="_blank" class="youtube-link">
+                        <a href="https://www.youtube.com/watch?v=tpBHtPPW6lw" target="_blank" class="youtube-link">
                             ▶️ Tycho - Awake
                         </a>
                     </div>
@@ -1033,6 +1359,51 @@
                 </div>
             </div>
 
+            <div class="genre-card" data-category="world" data-moods="放松,反战,阳光" data-composers="Bob Marley,Peter Tosh,Jimmy Cliff">
+                <div class="genre-header">
+                    <div class="genre-title-row">
+                        <div>
+                            <div class="genre-name">雷鬼</div>
+                            <div class="genre-en">Reggae (1960s-present)</div>
+                        </div>
+                        <span class="genre-origin">🇯🇲 牙买加</span>
+                    </div>
+                    <div class="genre-moods">
+                        <span class="mood-tag">🧘 放松</span>
+                        <span class="mood-tag">✌️ 反战</span>
+                        <span class="mood-tag">☀️ 阳光</span>
+                        <span class="mood-tag">🌴 热带</span>
+                    </div>
+                </div>
+                <div class="genre-body">
+                    <div class="info-section">
+                        <div class="info-label">📖 历史起源</div>
+                        <div class="info-content">1960年代末诞生于牙买加金士顿的贫民区，由Ska和Rocksteady演化而来。Bob Marley将雷鬼与拉斯塔法里信仰推向世界，成为反战、和平与社会正义的象征。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">🎺 配器特点</div>
+                        <div class="info-content">标志性的反拍吉他切音（Ska/Reggae节奏型）；深沉浑厚的电贝斯线条；键盘（风琴、电钢琴）提供和弦填充；鼓强调第三拍；口琴、萨克斯作为旋律乐器。</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👨‍🎤 代表艺术家</div>
+                        <div class="composers-list">
+                            <span class="composer-tag">Bob Marley</span>
+                            <span class="composer-tag">Peter Tosh</span>
+                            <span class="composer-tag">Jimmy Cliff</span>
+                            <span class="composer-tag">Toots & the Maytals</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <a href="https://www.youtube.com/watch?v=69RdQFDuYPI" target="_blank" class="youtube-link">
+                            ▶️ Bob Marley - Three Little Birds
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- 流行音乐 -->
             <div class="genre-card" data-category="pop" data-moods="欢快,商业,时尚" data-composers="Michael Jackson,Madonna,Taylor Swift">
                 <div class="genre-header">
@@ -1125,196 +1496,7 @@
                 </div>
             </div>
 
-            <!-- 电影配乐 -->
-            <div class="genre-card" data-category="classical" data-moods="史诗,感人,紧张" data-composers="Hans Zimmer,John Williams,久石让">
-                <div class="genre-header">
-                    <div class="genre-title-row">
-                        <div>
-                            <div class="genre-name">电影配乐</div>
-                            <div class="genre-en">Film Score (1930s-present)</div>
-                        </div>
-                        <span class="genre-origin">🇺🇸 好莱坞</span>
-                    </div>
-                    <div class="genre-moods">
-                        <span class="mood-tag">🎬 史诗</span>
-                        <span class="mood-tag">😢 感人</span>
-                        <span class="mood-tag">😰 紧张</span>
-                        <span class="mood-tag">✨ 壮丽</span>
-                    </div>
-                </div>
-                <div class="genre-body">
-                    <div class="info-section">
-                        <div class="info-label">📖 历史起源</div>
-                        <div class="info-content">电影配乐诞生于1920年代末的有声电影时代，Max Steiner的《金刚》(1933)确立了现代电影配乐的基本形式。从古典交响到电子实验，电影音乐已成为20世纪最重要的音乐体裁之一。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">🎺 配器特点</div>
-                        <div class="info-content">大型交响乐团为基础；结合电子合成器创造特殊音效；世界民族乐器（如二胡、塔布拉、迪吉里杜管）；根据画面情绪灵活变化编制规模。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">👨‍🎤 代表作曲家</div>
-                        <div class="composers-list">
-                            <span class="composer-tag">John Williams</span>
-                            <span class="composer-tag">Hans Zimmer</span>
-                            <span class="composer-tag">久石让</span>
-                            <span class="composer-tag">Ennio Morricone</span>
-                            <span class="composer-tag">Danny Elfman</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=LIQpy78JW6U" target="_blank" class="youtube-link">
-                            ▶️ Hans Zimmer - Time (盗梦空间)
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-                        
-            <!-- 游戏配乐 -->
-            <div class="genre-card" data-category="film" data-moods="史诗,紧张,冒险,怀旧" data-composers="植松伸夫,下村阳子,Austin Wintory">
-                <div class="genre-header">
-                    <div class="genre-title-row">
-                        <div>
-                            <div class="genre-name">游戏配乐</div>
-                            <div class="genre-en">Video Game Music (1980s-present)</div>
-                        </div>
-                        <span class="genre-origin">🎮 全球</span>
-                    </div>
-                    <div class="genre-moods">
-                        <span class="mood-tag">🎮 史诗</span>
-                        <span class="mood-tag">😰 紧张</span>
-                        <span class="mood-tag">⚔️ 冒险</span>
-                        <span class="mood-tag">📟 怀旧</span>
-                    </div>
-                </div>
-                <div class="genre-body">
-                    <div class="info-section">
-                        <div class="info-label">📖 历史起源</div>
-                        <div class="info-content">从1980年代8-bit芯片音乐发展至今，游戏音乐已成为当代最具影响力的音乐形式之一。日本作曲家（植松伸夫、近藤浩治）奠定了JRPG音乐传统，西方管弦乐编制与电子音乐的融合创造了独特的互动音乐体验。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">🎺 配器特点</div>
-                        <div class="info-content">早期：芯片音源（Square波、Triangle波、噪声）的极简主义；现代：完整交响乐团+电子合成器+世界民族乐器；独特的"循环音乐"（Loop）设计；互动音乐系统（根据游戏状态变化）。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">👨‍🎤 代表作曲家</div>
-                        <div class="composers-list">
-                            <span class="composer-tag">植松伸夫</span>
-                            <span class="composer-tag">近藤浩治</span>
-                            <span class="composer-tag">下村阳子</span>
-                            <span class="composer-tag">Jeremy Soule</span>
-                            <span class="composer-tag">Austin Wintory</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=tcHB9yg8D8c" target="_blank" class="youtube-link">
-                            ▶️ 植松伸夫 - One-Winged Angel (FF7)
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 新古典/当代古典 -->
-            <div class="genre-card" data-category="classical" data-moods="宁静,冥想,未来感" data-composers="Ólafur Arnalds,Max Richter,Ludovico Einaudi">
-                <div class="genre-header">
-                    <div class="genre-title-row">
-                        <div>
-                            <div class="genre-name">新古典/极简主义</div>
-                            <div class="genre-en">Neo-Classical/Minimalism (1960s-present)</div>
-                        </div>
-                        <span class="genre-origin">🇪🇺 欧洲/🇺🇸 美国</span>
-                    </div>
-                    <div class="genre-moods">
-                        <span class="mood-tag">🧘 宁静</span>
-                        <span class="mood-tag">🌙 冥想</span>
-                        <span class="mood-tag">🔮 未来感</span>
-                        <span class="mood-tag">🎨 抽象</span>
-                    </div>
-                </div>
-                <div class="genre-body">
-                    <div class="info-section">
-                        <div class="info-label">📖 历史起源</div>
-                        <div class="info-content">1960年代Steve Reich、Philip Glass等美国作曲家开创的极简主义音乐，与古典传统结合形成新古典流派。21世纪与电子音乐、后摇融合，成为流媒体时代最受欢迎的现代古典形式。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">🎺 配器特点</div>
-                        <div class="info-content">弦乐四重奏、钢琴独奏为核心；循环反复的短小动机；电子元素（pad音色、glitch音效）；环境音采样（自然声、城市噪音）；渐进式的细微变化。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">👨‍🎤 代表艺术家</div>
-                        <div class="composers-list">
-                            <span class="composer-tag">Max Richter</span>
-                            <span class="composer-tag">Ólafur Arnalds</span>
-                            <span class="composer-tag">Ludovico Einaudi</span>
-                            <span class="composer-tag">Nils Frahm</span>
-                            <span class="composer-tag">Philip Glass</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=2Y3gEP4mP8M" target="_blank" class="youtube-link">
-                            ▶️ Max Richter - On The Nature of Daylight
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 放克/Funk -->
-            <div class="genre-card" data-category="jazz" data-moods="律动,欢快,性感" data-composers="James Brown,Prince,George Clinton">
-                <div class="genre-header">
-                    <div class="genre-title-row">
-                        <div>
-                            <div class="genre-name">放克</div>
-                            <div class="genre-en">Funk (1960s-present)</div>
-                        </div>
-                        <span class="genre-origin">🇺🇸 美国</span>
-                    </div>
-                    <div class="genre-moods">
-                        <span class="mood-tag">💃 律动</span>
-                        <span class="mood-tag">😊 欢快</span>
-                        <span class="mood-tag">💋 性感</span>
-                        <span class="mood-tag">🔥 热情</span>
-                    </div>
-                </div>
-                <div class="genre-body">
-                    <div class="info-section">
-                        <div class="info-label">📖 历史起源</div>
-                        <div class="info-content">1960年代中期由James Brown开创，将灵魂乐、R&B的律动推向极致。Funk强调"第一拍"（The One），贝斯线条复杂而主导，是Hip-hop采样最重要的来源之一。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">🎺 配器特点</div>
-                        <div class="info-content">电贝斯是核心乐器（Slap技巧）；铜管组（小号、长号、萨克斯）提供有力 riff；节奏吉他以切分节奏扫弦；鼓强调第一拍和第三拍；合成器在70-80年代加入。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">👨‍🎤 代表艺术家</div>
-                        <div class="composers-list">
-                            <span class="composer-tag">James Brown</span>
-                            <span class="composer-tag">Prince</span>
-                            <span class="composer-tag">Parliament-Funkadelic</span>
-                            <span class="composer-tag">Sly & the Family Stone</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=3vO7X6c4kgE" target="_blank" class="youtube-link">
-                            ▶️ James Brown - Get Up Offa That Thing
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 灵魂乐 -->
-            <div class="genre-card" data-category="pop" data-moods="深情,热情,感性" data-composers="Aretha Franklin,Ray Charles,Stevie Wonder">
+            <div class="genre-card" data-category="pop" data-moods="深情,热情,律动" data-composers="Aretha Franklin,Ray Charles,Stevie Wonder">
                 <div class="genre-header">
                     <div class="genre-title-row">
                         <div>
@@ -1360,144 +1542,50 @@
                 </div>
             </div>
 
-            <!-- 雷鬼 -->
-            <div class="genre-card" data-category="world" data-moods="放松,反战,阳光" data-composers="Bob Marley,Peter Tosh,Jimmy Cliff">
+            <div class="genre-card" data-category="pop" data-moods="律动,欢快,性感" data-composers="James Brown,Prince,George Clinton">
                 <div class="genre-header">
                     <div class="genre-title-row">
                         <div>
-                            <div class="genre-name">雷鬼</div>
-                            <div class="genre-en">Reggae (1960s-present)</div>
+                            <div class="genre-name">放克</div>
+                            <div class="genre-en">Funk (1960s-present)</div>
                         </div>
-                        <span class="genre-origin">🇯🇲 牙买加</span>
+                        <span class="genre-origin">🇺🇸 美国</span>
                     </div>
                     <div class="genre-moods">
-                        <span class="mood-tag">🧘 放松</span>
-                        <span class="mood-tag">✌️ 反战</span>
-                        <span class="mood-tag">☀️ 阳光</span>
-                        <span class="mood-tag">🌴 热带</span>
+                        <span class="mood-tag">💃 律动</span>
+                        <span class="mood-tag">😊 欢快</span>
+                        <span class="mood-tag">💋 性感</span>
+                        <span class="mood-tag">🔥 热情</span>
                     </div>
                 </div>
                 <div class="genre-body">
                     <div class="info-section">
                         <div class="info-label">📖 历史起源</div>
-                        <div class="info-content">1960年代末诞生于牙买加金士顿的贫民区，由Ska和Rocksteady演化而来。Bob Marley将雷鬼与拉斯塔法里信仰推向世界，成为反战、和平与社会正义的象征。</div>
+                        <div class="info-content">1960年代中期由James Brown开创，将灵魂乐、R&B的律动推向极致。Funk强调"第一拍"（The One），贝斯线条复杂而主导，是Hip-hop采样最重要的来源之一。</div>
                     </div>
                     
                     <div class="info-section">
                         <div class="info-label">🎺 配器特点</div>
-                        <div class="info-content">标志性的反拍吉他切音（Ska/Reggae节奏型）；深沉浑厚的电贝斯线条；键盘（风琴、电钢琴）提供和弦填充；鼓强调第三拍；口琴、萨克斯作为旋律乐器。</div>
+                        <div class="info-content">电贝斯是核心乐器（Slap技巧）；铜管组（小号、长号、萨克斯）提供有力 riff；节奏吉他以切分节奏扫弦；鼓强调第一拍和第三拍；合成器在70-80年代加入。</div>
                     </div>
                     
                     <div class="info-section">
                         <div class="info-label">👨‍🎤 代表艺术家</div>
                         <div class="composers-list">
-                            <span class="composer-tag">Bob Marley</span>
-                            <span class="composer-tag">Peter Tosh</span>
-                            <span class="composer-tag">Jimmy Cliff</span>
-                            <span class="composer-tag">Toots & the Maytals</span>
+                            <span class="composer-tag">James Brown</span>
+                            <span class="composer-tag">Prince</span>
+                            <span class="composer-tag">Parliament-Funkadelic</span>
+                            <span class="composer-tag">Sly & the Family Stone</span>
                         </div>
                     </div>
                     
                     <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=69RdQFDuYPI" target="_blank" class="youtube-link">
-                            ▶️ Bob Marley - Three Little Birds
+                        <a href="https://www.youtube.com/watch?v=3vO7X6c4kgE" target="_blank" class="youtube-link">
+                            ▶️ James Brown - Get Up Offa That Thing
                         </a>
                     </div>
                 </div>
             </div>
-
-            <!-- 朋克 -->
-            <div class="genre-card" data-category="rock" data-moods="叛逆,能量,原始" data-composers="Sex Pistols,Ramones,The Clash">
-                <div class="genre-header">
-                    <div class="genre-title-row">
-                        <div>
-                            <div class="genre-name">朋克摇滚</div>
-                            <div class="genre-en">Punk Rock (1970s-present)</div>
-                        </div>
-                        <span class="genre-origin">🇬🇧 英国/🇺🇸 美国</span>
-                    </div>
-                    <div class="genre-moods">
-                        <span class="mood-tag">✊ 叛逆</span>
-                        <span class="mood-tag">⚡ 能量</span>
-                        <span class="mood-tag">🎸 原始</span>
-                        <span class="mood-tag">🏙️ 街头</span>
-                    </div>
-                </div>
-                <div class="genre-body">
-                    <div class="info-section">
-                        <div class="info-label">📖 历史起源</div>
-                        <div class="info-content">1970年代中期在英国和美国兴起，对华丽摇滚和前卫摇滚的过度技术化进行反叛。"三和弦革命"追求最简化的音乐形式，DIY精神和反建制态度是其核心。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">🎺 配器特点</div>
-                        <div class="info-content">快速、粗糙、高失真度的电吉他；简单直接的鼓点（通常是4/4拍高速进行）；贝斯与底鼓同步推进；人声以呼喊、咆哮为主；歌曲短小精悍（通常2-3分钟）。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">👨‍🎤 代表乐队</div>
-                        <div class="composers-list">
-                            <span class="composer-tag">Sex Pistols</span>
-                            <span class="composer-tag">The Ramones</span>
-                            <span class="composer-tag">The Clash</span>
-                            <span class="composer-tag">Green Day</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=2AjKebG8z6c" target="_blank" class="youtube-link">
-                            ▶️ The Ramones - Blitzkrieg Bop
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 垃圾摇滚 -->
-            <div class="genre-card" data-category="rock" data-moods="愤怒,忧郁,力量" data-composers="Nirvana,Pearl Jam,Soundgarden">
-                <div class="genre-header">
-                    <div class="genre-title-row">
-                        <div>
-                            <div class="genre-name">垃圾摇滚/油渍摇滚</div>
-                            <div class="genre-en">Grunge (1980s-1990s)</div>
-                        </div>
-                        <span class="genre-origin">🇺🇸 西雅图</span>
-                    </div>
-                    <div class="genre-moods">
-                        <span class="mood-tag">😤 愤怒</span>
-                        <span class="mood-tag">😢 忧郁</span>
-                        <span class="mood-tag">💪 力量</span>
-                        <span class="mood-tag">🌧️ 阴郁</span>
-                    </div>
-                </div>
-                <div class="genre-body">
-                    <div class="info-section">
-                        <div class="info-label">📖 历史起源</div>
-                        <div class="info-content">1980年代中期诞生于西雅图，融合朋克的愤怒、重金属的厚重和独立摇滚的旋律感。Nirvana的《Nevermind》(1991)将Grunge推向主流，成为90年代美国青年文化的代表。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">🎺 配器特点</div>
-                        <div class="info-content">厚重的失真吉他（类似金属但更脏）；极端的音量动态变化（从安静到爆发）；旋律化的清音与失真段落对比；贝斯线条突出且黑暗；鼓点有力但不过于复杂。</div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-label">👨‍🎤 代表乐队</div>
-                        <div class="composers-list">
-                            <span class="composer-tag">Nirvana</span>
-                            <span class="composer-tag">Pearl Jam</span>
-                            <span class="composer-tag">Soundgarden</span>
-                            <span class="composer-tag">Alice in Chains</span>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <a href="https://www.youtube.com/watch?v=hTWKbfoikeg" target="_blank" class="youtube-link">
-                            ▶️ Nirvana - Smells Like Teen Spirit
-                        </a>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
         <!-- 无结果提示 -->
