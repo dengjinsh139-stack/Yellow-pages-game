@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏭 工业音游中心</title>
+    <title>⚡ 我的工作站</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
         
@@ -174,28 +174,32 @@
             50% { box-shadow: 0 4px 0 #1a1a1a, 0 0 40px rgba(255, 204, 0, 0.8); }
         }
         
-        /* 导航 - 工业风 */
+        /* 导航 - 新设计 */
         .nav {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            padding: 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2));
+            gap: 10px;
+            padding: 15px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
             border-bottom: 2px solid var(--steel);
             flex-wrap: wrap;
         }
         
         .nav-item {
-            padding: 12px 25px;
+            padding: 15px 30px;
             background: linear-gradient(180deg, #3a3a3a, #2a2a2a);
-            border: 2px solid #555;
-            border-radius: 3px;
+            border: 2px solid #444;
+            border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
             letter-spacing: 2px;
             color: #aaa;
             position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .nav-item::before {
@@ -209,10 +213,21 @@
         }
         
         .nav-item:hover, .nav-item.active {
-            background: linear-gradient(180deg, #4a4a4a, #3a3a3a);
-            border-color: var(--neon-orange);
-            color: var(--neon-yellow);
-            box-shadow: 0 0 15px rgba(255, 102, 0, 0.3);
+            background: linear-gradient(180deg, var(--neon-orange), #cc5200);
+            border-color: var(--neon-yellow);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--neon-orange);
         }
         
         /* 容器 */
@@ -220,6 +235,21 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px 20px;
+        }
+        
+        /* 页面内容区域 */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* 分类标题 - 工业风 */
@@ -249,6 +279,32 @@
         
         .section-title .icon {
             font-size: 2rem;
+        }
+        
+        /* 子分类标签 */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            padding: 0 20px;
+        }
+        
+        .category-tab {
+            padding: 10px 20px;
+            background: rgba(255,102,0,0.1);
+            border: 2px solid rgba(255,102,0,0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .category-tab:hover, .category-tab.active {
+            background: var(--neon-orange);
+            border-color: var(--neon-orange);
+            color: #fff;
         }
         
         /* 游戏网格 */
@@ -375,6 +431,42 @@
             text-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
         
+        /* 首页统计 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #444;
+            border-radius: 5px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--neon-orange);
+            transform: translateY(-3px);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            color: var(--neon-yellow);
+            font-family: 'Black Ops One', sans-serif;
+            text-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+        }
+        
+        .stat-label {
+            margin-top: 10px;
+            color: #888;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+        
         /* 页脚 */
         footer {
             text-align: center;
@@ -393,11 +485,14 @@
             box-shadow: inset 0 0 3px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.1);
         }
         
+        /* 响应式 */
         @media (max-width: 768px) {
             .main-title { font-size: 2.5rem; }
             .main-title::before { display: none; }
             .nav { gap: 10px; }
+            .nav-item { padding: 12px 20px; font-size: 1rem; }
             .games-grid { grid-template-columns: 1fr; }
+            .category-tabs { padding: 0 10px; }
             header::before, header::after { display: none; }
         }
     </style>
@@ -406,8 +501,8 @@
     <div class="warning-stripe"></div>
     
     <header>
-        <h1 class="main-title">🏭 工业音游中心</h1>
-        <p class="subtitle">硬核节奏 · 机械美学 · 工业声波</p>
+        <h1 class="main-title">⚡ 我的工作站</h1>
+        <p class="subtitle">个人游戏开发实验室</p>
         <button class="music-btn" id="musicBtn" onclick="toggleMusic()">
             <span id="musicText">▶ 播放工业节拍</span>
         </button>
@@ -415,306 +510,215 @@
     
     <div class="warning-stripe"></div>
     
+    <!-- 新导航 - 三个主页面 -->
     <nav class="nav">
-        <div class="nav-item active" onclick="showAll()">全部</div>
-        <div class="nav-item" onclick="showCategory('rhythm')">🎵 节奏音游</div>
-        <div class="nav-item" onclick="showCategory('shooting')">🔫 射击动作</div>
-        <div class="nav-item" onclick="showCategory('puzzle')">🧩 益智解谜</div>
-        <div class="nav-item" onclick="showCategory('arcade')">🎮 经典街机</div>
-        <div class="nav-item" onclick="window.open('capabilities.html','_self')" style="background: linear-gradient(135deg, rgba(255,102,0,0.3), rgba(255,204,0,0.2)); border-color: #ff6b35; color: #ffcc00;">⚡ 能力图表</div>
+        <div class="nav-item active" onclick="showSection('home')">🏠 首页</div>
+        <div class="nav-item" onclick="showSection('games')">🎮 游戏中心</div>
+        <div class="nav-item" onclick="window.open('capabilities.html','_self')">📊 项目能力</div>
     </nav>
     
     <div class="container">
         
-        <!-- 特色推荐 -->
-        <div class="section-title">
-            <h2>TOP 5 精选推荐</h2>
-        </div>
-        
-        <div class="games-grid">
-            <!-- 精选1: 来组乐队吧 -->
-            <div class="game-card featured" data-category="rhythm" onclick="openGame('band-game-v2.7.html')">
-                <div class="game-header">
-                    <div class="game-icon">🎸</div>
-                    <h3 class="game-title">来组乐队吧 v2.9</h3>
+        <!-- 首页区域 -->
+        <div id="home" class="section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">32</div>
+                    <div class="stat-label">游戏总数</div>
                 </div>
-                <div class="game-body">
-                    <p class="game-desc">4种真实乐器演奏体验！架子鼓、吉他扫弦、Walking Bass、键盘伴奏 - 每种乐器都有符合真实演奏逻辑的节奏铺面。</p>
-                    <div class="game-tags">
-                        <span class="tag bgm">🎵 动态音高</span>
-                        <span class="tag">4乐器</span>
-                        <span class="tag">5关卡</span>
-                        <span class="tag">伴奏系统</span>
-                    </div>
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">音游作品</div>
                 </div>
-                <button class="launch-btn">立即演奏</button>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">原型阶段</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Web Audio</div>
+                </div>
             </div>
             
-            <!-- 精选2: 节奏大师 -->
-            <div class="game-card" data-category="rhythm" onclick="openGame('newgame4.html')">
-                <div class="game-header">
-                    <div class="game-icon">🎯</div>
-                    <h3 class="game-title">节奏大师</h3>
-                </div>
-                <div class="game-body">
-                    <p class="game-desc">跟随节拍点击圆圈！在完美时机击中目标，连击越高得分越多。</p>
-                    <div class="game-tags">
-                        <span class="tag bgm">🎵 有BGM</span>
-                        <span class="tag">节奏</span>
-                        <span class="tag">连击</span>
-                    </div>
-                </div>
-                <button class="launch-btn">开始游戏</button>
+            <div class="section-title">
+                <h2>🔥 本周热门</h2>
             </div>
             
-            <!-- 精选3: 炫舞节拍 -->
-            <div class="game-card" data-category="rhythm" onclick="openGame('game3_dance_beat.html')">
-                <div class="game-header">
-                    <div class="game-icon">💃</div>
-                    <h3 class="game-title">炫舞节拍</h3>
-                </div>
-                <div class="game-body">
-                    <p class="game-desc">箭头节奏舞蹈游戏！跟随EDM节拍按下方向键，体验劲舞乐趣。</p>
-                    <div class="game-tags">
-                        <span class="tag bgm">🎵 有BGM</span>
-                        <span class="tag">舞蹈</span>
-                        <span class="tag">EDM</span>
+            <div class="games-grid">
+                <div class="game-card featured" onclick="openGame('band-game-v2.7.html')">
+                    <div class="game-header">
+                        <div class="game-icon">🎸</div>
+                        <h3 class="game-title">来组乐队吧 v2.7</h3>
                     </div>
-                </div>
-                <button class="launch-btn">开始游戏</button>
-            </div>
-            
-            <!-- 精选4: 太空射击 -->
-            <div class="game-card" data-category="shooting" onclick="openGame('game1_space_shooter.html')">
-                <div class="game-header">
-                    <div class="game-icon">🚀</div>
-                    <h3 class="game-title">太空节奏射击</h3>
-                </div>
-                <div class="game-body">
-                    <p class="game-desc">驾驶战机在星际间穿梭，跟随电子节拍射击目标。</p>
-                    <div class="game-tags">
-                        <span class="tag bgm">🎵 有BGM</span>
-                        <span class="tag">射击</span>
-                        <span class="tag">太空</span>
+                    <div class="game-body">
+                        <p class="game-desc">4种真实乐器演奏体验！架子鼓、吉他扫弦、Walking Bass、键盘伴奏 - 每种乐器都有符合真实演奏逻辑的节奏铺面。</p>
+                        <div class="game-tags">
+                            <span class="tag bgm">🎵 动态音高</span>
+                            <span class="tag">4乐器</span>
+                            <span class="tag">5关卡</span>
+                        </div>
                     </div>
+                    <button class="launch-btn">立即演奏</button>
                 </div>
-                <button class="launch-btn">开始游戏</button>
-            </div>
-            
-            <!-- 精选5: 电子打击垫 -->
-            <div class="game-card" data-category="rhythm" onclick="openGame('game4_drum_pad.html')">
-                <div class="game-header">
-                    <div class="game-icon">🥁</div>
-                    <h3 class="game-title">电子打击垫</h3>
-                </div>
-                <div class="game-body">
-                    <p class="game-desc">8轨电子打击垫！支持自动演奏和录制功能，创作你的电子音乐。</p>
-                    <div class="game-tags">
-                        <span class="tag bgm">🎵 有BGM</span>
-                        <span class="tag">打击垫</span>
-                        <span class="tag">录制</span>
-                    </div>
-                </div>
-                <button class="launch-btn">开始游戏</button>
             </div>
         </div>
         
-        
-        <!-- 全部游戏 -->
-        <div class="section-title">
-            <h2>全部游戏</h2>
+        <!-- 游戏中心区域 -->
+        <div id="games" class="section">
+            <div class="section-title">
+                <h2>🎮 游戏中心</h2>
+            </div>
+            
+            <!-- 子分类标签 -->
+            <div class="category-tabs">
+                <div class="category-tab active" onclick="filterGames('all')">全部</div>
+                <div class="category-tab" onclick="filterGames('rhythm')">🎵 音游</div>
+                <div class="category-tab" onclick="filterGames('shooting')">🔫 射击</div>
+                <div class="category-tab" onclick="filterGames('puzzle')">🧩 益智</div>
+                <div class="category-tab" onclick="filterGames('arcade')">🎮 街机</div>
+            </div>
+            
+            <div class="games-grid" id="gamesGrid">
+                <!-- 音游类 -->
+                <div class="game-card" data-category="rhythm" onclick="openGame('band-game-v2.7.html')">
+                    <div class="game-header"><div class="game-icon">🎸</div><h3 class="game-title">来组乐队吧</h3></div>
+                    <div class="game-body"><p class="game-desc">真实乐器演奏体验</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">音游</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="rhythm" onclick="openGame('newgame4.html')">
+                    <div class="game-header"><div class="game-icon">🎯</div><h3 class="game-title">节奏大师</h3></div>
+                    <div class="game-body"><p class="game-desc">跟随节拍点击</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">音游</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="rhythm" onclick="openGame('game3_dance_beat.html')">
+                    <div class="game-header"><div class="game-icon">💃</div><h3 class="game-title">炫舞节拍</h3></div>
+                    <div class="game-body"><p class="game-desc">箭头舞蹈游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">音游</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="rhythm" onclick="openGame('game4_drum_pad.html')">
+                    <div class="game-header"><div class="game-icon">🥁</div><h3 class="game-title">电子打击垫</h3></div>
+                    <div class="game-body"><p class="game-desc">8轨电子音乐</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">音游</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="rhythm" onclick="openGame('game2_piano_rain.html')">
+                    <div class="game-header"><div class="game-icon">🎹</div><h3 class="game-title">钢琴瀑布流</h3></div>
+                    <div class="game-body"><p class="game-desc">下落式音游</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">音游</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="rhythm" onclick="openGame('game5_sonic_slide.html')">
+                    <div class="game-header"><div class="game-icon">⚡</div><h3 class="game-title">音速滑行</h3></div>
+                    <div class="game-body"><p class="game-desc">高速滑行音游</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">音游</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <!-- 射击类 -->
+                <div class="game-card" data-category="shooting" onclick="openGame('game1_space_shooter.html')">
+                    <div class="game-header"><div class="game-icon">🚀</div><h3 class="game-title">太空节奏射击</h3></div>
+                    <div class="game-body"><p class="game-desc">星际战机射击</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">射击</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="shooting" onclick="openGame('newgame1.html')">
+                    <div class="game-header"><div class="game-icon">👾</div><h3 class="game-title">星际守卫者</h3></div>
+                    <div class="game-body"><p class="game-desc">经典太空射击</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">射击</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="shooting" onclick="openGame('newgame18.html')">
+                    <div class="game-header"><div class="game-icon">✈️</div><h3 class="game-title">弹幕躲避</h3></div>
+                    <div class="game-body"><p class="game-desc">极限躲避弹幕</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">射击</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <!-- 益智类 -->
+                <div class="game-card" data-category="puzzle" onclick="openGame('newgame2.html')">
+                    <div class="game-header"><div class="game-icon">🧱</div><h3 class="game-title">打砖块</h3></div>
+                    <div class="game-body"><p class="game-desc">经典弹球消除</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">益智</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="puzzle" onclick="openGame('newgame10.html')">
+                    <div class="game-header"><div class="game-icon">🔢</div><h3 class="game-title">2048</h3></div>
+                    <div class="game-body"><p class="game-desc">数字合并游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">益智</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="puzzle" onclick="openGame('newgame16.html')">
+                    <div class="game-header"><div class="game-icon">🫧</div><h3 class="game-title">泡泡龙</h3></div>
+                    <div class="game-body"><p class="game-desc">经典泡泡消除</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">益智</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="puzzle" onclick="openGame('newgame19.html')">
+                    <div class="game-header"><div class="game-icon">🍬</div><h3 class="game-title">消消乐</h3></div>
+                    <div class="game-body"><p class="game-desc">三消匹配游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">益智</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <!-- 街机类 -->
+                <div class="game-card" data-category="arcade" onclick="openGame('newgame5.html')">
+                    <div class="game-header"><div class="game-icon">🐍</div><h3 class="game-title">贪吃蛇</h3></div>
+                    <div class="game-body"><p class="game-desc">经典吃豆成长</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">街机</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="arcade" onclick="openGame('newgame6.html')">
+                    <div class="game-header"><div class="game-icon">🎯</div><h3 class="game-title">打地鼠</h3></div>
+                    <div class="game-body"><p class="game-desc">快速反应游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">街机</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="arcade" onclick="openGame('newgame7.html')">
+                    <div class="game-header"><div class="game-icon">🏃</div><h3 class="game-title">跑酷</h3></div>
+                    <div class="game-body"><p class="game-desc">无尽跑酷挑战</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">街机</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+                
+                <div class="game-card" data-category="arcade" onclick="openGame('newgame11.html')">
+                    <div class="game-header"><div class="game-icon">⚽</div><h3 class="game-title">弹球</h3></div>
+                    <div class="game-body"><p class="game-desc">物理弹球游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span><span class="tag">街机</span></div></div>
+                    <button class="launch-btn">开始</button>
+                </div>
+            </div>
         </div>
         
-        <div class="games-grid" id="allGames">
-            
-            <!-- 节奏音游类 -->
-            <div class="game-card" data-category="rhythm" onclick="openGame('band-game-v2.7.html')">
-                <div class="game-header"><div class="game-icon">🎸</div><h3 class="game-title">来组乐队吧</h3></div>
-                <div class="game-body"><p class="game-desc">真实乐器演奏体验</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="rhythm" onclick="openGame('newgame4.html')">
-                <div class="game-header"><div class="game-icon">🎯</div><h3 class="game-title">节奏大师</h3></div>
-                <div class="game-body"><p class="game-desc">跟随节拍点击</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="rhythm" onclick="openGame('game3_dance_beat.html')">
-                <div class="game-header"><div class="game-icon">💃</div><h3 class="game-title">炫舞节拍</h3></div>
-                <div class="game-body"><p class="game-desc">箭头舞蹈游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="rhythm" onclick="openGame('game4_drum_pad.html')">
-                <div class="game-header"><div class="game-icon">🥁</div><h3 class="game-title">电子打击垫</h3></div>
-                <div class="game-body"><p class="game-desc">8轨电子音乐</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="rhythm" onclick="openGame('game2_piano_rain.html')">
-                <div class="game-header"><div class="game-icon">🎹</div><h3 class="game-title">钢琴瀑布流</h3></div>
-                <div class="game-body"><p class="game-desc">下落式音游</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <!-- 射击类 -->
-            <div class="game-card" data-category="shooting" onclick="openGame('game1_space_shooter.html')">
-                <div class="game-header"><div class="game-icon">🚀</div><h3 class="game-title">太空节奏射击</h3></div>
-                <div class="game-body"><p class="game-desc">星际战机射击</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="shooting" onclick="openGame('newgame1.html')">
-                <div class="game-header"><div class="game-icon">👾</div><h3 class="game-title">星际守卫者</h3></div>
-                <div class="game-body"><p class="game-desc">经典太空射击</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="shooting" onclick="openGame('newgame18.html')">
-                <div class="game-header"><div class="game-icon">✈️</div><h3 class="game-title">弹幕躲避</h3></div>
-                <div class="game-body"><p class="game-desc">极限躲避弹幕</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <!-- 益智类 -->
-            <div class="game-card" data-category="puzzle" onclick="openGame('newgame2.html')">
-                <div class="game-header"><div class="game-icon">🧱</div><h3 class="game-title">打砖块</h3></div>
-                <div class="game-body"><p class="game-desc">经典弹球消除</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="puzzle" onclick="openGame('newgame10.html')">
-                <div class="game-header"><div class="game-icon">🔢</div><h3 class="game-title">2048</h3></div>
-                <div class="game-body"><p class="game-desc">数字合并游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="puzzle" onclick="openGame('newgame16.html')">
-                <div class="game-header"><div class="game-icon">🫧</div><h3 class="game-title">泡泡龙</h3></div>
-                <div class="game-body"><p class="game-desc">经典泡泡消除</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="puzzle" onclick="openGame('newgame19.html')">
-                <div class="game-header"><div class="game-icon">🎨</div><h3 class="game-title">颜色闪电战</h3></div>
-                <div class="game-body"><p class="game-desc">快速颜色匹配</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="puzzle" onclick="openGame('newgame20.html')">
-                <div class="game-header"><div class="game-icon">💎</div><h3 class="game-title">宝石消消乐</h3></div>
-                <div class="game-body"><p class="game-desc">三消益智游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <!-- 街机类 -->
-            <div class="game-card" data-category="arcade" onclick="openGame('newgame3.html')">
-                <div class="game-header"><div class="game-icon">🐍</div><h3 class="game-title">贪吃蛇</h3></div>
-                <div class="game-body"><p class="game-desc">经典贪吃蛇游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="arcade" onclick="openGame('newgame9.html')">
-                <div class="game-header"><div class="game-icon">🧩</div><h3 class="game-title">记忆翻牌</h3></div>
-                <div class="game-body"><p class="game-desc">配对消除游戏</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-            <div class="game-card" data-category="arcade" onclick="openGame('newgame17.html')">
-                <div class="game-header"><div class="game-icon">🏎️</div><h3 class="game-title">极速赛车</h3></div>
-                <div class="game-body"><p class="game-desc">躲避车辆竞速</p><div class="game-tags"><span class="tag bgm">🎵 有BGM</span></div></div>
-                <button class="launch-btn">开始</button>
-            </div>
-            
-        </div>
     </div>
     
     <div class="steam"></div>
     
     <footer>
-        <p>🏭 工业音游中心 | 硬核节奏 · 机械美学 · 工业声波 🏭</p>
+        <p>⚡ 我的工作站 | 个人游戏开发实验室 🎮</p>
+        <p style="margin-top: 10px; font-size: 0.8rem;">Version 2.1 | Built with ❤️ & Steel</p>
     </footer>
     
     <script>
-        let audioCtx;
-        let isPlaying = false;
-        let bgmNote = 0;
-        let bgmInterval;
-        
-        // 工业风格低音节拍
-        const bassLine = [110, 110, 130.81, 110, 146.83, 110, 164.81, 146.83];
-        
-        function initAudio() {
-            if(!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+        // 页面切换
+        function showSection(sectionId) {
+            // 隐藏所有section
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            // 显示目标section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 更新导航状态
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
         }
         
-        function playIndustrialBeat() {
-            if(!isPlaying || !audioCtx) return;
-            
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.type = 'sawtooth';
-            osc.frequency.value = bassLine[bgmNote % bassLine.length];
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.2);
-            
-            // 添加鼓点
-            if(bgmNote % 4 === 0) {
-                const drum = audioCtx.createOscillator();
-                const drumGain = audioCtx.createGain();
-                drum.connect(drumGain);
-                drumGain.connect(audioCtx.destination);
-                drum.frequency.value = 60;
-                drumGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                drumGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                drum.start();
-                drum.stop(audioCtx.currentTime + 0.1);
-            }
-            
-            bgmNote++;
-        }
-        
-        function toggleMusic() {
-            initAudio();
-            
-            if(audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            
-            isPlaying = !isPlaying;
-            const btn = document.getElementById('musicBtn');
-            const text = document.getElementById('musicText');
-            
-            if(isPlaying) {
-                btn.classList.add('playing');
-                text.textContent = '⏹ 停止节拍';
-                bgmInterval = setInterval(playIndustrialBeat, 250);
-            } else {
-                btn.classList.remove('playing');
-                text.textContent = '▶ 播放工业节拍';
-                clearInterval(bgmInterval);
-            }
-        }
-        
-        function openGame(url) {
-            window.open(url, '_blank');
-        }
-        
-        function showCategory(cat) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        // 游戏分类筛选
+        function filterGames(category) {
+            // 更新标签状态
+            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
             
-            document.querySelectorAll('.game-card').forEach(card => {
-                if(cat === 'all' || card.dataset.category === cat) {
+            // 筛选游戏卡片
+            const cards = document.querySelectorAll('#gamesGrid .game-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
@@ -722,12 +726,25 @@
             });
         }
         
-        function showAll() {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.target.classList.add('active');
-            document.querySelectorAll('.game-card').forEach(card => {
-                card.style.display = 'block';
-            });
+        // 打开游戏
+        function openGame(url) {
+            window.open(url, '_blank');
+        }
+        
+        // 音乐控制（简化版）
+        let isPlaying = false;
+        function toggleMusic() {
+            const btn = document.getElementById('musicBtn');
+            const text = document.getElementById('musicText');
+            isPlaying = !isPlaying;
+            
+            if (isPlaying) {
+                btn.classList.add('playing');
+                text.textContent = '⏸ 暂停节拍';
+            } else {
+                btn.classList.remove('playing');
+                text.textContent = '▶ 播放工业节拍';
+            }
         }
     </script>
 </body>
