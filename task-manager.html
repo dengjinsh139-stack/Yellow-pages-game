@@ -871,69 +871,146 @@
         setInterval(updateTime, 1000);
         updateTime();
 
-        // 模拟动态数据更新
-        function updateStats() {
-            // 随机波动负载
-            const baseLoad = 59;
-            const variation = Math.floor(Math.random() * 10) - 5;
-            const currentLoad = Math.max(0, Math.min(100, baseLoad + variation));
+        // 从服务器获取真实状态数据
+        let currentStatus = null;
+        
+        async function fetchStatus() {
+            try {
+                const response = await fetch('status.json?t=' + Date.now());
+                if (!response.ok) throw new Error('Failed to fetch');
+                const data = await response.json();
+                currentStatus = data;
+                updateUI(data);
+            } catch (error) {
+                console.log('Using fallback data:', error);
+                // 如果获取失败，使用模拟数据
+                updateStats();
+            }
+        }
+
+        function updateUI(data) {
+            // 更新负载显示
+            const load = data.load.percentage;
+            document.getElementById('loadPercentage').textContent = load + '%';
+            document.getElementById('meterFill').style.width = load + '%';
             
-            // 更新百分比
-            document.getElementById('loadPercentage').textContent = currentLoad + '%';
-            document.getElementById('meterFill').style.width = currentLoad + '%';
-            
-            // 更新负载状态
+            // 更新状态等级
             const stages = ['stageIdle', 'stageLow', 'stageMid', 'stageBusy'];
             stages.forEach(id => document.getElementById(id).classList.remove('active'));
             
-            let stageClass = '';
-            let badgeText = '';
-            let badgeClass = '';
-            let fillColor = '';
+            const level = data.load.level;
+            document.getElementById('stage' + level.charAt(0).toUpperCase() + level.slice(1)).classList.add('active');
             
-            if (currentLoad < 25) {
-                document.getElementById('stageIdle').classList.add('active');
-                badgeText = '🟢 空闲 - 全力运转中';
-                badgeClass = 'low';
-                fillColor = 'linear-gradient(90deg, #00d26a 0%, #00b894 100%)';
-                document.getElementById('loadPercentage').className = 'load-percentage low';
-            } else if (currentLoad < 50) {
-                document.getElementById('stageLow').classList.add('active');
-                badgeText = '🔵 低负载 - 响应迅速';
-                badgeClass = 'low';
-                fillColor = 'linear-gradient(90deg, #3498db 0%, #2980b9 100%)';
-                document.getElementById('loadPercentage').className = 'load-percentage low';
-            } else if (currentLoad < 75) {
-                document.getElementById('stageMid').classList.add('active');
-                badgeText = '🟡 中等负载 - 建议简单任务';
-                badgeClass = '';
-                fillColor = 'linear-gradient(90deg, #ffc107 0%, #ff9800 100%)';
-                document.getElementById('loadPercentage').className = 'load-percentage';
-            } else {
-                document.getElementById('stageBusy').classList.add('active');
-                badgeText = '🔴 高负载 - 需要休息';
-                badgeClass = 'high';
-                fillColor = 'linear-gradient(90deg, #e74c3c 0%, #c0392b 100%)';
-                document.getElementById('loadPercentage').className = 'load-percentage high';
-            }
-            
+            // 更新badge
             const badge = document.getElementById('loadBadge');
-            badge.innerHTML = '<span>' + badgeText.split(' ')[0] + '</span> ' + badgeText.split(' ').slice(1).join(' ');
-            badge.className = 'load-badge ' + badgeClass;
-            document.getElementById('meterFill').style.background = fillColor;
+            let badgeEmoji = level === 'idle' ? '🟢' : level === 'low' ? '🔵' : level === 'mid' ? '🟡' : '🔴';
+            badge.innerHTML = '<span>' + badgeEmoji + '</span> ' + data.load.status_text;
+            badge.className = 'load-badge ' + (level === 'idle' || level === 'low' ? 'low' : level === 'busy' ? 'high' : '');
             
-            // 更新CPU和内存
-            document.getElementById('cpuLoad').textContent = (Math.floor(Math.random() * 30) + 10) + '%';
-            document.getElementById('memoryUsage').textContent = (Math.floor(Math.random() * 20) + 40) + '%';
+            // 更新负载百分比样式
+            const loadEl = document.getElementById('loadPercentage');
+            loadEl.className = 'load-percentage ' + (level === 'idle' || level === 'low' ? 'low' : level === 'busy' ? 'high' : '');
             
-            // 更新token计数（模拟增长）
-            const tokens = 15.4 + (Math.random() * 0.5);
-            document.getElementById('tokenCount').textContent = tokens.toFixed(1) + 'k';
+            // 更新进度条颜色
+            const colors = {
+                idle: 'linear-gradient(90deg, #00d26a 0%, #00b894 100%)',
+                low: 'linear-gradient(90deg, #3498db 0%, #2980b9 100%)',
+                mid: 'linear-gradient(90deg, #ffc107 0%, #ff9800 100%)',
+                busy: 'linear-gradient(90deg, #e74c3c 0%, #c0392b 100%)'
+            };
+            document.getElementById('meterFill').style.background = colors[level];
+            
+            // 更新系统信息
+            document.getElementById('cpuLoad').textContent = data.load.cpu + '%';
+            document.getElementById('memoryUsage').textContent = data.load.memory + '%';
+            
+            // 更新统计卡片
+            document.getElementById('sessionCount').textContent = data.sessions.active;
+            document.getElementById('pendingCount').textContent = data.sessions.pending;
+            document.getElementById('processingCount').textContent = data.sessions.processing;
+            document.getElementById('tokenCount').textContent = data.tokens.current_session;
+            
+            // 更新时间戳
+            const updateTime = new Date(data.timestamp);
+            const elapsed = Math.floor((Date.now() - updateTime.getTime()) / 1000);
+            document.getElementById('waitTime').textContent = elapsed < 60 ? elapsed + 's' : Math.floor(elapsed / 60) + 'm';
+            
+            // 更新任务列表
+            updateTaskList(data.tasks);
+            
+            // 更新图表
+            updateChart(data.history);
         }
 
-        // 每3秒更新一次数据
-        setInterval(updateStats, 3000);
-        updateStats();
+        function updateTaskList(tasks) {
+            const container = document.getElementById('taskList');
+            container.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                
+                const statusClass = task.status === 'processing' ? 'processing' : task.status === 'completed' ? 'completed' : 'pending';
+                const badgeClass = task.status === 'processing' ? 'processing' : task.status === 'completed' ? 'idle' : 'waiting';
+                const badgeText = task.status === 'processing' ? '⚡ processing' : task.status === 'completed' ? '✅ completed' : '⏳ pending';
+                
+                item.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-name">
+                            <span class="task-status-dot ${statusClass}"></span>
+                            ${task.type}: ${task.name}
+                        </div>
+                        <div class="task-meta">${task.tokens} tokens · ${task.status === 'processing' ? '进行中' : task.status === 'completed' ? '已完成' : '等待中'}</div>
+                    </div>
+                    <div class="task-badge ${badgeClass}">
+                        ${badgeText}
+                    </div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        function updateChart(history) {
+            if (!history || !history.load_5min) return;
+            
+            const data = history.load_5min;
+            const maxVal = 100;
+            const width = 800;
+            const height = 160;
+            const padding = 20;
+            
+            // 构建SVG路径
+            let pathD = 'M0,' + (height - (data[0] / maxVal) * (height - padding * 2) - padding);
+            
+            for (let i = 1; i < data.length; i++) {
+                const x = (i / (data.length - 1)) * width;
+                const y = height - (data[i] / maxVal) * (height - padding * 2) - padding;
+                pathD += ' L' + x + ',' + y;
+            }
+            
+            // 更新路径
+            const path = document.getElementById('loadPath');
+            if (path) path.setAttribute('d', pathD);
+            
+            // 更新填充
+            const fillPath = document.getElementById('fillPath');
+            if (fillPath) fillPath.setAttribute('d', pathD + ' L' + width + ',' + height + ' L0,' + height + ' Z');
+        }
+
+        // 模拟数据（备用）
+        function updateStats() {
+            const currentLoad = 59;
+            document.getElementById('loadPercentage').textContent = currentLoad + '%';
+            document.getElementById('meterFill').style.width = currentLoad + '%';
+            document.getElementById('stageMid').classList.add('active');
+            document.getElementById('cpuLoad').textContent = '18%';
+            document.getElementById('memoryUsage').textContent = '42%';
+        }
+
+        // 初始加载和定时更新
+        fetchStatus();
+        setInterval(fetchStatus, 5000); // 每5秒刷新一次
 
         // 图表标签切换
         document.querySelectorAll('.chart-tab').forEach(tab => {
