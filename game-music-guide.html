@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏配乐设计师手册 | ⚡ 我的工作站</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* 导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+
+        /* 主布局 */
+        .main-container {
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+
+        /* 左侧导航 */
+        .sidebar {
+            width: 280px;
+            background: rgba(20, 20, 30, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px 0;
+            position: fixed;
+            left: 0;
+            top: 60px;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 25px 10px;
+            font-size: 0.75rem;
+            color: #00d4aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 25px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+            border-left-color: #00d4aa;
+        }
+
+        .nav-item-icon {
+            margin-right: 10px;
+        }
+
+        /* 主内容区 */
+        .content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-desc {
+            color: #888;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 800px;
+        }
+
+        .work-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #00d4aa;
+            margin-top: 15px;
+        }
+
+        /* 风格卡片 */
+        .genre-section {
+            margin-bottom: 60px;
+            scroll-margin-top: 100px;
+        }
+
+        .genre-header-large {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 212, 170, 0.2);
+        }
+
+        .genre-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.2) 0%, rgba(0, 168, 232, 0.2) 100%);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .genre-title-group h2 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .genre-title-en {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .genre-meta {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-block {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .meta-label {
+            font-size: 0.8rem;
+            color: #00d4aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-content {
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .mood-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .mood-tag {
+            padding: 6px 14px;
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #e74c3c;
+        }
+
+        .mood-tag.calm {
+            background: rgba(52, 152, 219, 0.15);
+            border-color: rgba(52, 152, 219, 0.3);
+            color: #3498db;
+        }
+
+        .mood-tag.epic {
+            background: rgba(155, 89, 182, 0.15);
+            border-color: rgba(155, 89, 182, 0.3);
+            color: #9b59b6;
+        }
+
+        .mood-tag.energy {
+            background: rgba(241, 196, 15, 0.15);
+            border-color: rgba(241, 196, 15, 0.3);
+            color: #f1c40f;
+        }
+
+        /* 作曲家区域 */
+        .composers-section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .composer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .composer-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 18px;
+            transition: all 0.3s;
+        }
+
+        .composer-card:hover {
+            background: rgba(0, 212, 170, 0.05);
+            border-color: rgba(0, 212, 170, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .composer-name {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .composer-name-ja {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .composer-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .composer-link {
+            padding: 6px 12px;
+            background: rgba(0, 132, 255, 0.1);
+            border: 1px solid rgba(0, 132, 255, 0.3);
+            border-radius: 6px;
+            color: #0084ff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .composer-link:hover {
+            background: rgba(0, 132, 255, 0.2);
+        }
+
+        .composer-link.wiki {
+            background: rgba(100, 100, 100, 0.1);
+            border-color: rgba(100, 100, 100, 0.3);
+            color: #888;
+        }
+
+        .composer-link.wiki:hover {
+            background: rgba(100, 100, 100, 0.2);
+        }
+
+        /* 试听区域 */
+        .audio-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+
+        .audio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .audio-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .audio-item:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .audio-platform {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .audio-platform.bilibili {
+            background: #00a1d6;
+            color: #fff;
+        }
+
+        .audio-platform.youtube {
+            background: #ff0000;
+            color: #fff;
+        }
+
+        .audio-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .audio-title {
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .audio-game {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .audio-link {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .audio-link:hover {
+            background: rgba(0, 212, 170, 0.3);
+        }
+
+        /* 工作笔记 */
+        .work-notes {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(241, 196, 15, 0.05);
+            border: 1px solid rgba(241, 196, 15, 0.2);
+            border-radius: 12px;
+        }
+
+        .work-notes-title {
+            color: #f1c40f;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .work-notes ul {
+            list-style: none;
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .work-notes li {
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .work-notes li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #f1c40f;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .sidebar { width: 240px; }
+            .content { margin-left: 240px; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .content { margin-left: 0; padding: 20px; }
+            .page-title { font-size: 1.8rem; }
+            .composer-grid { grid-template-columns: 1fr; }
+            .audio-grid { grid-template-columns: 1fr; }
+        }
+
+        /* 快速搜索 */
+        .quick-search {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 100;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">🎮</div>
+                <span>我的工作站</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">首页</a>
+                <a href="games.html" class="nav-link">游戏中心</a>
+                <a href="sound-effects-login.html" class="nav-link">音效相关</a>
+                <a href="music-genres.html" class="nav-link">音乐相关</a>
+                <a href="game-music-guide.html" class="nav-link active">游戏配乐</a>
+                <a href="task-manager.html" class="nav-link">任务管理器</a>
+                <a href="capabilities.html" class="nav-link">项目能力</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- 左侧导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">🎮 游戏配乐</div>
+                <div class="sidebar-subtitle">12种核心风格 · 50+作曲家</div>
+            </div>
+
+            <div class="quick-search">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索风格、作曲家...">
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">复古芯片</div>
+                <a href="#chiptune-8bit" class="nav-item"><span class="nav-item-icon">👾</span>8-bit 芯片音乐</a>
+                <a href="#chiptune-16bit" class="nav-item"><span class="nav-item-icon">🎛️</span>16-bit / FM合成</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">管弦交响</div>
+                <a href="#jrpg-orchestral" class="nav-item"><span class="nav-item-icon">⚔️</span>日系RPG管弦</a>
+                <a href="#western-epic" class="nav-item"><span class="nav-item-icon">🏰</span>西方史诗管弦</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">电子现代</div>
+                <a href="#cyberpunk" class="nav-item"><span class="nav-item-icon">🌃</span>赛博朋克/合成器波</a>
+                <a href="#edm-action" class="nav-item"><span class="nav-item-icon">⚡</span>EDM动作音乐</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">氛围情绪</div>
+                <a href="#horror" class="nav-item"><span class="nav-item-icon">😱</span>恐怖生存</a>
+                <a href="#open-world" class="nav-item"><span class="nav-item-icon">🌲</span>开放世界探索</a>
+                <a href="#ambient" class="nav-item"><span class="nav-item-icon">🌊</span>氛围/环境音乐</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">地域风格</div>
+                <a href="#chinese-style" class="nav-item"><span class="nav-item-icon">🎋</span>中国古风</a>
+                <a href="#japanese-traditional" class="nav-item"><span class="nav-item-icon">🏯</span>日本和风</a>
+                <a href="#celtic-fantasy" class="nav-item"><span class="nav-item-icon">🍀</span>凯尔特/奇幻</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">特殊类型</div>
+                <a href="#indie" class="nav-item"><span class="nav-item-icon">💎</span>独立游戏</a>
+                <a href="#mobile" class="nav-item"><span class="nav-item-icon">📱</span>手游/休闲</a>
+            </div>
+        </aside>
+
+        <!-- 主内容 -->
+        <main class="content">
+            <header class="page-header">
+                <h1 class="page-title">游戏配乐设计师手册</h1>
+                <p class="page-desc">
+                    专业游戏音频设计师的工作参考手册。涵盖12种核心游戏音乐风格，包含配器分析、作曲家档案、双平台试听链接。
+                    用于项目参考、风格定位、作曲家研究。
+                </p>
+                <div class="work-badge">
+                    <span>📅</span>
+                    <span>最后更新：2026-03-17 · 26种风格 · 50+作曲家</span>
+                </div>
+            </header>
+
+            <!-- 8-bit芯片音乐 -->
+            <section class="genre-section" id="chiptune-8bit">
+                <div class="genre-header-large">
+                    <div class="genre-icon">👾</div>
+                    <div class="genre-title-group">
+                        <h2>8-bit 芯片音乐</h2>
+                        <div class="genre-title-en">Chiptune / 8-bit Music (1980s-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">复古游戏、独立像素游戏、怀旧关卡、迷你游戏、UI音效</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">超级马里奥、魂斗罗、塞尔达传说(初代)、洛克人、俄罗斯方块</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag energy">😊 怀旧</span>
+                            <span class="mood-tag energy">⚡ 活力</span>
+                            <span class="mood-tag">🎮 趣味</span>
+                            <span class="mood-tag calm">📟 极简</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>硬件限制下的极致创意：</strong>基于方波(Square Wave)模拟管风琴、钢琴；三角波(Triangle Wave)负责贝斯线；
+                        噪声通道(Noise Channel)模拟打击乐和音效；极少音轨(通常3-4轨)要求旋律极度精炼；
+                        琶音(Arpeggio)技巧模拟和弦；高频音符模拟镲片。现代芯片音乐使用软件合成器(NES VST、FamiTracker)或真实硬件。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">近藤浩治</div>
+                            <div class="composer-name-ja">Koji Kondo</div>
+                            <div class="composer-links">
+                                <a href="https://wiki.biligame.com/zelda/近藤浩治" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Koji_Kondo" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">古代祐三</div>
+                            <div class="composer-name-ja">Yuzo Koshiro</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/古代祐三" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Yuzo_Koshiro" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">田中宏和</div>
+                            <div class="composer-name-ja">Hirokazu Tanaka</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/田中宏和" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Hirokazu_Tanaka" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Tim Follin</div>
+                            <div class="composer-name-ja">英国芯片音乐先锋</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Tim_Follin" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">超级马里奥主题曲</div>
+                                <div class="audio-game">Super Mario Bros. (1985)</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Super Mario Bros. Theme</div>
+                                <div class="audio-game">Koji Kondo</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=uhmE20Q8xxc" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">魂斗罗水下关卡</div>
+                                <div class="audio-game">Contra (1987)</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1Ax41117Tz" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Streets of Rage 2 OST</div>
+                                <div class="audio-game">Yuzo Koshiro</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=vx2VhXHg9Tg" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>现代独立游戏使用芯片音乐时，常叠加轻微混响/延迟来增加"复古但精致"的质感</li>
+                        <li>8-bit音乐的限制（4通道、无连续音高变化）反而成为创作特色</li>
+                        <li>参考工具：FamiStudio、DefleMask、 chipsynth MD</li>
+                        <li>商用注意：任天堂等公司的经典8-bit旋律仍有版权保护</li>
+                    </ul>
+                </div>
+            </section>
+</body>
+</html>
+            <!-- 16-bit/FM合成 -->
+            <section class="genre-section" id="chiptune-16bit">
+                <div class="genre-header-large">
+                    <div class="genre-icon">🎛️</div>
+                    <div class="genre-title-group">
+                        <h2>16-bit / FM合成音乐</h2>
+                        <div class="genre-title-en">16-bit / FM Synthesis (1988-1995)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">街机游戏、格斗游戏、高速动作游戏、赛车游戏、RPG战斗曲</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">索尼克、街霸2、怒之铁拳、梦幻之星、光明力量、魂斗罗铁血兵团</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag energy">🔥 热血</span>
+                            <span class="mood-tag">💥 冲击</span>
+                            <span class="mood-tag energy">⚡ 速度</span>
+                            <span class="mood-tag epic">🎸 时髦</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>Yamaha FM芯片的革命：</strong>Yamaha YM2612(MD)和YM2151(街机)带来更丰富的音色。
+                        FM合成可以模拟逼真的打击乐、金属感的贝斯、闪亮的电钢琴；采样回放(PCM)加入人声和真实乐器片段；
+                        更多音轨(6-10轨)支持更复杂的编曲；电子舞曲元素大量融入；失真效果和速射琶音创造速度感。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">古代祐三</div>
+                            <div class="composer-name-ja">Yuzo Koshiro</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/古代祐三" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Yuzo_Koshiro" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">下村阳子</div>
+                            <div class="composer-name-ja">Yoko Shimomura</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/下村阳子" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Yoko_Shimomura" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">川口博史</div>
+                            <div class="composer-name-ja">Hiroshi Kawaguchi</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Hiroshi_Kawaguchi_(composer)" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">光吉猛修</div>
+                            <div class="composer-name-ja">Takenobu Mitsuyoshi</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Takenobu_Mitsuyoshi" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">街霸2 古烈主题曲</div>
+                                <div class="audio-game">Street Fighter II (1991)</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1Ax41117Tz" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Sonic the Hedgehog - Green Hill Zone</div>
+                                <div class="audio-game">Masato Nakamura</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=G-i8HYi1QH0" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Streets of Rage 2 - Go Straight</div>
+                                <div class="audio-game">Yuzo Koshiro</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=1F_fJPbPtyQ" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>FM合成器插件：FM8、Dexed、Retro Synth FM模式</li>
+                        <li>16-bit音乐的"亮"和"脆"特质来自高频泛音丰富的FM音色</li>
+                        <li>现代应用：复古风格独立游戏常融合16-bit元素与现代制作</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 日系RPG管弦 -->
+            <section class="genre-section" id="jrpg-orchestral">
+                <div class="genre-header-large">
+                    <div class="genre-icon">⚔️</div>
+                    <div class="genre-title-group">
+                        <h2>日系RPG管弦乐</h2>
+                        <div class="genre-title-en">JRPG Orchestral (1987-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">主线剧情、Boss战、情感过场、世界地图、最终迷宫</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">最终幻想、勇者斗恶龙、传说系列、异度神剑、女神异闻录、尼尔</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag epic">😢 感动</span>
+                            <span class="mood-tag epic">⚔️ 史诗</span>
+                            <span class="mood-tag">🌸 唯美</span>
+                            <span class="mood-tag calm">💕 浪漫</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>管弦+民族的独特配方：</strong>以浪漫主义晚期管弦乐为基础（瓦格纳、理查·施特劳斯影响），
+                        融入日本传统乐器（尺八、三味线、太鼓）创造独特东方色彩；钢琴与弦乐的对话式旋律是标志性特征；
+                        合唱团营造史诗感；合成器铺底增加现代感；强调歌唱性旋律，每个角色/地点有独立主题(leitmotif)。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">植松伸夫</div>
+                            <div class="composer-name-ja">Nobuo Uematsu</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/植松伸夫" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Nobuo_Uematsu" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">椙山浩一</div>
+                            <div class="composer-name-ja">Koichi Sugiyama</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/椙山浩一" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Koichi_Sugiyama" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">光田康典</div>
+                            <div class="composer-name-ja">Yasunori Mitsuda</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/光田康典" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Yasunori_Mitsuda" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">下村阳子</div>
+                            <div class="composer-name-ja">Yoko Shimomura</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/下村阳子" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Yoko_Shimomura" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">目黑将司</div>
+                            <div class="composer-name-ja">Shoji Meguro</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/目黑将司" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Shoji_Meguro" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">岡部啓一</div>
+                            <div class="composer-name-ja">Keiichi Okabe</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/岡部啓一" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Keiichi_Okabe" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">片翼の天使</div>
+                                <div class="audio-game">最终幻想7 - 植松伸夫</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">To Zanarkand</div>
+                                <div class="audio-game">最终幻想10 - 植松伸夫</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=2gO1Q99qSXQ" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Xenoblade Main Theme</div>
+                                <div class="audio-game">异度神剑 - 下村阳子</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=6pAWp-5rXg8" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>日系RPG音乐的核心是"旋律记忆度"，每个重要角色/地点必须有主题动机</li>
+                        <li>参考古典作曲：拉赫玛尼诺夫(钢琴)、德沃夏克(民族风)、久石让(动画配乐)</li>
+                        <li>现代JRPG常融合J-pop、爵士、电子等元素（如女神异闻录系列）</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 西方史诗管弦 -->
+            <section class="genre-section" id="western-epic">
+                <div class="genre-header-large">
+                    <div class="genre-icon">🏰</div>
+                    <div class="genre-title-group">
+                        <h2>西方史诗管弦乐</h2>
+                        <div class="genre-title-en">Western Epic Orchestral (2000s-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">MMORPG、3A大作、电影化叙事、战争场面、最终Boss战</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">魔兽世界、上古卷轴、战神、刺客信条、使命召唤、光环</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag epic">🏔️ 壮阔</span>
+                            <span class="mood-tag">🐉 奇幻</span>
+                            <span class="mood-tag">⚔️ 战争</span>
+                            <span class="mood-tag epic">👑 庄严</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>好莱坞式大编制：</strong>完整的交响乐团（80-100人）+ 大型合唱团（拉丁语/北欧语）；
+                        大量铜管（小号、长号、圆号、大号）营造史诗感；打击乐组（定音鼓、战鼓、大锣、铙钹）强调节奏冲击力；
+                        弦乐提供旋律和情感铺底；世界民族乐器（爱尔兰哨笛、挪威弓弦乐器）增加异域色彩；
+                        预告片音乐常见的"Braam"低频音效和"Rise"上升音效。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">Jeremy Soule</div>
+                            <div class="composer-name-ja">上古卷轴、激战</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Jeremy_Soule" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Russell Brower</div>
+                            <div class="composer-name-ja">魔兽世界、暗黑3</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Russell_Brower" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Gareth Coker</div>
+                            <div class="composer-name-ja">奥日、方舟生存进化</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Gareth_Coker" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Austin Wintory</div>
+                            <div class="composer-name-ja">风之旅人、刺客信条</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Austin_Wintory" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Bear McCreary</div>
+                            <div class="composer-name-ja">战神、使命召唤</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Bear_McCreary" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Inon Zur</div>
+                            <div class="composer-name-ja">辐射、龙腾世纪</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Inon_Zur" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">魔兽世界 主题曲</div>
+                                <div class="audio-game">Jason Hayes</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Dragonborn (Skyrim Theme)</div>
+                                <div class="audio-game">Jeremy Soule</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=4zLfCnGVeL4" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">God of War (2018) Soundtrack</div>
+                                <div class="audio-game">Bear McCreary</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7p--L5K1Ecg" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>西方史诗配乐更强调"宏大空间感"和"真实乐器质感"，与日系偏旋律化的风格形成对比</li>
+                        <li>常用民族乐器：爱尔兰哨笛(Tin Whistle)、北欧Tagelharpa、蒙古马头琴</li>
+                        <li>预算有限的独立游戏可使用高质量管弦乐音源(如BBC SO、Albion ONE)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 赛博朋克/合成器波 -->
+            <section class="genre-section" id="cyberpunk">
+                <div class="genre-header-large">
+                    <div class="genre-icon">🌃</div>
+                    <div class="genre-title-group">
+                        <h2>赛博朋克 / 合成器波</h2>
+                        <div class="genre-title-en">Cyberpunk / Synthwave (2010s-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">科幻都市、黑客题材、夜总会场景、追逐戏、UI界面</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">赛博朋克2077、武士零、远哭3血龙、迈阿密热线、Deus Ex、质量效应</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag">🌃 霓虹</span>
+                            <span class="mood-tag">🤖 未来</span>
+                            <span class="mood-tag energy">🔥 叛逆</span>
+                            <span class="mood-tag calm">💊 迷幻</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>复古未来的声音：</strong>模拟合成器(Neptune、Juno、Prophet)创造肥厚贝斯和闪亮主音；
+                        鼓机(808/909)提供经典的电子鼓点；大量使用琶音器(Arpeggiator)营造机械感；
+                        人声经过声码器(Vocoder)处理；故障音效(Glitch)、比特粉碎(Bit Crush)增加数字质感；
+                        有时融合工业音乐的金属敲击和电子噪音。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">Marcin Przybyłowicz</div>
+                            <div class="composer-name-ja">赛博朋克2077</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Marcin_Przyby%C5%82owicz" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Perturbator</div>
+                            <div class="composer-name-ja">法国合成器波先锋</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Perturbator" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Mick Gordon</div>
+                            <div class="composer-name-ja">毁灭战士、掠食</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Mick_Gordon_(composer)" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Johan Söderqvist</div>
+                            <div class="composer-name-ja">战地、镜之边缘</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Johan_S%C3%B6derqvist" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">赛博朋克2077 原声带</div>
+                                <div class="audio-game">Marcin Przybyłowicz</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">The Rebel Path</div>
+                                <div class="audio-game">Cyberpunk 2077</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7F_1Jy7rMgc" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Doom (2016) OST - Rip & Tear</div>
+                                <div class="audio-game">Mick Gordon</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=zZMg9ryeWOw" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>合成器波音色推荐：Arturia V Collection、U-he Diva、Xfer Serum</li>
+                        <li>赛博朋克风格需要"脏"和"干净"的对比，如纯净合成器Pad vs 工业噪音</li>
+                        <li>参考电影：《银翼杀手》《阿基拉》《攻壳机动队》配乐</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 恐怖生存 -->
+            <section class="genre-section" id="horror">
+                <div class="genre-header-large">
+                    <div class="genre-icon">😱</div>
+                    <div class="genre-title-group">
+                        <h2>恐怖生存音乐</h2>
+                        <div class="genre-title-en">Horror Survival (1996-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">恐怖游戏、生存游戏、心理惊悚、Boss战、探索区域</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">寂静岭、生化危机、死亡空间、逃生、恶灵附身、瘟疫传说</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag">😱 恐惧</span>
+                            <span class="mood-tag">🔮 悬疑</span>
+                            <span class="mood-tag">👻 诡异</span>
+                            <span class="mood-tag">😰 不安</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>心理恐惧的声音设计：</strong>工业噪音和金属摩擦声；Prepared Piano（加料钢琴）创造陌生音色；
+                        低频次声波(18-20Hz)引发生理不适；不和谐音程（三全音、小二度）；反向播放和变速扭曲；
+                        突然的静默(Jump Scare前置)；弦乐滑音和弓压噪音；合成器 drone 音墙；
+                        寂静岭风格：工业噪音与优美旋律的强烈对比。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">Akira Yamaoka</div>
+                            <div class="composer-name-ja">山冈晃 - 寂静岭</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/山岡晃" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Akira_Yamaoka" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Joseph Bishara</div>
+                            <div class="composer-name-ja">招魂、潜伏、厄运</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Joseph_Bishara" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Trent Reznor</div>
+                            <div class="composer-name-ja">Nine Inch Nails - 厄运</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Trent_Reznor" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Garry Schyman</div>
+                            <div class="composer-name-ja">生化奇兵、中土世界</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Garry_Schyman" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">寂静岭2 原声带</div>
+                                <div class="audio-game">Akira Yamaoka</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Theme of Laura</div>
+                                <div class="audio-game">Silent Hill 2 - Akira Yamaoka</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=6nTrTtf33hs" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Doom (2016) OST - Rip & Tear</div>
+                                <div class="audio-game">Mick Gordon</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=zZMg9ryeWOw" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>恐怖音乐的核心是"不可预测性"，避免稳定节拍和调性</li>
+                        <li>Jump Scare音乐结构：突然的静默→低频积累→高频爆发</li>
+                        <li>工具推荐：Kontakt的Prepared Piano、工业采样包、噪音合成器</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 开放世界探索 -->
+            <section class="genre-section" id="open-world">
+                <div class="genre-header-large">
+                    <div class="genre-icon">🌲</div>
+                    <div class="genre-title-group">
+                        <h2>开放世界探索音乐</h2>
+                        <div class="genre-title-en">Open World Exploration (2000s-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">开放世界地图、探索区域、环境氛围、昼夜循环、天气变化</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">塞尔达传说(旷野之息)、荒野大镖客、艾尔登法环、原神、死亡搁浅</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag calm">🌲 沉浸</span>
+                            <span class="mood-tag calm">🧘 宁静</span>
+                            <span class="mood-tag epic">🏔️ 壮阔</span>
+                            <span class="mood-tag calm">🌊 治愈</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>动态音乐系统：</strong>使用Wwise/FMOD实现水平/垂直重混(horizontal/vertical remixing)；
+                        多层音乐轨道（探索层、战斗层、氛围层）平滑切换；钢琴、吉他、弦乐四重奏创造亲密感；
+                        环境音效与音乐融合（风声、水声、鸟鸣）；极简主义重复动机营造冥想感；
+                        根据玩家行为（战斗/潜行/骑乘）动态变化。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">岩田恭明</div>
+                            <div class="composer-name-ja">Yasuaki Iwata</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/岩田恭明" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">若井淑</div>
+                            <div class="composer-name-ja">Manaka Kataoka</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Manaka_Kataoka" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Woody Jackson</div>
+                            <div class="composer-name-ja">荒野大镖客</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Woody_Jackson" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Ludvig Forssell</div>
+                            <div class="composer-name-ja">死亡搁浅</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Ludvig_Forssell" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">陈致逸</div>
+                            <div class="composer-name-ja">HOYO-MIX - 原神</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">塞尔达旷野之息 原声带</div>
+                                <div class="audio-game">岩田恭明、若井淑</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">RDR2 - That's the Way It Is</div>
+                                <div class="audio-game">Woody Jackson</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7p--L5K1Ecg" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">原神 璃月主题曲</div>
+                                <div class="audio-game">陈致逸 - HOYO-MIX</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>开放世界音乐的核心是"不打扰"，让玩家专注于探索</li>
+                        <li>动态音乐系统需要与程序员紧密配合，设计好触发点和过渡逻辑</li>
+                        <li>参考技术：Wwise States/Switches、FMOD Parameters</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 中国古风 -->
+            <section class="genre-section" id="chinese-style">
+                <div class="genre-header-large">
+                    <div class="genre-icon">🎋</div>
+                    <div class="genre-title-group">
+                        <h2>中国古风游戏音乐</h2>
+                        <div class="genre-title-en">Chinese Style Game Music (1990s-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">武侠RPG、仙侠游戏、历史题材、中国风神地图、剧情过场</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">仙剑奇侠传、轩辕剑、原神(璃月)、黑神话悟空、天涯明月刀、古剑奇谭</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag calm">🎋 意境</span>
+                            <span class="mood-tag calm">🌫️ 诗意</span>
+                            <span class="mood-tag epic">🏔️ 大气</span>
+                            <span class="mood-tag">⚔️ 武侠</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>中西融合的独特美学：</strong>民族乐器（古筝、二胡、笛子/箫、琵琶）与西洋管弦乐融合；
+                        五声音阶(宫商角徵羽)与西方和声结合；中国大鼓、锣、编钟营造史诗感；
+                        笛子独奏代表角色/情感主题；女声吟唱增加空灵意境；古琴代表文人雅士；
+                        现代古风还融入电子元素（如HOYO-MIX风格）。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">林坤信</div>
+                            <div class="composer-name-ja">仙剑奇侠传</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/林坤信" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">曾志豪</div>
+                            <div class="composer-name-ja">轩辕剑、古剑奇谭</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/曾志豪" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">陈致逸</div>
+                            <div class="composer-name-ja">原神、天涯明月刀</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">麦振鸿</div>
+                            <div class="composer-name-ja">仙剑电视剧配乐</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/麥振鴻" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">翟锦彦</div>
+                            <div class="composer-name-ja">黑神话悟空</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/黑神话：悟空" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">蝶恋 - 仙剑奇侠传</div>
+                                <div class="audio-game">林坤信</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">原神璃月战斗音乐</div>
+                                <div class="audio-game">陈致逸 - HOYO-MIX</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Black Myth: Wukong Trailer Music</div>
+                                <div class="audio-game">翟锦彦</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=1F3OGJnD3Qk" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>古筝演奏技法：摇指(长音)、刮奏(琶音)、泛音(空灵)</li>
+                        <li>笛子常用调式：D调(明亮)、G调(柔和)、C调(低沉)</li>
+                        <li>参考音源：Kong Audio(中国民族乐器)、Ample Sound GuZheng</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 日本和风 -->
+            <section class="genre-section" id="japanese-traditional">
+                <div class="genre-header-large">
+                    <div class="genre-icon">🏯</div>
+                    <div class="genre-title-group">
+                        <h2>日本和风游戏音乐</h2>
+                        <div class="genre-title-en">Japanese Traditional Style (1990s-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">和风RPG、武士题材、妖怪题材、浮世绘风格、神社场景</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">大神、只狼、对马岛之魂、阴阳师、胧村正、鬼武者</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag calm">🌸 樱花</span>
+                            <span class="mood-tag">🗡️ 武士</span>
+                            <span class="mood-tag">👺 妖怪</span>
+                            <span class="mood-tag calm">🍃 禅意</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>和洋折衷的美学：</strong>日本传统乐器：尺八（苍凉）、三味线（叙事）、太鼓（节奏）、
+                        琴(Koto)（优雅）、篠笛（民俗）；都节音阶(イチョウチョウ)创造独特东方色彩；
+                        常与西方管弦乐或电子音乐融合；能剧/歌舞伎元素用于Boss战；
+                        自然声音（风铃、流水、蝉鸣）营造季节感。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">大神遊</div>
+                            <div class="composer-name-ja">Masami Ueda</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Masami_Ueda" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">北村友香</div>
+                            <div class="composer-name-ja">Yuka Kitamura</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Yuka_Kitamura" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">梅林茂</div>
+                            <div class="composer-name-ja">Shigeru Umebayashi</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/梅林茂" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">梶浦由记</div>
+                            <div class="composer-name-ja">Yuki Kajiura</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/梶浦由记" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Yuki_Kajiura" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Sekiro - Shinobi Execution</div>
+                                <div class="audio-game">北村友香</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Ghost of Tsushima - The Way of the Ghost</div>
+                                <div class="audio-game">梅林茂</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">大神 原声带</div>
+                                <div class="audio-game">大神遊</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>尺八音源：Sonica Instruments Shakuhachi、Embertone Shakuhachi</li>
+                        <li>都节音阶：1-b2-4-5-b6（如《樱花》旋律）</li>
+                        <li>太鼓节奏：表达武士道的庄严与力量感</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 凯尔特/奇幻 -->
+            <section class="genre-section" id="celtic-fantasy">
+                <div class="genre-header-large">
+                    <div class="genre-icon">🍀</div>
+                    <div class="genre-title-group">
+                        <h2>凯尔特/奇幻音乐</h2>
+                        <div class="genre-title-en">Celtic / Fantasy Music (1990s-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">奇幻RPG、精灵/矮人种族主题、森林/草原场景、酒馆音乐、冒险启程</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">塞尔达传说、最终幻想、上古卷轴、巫师3、勇者斗恶龙、奥日</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag calm">🧚 精灵</span>
+                            <span class="mood-tag calm">🌲 森林</span>
+                            <span class="mood-tag energy">⚔️ 冒险</span>
+                            <span class="mood-tag epic">🏰 中世纪</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>欧洲民谣与幻想的融合：</strong>爱尔兰哨笛(Tin Whistle)、风笛(Uilleann Pipes)、
+                        小提琴/ fiddle 舞曲节奏、竖琴(Harp)、布祖基琴(Bouzouki)；多利亚调式和混合利底亚调式创造明亮感；
+                        鲁特琴(Lute)和曼陀林用于酒馆场景；打击乐使用宝思兰鼓(Bodhrán)；
+                        女声无词吟唱(类似Enya风格)营造精灵氛围。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">Koji Kondo</div>
+                            <div class="composer-name-ja">近藤浩治 - 塞尔达</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/近藤浩治" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Koji_Kondo" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Gareth Coker</div>
+                            <div class="composer-name-ja">奥日系列</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Gareth_Coker" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Jeremy Soule</div>
+                            <div class="composer-name-ja">上古卷轴</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Jeremy_Soule" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Marcin Przybyłowicz</div>
+                            <div class="composer-name-ja">巫师3</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Marcin_Przyby%C5%82owicz" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Ori and the Blind Forest OST</div>
+                                <div class="audio-game">Gareth Coker</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=MeVFrt7BUvw" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">The Witcher 3 - The Fields of Ard Skellig</div>
+                                <div class="audio-game">Marcin Przybyłowicz</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">塞尔达传说 荒野之息</div>
+                                <div class="audio-game">近藤浩治团队</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>凯尔特音乐的节奏特点是Jig(6/8拍)和Reel(4/4拍)</li>
+                        <li>参考真实民谣乐队：The Chieftains、Clannad、Loreena McKennitt</li>
+                        <li>音源推荐：8Dio Celtic Winds、Embertone Blakus Cello</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 独立游戏 -->
+            <section class="genre-section" id="indie">
+                <div class="genre-header-large">
+                    <div class="genre-icon">💎</div>
+                    <div class="genre-title-group">
+                        <h2>独立游戏音乐</h2>
+                        <div class="genre-title-en">Indie Game Music (2008-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">像素游戏、艺术游戏、叙事游戏、实验性玩法、情感体验</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">蔚蓝、空洞骑士、哈迪斯、传说之下、星露谷、Gris、风之旅人</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag calm">✨ 创意</span>
+                            <span class="mood-tag">💙 情感</span>
+                            <span class="mood-tag calm">🎨 艺术</span>
+                            <span class="mood-tag energy">⭐ 个性</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>打破常规的实验精神：</strong>极简主义钢琴独奏；chiptune与真实乐器混合；
+                        电子氛围音乐；独奏吉他；人声哼唱/无词吟唱；合成器实验音色；
+                        强调情感表达而非技术华丽；常与游戏机制紧密结合（如蔚蓝的音乐与平台跳跃同步）。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">Lena Raine</div>
+                            <div class="composer-name-ja">蔚蓝、Chicory、我的世界</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Lena_Raine" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Christopher Larkin</div>
+                            <div class="composer-name-ja">空洞骑士</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Christopher_Larkin_(composer)" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Darren Korb</div>
+                            <div class="composer-name-ja">堡垒、晶体管、哈迪斯</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Darren_Korb" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Toby Fox</div>
+                            <div class="composer-name-ja">传说之下、三角符文</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/Toby_Fox" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://en.wikipedia.org/wiki/Toby_Fox" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Austin Wintory</div>
+                            <div class="composer-name-ja">风之旅人</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Austin_Wintory" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Celeste OST - Resurrections</div>
+                                <div class="audio-game">Lena Raine</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Hollow Knight OST</div>
+                                <div class="audio-game">Christopher Larkin</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">传说之下 原声带</div>
+                                <div class="audio-game">Toby Fox</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>独立游戏音乐强调"个人表达"，常为一人包办作曲+设计</li>
+                        <li>预算有限时的策略：用好少数几个乐器，追求记忆点而非复杂度</li>
+                        <li>Toby Fox的Undertale证明：一个旋律的变奏可以贯穿整个游戏</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 手游/休闲 -->
+            <section class="genre-section" id="mobile">
+                <div class="genre-header-large">
+                    <div class="genre-icon">📱</div>
+                    <div class="genre-title-group">
+                        <h2>手游/休闲游戏音乐</h2>
+                        <div class="genre-title-en">Mobile / Casual Game Music (2008-present)</div>
+                    </div>
+                </div>
+
+                <div class="genre-meta">
+                    <div class="meta-block">
+                        <div class="meta-label">🎯 适用场景</div>
+                        <div class="meta-content">手游BGM、益智游戏、模拟经营、放置游戏、广告视频</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎮 代表游戏</div>
+                        <div class="meta-content">王者荣耀、原神(移动端)、开心消消乐、纪念碑谷、动物森友会、糖豆人</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">🎭 情绪标签</div>
+                        <div class="mood-tags">
+                            <span class="mood-tag calm">😊 轻松</span>
+                            <span class="mood-tag energy">✨ 明快</span>
+                            <span class="mood-tag calm">🎵 洗脑</span>
+                            <span class="mood-tag">🎮 耐听</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-block" style="margin-bottom: 30px;">
+                    <div class="meta-label">🎹 配器特点</div>
+                    <div class="meta-content">
+                        <strong>小屏幕的听觉设计：</strong>短小循环(30-60秒)不占用过多内存；
+                        轻快的节奏和明亮的调性；电子音色为主减少文件大小；
+                        重复性高但变化微妙（ layering增加/减少轨道）；UI音效与音乐节奏同步；
+                        考虑手机扬声器的中频响应；可长时间播放不疲劳；可随时中断不影响体验。
+                    </div>
+                </div>
+
+                <div class="composers-section">
+                    <div class="section-title">👨‍🎤 代表作曲家</div>
+                    <div class="composer-grid">
+                        <div class="composer-card">
+                            <div class="composer-name">陈致逸</div>
+                            <div class="composer-name-ja">原神 - HOYO-MIX</div>
+                            <div class="composer-links">
+                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">B站百科</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Kazumi Totaka</div>
+                            <div class="composer-name-ja">户高一生 - 动物森友会</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Kazumi_Totaka" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                        <div class="composer-card">
+                            <div class="composer-name">Jennifer Mankins</div>
+                            <div class="composer-name-ja">纪念碑谷</div>
+                            <div class="composer-links">
+                                <a href="https://en.wikipedia.org/wiki/Monument_Valley_(video_game)" target="_blank" class="composer-link wiki">Wiki</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="section-title">🎧 试听参考</div>
+                    <div class="audio-grid">
+                        <div class="audio-item">
+                            <div class="audio-platform bilibili">B</div>
+                            <div class="audio-info">
+                                <div class="audio-title">动物森友会 主题曲</div>
+                                <div class="audio-game">户高一生</div>
+                            </div>
+                            <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="audio-link">播放</a>
+                        </div>
+                        <div class="audio-item">
+                            <div class="audio-platform youtube">▶</div>
+                            <div class="audio-info">
+                                <div class="audio-title">Monument Valley Soundtrack</div>
+                                <div class="audio-game">Stafford Bawler</div>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="audio-link">播放</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-notes">
+                    <div class="work-notes-title">📝 工作笔记</div>
+                    <ul>
+                        <li>手游音乐文件大小控制：BPM 100-130，ogg格式优于mp3</li>
+                        <li>动物森友会的"动态小时音乐"：每小时不同版本，随天气变化</li>
+                        <li>注意音频焦点：接电话、通知音时不应被游戏音乐干扰</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const sections = document.querySelectorAll('.genre-section');
+            
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // 导航高亮
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.genre-section');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
