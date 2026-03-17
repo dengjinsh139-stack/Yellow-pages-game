@@ -548,6 +548,180 @@
             border-radius: 2px;
         }
 
+        /* 当前工作面板 */
+        .work-panel {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.08) 0%, rgba(0, 168, 232, 0.05) 100%);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .work-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .work-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .work-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(0, 210, 106, 0.15);
+            border: 1px solid rgba(0, 210, 106, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #00d26a;
+        }
+
+        .work-status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00d26a;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .work-content {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .work-main-title {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .work-description {
+            color: #888;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .work-files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .work-file {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #00d4aa;
+            font-family: monospace;
+        }
+
+        .work-progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .work-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .work-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* 最近活动面板 */
+        .activity-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .activity-detail {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #666;
+            white-space: nowrap;
+        }
+
         /* 底部标签页 */
         .bottom-tabs {
             display: flex;
@@ -613,6 +787,7 @@
                 <a href="games.html" class="nav-link">游戏中心</a>
                 <a href="sound-effects-login.html" class="nav-link">音效相关</a>
                 <a href="capabilities.html" class="nav-link">项目能力</a>
+                <a href="wwise.html" class="nav-link">Wwise</a>
                 <a href="task-manager.html" class="nav-link active">任务管理器</a>
             </div>
         </div>
@@ -734,6 +909,70 @@
             <div class="stat-card">
                 <div class="stat-label">Est.Wait</div>
                 <div class="stat-value" id="waitTime">--</div>
+            </div>
+        </div>
+
+        <!-- 当前工作面板 -->
+        <div class="work-panel" id="currentWorkPanel">
+            <div class="work-header">
+                <div class="work-title">
+                    <span>🔥</span>
+                    当前正在处理
+                </div>
+                <div class="work-status">
+                    <span class="work-status-dot"></span>
+                    <span id="workStatusText">运行中</span>
+                </div>
+            </div>
+            <div class="work-content">
+                <div class="work-main-title" id="workTitle">网站风格统一与维护</div>
+                <div class="work-description" id="workDescription">统一全站风格为青绿蓝科技风，优化任务管理器显示</div>
+                <div class="work-files" id="workFiles">
+                    <span class="work-file">index.html</span>
+                    <span class="work-file">music-genres.html</span>
+                    <span class="work-file">task-manager.html</span>
+                </div>
+                <div class="work-progress-bar">
+                    <div class="work-progress-fill" id="workProgress" style="width: 85%;"></div>
+                </div>
+                <div class="work-meta">
+                    <span id="workProgressText">进度: 85%</span>
+                    <span id="workETA">预计: 即将完成</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近活动面板 -->
+        <div class="activity-panel" id="activityPanel">
+            <div class="activity-header">
+                <span>📜</span>
+                最近活动
+            </div>
+            <div class="activity-list" id="activityList">
+                <div class="activity-item">
+                    <div class="activity-icon">📝</div>
+                    <div class="activity-content">
+                        <div class="activity-title">推送更新</div>
+                        <div class="activity-detail">版本号移至导航栏</div>
+                    </div>
+                    <div class="activity-time">20:38</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">🎨</div>
+                    <div class="activity-content">
+                        <div class="activity-title">样式统一</div>
+                        <div class="activity-detail">统一全站青绿蓝科技风</div>
+                    </div>
+                    <div class="activity-time">20:29</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">🗑️</div>
+                    <div class="activity-content">
+                        <div class="activity-title">移除组件</div>
+                        <div class="activity-detail">删除游戏配乐手册快速跳转</div>
+                    </div>
+                    <div class="activity-time">20:20</div>
+                </div>
             </div>
         </div>
 
@@ -935,11 +1174,68 @@
             const elapsed = Math.floor((Date.now() - updateTime.getTime()) / 1000);
             document.getElementById('waitTime').textContent = elapsed < 60 ? elapsed + 's' : Math.floor(elapsed / 60) + 'm';
             
+            // 更新当前工作内容
+            if (data.current_work) {
+                updateCurrentWork(data.current_work);
+            }
+            
+            // 更新最近活动
+            if (data.recent_activity) {
+                updateActivityList(data.recent_activity);
+            }
+            
             // 更新任务列表
             updateTaskList(data.tasks);
             
             // 更新图表
             updateChart(data.history);
+        }
+
+        function updateCurrentWork(work) {
+            const titleEl = document.getElementById('workTitle');
+            const descEl = document.getElementById('workDescription');
+            const filesEl = document.getElementById('workFiles');
+            const progressEl = document.getElementById('workProgress');
+            const progressTextEl = document.getElementById('workProgressText');
+            const etaEl = document.getElementById('workETA');
+            const statusTextEl = document.getElementById('workStatusText');
+            
+            if (titleEl) titleEl.textContent = work.title || '暂无进行中的任务';
+            if (descEl) descEl.textContent = work.description || '等待新指令';
+            
+            if (filesEl && work.files_modified) {
+                filesEl.innerHTML = work.files_modified.map(f => '<span class="work-file">' + f + '</span>').join('');
+            }
+            
+            if (progressEl) {
+                const progress = parseInt(work.progress) || 0;
+                progressEl.style.width = progress + '%';
+            }
+            
+            if (progressTextEl) progressTextEl.textContent = '进度: ' + (work.progress || '0%');
+            if (etaEl) etaEl.textContent = '预计: ' + (work.eta || '计算中');
+            if (statusTextEl) statusTextEl.textContent = work.status || '运行中';
+        }
+
+        function updateActivityList(activities) {
+            const container = document.getElementById('activityList');
+            if (!container || !activities) return;
+            
+            container.innerHTML = '';
+            
+            activities.forEach(activity => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <div class="activity-icon">${activity.icon || '🔹'}</div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.action || '未知活动'}</div>
+                        <div class="activity-detail">${activity.detail || ''}</div>
+                    </div>
+                    <div class="activity-time">${activity.time || ''}</div>
+                `;
+                container.appendChild(item);
+            });
         }
 
         function updateTaskList(tasks) {
@@ -954,6 +1250,8 @@
                 const badgeClass = task.status === 'processing' ? 'processing' : task.status === 'completed' ? 'idle' : 'waiting';
                 const badgeText = task.status === 'processing' ? '⚡ processing' : task.status === 'completed' ? '✅ completed' : '⏳ pending';
                 
+                const description = task.description ? `<div class="task-meta">${task.description}</div>` : '';
+                
                 item.innerHTML = `
                     <div class="task-info">
                         <div class="task-name">
@@ -961,6 +1259,7 @@
                             ${task.type}: ${task.name}
                         </div>
                         <div class="task-meta">${task.tokens} tokens · ${task.status === 'processing' ? '进行中' : task.status === 'completed' ? '已完成' : '等待中'}</div>
+                        ${description}
                     </div>
                     <div class="task-badge ${badgeClass}">
                         ${badgeText}

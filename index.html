@@ -60,6 +60,22 @@
             font-weight: 700;
         }
 
+        .nav-logo-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-version {
+            font-size: 0.7rem;
+            color: var(--primary);
+            background: rgba(0, 212, 170, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            font-weight: 500;
+        }
+
         .nav-logo-icon {
             width: 36px; height: 36px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
@@ -382,13 +398,17 @@
         <div class="nav-content">
             <a href="index.html" class="nav-logo">
                 <div class="nav-logo-icon">⚡</div>
-                <span>我的工作站</span>
+                <div class="nav-logo-text">
+                    <span>我的工作站</span>
+                    <span class="nav-version">v2.4.0</span>
+                </div>
             </a>
             <div class="nav-links">
                 <a class="nav-link active" onclick="showSection('home')">🏠 首页</a>
                 <a class="nav-link" onclick="showSection('games')">🎮 游戏中心</a>
                 <a class="nav-link" onclick="window.open('sound-effects-login.html','_self')">🔊 音效相关</a>
                 <a class="nav-link" onclick="window.open('music-genres.html','_self')">🎵 音乐百科</a>
+                <a class="nav-link" onclick="window.open('wwise.html','_self')">🔊 Wwise</a>
                 <a class="nav-link" onclick="window.open('task-manager.html','_self')">📈 任务管理器</a>
                 <a class="nav-link" onclick="window.open('capabilities.html','_self')">📊 项目能力</a>
             </div>
@@ -577,7 +597,6 @@
     
     <footer>
         <p>⚡ 我的工作站 | 个人游戏开发实验室 🎮</p>
-        <p style="margin-top: 10px; font-size: 0.8rem;">Version 2.3.7 | Built with ❤️‍🔥</p>
     </footer>
     
     <script>
