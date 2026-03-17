@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔊 Soundminer 使用指南 | 我的工作站</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --bg-dark: #0f0f23;
+            --bg-card: #1a1a2e;
+            --bg-hover: #252542;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .back-btn {
+            padding: 8px 16px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        /* 搜索区域 */
+        .search-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1b4b);
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .search-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .search-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            padding-left: 50px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            background: var(--bg-dark);
+            color: var(--text);
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        
+        .search-tips {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .tip-tag {
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tip-tag:hover {
+            background: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* 内容区域 */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 功能卡片网格 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+        }
+        
+        .feature-card.hidden {
+            display: none;
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature-steps {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-steps li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .feature-steps li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-steps li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 15px;
+        }
+        
+        .feature-tag {
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #818cf8;
+        }
+        
+        /* 快捷命令表格 */
+        .shortcut-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .shortcut-table th,
+        .shortcut-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .shortcut-table th {
+            background: rgba(99, 102, 241, 0.2);
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .shortcut-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .shortcut-table tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        .key {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+        
+        /* 搜索结果提示 */
+        .search-results-info {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .search-results-info span {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-title {
+                font-size: 1.4rem;
+            }
+            
+            .shortcut-table {
+                font-size: 0.85rem;
+            }
+            
+            .shortcut-table th,
+            .shortcut-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-btn">← 返回工作站</a>
+            <span class="logo">🔊 Soundminer 使用指南</span>
+        </div>
+    </header>
+    
+    <!-- 搜索区域 -->
+    <section class="search-section">
+        <div class="search-container">
+            <h1 class="search-title">🤔 怎么用大白话找功能？</h1>
+            <p class="search-subtitle">输入你想做的事，比如"怎么把音效拖到Pro Tools里"、"怎么改文件名"</p>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索功能，试试：导入音效、改速度、找相似音...">
+            </div>
+            
+            <div class="search-tips">
+                <span class="tip-tag" onclick="quickSearch('导入')">📥 怎么导入音效</span>
+                <span class="tip-tag" onclick="quickSearch('搜索')">🔍 怎么找音效</span>
+                <span class="tip-tag" onclick="quickSearch('拖到')">🎯 拖到Pro Tools</span>
+                <span class="tip-tag" onclick="quickSearch('改名')">✏️ 改文件名</span>
+                <span class="tip-tag" onclick="quickSearch('变速')">⚡ 调速度音调</span>
+                <span class="tip-tag" onclick="quickSearch('截取')">✂️ 截取片段</span>
+                <span class="tip-tag" onclick="quickSearch('快捷键')">⌨️ 快捷键</span>
+            </div>
+            
+            <div class="search-results-info" id="resultsInfo"></div>
+        </div>
+    </section>
+    
+    <!-- 内容区域 -->
+    <main class="content">
+        
+        <!-- 基础操作 -->
+        <section class="section">
+            <h2 class="section-title">📚 基础操作</h2>
+            
+            <div class="feature-grid" id="basicSection">
+                
+                <div class="feature-card" data-keywords="导入 添加 加载 文件夹 数据库 音效库 建库">
+                    <div class="feature-icon">📥</div>
+                    <h3 class="feature-title">导入音效库</h3>
+                    <p class="feature-desc">把电脑里的音效文件导入到Soundminer里管理</p>
+                    <ul class="feature-steps">
+                        <li>点击菜单栏「文件」→「导入音效库」</li>
+                        <li>选择要导入的文件夹</li>
+                        <li>等待扫描完成，音效就进库了</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">新建数据库</span>
+                        <span class="feature-tag">拖拽导入</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="搜索 查找 找音效 关键词 筛选 过滤">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">搜索音效</h3>
+                    <p class="feature-desc">用关键词快速找到想要的音效</p>
+                    <ul class="feature-steps">
+                        <li>在顶部搜索栏输入关键词，比如"爆炸"</li>
+                        <li>按回车，结果实时显示</li>
+                        <li>可以用多个词组合，比如"爆炸 金属"</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">关键词搜索</span>
+                        <span class="feature-tag">组合筛选</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="播放 试听 预览 波形 点击 听">
+                    <div class="feature-icon">▶️</div>
+                    <h3 class="feature-title">预览播放</h3>
+                    <p class="feature-desc">点击波形任意位置就能从那里开始播放</p>
+                    <ul class="feature-steps">
+                        <li>在波形显示区点击任意位置</li>
+                        <li>音频从点击处开始播放</li>
+                        <li>空格键暂停/继续</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">波形点击</span>
+                        <span class="feature-tag">空格控制</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="波形 放大 缩小 缩放 查看">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">波形缩放</h3>
+                    <p class="feature-desc">放大波形看细节，缩小看整体</p>
+                    <ul class="feature-steps">
+                        <li>鼠标滚轮：横向放大/缩小波形</li>
+                        <li>Ctrl+滚轮：纵向放大/缩小</li>
+                        <li>按 / 键快速还原视图</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">鼠标滚轮</span>
+                        <span class="feature-tag">快捷键 /</span>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- DAW集成 -->
+        <section class="section">
+            <h2 class="section-title">🎵 DAW集成</h2>
+            
+            <div class="feature-grid" id="dawSection">
+                
+                
+                <div class="feature-card" data-keywords="拖到 Pro Tools Logic 宿主 DAW 传输 导入 发送">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">拖到DAW里</h3>
+                    <p class="feature-desc">直接把音效拖到Pro Tools、Logic等宿主软件</p>
+                    <ul class="feature-steps">
+                        <li>选中想要的音效</li>
+                        <li>直接拖拽到DAW的时间线上</li>
+                        <li>或者拖到手上的小图标，生成新文件</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">Pro Tools</span>
+                        <span class="feature-tag">Logic Pro</span>
+                        <span class="feature-tag">直接拖拽</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="Spot 定位 时间点 插入 时间线 精准">
+                    <div class="feature-icon">📍</div>
+                    <h3 class="feature-title">Spot精准定位</h3>
+                    <p class="feature-desc">把音效精确放到DAW的指定时间点</p>
+                    <ul class="feature-steps">
+                        <li>在DAW里把播放头放到想要的位置</li>
+                        <li>在Soundminer里选中音效</li>
+                        <li>点击「Spot to DAW」按钮</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">精准定位</span>
+                        <span class="feature-tag">时间线</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="ReWire 监听 播放 通过 硬件 输出">
+                    <div class="feature-icon">🔌</div>
+                    <h3 class="feature-title">ReWire监听</h3>
+                    <p class="feature-desc">让Soundminer的声音通过DAW播放，使用同一套硬件</p>
+                    <ul class="feature-steps">
+                        <li>先打开DAW，创建Aux轨</li>
+                        <li>加载 Soundminer Monitor 插件</li>
+                        <li>Soundminer里点击ReWire图标连接</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">监听插件</span>
+                        <span class="feature-tag">统一输出</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="批量 导出 转换 格式 采样率">
+                    <div class="feature-icon">📦</div>
+                    <h3 class="feature-title">批量导出</h3>
+                    <p class="feature-desc">一次性导出多个音效，自动转换格式</p>
+                    <ul class="feature-steps">
+                        <li>选中多个音效文件</li>
+                        <li>右键选择「导出」或「Transfer」</li>
+                        <li>设置目标格式和路径</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">批量处理</span>
+                        <span class="feature-tag">格式转换</span>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 音频处理 -->
+        <section class="section">
+            <h2 class="section-title">🎛️ 音频处理</h2>
+            
+            <div class="feature-grid" id="processSection">
+                
+                
+                <div class="feature-card" data-keywords="截取 片段 选区 裁剪 区域 拖动">
+                    <div class="feature-icon">✂️</div>
+                    <h3 class="feature-title">截取片段</h3>
+                    <p class="feature-desc">只导出音频的某一部分，不是整个文件</p>
+                    <ul class="feature-steps">
+                        <li>在波形上拖动鼠标，选中想要的区域</li>
+                        <li>区域会高亮显示</li>
+                        <li>拖拽小手图标导出选中部分</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">精确选区</span>
+                        <span class="feature-tag">部分导出</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="变速 变调 速度 音调 升降 调性 采样率">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">变速变调</h3>
+                    <p class="feature-desc">改变音频的播放速度和音调，不用打开其他软件</p>
+                    <ul class="feature-steps">
+                        <li>播放器上方有个小推子（采样控制器）</li>
+                        <li>左右拖动改变速度</li>
+                        <li>点击钢琴图标可以按音高调整</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">实时变速</span>
+                        <span class="feature-tag">音分调整</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="VST 插件 效果器 处理 混响 EQ 均衡">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">VST插件处理</h3>
+                    <p class="feature-desc">在Soundminer里直接加效果器处理音频（Pro版）</p>
+                    <ul class="feature-steps">
+                        <li>打开DSP Rack（效果器机架）</li>
+                        <li>加载你喜欢的VST插件</li>
+                        <li>实时预览效果，满意后导出</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">Pro版功能</span>
+                        <span class="feature-tag">效果器</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="循环 重复 播放 loop 循环模式">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">循环播放</h3>
+                    <p class="feature-desc">让选中的片段重复播放，方便仔细听</p>
+                    <ul class="feature-steps">
+                        <li>选中一段区域</li>
+                        <li>点击循环按钮开启loop模式</li>
+                        <li>选中区域会循环播放</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">Loop</span>
+                        <span class="feature-tag">反复试听</span>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 元数据管理 -->
+        <section class="section">
+            <h2 class="section-title">🏷️ 元数据管理</h2>
+            
+            <div class="feature-grid" id="metaSection">
+                
+                
+                <div class="feature-card" data-keywords="改名 修改 编辑 元数据 标签 信息 BWF">
+                    <div class="feature-icon">✏️</div>
+                    <h3 class="feature-title">修改元数据</h3>
+                    <p class="feature-desc">编辑音效的名称、描述、分类等信息</p>
+                    <ul class="feature-steps">
+                        <li>选中要修改的音效</li>
+                        <li>在右侧信息面板编辑各个字段</li>
+                        <li>右键选择「Embed」把修改写进文件</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">描述编辑</span>
+                        <span class="feature-tag">嵌入保存</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="UCS 分类 类别 标准 统一 音效分类">
+                    <div class="feature-icon">📂</div>
+                    <h3 class="feature-title">UCS分类标准</h3>
+                    <p class="feature-desc">使用国际通用的音效分类系统，方便和其他人协作</p>
+                    <ul class="feature-steps">
+                        <li>UCS = Universal Category System</li>
+                        <li>选择 Category（大类）如 WEAPONS</li>
+                        <li>选择 Subcategory（小类）如 Gun</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">国际标准</span>
+                        <span class="feature-tag">团队协作</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="批量修改 批量编辑 多选 一起改">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">批量修改</h3>
+                    <p class="feature-desc">一次性修改多个文件的元数据</p>
+                    <ul class="feature-steps">
+                        <li>选中多个音效文件</li>
+                        <li>打开 Workflow 工作流窗口</li>
+                        <li>使用「批量编辑」功能统一修改</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">批量处理</span>
+                        <span class="feature-tag">效率工具</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card" data-keywords="收藏  playlist 播放列表 常用 快捷 保存搜索">
+                    <div class="feature-icon">⭐</div>
+                    <h3 class="feature-title">收藏夹和保存搜索</h3>
+                    <p class="feature-desc">把常用的音效或搜索条件存起来，下次直接用</p>
+                    <ul class="feature-steps">
+                        <li>Playlist：拖拽音效到自定义文件夹</li>
+                        <li>Saved Searches：保存常用搜索关键词</li>
+                        <li>在左侧面板快速访问</li>
+                    </ul>
+                    <div class="feature-tags">
+                        <span class="feature-tag">快捷访问</span>
+                        <span class="feature-tag">常用收藏</span>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 快捷键 -->
+        <section class="section">
+            <h2 class="section-title">⌨️ 常用快捷键</h2>
+            
+            <table class="shortcut-table" id="shortcutSection">
+                <thead>
+                    <tr>
+                        <th>快捷键</th>
+                        <th>功能</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="空格 播放 暂停">
+                        <td><span class="key">空格</span></td>
+                        <td>播放/暂停</td>
+                        <td>控制音频播放</td>
+                    </tr>
+                    <tr data-keywords="L 锁定 搜索 筛选">
+                        <td><span class="key">Cmd/Ctrl + L</span></td>
+                        <td>锁定搜索</td>
+                        <td>在当前结果中继续筛选</td>
+                    </tr>
+                    <tr data-keywords="返回 撤销 上一步 后退">
+                        <td><span class="key">Back</span></td>
+                        <td>返回上一步</td>
+                        <td>回到上次搜索结果</td>
+                    </tr>
+                    <tr data-keywords="波形 放大 缩小 还原">
+                        <td><span class="key">/</span></td>
+                        <td>还原波形视图</td>
+                        <td>快速恢复波形默认大小</td>
+                    </tr>
+                    <tr data-keywords="全选 选择 所有">
+                        <td><span class="key">Cmd/Ctrl + A</span></td>
+                        <td>全选</td>
+                        <td>选中所有搜索结果</td>
+                    </tr>
+                    <tr data-keywords="查找 所有 Find All 显示">
+                        <td><span class="key">Find All</span>按钮</td>
+                        <td>显示所有</td>
+                        <td>显示数据库里所有音效</td>
+                    </tr>
+                    <tr data-keywords="同文件夹 同类 Same Folder">
+                        <td><span class="key">Same Folder</span>按钮</td>
+                        <td>同文件夹</td>
+                        <td>显示选中音效所在文件夹的所有内容</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+    </main>
+    
+    <footer class="footer">
+        <p>⚡ 我的工作站 | Soundminer 使用指南</p>
+        <p style="margin-top: 10px; font-size: 0.85rem;">文档基于 Soundminer V6 PRO / PLUS 整理</p>
+    </footer>
+    
+    <script>
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const allCards = document.querySelectorAll('.feature-card, .shortcut-table tbody tr');
+        
+        // 关键词映射表（大白话 → 技术词）
+        const keywordMap = {
+            // 导入相关
+            '导': '导入 添加 加载',
+            '加': '导入 添加 加载',
+            '传': '导入 添加 加载 传输',
+            '建库': '导入 数据库',
+            '新建': '导入 数据库',
+            
+            // 搜索相关
+            '找': '搜索 查找',
+            '搜': '搜索 查找',
+            '查': '搜索 查找',
+            '筛选': '搜索 过滤',
+            '过滤': '搜索',
+            
+            // DAW相关
+            '拖': '拖到 DAW Pro Tools Logic',
+            '拉': '拖到 DAW',
+            '送': '传输 拖到 Spot',
+            '进': '导入 拖到',
+            'protools': 'Pro Tools DAW',
+            'logic': 'Logic DAW',
+            '宿主': 'DAW',
+            
+            // 编辑相关
+            '改': '修改 编辑 改名',
+            '修': '修改 编辑',
+            '变': '修改 变速 变调',
+            '重命名': '改名 修改',
+            
+            // 处理相关
+            '剪': '截取 裁剪 片段',
+            '裁': '截取 裁剪',
+            '选': '截取 选区',
+            '区': '截取 选区',
+            '段': '截取 片段',
+            '部': '截取 片段',
+            
+            // 变速相关
+            '速': '变速 速度',
+            '调': '变调 音调 调性',
+            '音调': '变调',
+            '快慢': '变速',
+            '升降': '变调',
+            
+            // 播放相关
+            '听': '播放 试听 预览',
+            '播': '播放',
+            '放': '播放',
+            '预览': '播放',
+            
+            // 波形相关
+            '图': '波形 查看',
+            '放大': '波形 缩放',
+            '缩小': '波形 缩放',
+            
+            // 收藏相关
+            '收': '收藏 playlist',
+            '藏': '收藏',
+            '常用': '收藏 playlist',
+            '喜欢': '收藏',
+            
+            // 分类相关
+            '类': '分类 UCS 类别',
+            '分': '分类 UCS',
+            '标准': 'UCS 分类',
+            
+            // 批量相关
+            '批': '批量 多选',
+            '多': '批量 多选 多个',
+            '一起': '批量',
+            '同时': '批量',
+            
+            // 快捷键相关
+            '键': '快捷键',
+            '快捷': '快捷键',
+            '按钮': '快捷键',
+        };
+        
+        function search(query) {
+            if (!query.trim()) {
+                // 显示所有
+                allCards.forEach(card => card.classList.remove('hidden'));
+                resultsInfo.innerHTML = '';
+                return;
+            }
+            
+            // 扩展查询词
+            let expandedQuery = query.toLowerCase();
+            for (let [key, value] of Object.entries(keywordMap)) {
+                if (query.includes(key)) {
+                    expandedQuery += ' ' + value;
+                }
+            }
+            
+            const keywords = expandedQuery.split(/\s+/).filter(k => k.length > 0);
+            let matchCount = 0;
+            
+            allCards.forEach(card => {
+                const cardKeywords = (card.dataset.keywords || '').toLowerCase();
+                const title = card.querySelector('.feature-title, td:nth-child(2)')?.textContent.toLowerCase() || '';
+                const desc = card.querySelector('.feature-desc, td:nth-child(3)')?.textContent.toLowerCase() || '';
+                
+                const content = cardKeywords + ' ' + title + ' ' + desc;
+                
+                // 匹配逻辑：任意一个关键词匹配即可
+                const isMatch = keywords.some(keyword => content.includes(keyword));
+                
+                if (isMatch) {
+                    card.classList.remove('hidden');
+                    matchCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            // 显示结果数量
+            if (matchCount === 0) {
+                resultsInfo.innerHTML = '没有找到相关功能，试试其他关键词 🤔';
+            } else {
+                resultsInfo.innerHTML = `找到 <span>${matchCount}</span> 个相关功能 ✨`;
+            }
+        }
+        
+        // 输入搜索
+        searchInput.addEventListener('input', (e) => {
+            search(e.target.value);
+        });
+        
+        // 快速搜索
+        function quickSearch(term) {
+            searchInput.value = term;
+            search(term);
+            searchInput.focus();
+        }
+        
+        // 回车搜索
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                search(searchInput.value);
+            }
+        });
+    </script>
+</body>
+</html>
