@@ -98,6 +98,57 @@
 
         .header p {
             color: #888;
+        }
+
+        /* 标签页导航 */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: rgba(15, 15, 23, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 游戏配乐iframe */
+        .game-music-frame {
+            width: 100%;
+            height: calc(100vh - 250px);
+            border: none;
+            background: #0a0a0f;
             font-size: 1.1rem;
             max-width: 600px;
             margin: 0 auto;
@@ -391,6 +442,15 @@
         <h1>音乐风格百科</h1>
         <p>探索世界音乐风格，了解情绪标签、历史起源、配器特点与经典作曲家</p>
     </header>
+
+    <!-- 标签页导航 -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('genres')">🎵 音乐风格百科</button>
+        <button class="tab-btn" onclick="switchTab('game-music')">🎮 游戏配乐设计师手册</button>
+    </div>
+
+    <!-- 音乐风格百科内容 -->
+    <div id="genres-tab" class="tab-content active">
 
     <!-- 搜索 -->
     <section class="search-section">
@@ -1642,6 +1702,9 @@
         </div>
     </main>
 
+    </div>
+    <!-- /genres-tab -->
+
     <script>
         // 音乐风格数据
         const genres = document.querySelectorAll('.genre-card');
@@ -1723,6 +1786,26 @@
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') search();
         });
+
+        // 标签页切换
+        function switchTab(tab) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 移除所有按钮激活状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // 激活当前标签
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
     </script>
+
+    <!-- 游戏配乐设计师手册内容 -->
+    <div id="game-music-tab" class="tab-content">
+        <iframe src="game-music-guide.html" class="game-music-frame"></iframe>
+    </div>
 </body>
 </html>
