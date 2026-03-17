@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-03-17T15:34:02.686269",
+  "agent": {
+    "name": "Kimi Claw",
+    "version": "2.2.0",
+    "status": "online",
+    "mood": "active"
+  },
+  "system": {
+    "host": "iv-yehyrmzt345i3z9qpig1",
+    "model": "kimi-coding/k2p5",
+    "reasoning": "high",
+    "channel": "feishu"
+  },
+  "load": {
+    "percentage": 65,
+    "level": "mid",
+    "status_text": "中等负载 - 处理复杂任务",
+    "cpu": 18,
+    "memory": 42
+  },
+  "sessions": {
+    "total": 1,
+    "active": 1,
+    "pending": 0,
+    "processing": 1
+  },
+  "tokens": {
+    "current_session": "15.8k",
+    "total_today": "45.2k",
+    "limit": "unlimited"
+  },
+  "tasks": [
+    {
+      "id": 1,
+      "name": "对话: 实时状态同步",
+      "status": "processing",
+      "type": "对话",
+      "tokens": "2.1k",
+      "start_time": "2026-03-17T15:34:02.686279"
+    },
+    {
+      "id": 2,
+      "name": "GitHub: 任务管理器部署",
+      "status": "completed",
+      "type": "部署",
+      "tokens": "30k",
+      "start_time": "2026-03-17T14:30:00"
+    },
+    {
+      "id": 3,
+      "name": "音效中心: 密码保护",
+      "status": "completed",
+      "type": "安全",
+      "tokens": "5.2k",
+      "start_time": "2026-03-17T14:45:00"
+    }
+  ],
+  "history": {
+    "load_5min": [
+      32,
+      45,
+      52,
+      48,
+      59,
+      62,
+      58,
+      65,
+      61,
+      65
+    ],
+    "labels": [
+      "-4m",
+      "-3m30s",
+      "-3m",
+      "-2m30s",
+      "-2m",
+      "-1m30s",
+      "-1m",
+      "-30s",
+      "-15s",
+      "now"
+    ]
+  }
+}
