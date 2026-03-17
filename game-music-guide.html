@@ -71,6 +71,23 @@
             color: #00d4aa;
         }
 
+        /* iframe嵌入模式样式 */
+        body.in-iframe .top-nav,
+        body.in-iframe .sidebar {
+            display: none !important;
+        }
+        
+        body.in-iframe .main-container {
+            padding-top: 0;
+            max-width: 100%;
+        }
+        
+        body.in-iframe .content {
+            margin-left: 0;
+            max-width: 100%;
+            padding: 20px;
+        }
+
         /* 主布局 */
         .main-container {
             display: flex;
@@ -2059,6 +2076,11 @@
     </div>
 
     <script>
+        // 检测是否在iframe中
+        if (window.self !== window.top) {
+            document.body.classList.add('in-iframe');
+        }
+
         // 搜索功能
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase();
