@@ -510,10 +510,11 @@
     
     <div class="warning-stripe"></div>
     
-    <!-- 新导航 - 三个主页面 -->
+    <!-- 新导航 - 四个主页面 -->
     <nav class="nav">
         <div class="nav-item active" onclick="showSection('home')">🏠 首页</div>
         <div class="nav-item" onclick="showSection('games')">🎮 游戏中心</div>
+        <div class="nav-item" onclick="openSoundminerGuide()">🔊 音效相关</div>
         <div class="nav-item" onclick="window.open('capabilities.html','_self')">📊 项目能力</div>
     </nav>
     
@@ -693,7 +694,7 @@
     
     <footer>
         <p>⚡ 我的工作站 | 个人游戏开发实验室 🎮</p>
-        <p style="margin-top: 10px; font-size: 0.8rem;">Version 2.1 | Built with ❤️ & Steel</p>
+        <p style="margin-top: 10px; font-size: 0.8rem;">Version 2.2 | Built with ❤️ & Steel</p>
     </footer>
     
     <script>
@@ -707,6 +708,11 @@
             // 更新导航状态
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             event.target.classList.add('active');
+        }
+        
+        // 打开 Soundminer 指南
+        function openSoundminerGuide() {
+            window.open('soundminer-guide.html', '_self');
         }
         
         // 游戏分类筛选
