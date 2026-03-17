@@ -1786,6 +1786,10 @@
 
         // 标签页切换
         function switchTab(tab) {
+            if (tab === 'game-music') {
+                window.location.href = 'game-music-guide.html';
+                return;
+            }
             // 隐藏所有标签内容
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
@@ -1802,7 +1806,14 @@
 
     <!-- 游戏配乐设计师手册内容 -->
     <div id="game-music-tab" class="tab-content">
-        <iframe src="game-music-guide.html" class="game-music-frame"></iframe>
+        <div style="text-align: center; padding: 100px 20px;">
+            <p style="font-size: 1.2rem; color: #888; margin-bottom: 30px;">正在跳转到游戏配乐设计师手册...</p>
+            <a href="game-music-guide.html" style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 30px; font-size: 1.1rem;">立即进入 🎮</a>
+        </div>
+        <script>
+            // 自动跳转
+            window.location.href = 'game-music-guide.html';
+        </script>
     </div>
 </body>
 </html>
