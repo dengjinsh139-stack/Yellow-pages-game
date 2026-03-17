@@ -490,6 +490,29 @@
             }
         }
     </style>
+
+<script>
+// 登录验证
+(function() {
+    const CONFIG = {
+        sessionKey: 'sfx_access_granted',
+        loginPage: 'sound-effects-login.html',
+        sessionDuration: 24 * 60 * 60 * 1000
+    };
+    
+    const session = localStorage.getItem(CONFIG.sessionKey);
+    if (!session) {
+        window.location.href = CONFIG.loginPage;
+        return;
+    }
+    
+    const data = JSON.parse(session);
+    if (Date.now() - data.timestamp > CONFIG.sessionDuration) {
+        localStorage.removeItem(CONFIG.sessionKey);
+        window.location.href = CONFIG.loginPage;
+    }
+})();
+</script>
 </head>
 <body>
     <!-- 头部 -->
