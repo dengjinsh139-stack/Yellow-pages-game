@@ -281,6 +281,30 @@
             margin-top: 60px;
         }
     </style>
+    <script>
+        // 访问权限检查
+        var SESSION_KEY = 'finance_access_granted';
+        var SESSION_DURATION = 24 * 60 * 60 * 1000;
+        
+        function checkAccess() {
+            var session = localStorage.getItem(SESSION_KEY);
+            if (!session) {
+                window.location.href = 'finance-login.html';
+                return false;
+            }
+            var data = JSON.parse(session);
+            if (Date.now() - data.timestamp > SESSION_DURATION) {
+                localStorage.removeItem(SESSION_KEY);
+                window.location.href = 'finance-login.html';
+                return false;
+            }
+            return true;
+        }
+        
+        if (!checkAccess()) {
+            // 未授权，会跳转
+        }
+    </script>
 </head>
 <body>
     <nav>
@@ -296,7 +320,7 @@
                 <a href="wwise/wwise.html" class="nav-link">🔊 Wwise</a>
                 <a href="task-manager.html" class="nav-link">📈 任务管理器</a>
                 <a href="capabilities.html" class="nav-link">📊 项目能力</a>
-                <a href="finance.html" class="nav-link active">💰 理财相关</a>
+                <a href="finance-login.html" class="nav-link active">💰 理财相关</a>
             </div>
         </div>
     </nav>
