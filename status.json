@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-03-19T04:11:00+08:00",
+  "timestamp": "2026-03-19T04:33:23.281621",
   "agent": {
     "name": "Kimi Claw",
-    "version": "2.4.0",
+    "version": "2.4.9",
     "status": "online",
     "mood": "maintenance",
     "avatar": "❤️‍🔥"
@@ -14,11 +14,11 @@
     "channel": "feishu"
   },
   "load": {
-    "percentage": 15,
+    "percentage": 42,
     "level": "low",
     "status_text": "低负载 - 系统维护中",
-    "cpu": 5,
-    "memory": 18
+    "cpu": 34,
+    "memory": 51
   },
   "sessions": {
     "total": 1,
@@ -77,13 +77,39 @@
     }
   ],
   "history": {
-    "load_5min": [18, 22, 15, 12, 15, 18, 15, 12, 10, 15],
-    "labels": ["-4m", "-3m30s", "-3m", "-2m30s", "-2m", "-1m30s", "-1m", "-30s", "-15s", "now"]
+    "load_5min": [
+      15,
+      12,
+      15,
+      18,
+      15,
+      12,
+      10,
+      15,
+      40,
+      42
+    ],
+    "labels": [
+      "-4m",
+      "-3m30s",
+      "-3m",
+      "-2m30s",
+      "-2m",
+      "-1m30s",
+      "-1m",
+      "-30s",
+      "-15s",
+      "now"
+    ]
   },
   "backup": {
-    "last_backup": "昨日 13:18",
-    "next_check": "09:00",
-    "changes_detected": false,
-    "total_backups": 2
+    "last_backup": "2026-03-19 00:02",
+    "next_check": "2026-03-19 06:02",
+    "total_backups": 2,
+    "changes_detected": true
+  },
+  "stats": {
+    "commits_today": 1,
+    "files_modified": 76
   }
 }
