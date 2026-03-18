@@ -614,24 +614,61 @@
             z-index: 100;
             margin-bottom: 8px;
         }
+    
+        /* 悬浮音乐控制按钮 */
+        .music-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            border: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-float-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+        }
+
+        .music-float-btn.playing {
+            animation: floatPulse 2s infinite;
+        }
+
+        @keyframes floatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3); transform: scale(1); }
+            50% { box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5); transform: scale(1.02); }
+        }
+
     </style>
 </head>
 <body>
     <!-- 导航 -->
     <nav class="top-nav">
         <div class="nav-content">
-            <a href="index.html" class="nav-logo">
+            <a href="../index.html" class="nav-logo">
                 <div class="nav-logo-icon">🎮</div>
                 <span>我的工作站</span>
             </a>
             <div class="nav-links">
-                <a href="index.html" class="nav-link">首页</a>
+                <a href="../index.html" class="nav-link">首页</a>
                 <a href="games.html" class="nav-link">游戏中心</a>
-                <a href="sound-effects-login.html" class="nav-link">音效相关</a>
+                <a href="../sound-effects-login.html" class="nav-link">音效相关</a>
                 <a href="music-genres.html" class="nav-link">音乐相关</a>
                 <a href="game-music-guide.html" class="nav-link active">游戏配乐</a>
-                <a href="task-manager.html" class="nav-link">任务管理器</a>
-                <a href="capabilities.html" class="nav-link">项目能力</a>
+                <a href="../task-manager.html" class="nav-link">任务管理器</a>
+                <a href="../capabilities.html" class="nav-link">项目能力</a>
             </div>
         </div>
     </nav>
@@ -747,7 +784,7 @@
                             <div class="composer-name">近藤浩治</div>
                             <div class="composer-name-ja">Koji Kondo</div>
                             <div class="composer-links">
-                                <a href="https://wiki.biligame.com/zelda/近藤浩治" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/近藤浩治" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Koji_Kondo" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -755,7 +792,7 @@
                             <div class="composer-name">古代祐三</div>
                             <div class="composer-name-ja">Yuzo Koshiro</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/古代祐三" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/古代祐三" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Yuzo_Koshiro" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -763,7 +800,7 @@
                             <div class="composer-name">田中宏和</div>
                             <div class="composer-name-ja">Hirokazu Tanaka</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/田中宏和" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/田中宏和" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Hirokazu_Tanaka" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -825,8 +862,6 @@
                     </ul>
                 </div>
             </section>
-</body>
-</html>
             <!-- 16-bit/FM合成 -->
             <section class="genre-section" id="chiptune-16bit">
                 <div class="genre-header-large">
@@ -873,7 +908,7 @@
                             <div class="composer-name">古代祐三</div>
                             <div class="composer-name-ja">Yuzo Koshiro</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/古代祐三" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/古代祐三" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Yuzo_Koshiro" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -881,7 +916,7 @@
                             <div class="composer-name">下村阳子</div>
                             <div class="composer-name-ja">Yoko Shimomura</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/下村阳子" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/下村阳子" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Yoko_Shimomura" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -988,7 +1023,7 @@
                             <div class="composer-name">植松伸夫</div>
                             <div class="composer-name-ja">Nobuo Uematsu</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/植松伸夫" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/植松伸夫" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Nobuo_Uematsu" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -996,7 +1031,7 @@
                             <div class="composer-name">椙山浩一</div>
                             <div class="composer-name-ja">Koichi Sugiyama</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/椙山浩一" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/椙山浩一" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Koichi_Sugiyama" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1004,7 +1039,7 @@
                             <div class="composer-name">光田康典</div>
                             <div class="composer-name-ja">Yasunori Mitsuda</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/光田康典" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/光田康典" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Yasunori_Mitsuda" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1012,7 +1047,7 @@
                             <div class="composer-name">下村阳子</div>
                             <div class="composer-name-ja">Yoko Shimomura</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/下村阳子" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/下村阳子" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Yoko_Shimomura" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1020,7 +1055,7 @@
                             <div class="composer-name">目黑将司</div>
                             <div class="composer-name-ja">Shoji Meguro</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/目黑将司" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/目黑将司" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Shoji_Meguro" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1028,7 +1063,7 @@
                             <div class="composer-name">岡部啓一</div>
                             <div class="composer-name-ja">Keiichi Okabe</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/岡部啓一" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/岡部啓一" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Keiichi_Okabe" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1364,7 +1399,7 @@
                             <div class="composer-name">Akira Yamaoka</div>
                             <div class="composer-name-ja">山冈晃 - 寂静岭</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/山岡晃" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/山岡晃" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Akira_Yamaoka" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1479,7 +1514,7 @@
                             <div class="composer-name">岩田恭明</div>
                             <div class="composer-name-ja">Yasuaki Iwata</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/岩田恭明" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/岩田恭明" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                         <div class="composer-card">
@@ -1507,7 +1542,7 @@
                             <div class="composer-name">陈致逸</div>
                             <div class="composer-name-ja">HOYO-MIX - 原神</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                     </div>
@@ -1600,35 +1635,35 @@
                             <div class="composer-name">林坤信</div>
                             <div class="composer-name-ja">仙剑奇侠传</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/林坤信" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/林坤信" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                         <div class="composer-card">
                             <div class="composer-name">曾志豪</div>
                             <div class="composer-name-ja">轩辕剑、古剑奇谭</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/曾志豪" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/曾志豪" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                         <div class="composer-card">
                             <div class="composer-name">陈致逸</div>
                             <div class="composer-name-ja">原神、天涯明月刀</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                         <div class="composer-card">
                             <div class="composer-name">麦振鸿</div>
                             <div class="composer-name-ja">仙剑电视剧配乐</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/麥振鴻" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/麥振鴻" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                         <div class="composer-card">
                             <div class="composer-name">翟锦彦</div>
                             <div class="composer-name-ja">黑神话悟空</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/黑神话：悟空" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/黑神话：悟空" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                     </div>
@@ -1735,14 +1770,14 @@
                             <div class="composer-name">梅林茂</div>
                             <div class="composer-name-ja">Shigeru Umebayashi</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/梅林茂" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/梅林茂" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                         <div class="composer-card">
                             <div class="composer-name">梶浦由记</div>
                             <div class="composer-name-ja">Yuki Kajiura</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/梶浦由记" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/梶浦由记" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Yuki_Kajiura" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1836,7 +1871,7 @@
                             <div class="composer-name">Koji Kondo</div>
                             <div class="composer-name-ja">近藤浩治 - 塞尔达</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/近藤浩治" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/近藤浩治" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Koji_Kondo" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -1971,7 +2006,7 @@
                             <div class="composer-name">Toby Fox</div>
                             <div class="composer-name-ja">传说之下、三角符文</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/Toby_Fox" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/Toby_Fox" target="_blank" class="composer-link">中文维基</a>
                                 <a href="https://en.wikipedia.org/wiki/Toby_Fox" target="_blank" class="composer-link wiki">Wiki</a>
                             </div>
                         </div>
@@ -2072,7 +2107,7 @@
                             <div class="composer-name">陈致逸</div>
                             <div class="composer-name-ja">原神 - HOYO-MIX</div>
                             <div class="composer-links">
-                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">B站百科</a>
+                                <a href="https://zh.wikipedia.org/wiki/陈致逸" target="_blank" class="composer-link">中文维基</a>
                             </div>
                         </div>
                         <div class="composer-card">
@@ -2181,5 +2216,17 @@
             });
         });
     </script>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" src="../assets/audio/bg-music.mp3" loop preload="auto"></audio>
+    
+    <!-- 悬浮音乐控制按钮 -->
+    <div id="musicFloatBtn" class="music-float-btn" onclick="toggleGlobalMusic()">
+        <span id="musicFloatIcon">🔇</span>
+        <span id="musicFloatText">开启音乐</span>
+    </div>
+
+    <script src="../assets/js/music-system.js"></script>
+
 </body>
 </html>

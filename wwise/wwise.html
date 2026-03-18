@@ -345,6 +345,37 @@
             color: var(--primary-blue);
         }
         
+        /* 文档链接按钮 */
+        .doc-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.15) 0%, rgba(0, 168, 232, 0.15) 100%);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 6px;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .doc-link:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.25) 0%, rgba(0, 168, 232, 0.25) 100%);
+            transform: translateX(3px);
+        }
+        
+        .doc-link::after {
+            content: '→';
+            transition: transform 0.3s;
+        }
+        
+        .doc-link:hover::after {
+            transform: translateX(3px);
+        }
+        
         /* 案例库 */
         .case-grid {
             display: grid;
@@ -520,13 +551,50 @@
         .no-results.show {
             display: block;
         }
+    
+        /* 悬浮音乐控制按钮 */
+        .music-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            border: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-float-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+        }
+
+        .music-float-btn.playing {
+            animation: floatPulse 2s infinite;
+        }
+
+        @keyframes floatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3); transform: scale(1); }
+            50% { box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5); transform: scale(1.02); }
+        }
+
     </style>
 </head>
 <body>
     <!-- 顶部导航 -->
     <nav class="top-nav">
         <div class="nav-content">
-            <a href="index.html" class="nav-logo">
+            <a href="../index.html" class="nav-logo">
                 <div class="nav-logo-icon">⚡</div>
                 <div class="nav-logo-text">
                     <span>我的工作站</span>
@@ -534,13 +602,13 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="index.html" class="nav-link">🏠 首页</a>
+                <a href="../index.html" class="nav-link">🏠 首页</a>
                 <a href="games.html" class="nav-link">🎮 游戏中心</a>
-                <a href="sound-effects-login.html" class="nav-link">🔊 音效相关</a>
+                <a href="../sound-effects-login.html" class="nav-link">🔊 音效相关</a>
                 <a href="music-genres.html" class="nav-link">🎵 音乐百科</a>
                 <a href="wwise.html" class="nav-link active">🔊 Wwise</a>
-                <a href="task-manager.html" class="nav-link">📈 任务管理</a>
-                <a href="capabilities.html" class="nav-link">📊 项目能力</a>
+                <a href="../task-manager.html" class="nav-link">📈 任务管理</a>
+                <a href="../capabilities.html" class="nav-link">📊 项目能力</a>
             </div>
         </div>
     </nav>
@@ -609,6 +677,7 @@
                     <span class="tag">入门</span>
                     <span class="tag-blue">安装</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=welcome_to_wwise" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Event 事件 音频触发">
@@ -623,6 +692,7 @@
                     <span class="tag">核心概念</span>
                     <span class="tag-blue">Event</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=events" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="SoundBank 音频包 资源管理">
@@ -637,6 +707,7 @@
                     <span class="tag">资源管理</span>
                     <span class="tag-blue">SoundBank</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=soundbanks" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="RTPC 实时参数 动态音频">
@@ -651,6 +722,7 @@
                     <span class="tag">动态控制</span>
                     <span class="tag-blue">RTPC</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=rtpcs" target="_blank" class="doc-link">查看官方文档</a>
             </div>
         </div>
         
@@ -673,6 +745,7 @@
                     <span class="tag">容器</span>
                     <span class="tag-blue">Random</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=random_containers" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Switch Container 切换容器 材质">
@@ -687,6 +760,7 @@
                     <span class="tag">容器</span>
                     <span class="tag-blue">Switch</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=switch_containers" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Blend Container 混合容器 层叠">
@@ -701,6 +775,7 @@
                     <span class="tag">容器</span>
                     <span class="tag-blue">Blend</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=blend_containers" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Sequence Container 序列容器 顺序播放">
@@ -715,6 +790,7 @@
                     <span class="tag">容器</span>
                     <span class="tag-blue">Sequence</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=sequence_containers" target="_blank" class="doc-link">查看官方文档</a>
             </div>
         </div>
         
@@ -737,6 +813,7 @@
                     <span class="tag">空间音频</span>
                     <span class="tag-blue">3D</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=3d_positioning" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Spatial Audio Room Portal 声学空间">
@@ -751,6 +828,7 @@
                     <span class="tag">空间音频</span>
                     <span class="tag-blue">Room</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=spatial_audio_room_portal" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Obstruction Occlusion 遮挡 阻挡">
@@ -765,6 +843,7 @@
                     <span class="tag">空间音频</span>
                     <span class="tag-blue">遮挡</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=obstruction_occlusion" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Dolby Atmos Object Audio 对象音频">
@@ -779,6 +858,7 @@
                     <span class="tag">空间音频</span>
                     <span class="tag-blue">Atmos</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=dolby_atmos" target="_blank" class="doc-link">查看官方文档</a>
             </div>
         </div>
         
@@ -801,6 +881,7 @@
                     <span class="tag">互动音乐</span>
                     <span class="tag-blue">架构</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=interactive_music" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Transition 过渡 音乐切换">
@@ -815,6 +896,7 @@
                     <span class="tag">互动音乐</span>
                     <span class="tag-blue">Transition</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=transitions" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Stinger 插播乐句 音乐提示">
@@ -829,6 +911,7 @@
                     <span class="tag">互动音乐</span>
                     <span class="tag-blue">Stinger</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=stingers" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="MIDI 虚拟乐器 程序化音乐">
@@ -843,6 +926,7 @@
                     <span class="tag">互动音乐</span>
                     <span class="tag-blue">MIDI</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=midi" target="_blank" class="doc-link">查看官方文档</a>
             </div>
         </div>
         
@@ -865,6 +949,7 @@
                     <span class="tag">混音</span>
                     <span class="tag-blue">HDR</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=hdr_audio" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Auto Ducking Sidechain 自动闪避">
@@ -879,6 +964,7 @@
                     <span class="tag">混音</span>
                     <span class="tag-blue">Ducking</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=auto_ducking" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Bus 总线 混音层级">
@@ -893,6 +979,7 @@
                     <span class="tag">混音</span>
                     <span class="tag-blue">Bus</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=bus_hierarchy" target="_blank" class="doc-link">查看官方文档</a>
             </div>
             
             <div class="knowledge-card" data-tags="Mastering Suite 母带 响度">
@@ -907,6 +994,7 @@
                     <span class="tag">混音</span>
                     <span class="tag-blue">Mastering</span>
                 </div>
+                <a href="https://www.audiokinetic.com/zh/library/edge/?source=Help&id=mastering_suite" target="_blank" class="doc-link">查看官方文档</a>
             </div>
         </div>
         
@@ -1198,5 +1286,17 @@
             item.classList.toggle('active');
         }
     </script>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" src="../assets/audio/bg-music.mp3" loop preload="auto"></audio>
+    
+    <!-- 悬浮音乐控制按钮 -->
+    <div id="musicFloatBtn" class="music-float-btn" onclick="toggleGlobalMusic()">
+        <span id="musicFloatIcon">🔇</span>
+        <span id="musicFloatText">开启音乐</span>
+    </div>
+
+    <script src="../assets/js/music-system.js"></script>
+
 </body>
 </html>

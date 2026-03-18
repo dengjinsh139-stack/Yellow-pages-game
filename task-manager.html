@@ -182,6 +182,45 @@
             color: #00d26a;
         }
 
+        /* 推送时间提示框 */
+        .push-time-banner {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1) 0%, rgba(0, 168, 232, 0.1) 100%);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .push-time-icon {
+            font-size: 1.2rem;
+        }
+
+        .push-time-text {
+            font-size: 0.9rem;
+            color: #00d4aa;
+            font-weight: 500;
+        }
+
+        .push-time-value {
+            font-size: 0.9rem;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* 主内容区 */
         .main-content {
             max-width: 900px;
@@ -196,6 +235,57 @@
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 25px;
+        }
+
+        /* 备份信息面板 */
+        .backup-panel {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.08) 0%, rgba(0, 168, 232, 0.08) 100%);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .backup-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #00d4aa;
+        }
+
+        .backup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .backup-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 15px;
+            border-radius: 10px;
+        }
+
+        .backup-label {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .backup-value {
+            font-size: 1rem;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .backup-value.success {
+            color: #00d26a;
+        }
+
+        .backup-value.warning {
+            color: #ffc107;
         }
 
         .tuner-header {
@@ -772,6 +862,43 @@
                 display: none;
             }
         }
+    
+        /* 悬浮音乐控制按钮 */
+        .music-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            border: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-float-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+        }
+
+        .music-float-btn.playing {
+            animation: floatPulse 2s infinite;
+        }
+
+        @keyframes floatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3); transform: scale(1); }
+            50% { box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5); transform: scale(1.02); }
+        }
+
     </style>
 </head>
 <body>
@@ -787,7 +914,7 @@
                 <a href="games.html" class="nav-link">游戏中心</a>
                 <a href="sound-effects-login.html" class="nav-link">音效相关</a>
                 <a href="capabilities.html" class="nav-link">项目能力</a>
-                <a href="wwise.html" class="nav-link">Wwise</a>
+                <a href="wwise/wwise.html" class="nav-link">Wwise</a>
                 <a href="task-manager.html" class="nav-link active">任务管理器</a>
             </div>
         </div>
@@ -804,7 +931,7 @@
                 <span class="status-dot online"></span>
                 在线运行中
             </span>
-            <span class="status-item">v2.2.0</span>
+            <span class="status-item">v2.4.0</span>
             <span class="status-item">❤️‍🔥 活跃</span>
             <span class="status-item" id="currentTime">--:--:--</span>
         </div>
@@ -836,6 +963,13 @@
             <span class="conn-label">内存占用</span>
             <span class="conn-value" id="memoryUsage">--%</span>
         </div>
+    </div>
+
+    <!-- 推送时间提示框 -->
+    <div class="push-time-banner" id="pushTimeBanner" style="display: none;">
+        <span class="push-time-icon">🕐</span>
+        <span class="push-time-text">状态推送时间:</span>
+        <span class="push-time-value" id="pushTimeValue">--</span>
     </div>
 
     <!-- 主内容 -->
@@ -888,6 +1022,32 @@
             </div>
         </div>
 
+        <!-- 备份信息面板 -->
+        <div class="backup-panel" id="backupPanel">
+            <div class="backup-header">
+                <span>💾</span>
+                自动备份状态
+            </div>
+            <div class="backup-grid">
+                <div class="backup-item">
+                    <div class="backup-label">上次备份</div>
+                    <div class="backup-value" id="backupLast">--</div>
+                </div>
+                <div class="backup-item">
+                    <div class="backup-label">下次检查</div>
+                    <div class="backup-value" id="backupNext">--</div>
+                </div>
+                <div class="backup-item">
+                    <div class="backup-label">备份总数</div>
+                    <div class="backup-value success" id="backupTotal">--</div>
+                </div>
+                <div class="backup-item">
+                    <div class="backup-label">变化检测</div>
+                    <div class="backup-value" id="backupChanges">--</div>
+                </div>
+            </div>
+        </div>
+
         <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -903,8 +1063,12 @@
                 <div class="stat-value" id="processingCount">1</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Tokens</div>
-                <div class="stat-value" id="tokenCount">--</div>
+                <div class="stat-label">今日提交</div>
+                <div class="stat-value" id="commitsCount">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">修改文件</div>
+                <div class="stat-value" id="filesCount">--</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Est.Wait</div>
@@ -1167,12 +1331,48 @@
             document.getElementById('sessionCount').textContent = data.sessions.active;
             document.getElementById('pendingCount').textContent = data.sessions.pending;
             document.getElementById('processingCount').textContent = data.sessions.processing;
-            document.getElementById('tokenCount').textContent = data.tokens.current_session;
+            
+            // 更新今日统计（从 stats 对象读取）
+            if (data.stats) {
+                document.getElementById('commitsCount').textContent = data.stats.commits_today || 0;
+                document.getElementById('filesCount').textContent = data.stats.files_modified || 0;
+            }
+            
+            // 更新备份信息
+            if (data.backup) {
+                document.getElementById('backupLast').textContent = data.backup.last_backup || '--';
+                document.getElementById('backupNext').textContent = data.backup.next_check || '--';
+                document.getElementById('backupTotal').textContent = data.backup.total_backups || 0;
+                const changesEl = document.getElementById('backupChanges');
+                if (data.backup.changes_detected) {
+                    changesEl.textContent = '✓ 已备份';
+                    changesEl.className = 'backup-value success';
+                } else {
+                    changesEl.textContent = '✗ 无变化';
+                    changesEl.className = 'backup-value warning';
+                }
+            }
             
             // 更新时间戳
             const updateTime = new Date(data.timestamp);
             const elapsed = Math.floor((Date.now() - updateTime.getTime()) / 1000);
             document.getElementById('waitTime').textContent = elapsed < 60 ? elapsed + 's' : Math.floor(elapsed / 60) + 'm';
+            
+            // 更新推送时间提示框
+            const pushTimeBanner = document.getElementById('pushTimeBanner');
+            const pushTimeValue = document.getElementById('pushTimeValue');
+            if (pushTimeBanner && pushTimeValue) {
+                pushTimeBanner.style.display = 'flex';
+                const timeStr = updateTime.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                pushTimeValue.textContent = timeStr;
+            }
             
             // 更新当前工作内容
             if (data.current_work) {
@@ -1327,5 +1527,17 @@
             });
         });
     </script>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" src="assets/audio/bg-music.mp3" loop preload="auto"></audio>
+    
+    <!-- 悬浮音乐控制按钮 -->
+    <div id="musicFloatBtn" class="music-float-btn" onclick="toggleGlobalMusic()">
+        <span id="musicFloatIcon">🔇</span>
+        <span id="musicFloatText">开启音乐</span>
+    </div>
+
+    <script src="assets/js/music-system.js"></script>
+
 </body>
 </html>

@@ -371,23 +371,9 @@
             color: #e74c3c;
         }
 
-        .youtube-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
+        
 
-        .youtube-link:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
-        }
+        
 
         /* 无结果提示 */
         .no-results {
@@ -412,24 +398,115 @@
             .genre-grid { grid-template-columns: 1fr; }
             .nav-links { display: none; }
         }
-    </style>
+    
+        /* 悬浮音乐控制按钮 */
+        .music-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            border: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-float-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+        }
+
+        .music-float-btn.playing {
+            animation: floatPulse 2s infinite;
+        }
+
+        @keyframes floatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3); transform: scale(1); }
+            50% { box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5); transform: scale(1.02); }
+        }
+
+    
+        /* 视频链接容器 */
+        .video-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .youtube-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .youtube-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+        }
+        
+        .bilibili-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #00a1d6 0%, #0084b8 100%);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .bilibili-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 161, 214, 0.3);
+        }
+        
+        .video-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+</style>
 </head>
 <body>
     <!-- 导航 -->
     <nav class="top-nav">
         <div class="nav-content">
-            <a href="index.html" class="nav-logo">
+            <a href="../index.html" class="nav-logo">
                 <div class="nav-logo-icon">⚡</div>
                 <span>我的工作站</span>
             </a>
             <div class="nav-links">
-                <a href="index.html" class="nav-link">首页</a>
+                <a href="../index.html" class="nav-link">首页</a>
                 <a href="games.html" class="nav-link">游戏中心</a>
-                <a href="sound-effects-login.html" class="nav-link">音效相关</a>
+                <a href="../sound-effects-login.html" class="nav-link">音效相关</a>
                 <a href="music-genres.html" class="nav-link active">音乐相关</a>
-                <a href="wwise.html" class="nav-link">Wwise</a>
-                <a href="task-manager.html" class="nav-link">任务管理器</a>
-                <a href="capabilities.html" class="nav-link">项目能力</a>
+                <a href="../wwise/wwise.html" class="nav-link">Wwise</a>
+                <a href="../task-manager.html" class="nav-link">任务管理器</a>
+                <a href="../capabilities.html" class="nav-link">项目能力</a>
             </div>
         </div>
     </nav>
@@ -541,9 +618,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=1fO0R9kiEDo" target="_blank" class="youtube-link">
-                            ▶️ 巴赫 - 哥德堡变奏曲
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1PE411o7je" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -586,9 +669,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=JTc1mDieQI8" target="_blank" class="youtube-link">
-                            ▶️ 莫扎特 - 第40号交响曲
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1hB4y1f7df" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -632,9 +721,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=7F9QzD4kCeo" target="_blank" class="youtube-link">
-                            ▶️ 肖邦 - 夜曲 Op.9 No.2
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1Y4411e7QR" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -678,9 +773,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=4fk2prKnYnI" target="_blank" class="youtube-link">
-                            ▶️ B.B. King - The Thrill Is Gone
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1m4411b73s" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -724,9 +825,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=ylXk1LBvIqU" target="_blank" class="youtube-link">
-                            ▶️ Miles Davis - So What
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1vJ411E7yN" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -769,9 +876,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=mFaxEA7Y-0g" target="_blank" class="youtube-link">
-                            ▶️ The Girl From Ipanema
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1f4411M7xb" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -816,9 +929,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=_U5HfZ3zFEE" target="_blank" class="youtube-link">
-                            ▶️ Hans Zimmer - Time (盗梦空间)
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1C4411b7nS" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -862,9 +981,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=tcHB9yg8D8c" target="_blank" class="youtube-link">
-                            ▶️ 植松伸夫 - One-Winged Angel (FF7)
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -908,9 +1033,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=UWM1i30Z3QE" target="_blank" class="youtube-link">
-                            ▶️ 久石让 - 千与千寻 - One Summer's Day
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1R4411m7EH" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -954,9 +1085,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=1F3OGJnD3Qk" target="_blank" class="youtube-link">
-                            ▶️ 阿鲲 - 流浪地球 主题曲
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1f4411E7Qs" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1000,9 +1137,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=5F1mOQT2DZw" target="_blank" class="youtube-link">
-                            ▶️ Two Steps From Hell - Victory
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1b4411Y7eA" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1046,9 +1189,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=6nTrTtf33hs" target="_blank" class="youtube-link">
-                            ▶️ Akira Yamaoka - Theme of Laura (寂静岭)
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1v4411L7wV" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1093,9 +1242,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=QkF3oxziUI4" target="_blank" class="youtube-link">
-                            ▶️ Led Zeppelin - Stairway to Heaven
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1sW411B7k8" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1139,9 +1294,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=CD-E-LDc384" target="_blank" class="youtube-link">
-                            ▶️ Metallica - Master of Puppets
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1xs411f7Y7" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1184,9 +1345,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=2AjKebG8z6c" target="_blank" class="youtube-link">
-                            ▶️ The Ramones - Blitzkrieg Bop
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1229,9 +1396,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=hTWKbfoikeg" target="_blank" class="youtube-link">
-                            ▶️ Nirvana - Smells Like Teen Spirit
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1xx411c7BF" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1275,9 +1448,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=XtLc_Kw0N1U" target="_blank" class="youtube-link">
-                            ▶️ Daft Punk - Get Lucky
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1ax411Y79N" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1320,9 +1499,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=IcrbM1l_BoI" target="_blank" class="youtube-link">
-                            ▶️ Avicii - Wake Me Up
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1Ds411C7op" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1365,9 +1550,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=tpBHtPPW6lw" target="_blank" class="youtube-link">
-                            ▶️ Tycho - Awake
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1411,9 +1602,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=lWzE1XzJ9jQ" target="_blank" class="youtube-link">
-                            ▶️ Buena Vista Social Club - Chan Chan
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1Us411D7Ab" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1456,9 +1653,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=8qLL2Gx3I_k" target="_blank" class="youtube-link">
-                            ▶️ Ravi Shankar - Raga Jog
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1501,9 +1704,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=69RdQFDuYPI" target="_blank" class="youtube-link">
-                            ▶️ Bob Marley - Three Little Birds
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1547,9 +1756,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=Zi_XLOBDo_Y" target="_blank" class="youtube-link">
-                            ▶️ Michael Jackson - Billie Jean
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1593,9 +1808,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=TVgh6cTTPng" target="_blank" class="youtube-link">
-                            ▶️ Kendrick Lamar - DNA.
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1639,9 +1860,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=H-kA0l2wJ2s" target="_blank" class="youtube-link">
-                            ▶️ Stevie Wonder - Superstition
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1684,9 +1911,15 @@
                     </div>
                     
                     <div class="info-section">
+                        
+                    <div class="video-links">
                         <a href="https://www.youtube.com/watch?v=3vO7X6c4kgE" target="_blank" class="youtube-link">
-                            ▶️ James Brown - Get Up Offa That Thing
+                            ▶️ YouTube
                         </a>
+                        <a href="https://www.bilibili.com/video/BV1bx411G7P1" target="_blank" class="bilibili-link">
+                            📺 Bilibili
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1812,5 +2045,17 @@
             <a href="game-music-guide.html" style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 30px; font-size: 1.1rem;">立即进入 🎮</a>
         </div>
     </div>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" src="../assets/audio/bg-music.mp3" loop preload="auto"></audio>
+    
+    <!-- 悬浮音乐控制按钮 -->
+    <div id="musicFloatBtn" class="music-float-btn" onclick="toggleGlobalMusic()">
+        <span id="musicFloatIcon">🔇</span>
+        <span id="musicFloatText">开启音乐</span>
+    </div>
+
+    <script src="../assets/js/music-system.js"></script>
+
 </body>
 </html>

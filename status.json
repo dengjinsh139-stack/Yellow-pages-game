@@ -1,10 +1,11 @@
 {
-  "timestamp": "2026-03-17T19:56:32.564204",
+  "timestamp": "2026-03-18T11:16:42.752001",
   "agent": {
     "name": "Kimi Claw",
-    "version": "2.2.0",
+    "version": "2.4.0",
     "status": "online",
-    "mood": "active"
+    "mood": "active",
+    "avatar": "❤️‍🔥"
   },
   "system": {
     "host": "iv-yehyrmzt345i3z9qpig1",
@@ -15,7 +16,7 @@
   "load": {
     "percentage": 65,
     "level": "mid",
-    "status_text": "中等负载 - 处理复杂任务",
+    "status_text": "中等负载 - 处理网站更新任务",
     "cpu": 18,
     "memory": 42
   },
@@ -26,34 +27,76 @@
     "processing": 1
   },
   "tokens": {
-    "current_session": "15.8k",
-    "total_today": "45.2k",
+    "current_session": "84.2k",
+    "total_today": "156.3k",
     "limit": "unlimited"
   },
+  "current_work": {
+    "title": "网站风格统一与维护",
+    "description": "统一全站风格为青绿蓝科技风，优化任务管理器显示",
+    "files_modified": [
+      "index.html",
+      "music-genres.html",
+      "task-manager.html",
+      "game-music-guide.html"
+    ],
+    "started_at": "2026-03-17T19:30:00",
+    "progress": "85%",
+    "eta": "即将完成"
+  },
+  "recent_activity": [
+    {
+      "time": "20:38",
+      "action": "推送更新",
+      "detail": "版本号移至导航栏",
+      "icon": "📝"
+    },
+    {
+      "time": "20:29",
+      "action": "样式统一",
+      "detail": "统一全站青绿蓝科技风",
+      "icon": "🎨"
+    },
+    {
+      "time": "20:20",
+      "action": "移除组件",
+      "detail": "删除游戏配乐手册快速跳转",
+      "icon": "🗑️"
+    },
+    {
+      "time": "19:56",
+      "action": "状态同步",
+      "detail": "更新任务管理器数据",
+      "icon": "🔄"
+    }
+  ],
   "tasks": [
     {
       "id": 1,
-      "name": "对话: 实时状态同步",
+      "name": "全站风格统一",
       "status": "processing",
-      "type": "对话",
-      "tokens": "2.1k",
-      "start_time": "2026-03-17T19:56:32.564214"
+      "type": "样式",
+      "tokens": "45.2k",
+      "start_time": "2026-03-17T19:30:00",
+      "description": "将首页、音乐百科、任务管理器统一为青绿蓝科技风"
     },
     {
       "id": 2,
-      "name": "GitHub: 任务管理器部署",
-      "status": "completed",
-      "type": "部署",
-      "tokens": "30k",
-      "start_time": "2026-03-17T14:30:00"
+      "name": "任务管理器优化",
+      "status": "processing",
+      "type": "功能",
+      "tokens": "12.5k",
+      "start_time": "2026-03-17T20:42:00",
+      "description": "添加当前工作内容显示，优化用户体验"
     },
     {
       "id": 3,
-      "name": "音效中心: 密码保护",
+      "name": "GitHub 同步",
       "status": "completed",
-      "type": "安全",
-      "tokens": "5.2k",
-      "start_time": "2026-03-17T14:45:00"
+      "type": "部署",
+      "tokens": "8.3k",
+      "start_time": "2026-03-17T20:38:00",
+      "description": "将所有修改推送至GitHub仓库"
     }
   ],
   "history": {

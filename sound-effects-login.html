@@ -190,6 +190,43 @@
             from { transform: scale(0); }
             to { transform: scale(1); }
         }
+    
+        /* 悬浮音乐控制按钮 */
+        .music-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            border: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-float-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+        }
+
+        .music-float-btn.playing {
+            animation: floatPulse 2s infinite;
+        }
+
+        @keyframes floatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3); transform: scale(1); }
+            50% { box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5); transform: scale(1.02); }
+        }
+
     </style>
 </head>
 <body>
@@ -319,5 +356,17 @@
             }, 600);
         });
     </script>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" src="assets/audio/bg-music.mp3" loop preload="auto"></audio>
+    
+    <!-- 悬浮音乐控制按钮 -->
+    <div id="musicFloatBtn" class="music-float-btn" onclick="toggleGlobalMusic()">
+        <span id="musicFloatIcon">🔇</span>
+        <span id="musicFloatText">开启音乐</span>
+    </div>
+
+    <script src="assets/js/music-system.js"></script>
+
 </body>
 </html>
