@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-19T01:45:08.303898",
+  "timestamp": "2026-03-19T01:48:59.490591",
   "agent": {
     "name": "Kimi Claw",
     "version": "2.4.9",
@@ -14,11 +14,11 @@
     "channel": "feishu"
   },
   "load": {
-    "percentage": 34,
+    "percentage": 31,
     "level": "mid",
     "status_text": "中等负载 - 处理全站优化任务",
     "cpu": 22,
-    "memory": 47
+    "memory": 41
   },
   "sessions": {
     "total": 1,
@@ -102,7 +102,6 @@
   ],
   "history": {
     "load_5min": [
-      62,
       68,
       72,
       70,
@@ -111,7 +110,8 @@
       72,
       41,
       34,
-      34
+      34,
+      31
     ],
     "labels": [
       "-4m",
@@ -131,5 +131,9 @@
     "next_check": "2026-03-19 06:02",
     "total_backups": 2,
     "changes_detected": true
+  },
+  "stats": {
+    "commits_today": 1,
+    "files_modified": 70
   }
 }
