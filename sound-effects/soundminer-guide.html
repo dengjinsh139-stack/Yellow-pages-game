@@ -35,6 +35,58 @@
             min-height: 100vh;
         }
         
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+        
         /* 头部 */
         .header {
             background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%);
@@ -515,10 +567,29 @@
 </script>
 </head>
 <body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站</span>
+            </a>
+            <div class="nav-links" id="nav-links">
+                <a href="../index.html" class="nav-link">🏠 首页</a>
+                <a href="../index.html#games" class="nav-link">🎮 游戏中心</a>
+                <a href="sound-effects-hub.html" class="nav-link active">🔊 音效相关</a>
+                <a href="../music/music-genres.html" class="nav-link">🎵 音乐百科</a>
+                <a href="../wwise/wwise.html" class="nav-link">🔊 Wwise</a>
+                <a href="../task-manager.html" class="nav-link">📈 任务管理器</a>
+                <a href="../capabilities.html" class="nav-link">📊 项目能力</a>
+                <a href="../finance-login.html" class="nav-link">💰 理财相关</a>
+            </div>
+        </div>
+    </nav>
+
     <!-- 头部 -->
     <header class="header">
         <div class="header-content">
-            <a href="../index.html" class="back-btn">← 返回工作站</a>
             <span class="logo">🔊 Soundminer 完全指南</span>
         </div>
     </header>
