@@ -4,8 +4,12 @@
  * <script src="nav-config.js"></script>
  */
 
+// 全局版本号 - 修改这里即可同步全站
+const APP_VERSION = 'v2.4.9';
+
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
+    version: APP_VERSION,
     items: [
         { id: 'home', label: '🏠 首页', href: '/index.html', active: false },
         { id: 'games', label: '🎮 游戏中心', href: '/index.html#games', active: false },
@@ -17,6 +21,22 @@ const NAV_CONFIG = {
         { id: 'finance', label: '💰 理财相关', href: '/finance-login.html', active: false }
     ]
 };
+
+// 初始化版本号显示
+function initVersion() {
+    // 处理纯版本号元素
+    const versionElements = document.querySelectorAll('.nav-version, [data-version]');
+    versionElements.forEach(el => {
+        const text = el.textContent;
+        // 如果文本只包含版本号，直接替换
+        if (text.match(/^v?\d+\.\d+\.\d+$/)) {
+            el.textContent = APP_VERSION;
+        } else {
+            // 否则只替换版本号部分（如 "v2.4.9 | 2026-03-19" 或 "⚡ 我的工作站 v2.4.9 | ..."）
+            el.textContent = text.replace(/v?\d+\.\d+\.\d+/g, APP_VERSION);
+        }
+    });
+}
 
 // 根据当前页面自动设置 active 状态
 function initNav() {
@@ -35,7 +55,7 @@ function initNav() {
         
         // 处理相对路径
         let href = item.href;
-        if (currentPath.includes('/music/') || currentPath.includes('/wwise/')) {
+        if (currentPath.includes('/music/') || currentPath.includes('/wwise/') || currentPath.includes('/sound-effects/')) {
             href = '..' + item.href;
         }
         
@@ -46,4 +66,7 @@ function initNav() {
 }
 
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', initNav);
+document.addEventListener('DOMContentLoaded', () => {
+    initVersion();
+    initNav();
+});
