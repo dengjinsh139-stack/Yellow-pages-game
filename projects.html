@@ -946,13 +946,9 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>类型:</label>
-                        <select id="filter-type" onchange="filterTable()">
-                            <option value="">全部</option>
-                            <option value="主线">主线</option>
-                            <option value="功能性语音">功能性语音</option>
-                            <option value="电影化cut scene">电影化cut scene</option>
-                            <option value="情绪语气">情绪语气</option>
+                        <label>角色:</label>
+                        <select id="filter-character" onchange="filterTable()">
+                            <option value="">全部角色</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -965,9 +961,22 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>搜索:</label>
-                        <input type="text" id="filter-search" placeholder="角色名/台词内容/配音..." onkeyup="filterTable()">
+                        <label>搜索台词:</label>
+                        <input type="text" id="filter-search" placeholder="输入台词关键词..." onkeyup="filterTable()">
                     </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button onclick="clearFilters()" style="padding: 8px 16px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; color: var(--text); cursor: pointer;">清空筛选</button>
+                    </div>
+                </div>
+                
+                <!-- 快捷筛选 -->
+                <div style="margin-bottom: 20px; padding: 15px; background: var(--bg-card); border-radius: 8px;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem; margin-right: 10px;">⚡ 快捷筛选:</span>
+                    <button onclick="quickFilter('batch', '第三批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3); border-radius: 4px; color: var(--primary); font-size: 0.85rem; cursor: pointer;">第三批</button>
+                    <button onclick="quickFilter('status', '待录制')" style="margin-right: 8px; padding: 6px 12px; background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); border-radius: 4px; color: #ff9800; font-size: 0.85rem; cursor: pointer;">待录制</button>
+                    <button onclick="quickFilter('batch', '第一批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); border-radius: 4px; color: #4caf50; font-size: 0.85rem; cursor: pointer;">第一批</button>
+                    <button onclick="quickFilter('status', '已录完')" style="padding: 6px 12px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); border-radius: 4px; color: #4caf50; font-size: 0.85rem; cursor: pointer;">已录完</button>
                 </div>
                 
                 <!-- 角色明细弹窗 -->
@@ -1229,25 +1238,59 @@
         // 筛选功能
         function filterTable() {
             const batch = document.getElementById('filter-batch').value;
-            const type = document.getElementById('filter-type').value;
+            const character = document.getElementById('filter-character').value;
             const status = document.getElementById('filter-status').value;
             const search = document.getElementById('filter-search').value.toLowerCase();
 
             filteredData = voiceData.filter(item => {
                 const matchBatch = !batch || item.batch === batch;
-                const matchType = !type || item.type.includes(type);
+                const matchCharacter = !character || item.character === character;
                 const matchStatus = !status || item.status === status;
                 const matchSearch = !search || 
                     item.character.toLowerCase().includes(search) ||
                     item.text.toLowerCase().includes(search) ||
-                    item.actor.toLowerCase().includes(search) ||
                     item.fileName.toLowerCase().includes(search);
                 
-                return matchBatch && matchType && matchStatus && matchSearch;
+                return matchBatch && matchCharacter && matchStatus && matchSearch;
             });
 
             currentPage = 1;
             renderTable();
+        }
+        
+        // 初始化角色选择器
+        function initCharacterSelect() {
+            const characters = [...new Set(voiceData.map(d => d.character))].sort();
+            const select = document.getElementById('filter-character');
+            
+            // 保留第一个"全部角色"选项
+            select.innerHTML = '<option value="">全部角色</option>';
+            
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+        }
+        
+        // 清空筛选
+        function clearFilters() {
+            document.getElementById('filter-batch').value = '';
+            document.getElementById('filter-character').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-search').value = '';
+            filterTable();
+        }
+        
+        // 快捷筛选
+        function quickFilter(field, value) {
+            if (field === 'batch') {
+                document.getElementById('filter-batch').value = value;
+            } else if (field === 'status') {
+                document.getElementById('filter-status').value = value;
+            }
+            filterTable();
         }
 
         // 分页功能
@@ -1300,219 +1343,7 @@
             
             // 如果是语音页，初始化表格
             if (tabId === 'g42-voice') {
-                updateStats();
-                renderTable();
-            }
-        }
-
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            updateStats();
-            renderTable();
-        });
-    </script>
-</body>
-</html>
-
-        // 计算统计数据
-        function updateStats() {
-            const uniqueChars = new Set(voiceData.map(d => d.character)).size;
-            const totalLines = voiceData.length;
-            const recordedLines = voiceData.filter(d => d.status === '已录完').length;
-            const progress = Math.round((recordedLines / totalLines) * 100);
-
-            document.getElementById('stat-characters').textContent = uniqueChars;
-            document.getElementById('stat-lines').textContent = totalLines;
-            document.getElementById('stat-recorded').textContent = recordedLines;
-            document.getElementById('stat-progress').textContent = progress + '%';
-        }
-
-        // 获取批次样式类
-        function getBatchClass(batch) {
-            const map = { '第一批': 'batch-1', '第二批': 'batch-2', '第三批': 'batch-3', '第2.5批': 'batch-2-5' };
-            return map[batch] || 'batch-1';
-        }
-
-        // 获取状态样式类
-        function getStatusClass(status) {
-            const map = { '已录完': 'status-done', '待录制': 'status-pending', '重录': 'status-recording' };
-            return map[status] || 'status-pending';
-        }
-
-        // 渲染表格
-        function renderTable() {
-            const tbody = document.getElementById('table-body');
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-            
-            // 更新分页信息
-            document.getElementById('current-page').textContent = currentPage;
-            document.getElementById('total-pages').textContent = totalPages || 1;
-            document.getElementById('prev-btn').disabled = currentPage <= 1;
-            document.getElementById('next-btn').disabled = currentPage >= totalPages;
-
-            // 空状态
-            if (filteredData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="empty-state">
-                            <div class="icon">🔍</div>
-                            <div>没有找到匹配的数据</div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            // 分页数据
-            const start = (currentPage - 1) * itemsPerPage;
-            const pageData = filteredData.slice(start, start + itemsPerPage);
-
-            tbody.innerHTML = pageData.map(item => `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>
-                        <div class="char-name-clickable" onclick="showCharacterDetail('${item.character}')">${item.character}</div>
-                        <div class="char-actor">${item.actor}</div>
-                    </td>
-                    <td><span class="batch-tag ${getBatchClass(item.batch)}">${item.batch}</span></td>
-                    <td><span class="type-tag">${item.type}</span></td>
-                    <td>${item.scene || '-'}</td>
-                    <td><div class="line-text" title="${item.text}">${item.text}</div></td>
-                    <td><span class="status-tag ${getStatusClass(item.status)}">${item.status}</span></td>
-                    <td>${item.fileName || '-'}</td>
-                </tr>
-            `).join('');
-        }
-
-        // 显示角色明细弹窗
-        function showCharacterDetail(charName) {
-            const charLines = voiceData.filter(d => d.character === charName);
-            if (charLines.length === 0) return;
-            
-            const charInfo = charLines[0];
-            const totalLines = charLines.length;
-            const recordedLines = charLines.filter(d => d.status === '已录完').length;
-            const progress = Math.round((recordedLines / totalLines) * 100);
-            
-            // 更新弹窗内容
-            document.getElementById('modal-char-name').textContent = charName;
-            document.getElementById('modal-char-actor').textContent = `配音: ${charInfo.actor}`;
-            document.getElementById('modal-char-stats').textContent = `已录 ${recordedLines} / 总 ${totalLines}`;
-            document.getElementById('modal-progress').style.width = progress + '%';
-            
-            // 设置角色头像emoji
-            const avatarMap = {
-                '燎原火': '🔥', '董卓': '👹', '司马懿': '🦅', '小孟': '🦋',
-                '袁方': '🌙', '郭嘉': '🦊', '刘备': '👑', '关羽': '🐉',
-                '张飞': '🐻', '吕布': '⚔️', '黄盖': '⚓', '颜良': '🔱',
-                '文丑': '🎭', '张辽': '🏹', '孙淑': '🌸'
-            };
-            document.getElementById('modal-avatar').textContent = avatarMap[charName] || '👤';
-            
-            // 渲染台词明细表
-            const modalBody = document.getElementById('modal-lines-body');
-            modalBody.innerHTML = charLines.map(line => `
-                <tr>
-                    <td><span class="batch-tag ${getBatchClass(line.batch)}">${line.batch}</span></td>
-                    <td><span class="type-tag">${line.type}</span></td>
-                    <td>${line.scene || '-'}</td>
-                    <td><div class="line-text" title="${line.text}">${line.text}</div></td>
-                    <td><span class="status-tag ${getStatusClass(line.status)}">${line.status}</span></td>
-                    <td>${line.fileName || '-'}</td>
-                </tr>
-            `).join('');
-            
-            // 显示弹窗
-            document.getElementById('character-modal').style.display = 'flex';
-        }
-        
-        // 关闭弹窗
-        function closeModal() {
-            document.getElementById('character-modal').style.display = 'none';
-        }
-        
-        // 点击弹窗外部关闭
-        document.addEventListener('click', function(e) {
-            const modal = document.getElementById('character-modal');
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
-        // 筛选功能
-        function filterTable() {
-            const batch = document.getElementById('filter-batch').value;
-            const type = document.getElementById('filter-type').value;
-            const status = document.getElementById('filter-status').value;
-            const search = document.getElementById('filter-search').value.toLowerCase();
-
-            filteredData = voiceData.filter(item => {
-                const matchBatch = !batch || item.batch === batch;
-                const matchType = !type || item.type.includes(type);
-                const matchStatus = !status || item.status === status;
-                const matchSearch = !search || 
-                    item.character.toLowerCase().includes(search) ||
-                    item.text.toLowerCase().includes(search) ||
-                    item.actor.toLowerCase().includes(search) ||
-                    item.fileName.toLowerCase().includes(search);
-                
-                return matchBatch && matchType && matchStatus && matchSearch;
-            });
-
-            currentPage = 1;
-            renderTable();
-        }
-
-        // 分页功能
-        function changePage(delta) {
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-            currentPage += delta;
-            if (currentPage < 1) currentPage = 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            renderTable();
-        }
-
-        // 初始化
-        function showSection(sectionId, linkElement) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionId).classList.add('active');
-            
-            document.querySelectorAll('.sub-nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            if (linkElement) {
-                linkElement.classList.add('active');
-            }
-
-            // 如果是 G42 页面，初始化数据
-            if (sectionId === 'g42') {
-                updateStats();
-                renderTable();
-            }
-        }
-        
-        // G42 子页签切换
-        function showG42Tab(tabId, linkElement) {
-            // 隐藏所有 G42 tab
-            document.querySelectorAll('.g42-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // 显示目标 tab
-            document.getElementById(tabId).classList.add('active');
-            
-            // 更新子导航状态
-            document.querySelectorAll('.g42-sub-nav a').forEach(link => {
-                link.classList.remove('active');
-            });
-            if (linkElement) {
-                linkElement.classList.add('active');
-            }
-            
-            // 如果是语音页，初始化表格
-            if (tabId === 'g42-voice') {
+                initCharacterSelect();
                 updateStats();
                 renderTable();
             }
