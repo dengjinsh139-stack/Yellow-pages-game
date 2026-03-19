@@ -316,6 +316,92 @@
             color: var(--text-muted);
         }
         
+        /* G42 子导航 */
+        .g42-sub-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding: 15px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        
+        .g42-sub-nav a {
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .g42-sub-nav a:hover {
+            color: #fff;
+            background: rgba(0, 212, 170, 0.1);
+        }
+        
+        .g42-sub-nav a.active {
+            color: var(--primary);
+            background: rgba(0, 212, 170, 0.15);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+        
+        .g42-tab {
+            display: none;
+        }
+        
+        .g42-tab.active {
+            display: block;
+        }
+        
+        /* G42 概览页 */
+        .g42-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .g42-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+        }
+        
+        .g42-card h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .g42-card p {
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        
+        .g42-card ul {
+            list-style: none;
+            color: var(--text-muted);
+        }
+        
+        .g42-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .g42-card li:last-child {
+            border-bottom: none;
+        }
+        
+        .g42-card li strong {
+            color: var(--text);
+        }
+        
         /* 统计卡片 */
         .stats-row {
             display: grid;
@@ -767,15 +853,67 @@
             </div>
         </div>
         
-        <!-- G42 项目页 - 录音管理 -->
+        <!-- G42 项目页 -->
         <div id="g42" class="section">
             <div class="g42-container">
                 <div class="g42-header">
-                    <h2>🎮 G42 配音管理</h2>
-                    <p>火凤燎原配音台本明细 - 快速追溯与查询</p>
+                    <h2>🎮 G42 项目</h2>
+                    <p>火凤燎原游戏开发项目</p>
                 </div>
                 
-                <!-- 统计卡片 -->
+                <!-- G42 子导航 -->
+                <nav class="g42-sub-nav">
+                    <a class="active" onclick="showG42Tab('g42-overview', this)">📊 概览</a>
+                    <a onclick="showG42Tab('g42-voice', this)">🎙️ 语音</a>
+                </nav>
+                
+                <!-- G42 概览页 -->
+                <div id="g42-overview" class="g42-tab active">
+                    <div class="g42-overview-grid">
+                        <div class="g42-card">
+                            <h3>📋 项目简介</h3>
+                            <p>《火凤燎原》是一款以三国为背景的剧情向游戏，讲述了燎原火、司马懿、小孟等角色在乱世中的故事。</p>
+                        </div>
+                        <div class="g42-card">
+                            <h3>🎯 项目状态</h3>
+                            <ul>
+                                <li><strong>第一批录音：</strong>已完成 ✅</li>
+                                <li><strong>第二批录音：</strong>进行中 🔄</li>
+                                <li><strong>第三批录音：</strong>待开始 ⏳</li>
+                            </ul>
+                        </div>
+                        <div class="g42-card">
+                            <h3>👥 主要角色</h3>
+                            <ul>
+                                <li>🔥 燎原火 - WeiF</li>
+                                <li>👹 董卓 - ZhangD</li>
+                                <li>🦅 司马懿 - 待定</li>
+                                <li>🦋 小孟 - 待定</li>
+                                <li>🌙 袁方 - 待定</li>
+                                <li>🦊 郭嘉 - 待定</li>
+                                <li>👑 刘备 - 待定</li>
+                                <li>🐉 关羽 - 待定</li>
+                            </ul>
+                        </div>
+                        <div class="g42-card">
+                            <h3>📊 快速统计</h3>
+                            <ul>
+                                <li><strong>角色总数：</strong>25+</li>
+                                <li><strong>台词总数：</strong>3000+</li>
+                                <li><strong>已录制：</strong>~70%</li>
+                                <li><strong>配音演员：</strong>10+</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- G42 语音页 - 配音管理 -->
+                <div id="g42-voice" class="g42-tab">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <p style="color: var(--text-muted);">火凤燎原配音台本明细 - 快速追溯与查询</p>
+                    </div>
+                    
+                    <!-- 统计卡片 -->
                 <div class="stats-row">
                     <div class="stat-box">
                         <div class="number" id="stat-characters">0</div>
@@ -1110,6 +1248,31 @@
 
             // 如果是 G42 页面，初始化数据
             if (sectionId === 'g42') {
+                updateStats();
+                renderTable();
+            }
+        }
+        
+        // G42 子页签切换
+        function showG42Tab(tabId, linkElement) {
+            // 隐藏所有 G42 tab
+            document.querySelectorAll('.g42-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示目标 tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // 更新子导航状态
+            document.querySelectorAll('.g42-sub-nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (linkElement) {
+                linkElement.classList.add('active');
+            }
+            
+            // 如果是语音页，初始化表格
+            if (tabId === 'g42-voice') {
                 updateStats();
                 renderTable();
             }
