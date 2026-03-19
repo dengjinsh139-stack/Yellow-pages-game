@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 项目 - 我的工作站</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #00d4aa;
+            --primary-blue: #00a8e8;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.05);
+            --text: #e0e0e0;
+            --text-muted: #888;
+        }
+        
+        body {
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-version {
+            font-size: 0.7rem;
+            color: var(--primary);
+            background: rgba(0, 212, 170, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            font-weight: 500;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 10px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--primary);
+        }
+        
+        /* 页面头部 */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background: linear-gradient(180deg, rgba(0, 212, 170, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .main-title {
+            font-family: 'Black Ops One', 'Noto Sans SC', sans-serif;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            letter-spacing: 3px;
+        }
+        
+        /* 子导航 */
+        .sub-nav {
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 0;
+            position: sticky;
+            top: 61px;
+            z-index: 999;
+        }
+        
+        .sub-nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .sub-nav-link {
+            padding: 10px 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        
+        .sub-nav-link:hover, .sub-nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--primary);
+            border-color: rgba(0, 212, 170, 0.3);
+        }
+        
+        /* 内容区域 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+        
+        /* 项目卡片 */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+        
+        .project-card:hover {
+            border-color: rgba(0, 212, 170, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .project-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .project-title {
+            font-size: 1.3rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        
+        .project-status {
+            padding: 4px 12px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-left: auto;
+        }
+        
+        .project-desc {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .meta-item span {
+            color: var(--primary);
+        }
+        
+        /* 占位内容 */
+        .placeholder-box {
+            background: var(--bg-card);
+            border: 2px dashed rgba(0, 212, 170, 0.3);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .placeholder-text {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-title { font-size: 2rem; }
+            .sub-nav-link { padding: 8px 15px; font-size: 0.85rem; }
+            .project-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <div class="nav-logo-text">
+                    <span>我的工作站</span>
+                    <span class="nav-version">v2.4.9</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">🏠 首页</a>
+                <a href="index.html#games" class="nav-link">🎮 游戏中心</a>
+                <a href="sound-effects-login.html" class="nav-link">🔊 音效相关</a>
+                <a href="music/music-genres.html" class="nav-link">🎵 音乐百科</a>
+                <a href="projects.html" class="nav-link active">📁 项目</a>
+                <a href="wwise/wwise.html" class="nav-link">🔊 Wwise</a>
+                <a href="task-manager.html" class="nav-link">📈 任务管理器</a>
+                <a href="capabilities.html" class="nav-link">📊 项目能力</a>
+                <a href="finance-login.html" class="nav-link">💰 理财相关</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 页面头部 -->
+    <header>
+        <h1 class="main-title">📁 项目中心</h1>
+        <p class="subtitle">项目管理与进度追踪</p>
+    </header>
+    
+    <!-- 子导航 -->
+    <nav class="sub-nav">
+        <div class="sub-nav-content">
+            <a href="#overview" class="sub-nav-link active" onclick="showSection('overview', this)">📊 概览</a>
+            <a href="#g42" class="sub-nav-link" onclick="showSection('g42', this)">🎮 G42</a>
+        </div>
+    </nav>
+    
+    <!-- 内容区域 -->
+    <div class="container">
+        <!-- 概览页 -->
+        <div id="overview" class="section active">
+            <div class="section-title">
+                <h2>📊 项目概览</h2>
+            </div>
+            <div class="project-grid">
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">🎮</div>
+                        <h3 class="project-title">G42</h3>
+                        <span class="project-status">进行中</span>
+                    </div>
+                    <p class="project-desc">游戏开发项目，待更新详细内容...</p>
+                    <div class="project-meta">
+                        <div class="meta-item">📅 <span>更新时间：</span>待更新</div>
+                        <div class="meta-item">👤 <span>负责人：</span>待更新</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- G42 项目页 -->
+        <div id="g42" class="section">
+            <div class="section-title">
+                <h2>🎮 G42 项目</h2>
+            </div>
+            <div class="placeholder-box">
+                <div class="placeholder-icon">📝</div>
+                <p class="placeholder-text">
+                    G42 项目内容待更新<br>
+                    后续将添加项目详情、进度、文档等内容
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showSection(sectionId, linkElement) {
+            // 隐藏所有section
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 显示目标section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 更新子导航状态
+            document.querySelectorAll('.sub-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (linkElement) {
+                linkElement.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
