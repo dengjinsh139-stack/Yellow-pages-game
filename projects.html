@@ -295,6 +295,243 @@
             line-height: 1.8;
         }
         
+        /* G42 录音管理表格样式 */
+        .g42-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .g42-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .g42-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .g42-header p {
+            color: var(--text-muted);
+        }
+        
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-box .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        /* 筛选栏 */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+        
+        .filter-group input {
+            min-width: 200px;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* 表格样式 */
+        .data-table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: rgba(0, 212, 170, 0.1);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        
+        .data-table tbody tr:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+        
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 角色列 */
+        .char-name {
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .char-actor {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        
+        /* 批次标签 */
+        .batch-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .batch-1 { background: rgba(0, 212, 170, 0.15); color: var(--primary); }
+        .batch-2 { background: rgba(0, 168, 232, 0.15); color: var(--primary-blue); }
+        .batch-3 { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+        .batch-2-5 { background: rgba(156, 39, 176, 0.15); color: #9c27b0; }
+        
+        /* 类型标签 */
+        .type-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+        
+        /* 状态标签 */
+        .status-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-done { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
+        .status-pending { background: rgba(255, 152, 0, 0.15); color: #ff9800; }
+        .status-recording { background: rgba(0, 212, 170, 0.15); color: var(--primary); }
+        
+        /* 台词内容 */
+        .line-text {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .pagination button {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: rgba(0, 212, 170, 0.2);
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination .page-info {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
         /* 响应式 */
         @media (max-width: 768px) {
             .main-title { font-size: 2rem; }
@@ -365,39 +602,265 @@
             </div>
         </div>
         
-        <!-- G42 项目页 -->
+        <!-- G42 项目页 - 录音管理 -->
         <div id="g42" class="section">
-            <div class="section-title">
-                <h2>🎮 G42 项目</h2>
-            </div>
-            <div class="placeholder-box">
-                <div class="placeholder-icon">📝</div>
-                <p class="placeholder-text">
-                    G42 项目内容待更新<br>
-                    后续将添加项目详情、进度、文档等内容
-                </p>
+            <div class="g42-container">
+                <div class="g42-header">
+                    <h2>🎮 G42 配音管理</h2>
+                    <p>火凤燎原配音台本明细 - 快速追溯与查询</p>
+                </div>
+                
+                <!-- 统计卡片 -->
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="number" id="stat-characters">0</div>
+                        <div class="label">角色总数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="stat-lines">0</div>
+                        <div class="label">台词总数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="stat-recorded">0</div>
+                        <div class="label">已录制</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="stat-progress">0%</div>
+                        <div class="label">总进度</div>
+                    </div>
+                </div>
+                
+                <!-- 筛选栏 -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>批次:</label>
+                        <select id="filter-batch" onchange="filterTable()">
+                            <option value="">全部</option>
+                            <option value="第一批">第一批</option>
+                            <option value="第二批">第二批</option>
+                            <option value="第2.5批">第2.5批</option>
+                            <option value="第三批">第三批</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>类型:</label>
+                        <select id="filter-type" onchange="filterTable()">
+                            <option value="">全部</option>
+                            <option value="主线">主线</option>
+                            <option value="功能性语音">功能性语音</option>
+                            <option value="电影化cut scene">电影化cut scene</option>
+                            <option value="情绪语气">情绪语气</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>状态:</label>
+                        <select id="filter-status" onchange="filterTable()">
+                            <option value="">全部</option>
+                            <option value="已录完">已录完</option>
+                            <option value="待录制">待录制</option>
+                            <option value="重录">重录</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>搜索:</label>
+                        <input type="text" id="filter-search" placeholder="角色名/台词内容/配音..." onkeyup="filterTable()">
+                    </div>
+                </div>
+                
+                <!-- 数据表格 -->
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>角色</th>
+                                <th>批次</th>
+                                <th>类型</th>
+                                <th>场景</th>
+                                <th>台词内容</th>
+                                <th>状态</th>
+                                <th>文件命名</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- 数据由 JS 填充 -->
+                        </tbody>
+                    </table>
+                    
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <button id="prev-btn" onclick="changePage(-1)" disabled>上一页</button>
+                        <span class="page-info">第 <span id="current-page">1</span> 页，共 <span id="total-pages">1</span> 页</span>
+                        <button id="next-btn" onclick="changePage(1)">下一页</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
+        // 模拟数据 - 基于你的 Excel 结构
+        const voiceData = [
+            { id: 1, character: '燎原火', actor: 'WeiF', batch: '第一批', type: '功能性语音', scene: '界面交互1', text: '杀一个高手，总比杀一百个喽啰来得方便', status: '已录完', fileName: 'HO 1100101 Voice Line Interface 1' },
+            { id: 2, character: '燎原火', actor: 'WeiF', batch: '第一批', type: '功能性语音', scene: '界面交互2', text: '活着，就是忠诚。', status: '已录完', fileName: 'HO 1100101 Voice Line Interface 2' },
+            { id: 3, character: '黄盖', actor: 'HAT', batch: '第一批', type: '情绪语气', scene: '战斗场景', text: '每个角色情绪语气：攻击*3*3（轻中重）', status: '已录完', fileName: 'HO 1100401 Voice Combat Roar RD-1' },
+            { id: 4, character: '黄盖', actor: 'HAT', batch: '第一批', type: '情绪语气', scene: '战斗场景', text: '每个角色情绪语气：受击*3*3（轻中重）', status: '已录完', fileName: 'HO 1100401 Voice Combat Hurt RD-1' },
+            { id: 5, character: '董卓', actor: 'ZhangD', batch: '第一批', type: '主线', scene: '梦谶前', text: '这到底是梦兆，还是卢尚书说的那什么"昼想夜梦，神形所遇"？', status: '已录完', fileName: 'VO MC XZ 1' },
+            { id: 6, character: '董卓', actor: 'ZhangD', batch: '第一批', type: '主线', scene: '梦谶前', text: '呵，想那么多作甚？说让我入朝，那便去北宫看个究竟！', status: '已录完', fileName: 'VO MC XZ 2' },
+            { id: 7, character: '司马懿', actor: '待定', batch: '第一批', type: '电影化cut scene', scene: '幻境', text: '世人笃信梦……', status: '已录完', fileName: 'VO Cut Scene 01' },
+            { id: 8, character: '司马懿', actor: '待定', batch: '第一批', type: '电影化cut scene', scene: '幻境', text: '曾有曹姓者梦三马食槽，唯恐被马吃掉，', status: '已录完', fileName: 'VO Cut Scene 02' },
+            { id: 9, character: '袁方', actor: '待定', batch: '第二批', type: '功能性语音', scene: '界面交互1', text: '你的感慨难掩内心，为夺天下的虚伪。', status: '已录完', fileName: 'HO 1100801 Voice Line Interface 1' },
+            { id: 10, character: '袁方', actor: '待定', batch: '第二批', type: '功能性语音', scene: '界面交互2', text: '我袁方有我自己的路。', status: '已录完', fileName: 'HO 1100801 Voice Line Interface 2' },
+            { id: 11, character: '郭嘉', actor: '待定', batch: '第二批', type: '电影化cut scene', scene: '剧情', text: '先乱后治,奉孝杀戮。', status: '已录完', fileName: 'VO Cut Scene 07' },
+            { id: 12, character: '刘备', actor: '待定', batch: '第二批', type: '电影化cut scene', scene: '剧情', text: '总有一天，野史中的关羽也只能回味。', status: '已录完', fileName: 'VO Cut Scene 11' },
+            { id: 13, character: '张雷', actor: '待定', batch: '第二批', type: '情绪语气', scene: '战斗场景', text: '每个角色情绪语气：攻击*3*3（轻中重）', status: '已录完', fileName: 'HO 1103401 Voice Combat Roar RD-1' },
+            { id: 14, character: '刘备', actor: '待定', batch: '第二批', type: '通用语气', scene: '战场', text: '每个角色情绪语气：回应上司命令*4', status: '已录完', fileName: '' },
+            { id: 15, character: '刘备', actor: '待定', batch: '第二批', type: '通用语气', scene: '战场', text: '每个角色情绪语气：冲杀时的呼叫声*4', status: '已录完', fileName: '' },
+            { id: 16, character: '小孟', actor: '待定', batch: '第2.5批', type: '功能性语音', scene: '界面交互1', text: '战争是残酷的。勇者胜，无能者败。', status: '重录', fileName: 'HO 1100201 Voice Line Interface 1' },
+            { id: 17, character: '小孟', actor: '待定', batch: '第2.5批', type: '功能性语音', scene: '界面交互2', text: '要记得，日会蚀，月会缺。', status: '重录', fileName: 'HO 1100201 Voice Line Interface 2' },
+            { id: 18, character: '小孟', actor: '待定', batch: '第2.5批', type: '电影化cut scene', scene: '音乐结束', text: '我走了，勿念。', status: '已录完', fileName: 'VO Cut Scene 32' },
+            { id: 19, character: '燎原火', actor: 'WeiF', batch: '第二批', type: '主线', scene: '司马朗III开场', text: '什么时候去司马家？以他为人质，我们进河内司马家，血洗——', status: '已录完', fileName: 'VO M SML 1' },
+            { id: 20, character: '吕布', actor: '待定', batch: '第二批', type: '主线', scene: '司马朗III开场', text: '在此之前，还有一件重要的事……', status: '已录完', fileName: 'VO M SML 2' },
+            { id: 21, character: '颜良', actor: '待定', batch: '第三批', type: '功能性语音', scene: '界面交互1', text: '你知道我在想什么吗？', status: '待录制', fileName: 'HO 1101101 Voice Line Interface 1' },
+            { id: 22, character: '颜良', actor: '待定', batch: '第三批', type: '功能性语音', scene: '界面交互2', text: '不过，你认为，有人受了刚才一刀，还可以活命吗？', status: '待录制', fileName: 'HO 1101101 Voice Line Interface 2' },
+            { id: 23, character: '关羽', actor: '待定', batch: '第三批', type: '主线', scene: '剧情', text: '某虽一介武夫，亦颇知忠义二字。', status: '待录制', fileName: '' },
+            { id: 24, character: '张飞', actor: '待定', batch: '第三批', type: '主线', scene: '剧情', text: '燕人张翼德在此！谁敢与我决一死战？', status: '待录制', fileName: '' },
+            { id: 25, character: '张辽', actor: '待定', batch: '第三批', type: '功能性语音', scene: '界面交互', text: ' assassin 出生的我，不会轻易倒下。', status: '待录制', fileName: '' }
+        ];
+
+        let filteredData = [...voiceData];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // 计算统计数据
+        function updateStats() {
+            const uniqueChars = new Set(voiceData.map(d => d.character)).size;
+            const totalLines = voiceData.length;
+            const recordedLines = voiceData.filter(d => d.status === '已录完').length;
+            const progress = Math.round((recordedLines / totalLines) * 100);
+
+            document.getElementById('stat-characters').textContent = uniqueChars;
+            document.getElementById('stat-lines').textContent = totalLines;
+            document.getElementById('stat-recorded').textContent = recordedLines;
+            document.getElementById('stat-progress').textContent = progress + '%';
+        }
+
+        // 获取批次样式类
+        function getBatchClass(batch) {
+            const map = { '第一批': 'batch-1', '第二批': 'batch-2', '第三批': 'batch-3', '第2.5批': 'batch-2-5' };
+            return map[batch] || 'batch-1';
+        }
+
+        // 获取状态样式类
+        function getStatusClass(status) {
+            const map = { '已录完': 'status-done', '待录制': 'status-pending', '重录': 'status-recording' };
+            return map[status] || 'status-pending';
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            // 更新分页信息
+            document.getElementById('current-page').textContent = currentPage;
+            document.getElementById('total-pages').textContent = totalPages || 1;
+            document.getElementById('prev-btn').disabled = currentPage <= 1;
+            document.getElementById('next-btn').disabled = currentPage >= totalPages;
+
+            // 空状态
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div class="icon">🔍</div>
+                            <div>没有找到匹配的数据</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // 分页数据
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = filteredData.slice(start, start + itemsPerPage);
+
+            tbody.innerHTML = pageData.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>
+                        <div class="char-name">${item.character}</div>
+                        <div class="char-actor">${item.actor}</div>
+                    </td>
+                    <td><span class="batch-tag ${getBatchClass(item.batch)}">${item.batch}</span></td>
+                    <td><span class="type-tag">${item.type}</span></td>
+                    <td>${item.scene || '-'}</td>
+                    <td><div class="line-text" title="${item.text}">${item.text}</div></td>
+                    <td><span class="status-tag ${getStatusClass(item.status)}">${item.status}</span></td>
+                    <td>${item.fileName || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 筛选功能
+        function filterTable() {
+            const batch = document.getElementById('filter-batch').value;
+            const type = document.getElementById('filter-type').value;
+            const status = document.getElementById('filter-status').value;
+            const search = document.getElementById('filter-search').value.toLowerCase();
+
+            filteredData = voiceData.filter(item => {
+                const matchBatch = !batch || item.batch === batch;
+                const matchType = !type || item.type.includes(type);
+                const matchStatus = !status || item.status === status;
+                const matchSearch = !search || 
+                    item.character.toLowerCase().includes(search) ||
+                    item.text.toLowerCase().includes(search) ||
+                    item.actor.toLowerCase().includes(search) ||
+                    item.fileName.toLowerCase().includes(search);
+                
+                return matchBatch && matchType && matchStatus && matchSearch;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        // 分页功能
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            currentPage += delta;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            renderTable();
+        }
+
+        // 初始化
         function showSection(sectionId, linkElement) {
-            // 隐藏所有section
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
-            
-            // 显示目标section
             document.getElementById(sectionId).classList.add('active');
             
-            // 更新子导航状态
             document.querySelectorAll('.sub-nav-link').forEach(link => {
                 link.classList.remove('active');
             });
             if (linkElement) {
                 linkElement.classList.add('active');
             }
+
+            // 如果是 G42 页面，初始化数据
+            if (sectionId === 'g42') {
+                updateStats();
+                renderTable();
+            }
         }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            renderTable();
+        });
     </script>
 </body>
 </html>
