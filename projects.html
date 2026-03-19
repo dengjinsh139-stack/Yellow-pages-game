@@ -1040,36 +1040,8 @@
         </div>
     </div>
     
+    <script src="data/g42-voice-data.js"></script>
     <script>
-        // 模拟数据 - 基于你的 Excel 结构
-        const voiceData = [
-            { id: 1, character: '燎原火', actor: 'WeiF', batch: '第一批', type: '功能性语音', scene: '界面交互1', text: '杀一个高手，总比杀一百个喽啰来得方便', status: '已录完', fileName: 'HO 1100101 Voice Line Interface 1' },
-            { id: 2, character: '燎原火', actor: 'WeiF', batch: '第一批', type: '功能性语音', scene: '界面交互2', text: '活着，就是忠诚。', status: '已录完', fileName: 'HO 1100101 Voice Line Interface 2' },
-            { id: 3, character: '黄盖', actor: 'HAT', batch: '第一批', type: '情绪语气', scene: '战斗场景', text: '每个角色情绪语气：攻击*3*3（轻中重）', status: '已录完', fileName: 'HO 1100401 Voice Combat Roar RD-1' },
-            { id: 4, character: '黄盖', actor: 'HAT', batch: '第一批', type: '情绪语气', scene: '战斗场景', text: '每个角色情绪语气：受击*3*3（轻中重）', status: '已录完', fileName: 'HO 1100401 Voice Combat Hurt RD-1' },
-            { id: 5, character: '董卓', actor: 'ZhangD', batch: '第一批', type: '主线', scene: '梦谶前', text: '这到底是梦兆，还是卢尚书说的那什么"昼想夜梦，神形所遇"？', status: '已录完', fileName: 'VO MC XZ 1' },
-            { id: 6, character: '董卓', actor: 'ZhangD', batch: '第一批', type: '主线', scene: '梦谶前', text: '呵，想那么多作甚？说让我入朝，那便去北宫看个究竟！', status: '已录完', fileName: 'VO MC XZ 2' },
-            { id: 7, character: '司马懿', actor: '待定', batch: '第一批', type: '电影化cut scene', scene: '幻境', text: '世人笃信梦……', status: '已录完', fileName: 'VO Cut Scene 01' },
-            { id: 8, character: '司马懿', actor: '待定', batch: '第一批', type: '电影化cut scene', scene: '幻境', text: '曾有曹姓者梦三马食槽，唯恐被马吃掉，', status: '已录完', fileName: 'VO Cut Scene 02' },
-            { id: 9, character: '袁方', actor: '待定', batch: '第二批', type: '功能性语音', scene: '界面交互1', text: '你的感慨难掩内心，为夺天下的虚伪。', status: '已录完', fileName: 'HO 1100801 Voice Line Interface 1' },
-            { id: 10, character: '袁方', actor: '待定', batch: '第二批', type: '功能性语音', scene: '界面交互2', text: '我袁方有我自己的路。', status: '已录完', fileName: 'HO 1100801 Voice Line Interface 2' },
-            { id: 11, character: '郭嘉', actor: '待定', batch: '第二批', type: '电影化cut scene', scene: '剧情', text: '先乱后治,奉孝杀戮。', status: '已录完', fileName: 'VO Cut Scene 07' },
-            { id: 12, character: '刘备', actor: '待定', batch: '第二批', type: '电影化cut scene', scene: '剧情', text: '总有一天，野史中的关羽也只能回味。', status: '已录完', fileName: 'VO Cut Scene 11' },
-            { id: 13, character: '张雷', actor: '待定', batch: '第二批', type: '情绪语气', scene: '战斗场景', text: '每个角色情绪语气：攻击*3*3（轻中重）', status: '已录完', fileName: 'HO 1103401 Voice Combat Roar RD-1' },
-            { id: 14, character: '刘备', actor: '待定', batch: '第二批', type: '通用语气', scene: '战场', text: '每个角色情绪语气：回应上司命令*4', status: '已录完', fileName: '' },
-            { id: 15, character: '刘备', actor: '待定', batch: '第二批', type: '通用语气', scene: '战场', text: '每个角色情绪语气：冲杀时的呼叫声*4', status: '已录完', fileName: '' },
-            { id: 16, character: '小孟', actor: '待定', batch: '第2.5批', type: '功能性语音', scene: '界面交互1', text: '战争是残酷的。勇者胜，无能者败。', status: '重录', fileName: 'HO 1100201 Voice Line Interface 1' },
-            { id: 17, character: '小孟', actor: '待定', batch: '第2.5批', type: '功能性语音', scene: '界面交互2', text: '要记得，日会蚀，月会缺。', status: '重录', fileName: 'HO 1100201 Voice Line Interface 2' },
-            { id: 18, character: '小孟', actor: '待定', batch: '第2.5批', type: '电影化cut scene', scene: '音乐结束', text: '我走了，勿念。', status: '已录完', fileName: 'VO Cut Scene 32' },
-            { id: 19, character: '燎原火', actor: 'WeiF', batch: '第二批', type: '主线', scene: '司马朗III开场', text: '什么时候去司马家？以他为人质，我们进河内司马家，血洗——', status: '已录完', fileName: 'VO M SML 1' },
-            { id: 20, character: '吕布', actor: '待定', batch: '第二批', type: '主线', scene: '司马朗III开场', text: '在此之前，还有一件重要的事……', status: '已录完', fileName: 'VO M SML 2' },
-            { id: 21, character: '颜良', actor: '待定', batch: '第三批', type: '功能性语音', scene: '界面交互1', text: '你知道我在想什么吗？', status: '待录制', fileName: 'HO 1101101 Voice Line Interface 1' },
-            { id: 22, character: '颜良', actor: '待定', batch: '第三批', type: '功能性语音', scene: '界面交互2', text: '不过，你认为，有人受了刚才一刀，还可以活命吗？', status: '待录制', fileName: 'HO 1101101 Voice Line Interface 2' },
-            { id: 23, character: '关羽', actor: '待定', batch: '第三批', type: '主线', scene: '剧情', text: '某虽一介武夫，亦颇知忠义二字。', status: '待录制', fileName: '' },
-            { id: 24, character: '张飞', actor: '待定', batch: '第三批', type: '主线', scene: '剧情', text: '燕人张翼德在此！谁敢与我决一死战？', status: '待录制', fileName: '' },
-            { id: 25, character: '张辽', actor: '待定', batch: '第三批', type: '功能性语音', scene: '界面交互', text: ' assassin 出生的我，不会轻易倒下。', status: '待录制', fileName: '' }
-        ];
-
         let filteredData = [...voiceData];
         let currentPage = 1;
         const itemsPerPage = 10;
