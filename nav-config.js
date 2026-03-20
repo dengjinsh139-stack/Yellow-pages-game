@@ -5,20 +5,20 @@
  */
 
 // 全局版本号 - 修改这里即可同步全站
-const APP_VERSION = 'v2.4.9';
+const APP_VERSION = 'v2.5.6';
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
     version: APP_VERSION,
     items: [
-        { id: 'home', label: '🏠 首页', href: '/index.html', active: false },
-        { id: 'games', label: '🎮 游戏中心', href: '/index.html#games', active: false },
-        { id: 'sound', label: '🔊 音效相关', href: '/sound-effects/sound-effects-login.html', active: false },
-        { id: 'music', label: '🎵 音乐百科', href: '/music/music-genres.html', active: false },
-        { id: 'wwise', label: '🔊 Wwise', href: '/wwise/wwise.html', active: false },
-        { id: 'task', label: '📈 任务管理器', href: '/task-manager.html', active: false },
-        { id: 'caps', label: '📊 项目能力', href: '/capabilities.html', active: false },
-        { id: 'finance', label: '💰 理财相关', href: '/finance-login.html', active: false }
+        { id: 'home', label: '🏠 首页', href: 'index.html', active: false },
+        { id: 'games', label: '🎮 游戏中心', href: 'index.html#games', active: false },
+        { id: 'sound', label: '🔊 音效相关', href: 'sound-effects-login.html', active: false },
+        { id: 'music', label: '🎵 音乐百科', href: 'music/music-genres.html', active: false },
+        { id: 'wwise', label: '🔊 Wwise', href: 'wwise/wwise.html', active: false },
+        { id: 'task', label: '📈 任务管理器', href: 'task-manager.html', active: false },
+        { id: 'caps', label: '📊 项目能力', href: 'capabilities.html', active: false },
+        { id: 'finance', label: '💰 理财相关', href: 'finance-login.html', active: false }
     ]
 };
 
