@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📁 项目 - 我的工作站</title>
+    <script>
+        // 访问权限检查
+        (function() {
+            var SESSION_KEY = 'projects_access_granted';
+            var SESSION_DURATION = 24 * 60 * 60 * 1000;
+            
+            var session = localStorage.getItem(SESSION_KEY);
+            if (!session) {
+                window.location.href = 'projects-login.html';
+                return;
+            }
+            
+            var data = JSON.parse(session);
+            if (Date.now() - data.timestamp >= SESSION_DURATION) {
+                localStorage.removeItem(SESSION_KEY);
+                window.location.href = 'projects-login.html';
+            }
+        })();
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
         
@@ -807,7 +826,7 @@
                 <a href="index.html#games" class="nav-link">🎮 游戏中心</a>
                 <a href="sound-effects-login.html" class="nav-link">🔊 音效相关</a>
                 <a href="music/music-genres.html" class="nav-link">🎵 音乐百科</a>
-                <a href="projects.html" class="nav-link active">📁 项目</a>
+                <a href="projects-login.html" class="nav-link active">📁 项目</a>
                 <a href="wwise/wwise.html" class="nav-link">🔊 Wwise</a>
                 <a href="task-manager.html" class="nav-link">📈 任务管理器</a>
                 <a href="capabilities.html" class="nav-link">📊 项目能力</a>

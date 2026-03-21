@@ -15,7 +15,7 @@ const NAV_CONFIG = {
         { id: 'games', label: '🎮 游戏中心', href: 'index.html#games', active: false },
         { id: 'sound', label: '🔊 音效相关', href: 'sound-effects-login.html', active: false },
         { id: 'music', label: '🎵 音乐百科', href: 'music/music-genres.html', active: false },
-        { id: 'projects', label: '📁 项目', href: 'projects.html', active: false },
+        { id: 'projects', label: '📁 项目', href: 'projects-login.html', active: false },
         { id: 'wwise', label: '🔊 Wwise', href: 'wwise/wwise.html', active: false },
         { id: 'task', label: '📈 任务管理器', href: 'task-manager.html', active: false },
         { id: 'caps', label: '📊 项目能力', href: 'capabilities.html', active: false },
