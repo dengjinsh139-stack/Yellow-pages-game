@@ -1068,62 +1068,8 @@
     </div>
     
     <script>
-        // 配音数据 - 从Excel导入 (2276条台词/200角色)
-        const voiceData = [{
-  "id": 1,
-  "character": "幼童",
-  "actor": "待定",
-  "batch": "第一批",
-  "type": "主线",
-  "scene": "兵败-关卡前",
-  "text": "小麦青青大麦枯……",
-  "status": "已录完",
-  "fileName": "VO 301019000"
-},
-{
-  "id": 2,
-  "character": "幼童",
-  "actor": "待定",
-  "batch": "第一批",
-  "type": "主线",
-  "scene": "兵败-关卡前",
-  "text": "谁当获者妇与姑，丈人何在西击胡……",
-  "status": "已录完",
-  "fileName": "VO 301019001"
-},
-{
-  "id": 3,
-  "character": "幼童",
-  "actor": "待定",
-  "batch": "第一批",
-  "type": "主线",
-  "scene": "兵败-关卡前",
-  "text": "吏买马，君具车，谁为诸君鼓咙胡——",
-  "status": "已录完",
-  "fileName": "VO 301019002"
-},
-{
-  "id": 4,
-  "character": "幼童",
-  "actor": "待定",
-  "batch": "第一批",
-  "type": "主线",
-  "scene": "兵败-关卡前",
-  "text": "……",
-  "status": "已录完",
-  "fileName": "VO 301019003"
-},
-{
-  "id": 5,
-  "character": "董卓",
-  "actor": "待定",
-  "batch": "第一批",
-  "type": "主线",
-  "scene": "兵败-关卡前",
-  "text": "大白天的，一个小娃娃竟敢当街唱这种童谣，看来周围应有不少蛾贼盘踞。",
-  "status": "已录完",
-  "fileName": "VO 301019004"
-}];
+        // 配音数据从 data/g42-voice-data.js 加载
+        
         let filteredData = [...voiceData];
         let currentPage = 1;
         const itemsPerPage = 10;
@@ -1400,6 +1346,7 @@
             renderTable();
         });
     </script>
+    <script src="data/g42-voice-data.js"></script>
 </body>
 </html>
 /* Cache bust: 1774344700 */
