@@ -206,6 +206,9 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .app-card::before {
@@ -313,6 +316,8 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            margin-top: auto;
+            align-self: flex-start;
         }
 
         .app-btn:hover {
