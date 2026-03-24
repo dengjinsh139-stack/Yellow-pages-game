@@ -308,7 +308,16 @@
             font-size: 0.85rem;
         }
 
-        .game-links {
+        .game-world-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -479,6 +488,7 @@
                                                         <span class="game-en">${game.nameEn}</span>
                                                     </div>
                                                 </div>
+                                                <p class="game-world-desc">${game.worldDescription}</p>
                                                 <div class="game-links">
                                                     <a href="${game.developerUrl}" target="_blank" class="game-link dev">
                                                         🏢 ${game.developer}

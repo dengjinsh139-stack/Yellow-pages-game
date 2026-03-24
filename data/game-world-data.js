@@ -24,7 +24,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.fromsoftware.jp/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bs411D7R6',
                             cgUrl: 'https://www.bilibili.com/video/BV1es411D73e',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Wx41187RS'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Wx41187RS',
+                            worldDescription: '洛斯里克王国的火焰即将熄灭，不死人被唤醒执行传火使命。在破败的城堡与阴森的地下墓穴中，玩家将面对昔日的英雄与堕落的神明，探索火之时代的终结与轮回的宿命。'
                         },
                         {
                             name: '巫师3：狂猎',
@@ -33,7 +34,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.cdprojekt.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1fx411A7mu',
                             cgUrl: 'https://www.bilibili.com/video/BV1gx411A7gg',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411D7E4'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411D7E4',
+                            worldDescription: '在大陆战火纷飞的年代，猎魔人杰洛特寻找失踪的养女希里。政治阴谋、种族冲突与超自然威胁交织，玩家的每一个选择都将影响这片大陆的命运走向。'
                         },
                         {
                             name: '艾尔登法环',
@@ -42,7 +44,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.fromsoftware.jp/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1jY411G7sW',
                             cgUrl: 'https://www.bilibili.com/video/BV1x64y1a7Bf',
-                            ostUrl: 'https://www.bilibili.com/video/BV1NS4y1F7X3'
+                            ostUrl: 'https://www.bilibili.com/video/BV1NS4y1F7X3',
+                            worldDescription: '交界地的艾尔登法环破碎，半神们争夺大卢恩引发破碎战争。被玷污者重返这片土地，探索黄金树下的秘密，挑战半神，最终成为艾尔登之王或带来新时代的秩序。'
                         }
                     ]
                 },
@@ -60,7 +63,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.intsys.co.jp/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1At411n77y',
                             cgUrl: 'https://www.bilibili.com/video/BV1it411n7Mc',
-                            ostUrl: 'https://www.bilibili.com/video/BV1B4411z7ET'
+                            ostUrl: 'https://www.bilibili.com/video/BV1B4411z7ET',
+                            worldDescription: '芙朵拉大陆上，三国鼎立。玩家作为士官学校教师，培养来自三个国家的年轻贵族。在学院日常与战场厮杀中，揭开千年历史的真相，决定大陆的未来。'
                         },
                         {
                             name: '最终幻想战略版',
@@ -69,7 +73,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.square-enix.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Bx411N7oc',
                             cgUrl: 'https://www.bilibili.com/video/BV1px411N7sQ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411P7NZ'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411P7NZ',
+                            worldDescription: '伊瓦利斯王国，两个贵族家族争夺王位的狮子战争。主角拉姆萨在阴谋与背叛中，逐渐揭开圣石背后的黑暗真相，挑战操纵历史的教会势力。'
                         },
                         {
                             name: 'XCOM 2',
@@ -78,7 +83,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.firaxis.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Us411X7Bg',
                             cgUrl: 'https://www.bilibili.com/video/BV1es411X7Hd',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du',
+                            worldDescription: '外星征服者统治地球已二十年，XCOM组织沦为抵抗军。玩家指挥地下游击队，从废墟城市中招募战士，夺回地球自由，揭露外星人改造人类的阴谋。'
                         }
                     ]
                 },
@@ -96,7 +102,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.square-enix.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1j7411w7xP',
                             cgUrl: 'https://www.bilibili.com/video/BV1X4411x7Sj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1A7411w7SC'
+                            ostUrl: 'https://www.bilibili.com/video/BV1A7411w7SC',
+                            worldDescription: '米德加都市，神罗公司榨取星球生命能源。前神罗战士克劳德加入雪崩组织，在破坏魔晄炉的任务中，逐渐发现自己过去的真相与星球命运的联系。'
                         },
                         {
                             name: '女神异闻录5 皇家版',
@@ -105,7 +112,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.atlus.co.jp/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1y4411M7yT',
                             cgUrl: 'https://www.bilibili.com/video/BV1nx411a7nj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1tx411a7S7'
+                            ostUrl: 'https://www.bilibili.com/video/BV1tx411a7S7',
+                            worldDescription: '东京，心灵扭曲的大人构建腐败社会。一群高中生觉醒人格面具力量，潜入恶人内心的认知空间"宫殿"，偷取扭曲的欲望，让恶人悔改，成为侠盗团的革命物语。'
                         },
                         {
                             name: '勇者斗恶龙XI',
@@ -114,7 +122,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.square-enix.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411x7MJ',
                             cgUrl: 'https://www.bilibili.com/video/BV1vx411x7hQ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7Cu'
+                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7Cu',
+                            worldDescription: '勇者诞生时即被预言将毁灭世界，故乡被魔王军攻陷后踏上旅程。在洛特泽塔西亚大陆上，勇者集结伙伴，揭开自己身世的秘密，对抗黑暗势力。'
                         }
                     ]
                 },
@@ -132,7 +141,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.blizzard.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7ZX',
                             cgUrl: 'https://www.bilibili.com/video/BV1bx411w7ZX',
-                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7tg'
+                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7tg',
+                            worldDescription: '艾泽拉斯大陆，联盟与部落战火绵延。从东部王国到外域，从诺森德到潘达利亚，英雄们对抗燃烧军团、古神低语与亡灵天灾，书写属于自己的传奇。'
                         },
                         {
                             name: '最终幻想XIV',
@@ -141,7 +151,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.square-enix.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1xW411j7B9',
                             cgUrl: 'https://www.bilibili.com/video/BV1xW411j7B9',
-                            ostUrl: 'https://www.bilibili.com/video/BV1nx41137BF'
+                            ostUrl: 'https://www.bilibili.com/video/BV1nx41137BF',
+                            worldDescription: '海德林与佐迪亚克，光与暗的星球。冒险者从普通冒险者成长为光之战士，穿越第一世界与第十三世界，阻止末日降临，探索古代文明灭亡的真相。'
                         },
                         {
                             name: '原神',
@@ -150,7 +161,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.mihoyo.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1At4y1q7Eu',
                             cgUrl: 'https://www.bilibili.com/video/BV1yp4y1x7SN',
-                            ostUrl: 'https://www.bilibili.com/video/BV1D64y1f7ij'
+                            ostUrl: 'https://www.bilibili.com/video/BV1D64y1f7ij',
+                            worldDescription: '旅行者寻找失散的血亲，游历提瓦特七国。每座城邦对应一种元素与一种理念，在探索中揭开"天理"与"神之眼"的秘密，见证神明的陨落与新秩序的建立。'
                         }
                     ]
                 }
@@ -179,7 +191,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.valvesoftware.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1eu4y1C7ow',
                             cgUrl: 'https://www.bilibili.com/video/BV1zh4y1P7c3',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Xh411T7cL'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Xh411T7cL',
+                            worldDescription: '全球反恐精英与恐怖分子之间的对抗。从炙热沙城到核子危机，经典的爆破模式与人质模式考验团队配合，是全球电竞史上最经典的FPS竞技游戏。'
                         },
                         {
                             name: '彩虹六号：围攻',
@@ -188,7 +201,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.ubisoft.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Us411d7TV',
                             cgUrl: 'https://www.bilibili.com/video/BV1es411d7Xj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411d7Ha'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411d7Ha',
+                            worldDescription: '全球反恐特种部队彩虹小队，面对白面具恐怖组织。可破坏的墙体、独特的干员技能、高度战术化的室内近距离作战，重新定义战术射击游戏体验。'
                         },
                         {
                             name: 'Valorant',
@@ -197,7 +211,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.riotgames.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1ka4y1i7NR',
                             cgUrl: 'https://www.bilibili.com/video/BV1Q54y1D7GH',
-                            ostUrl: 'https://www.bilibili.com/video/BV1HZ4y1s7jm'
+                            ostUrl: 'https://www.bilibili.com/video/BV1HZ4y1s7jm',
+                            worldDescription: '近未来的地球，一场名为"First Light"的事件让部分人类获得超能力。特工们装备符文科技武器，在回合制战术射击中运用独特技能争夺胜利。'
                         }
                     ]
                 },
@@ -215,7 +230,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.idsoftware.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1CJ411x7Ve',
                             cgUrl: 'https://www.bilibili.com/video/BV1CJ411x7Ve',
-                            ostUrl: 'https://www.bilibili.com/video/BV1nJ41187A4'
+                            ostUrl: 'https://www.bilibili.com/video/BV1nJ41187A4',
+                            worldDescription: '地狱大军入侵地球，毁灭战士从地狱要塞苏醒。在火星与地狱的战场中，以狂暴的近战与火器撕裂恶魔，阻止地狱祭司吞噬人类灵魂的阴谋。'
                         },
                         {
                             name: '雷神之锤：冠军',
@@ -224,7 +240,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.idsoftware.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Ex41187hC',
                             cgUrl: 'https://www.bilibili.com/video/BV1px41187hH',
-                            ostUrl: 'https://www.bilibili.com/video/BV1tx41187Xr'
+                            ostUrl: 'https://www.bilibili.com/video/BV1tx41187Xr',
+                            worldDescription: '雷神之锤宇宙中的竞技场，来自不同时空的战士们为荣耀而战。火箭跳、空中转身、超高速移动，经典竞技场FPS的现代化演绎。'
                         },
                         {
                             name: '虚幻竞技场',
@@ -233,7 +250,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.epicgames.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx41187Xs',
                             cgUrl: 'https://www.bilibili.com/video/BV1vx41187Cj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1ix41187Mo'
+                            ostUrl: 'https://www.bilibili.com/video/BV1ix41187Mo',
+                            worldDescription: '新地球政府的血腥竞技场赛事，参赛者使用各种未来武器互相厮杀。从传统的死亡竞赛到独特的占旗模式，纯粹的竞技射击体验。'
                         }
                     ]
                 },
@@ -251,7 +269,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.krafton.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1ex411x7vD',
                             cgUrl: 'https://www.bilibili.com/video/BV1xx411x7xS',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Jx411x7PM'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Jx411x7PM',
+                            worldDescription: '在废弃的东欧岛屿上，一百名玩家空投作战。搜集武器、装备，在不断缩小的安全区内生存，成为最后站立的胜利者，开创大逃杀游戏类型。'
                         },
                         {
                             name: 'Apex英雄',
@@ -260,7 +279,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.respawn.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1nb411U7wT',
                             cgUrl: 'https://www.bilibili.com/video/BV1nb411U7wT',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Tb411U79K'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Tb411U79K',
+                            worldDescription: '边境星系，Apex竞技场比赛。来自泰坦陨落宇宙的传奇角色，三人小队合作，利用角色独特技能在快节奏战斗中生存，揭开源氏与IMC战争的后续。'
                         },
                         {
                             name: '使命召唤：战区',
@@ -269,7 +289,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.infinityward.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1D7411s7ZK',
                             cgUrl: 'https://www.bilibili.com/video/BV1D7411s7ZK',
-                            ostUrl: 'https://www.bilibili.com/video/BV1A7411s7Yc'
+                            ostUrl: 'https://www.bilibili.com/video/BV1A7411s7Yc',
+                            worldDescription: '佛丹斯科战区，150人同场竞技。从使命召唤现代战争宇宙中延伸，结合系列经典武器系统与载具，提供快节奏的大逃杀体验。'
                         }
                     ]
                 }
@@ -298,7 +319,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.blizzard.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7Rg',
                             cgUrl: 'https://www.bilibili.com/video/BV1bx411w7Rg',
-                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7rY'
+                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7rY',
+                            worldDescription: '科普鲁星区，人族、虫族、神族三足鼎立。吉姆·雷诺、凯瑞甘、阿塔尼斯等英雄的命运交织，对抗堕落的萨尔纳加与虚空中的黑暗。'
                         },
                         {
                             name: '帝国时代4',
@@ -307,7 +329,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.relic.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1rL411G7Pe',
                             cgUrl: 'https://www.bilibili.com/video/BV1rL411G7Pe',
-                            ostUrl: 'https://www.bilibili.com/video/BV1SL411G7uK'
+                            ostUrl: 'https://www.bilibili.com/video/BV1SL411G7uK',
+                            worldDescription: '从黑暗时代到帝国时代，指挥历史上的伟大文明。英格兰、蒙古、中国等文明拥有独特单位与科技树，在中世纪战场上书写帝国兴衰。'
                         },
                         {
                             name: '全面战争：三国',
@@ -316,7 +339,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.creative-assembly.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Vb411L7xW',
                             cgUrl: 'https://www.bilibili.com/video/BV1Vb411L7xW',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Sb411L7mY'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Sb411L7mY',
+                            worldDescription: '东汉末年，群雄逐鹿。扮演曹操、刘备、孙权等诸侯，通过回合制战略管理内政外交，实时战斗指挥千军万马，体验三国英雄的史诗篇章。'
                         }
                     ]
                 },
@@ -334,7 +358,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.firaxis.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7og',
                             cgUrl: 'https://www.bilibili.com/video/BV1xs411x7og',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iA'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iA',
+                            worldDescription: '从石器时代到信息时代，领导文明跨越六千年。秦始皇、甘地、彼得大帝等领袖登场，发展科技、文化、宗教，建立能经受时间考验的帝国。'
                         },
                         {
                             name: 'XCOM 2',
@@ -343,7 +368,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.firaxis.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Us411X7Bg',
                             cgUrl: 'https://www.bilibili.com/video/BV1es411X7Hd',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du',
+                            worldDescription: '外星征服者统治地球已二十年，XCOM组织沦为抵抗军。玩家指挥地下游击队，从废墟城市中招募战士，夺回地球自由，揭露外星人改造人类的阴谋。'
                         },
                         {
                             name: '神界：原罪2',
@@ -352,7 +378,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.larian.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Ax411x7rT',
                             cgUrl: 'https://www.bilibili.com/video/BV1Ax411x7rT',
-                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7bc'
+                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7bc',
+                            worldDescription: '绿维珑世界，秘源术士被净源导师迫害。玩家扮演被囚禁的秘源术士，在浮空城中逃生，寻找成为神的方法，同时揭开虚空异兽入侵的真相。'
                         }
                     ]
                 },
@@ -370,7 +397,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.paradoxinteractive.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7oQ',
                             cgUrl: 'https://www.bilibili.com/video/BV1xs411x7oQ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7ih'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7ih',
+                            worldDescription: '银河系，数千星辰等待探索。从单一星球文明发展为星际帝国，遭遇外星种族、上古文明遗迹、维度裂缝。外交、战争、科技、种族特性，打造独特的太空史诗。'
                         },
                         {
                             name: '无尽空间2',
@@ -379,7 +407,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.amplitude-studios.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Ax411x7WE',
                             cgUrl: 'https://www.bilibili.com/video/BV1Ax411x7WE',
-                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7Qm'
+                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7Qm',
+                            worldDescription: '无尽宇宙，多个独特种族争夺银河霸权。每个种族拥有专属任务链与胜利条件，从吞噬星球的藤智者到数字生命的虚拟族，体验完全不同的太空文明发展之路。'
                         },
                         {
                             name: '银河文明3',
@@ -388,7 +417,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.stardock.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411x7oy',
                             cgUrl: 'https://www.bilibili.com/video/BV1vx411x7oT',
-                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7oN'
+                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7oN',
+                            worldDescription: '23世纪，人类首次接触外星文明。选择人类或外星种族，在巨大的银河地图上建立帝国。深度的飞船设计与外交系统，塑造属于你的太空文明传奇。'
                         }
                     ]
                 }
@@ -417,7 +447,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.riotgames.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1nx411G77t',
                             cgUrl: 'https://www.bilibili.com/video/BV1nx411G77t',
-                            ostUrl: 'https://www.bilibili.com/video/BV1jx411G7FH'
+                            ostUrl: 'https://www.bilibili.com/video/BV1jx411G7FH',
+                            worldDescription: '符文之地，众多城邦与势力纷争不断。召唤师召唤英雄在正义之地战斗解决争端。从德玛西亚的骑士到诺克萨斯的刺客，每位英雄都有独特的背景故事与能力。'
                         },
                         {
                             name: 'DOTA2',
@@ -426,7 +457,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.valvesoftware.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Gx411w7qw',
                             cgUrl: 'https://www.bilibili.com/video/BV1Gx411w7qw',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411w7RB'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411w7RB',
+                            worldDescription: '天辉与夜魇两座远古遗迹矗立在战场上。英雄们为各自阵营而战，争夺神秘的神杖与不朽之守护。起源于魔兽争霸3的经典地图，电竞奖金最高的赛事之一。'
                         },
                         {
                             name: '风暴英雄',
@@ -435,7 +467,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.blizzard.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7Fe',
                             cgUrl: 'https://www.bilibili.com/video/BV1bx411w7Fe',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Vx411w7cy'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Vx411w7cy',
+                            worldDescription: '时空枢纽，暴雪所有宇宙的交汇点。萨尔、迪亚波罗、凯瑞甘等传奇英雄跨越世界并肩作战。独特的团队经验共享机制与多样化战场目标，团队合作的极致体现。'
                         }
                     ]
                 },
@@ -453,7 +486,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.tencent.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7j8',
                             cgUrl: 'https://www.bilibili.com/video/BV1bx411C7j8',
-                            ostUrl: 'https://www.bilibili.com/video/BV1fx411C7oG'
+                            ostUrl: 'https://www.bilibili.com/video/BV1fx411C7oG',
+                            worldDescription: '王者峡谷，东西方历史与神话人物齐聚一堂。李白、貂蝉、亚瑟等英雄在5v5战场上对决。专为手机优化的操作体验，全球最火爆的移动端MOBA游戏。'
                         },
                         {
                             name: '英雄联盟手游',
@@ -462,7 +496,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.riotgames.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1iK4y1E7MB',
                             cgUrl: 'https://www.bilibili.com/video/BV1iK4y1E7MB',
-                            ostUrl: 'https://www.bilibili.com/video/BV1eK4y1E7vY'
+                            ostUrl: 'https://www.bilibili.com/video/BV1eK4y1E7vY',
+                            worldDescription: '符文之地的移动端版本，保留英雄联盟核心玩法与英雄技能，针对触屏操作重新设计。同样的史诗战场，随时随地的5v5竞技体验。'
                         },
                         {
                             name: '无尽对决',
@@ -471,7 +506,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.moonton.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7mY',
                             cgUrl: 'https://www.bilibili.com/video/BV1bx411C7mY',
-                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7Ty'
+                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7Ty',
+                            worldDescription: '幻境大陆，东西方神话融合的世界。每局10秒匹配，10分钟一局，快节奏的移动端MOBA体验。在东南亚与全球市场广受欢迎，国际化的电竞赛事体系。'
                         }
                     ]
                 }
@@ -500,7 +536,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.santamonicastudio.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1nW411j7Xv',
                             cgUrl: 'https://www.bilibili.com/video/BV1nW411j7Xv',
-                            ostUrl: 'https://www.bilibili.com/video/BV1zW411j7wS'
+                            ostUrl: 'https://www.bilibili.com/video/BV1zW411j7wS',
+                            worldDescription: '北欧神话世界，奎托斯带着儿子阿特柔斯踏上旅程。在米德加尔特的冰天雪地中，父子将面对诸神黄昏的预言，揭开神族与巨人的恩怨。'
                         },
                         {
                             name: '鬼泣5',
@@ -509,7 +546,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.capcom.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Bt411d7Nt',
                             cgUrl: 'https://www.bilibili.com/video/BV1Bt411d7Nt',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Jt411d7A7'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Jt411d7A7',
+                            worldDescription: '恶魔猎人但丁、尼禄与新角色V联手对抗恶魔之王尤里曾。在风格化的战斗中施展华丽连击，揭开红魔之树事件的真相，系列15周年的巅峰之作。'
                         },
                         {
                             name: '猎天使魔女2',
@@ -518,7 +556,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.platinumgames.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1Dx411C7gJ',
                             cgUrl: 'https://www.bilibili.com/video/BV1Dx411C7gJ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411C7h6'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411C7h6',
+                            worldDescription: '魔女贝优妮塔为了拯救好友贞德，深入地狱与天使大军战斗。在神曲风格的地狱景观中，以变身、召唤魔物与华丽的格斗技巧击败神话中的神明。'
                         }
                     ]
                 },
@@ -536,7 +575,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.nintendo.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1nx411u7vs',
                             cgUrl: 'https://www.bilibili.com/video/BV1nx411u7vs',
-                            ostUrl: 'https://www.bilibili.com/video/BV1hx411u7AS'
+                            ostUrl: 'https://www.bilibili.com/video/BV1hx411u7AS',
+                            worldDescription: '马里奥的帽子凯比拥有附身能力。在沙之国、森之国等独特的王国中冒险，收集月亮力量阻止酷霸王与桃花公主的婚礼，开启3D平台跳跃新纪元。'
                         },
                         {
                             name: '空洞骑士',
@@ -545,7 +585,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.teamcherry.com.au/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1vx411x7oy',
                             cgUrl: 'https://www.bilibili.com/video/BV1vx411x7oy',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411x7SA'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411x7SA',
+                            worldDescription: '圣巢王国，一座巨大的地下昆虫文明废墟。玩家扮演沉默的骑士探索交错的地道，与疯狂的神明后裔战斗，揭开瘟疫的源头与自身存在的意义。'
                         },
                         {
                             name: '蔚蓝',
@@ -554,7 +595,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'http://www.maddymakesgames.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1kx411x7uc',
                             cgUrl: 'https://www.bilibili.com/video/BV1kx411x7uc',
-                            ostUrl: 'https://www.bilibili.com/video/BV1bx411x7yw'
+                            ostUrl: 'https://www.bilibili.com/video/BV1bx411x7yw',
+                            worldDescription: '玛德琳攀登塞莱斯特山，一座能实现愿望的神秘山峰。在精准的平台跳跃中，她面对内心的焦虑与抑郁，用毅力征服山峰也征服内心的恶魔。'
                         }
                     ]
                 },
@@ -572,7 +614,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.kojimaproductions.jp/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7KJ',
                             cgUrl: 'https://www.bilibili.com/video/BV1bx411C7KJ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7yZ'
+                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7yZ',
+                            worldDescription: '1984年，大首领从昏迷中苏醒建立钻石犬佣兵团。在阿富汗与非洲的开放世界中执行潜行任务，建立基地、招募士兵，寻找摧毁MSF的凶手，揭开身份之谜。'
                         },
                         {
                             name: '刺客信条：英灵殿',
@@ -581,7 +624,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.ubisoft.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1DA41177wU',
                             cgUrl: 'https://www.bilibili.com/video/BV1DA41177wU',
-                            ostUrl: 'https://www.bilibili.com/video/BV1iA41177rs'
+                            ostUrl: 'https://www.bilibili.com/video/BV1iA41177rs',
+                            worldDescription: '维京时代，艾沃尔带领族人从挪威来到英格兰。在劫掠、定居与政治联盟中，与撒克逊国王和上古维序者斗争，同时揭开刺客与圣殿骑士千年战争的序幕。'
                         },
                         {
                             name: '耻辱2',
@@ -590,7 +634,8 @@ const GAME_WORLD_DATA = {
                             developerUrl: 'https://www.arkane-studios.com/',
                             gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7oM',
                             cgUrl: 'https://www.bilibili.com/video/BV1xs411x7oM',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iN'
+                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iN',
+                            worldDescription: '卡纳卡城邦，女巫德莱拉篡夺王位。玩家扮演科沃或艾米丽，利用超自然印记能力，在蒸汽朋克风格的城市中潜行或杀戮，夺回帝国的王座。'
                         }
                     ]
                 }
