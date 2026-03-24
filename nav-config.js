@@ -57,7 +57,7 @@ function initNav() {
         // 处理相对路径
         let href = item.href;
         if (currentPath.includes('/music/') || currentPath.includes('/wwise/') || currentPath.includes('/sound-effects/')) {
-            href = '..' + item.href;
+            href = '../' + item.href;
         }
         
         html += `<a href="${href}" class="nav-link ${activeClass}">${item.label}</a>`;
