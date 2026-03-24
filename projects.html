@@ -955,7 +955,7 @@
                 <div class="filter-bar">
                     <div class="filter-group">
                         <label>批次:</label>
-                        <select id="filter-batch" onchange="filterTable()">
+                        <select id="filter-batch" onchange="updateCharacterSelect(); filterTable()">
                             <option value="">全部</option>
                             <option value="第一批">第一批</option>
                             <option value="第二批">第二批</option>
@@ -1289,6 +1289,33 @@
                 option.value = char;
                 option.textContent = char;
                 select.appendChild(option);
+            });
+        }
+        
+        // 根据批次动态更新角色下拉框
+        function updateCharacterSelect() {
+            const batch = document.getElementById('filter-batch').value;
+            const characterSelect = document.getElementById('filter-character');
+            const currentCharacter = characterSelect.value;
+            
+            // 根据批次筛选角色
+            let characters;
+            if (batch) {
+                characters = [...new Set(voiceData.filter(d => d.batch === batch).map(d => d.character))].sort();
+            } else {
+                characters = [...new Set(voiceData.map(d => d.character))].sort();
+            }
+            
+            // 重新生成选项
+            characterSelect.innerHTML = '<option value="">全部角色</option>';
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                if (char === currentCharacter) {
+                    option.selected = true;
+                }
+                characterSelect.appendChild(option);
             });
         }
         
