@@ -1,139 +1,91 @@
 {
-  "timestamp": "2026-03-24T18:51:16.572936",
-  "agent": {
-    "name": "Kimi Claw",
-    "version": "2.5.6",
-    "status": "online",
-    "mood": "active",
-    "avatar": "❤️‍🔥"
-  },
-  "system": {
-    "host": "iv-yehyrmzt345i3z9qpig1",
-    "model": "kimi-coding/k2p5",
-    "reasoning": "high",
-    "channel": "feishu"
-  },
+  "timestamp": "2026-03-24T19:07:44.774400",
   "load": {
-    "percentage": 34,
-    "level": "mid",
-    "status_text": "中等负载 - 处理全站优化任务",
-    "cpu": 22,
-    "memory": 47
+    "percentage": 41,
+    "cpu": 0,
+    "memory": 41,
+    "level": "low",
+    "status_text": "低负载 - 运行良好",
+    "raw": {
+      "cpu_percent": 0.5,
+      "memory_percent": 41.8,
+      "memory_used_gb": 1.27,
+      "memory_total_gb": 3.76,
+      "disk_percent": 55.2,
+      "disk_used_gb": 20.65,
+      "disk_total_gb": 39.07,
+      "uptime_hours": 176.4
+    }
+  },
+  "stats": {
+    "commits_today": 19,
+    "commit_count": 422,
+    "last_commit": "2026-03-24 18:57:56 +0800",
+    "files_modified": 2,
+    "branches": 1
   },
   "sessions": {
-    "total": 1,
     "active": 1,
     "pending": 0,
-    "processing": 1
+    "processing": 0
   },
-  "tokens": {
-    "current_session": "12.8k",
-    "total_today": "189.5k",
-    "limit": "unlimited"
-  },
-  "current_work": {
-    "title": "全站卡片排版优化",
-    "description": "统一所有页面卡片布局，按钮锚定底部，修复导航栏一致性",
-    "files_modified": [
-      "index.html",
-      "music/music-genres.html",
-      "wwise/wwise.html",
-      "capabilities.html",
-      "task-manager.html"
-    ],
-    "started_at": "2026-03-19T00:45:00",
-    "progress": "90%",
-    "eta": "即将完成"
+  "backup": {
+    "last_backup": "2026-03-24 18:57",
+    "next_check": "2小时后",
+    "total_backups": 1,
+    "changes_detected": true
   },
   "recent_activity": [
     {
-      "time": "01:10",
-      "action": "排版优化",
-      "detail": "全站卡片按钮锚定底部",
-      "icon": "🎨"
+      "time": "刚刚",
+      "text": "系统状态更新"
     },
     {
-      "time": "00:55",
-      "action": "导航统一",
-      "detail": "统一8个页面导航栏",
-      "icon": "🧭"
+      "time": "5分钟前",
+      "text": "Git 同步完成"
     },
     {
-      "time": "00:35",
-      "action": "链接更新",
-      "detail": "Bilibili改为网易云",
-      "icon": "🎵"
-    },
-    {
-      "time": "00:20",
-      "action": "状态同步",
-      "detail": "更新任务管理器版本号",
-      "icon": "🔄"
+      "time": "10分钟前",
+      "text": "数据备份完成"
     }
   ],
   "tasks": [
     {
-      "id": 1,
-      "name": "导航栏统一",
       "status": "completed",
-      "type": "功能",
-      "tokens": "8.5k",
-      "start_time": "2026-03-19T00:50:00",
-      "description": "统一8个页面导航栏，添加emoji"
+      "text": "系统初始化"
     },
     {
-      "id": 2,
-      "name": "卡片排版优化",
-      "status": "processing",
-      "type": "样式",
-      "tokens": "15.2k",
-      "start_time": "2026-03-19T01:00:00",
-      "description": "全站卡片flex布局，按钮锚定底部"
+      "status": "completed",
+      "text": "数据加载"
     },
     {
-      "id": 3,
-      "name": "GitHub 推送",
+      "status": "active",
+      "text": "实时监控"
+    },
+    {
       "status": "pending",
-      "type": "部署",
-      "tokens": "--",
-      "start_time": "--",
-      "description": "将所有修改推送至GitHub"
+      "text": "待处理任务"
     }
   ],
-  "history": {
-    "load_5min": [
-      28,
-      45,
-      35,
-      44,
-      35,
-      40,
-      35,
-      42,
-      40,
-      34
-    ],
-    "labels": [
-      "-4m",
-      "-3m30s",
-      "-3m",
-      "-2m30s",
-      "-2m",
-      "-1m30s",
-      "-1m",
-      "-30s",
-      "-15s",
-      "now"
-    ]
-  },
-  "backup": {
-    "last_backup": "2026-03-24 18:03",
-    "next_check": "2026-03-25 00:03",
-    "total_backups": 10,
-    "changes_detected": true
-  },
-  "stats": {
-    "commits_today": 16,
-    "files_modified": 26
+  "history": [
+    30,
+    45,
+    35,
+    50,
+    40,
+    55,
+    45,
+    60,
+    50,
+    45,
+    55,
+    48
+  ],
+  "current_work": {
+    "title": "系统监控",
+    "description": "实时监控系统状态",
+    "files_modified": 2,
+    "progress": 41,
+    "eta": "运行中"
   }
 }
