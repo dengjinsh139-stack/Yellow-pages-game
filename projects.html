@@ -1343,6 +1343,8 @@
         function quickFilter(field, value) {
             if (field === 'batch') {
                 document.getElementById('filter-batch').value = value;
+                updateCharacterSelect();
+                updateBatchInfo();
             } else if (field === 'status') {
                 document.getElementById('filter-status').value = value;
             }
