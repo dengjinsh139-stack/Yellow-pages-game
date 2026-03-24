@@ -3,7 +3,7 @@ const GAME_WORLD_DATA = {
     categories: [
         {
             id: 'rpg',
-            name: 'RPG',
+            name: 'RPG · 角色扮演',
             fullName: 'Role-Playing Game',
             nameCn: '角色扮演游戏',
             description: '玩家扮演虚拟世界中的角色，通过完成任务、战斗、探索来推进剧情',
@@ -146,7 +146,7 @@ const GAME_WORLD_DATA = {
         },
         {
             id: 'fps',
-            name: 'FPS',
+            name: 'FPS · 第一人称射击',
             fullName: 'First-Person Shooter',
             nameCn: '第一人称射击',
             description: '以第一人称视角进行的射击游戏',
@@ -256,7 +256,7 @@ const GAME_WORLD_DATA = {
         },
         {
             id: 'slg',
-            name: 'SLG',
+            name: 'SLG · 策略模拟',
             fullName: 'Simulation Game',
             nameCn: '策略/模拟游戏',
             description: '强调策略规划、资源管理、模拟经营',
@@ -366,7 +366,7 @@ const GAME_WORLD_DATA = {
         },
         {
             id: 'moba',
-            name: 'MOBA',
+            name: 'MOBA · 多人在线竞技',
             fullName: 'Multiplayer Online Battle Arena',
             nameCn: '多人在线战术竞技',
             description: '两队对抗，推倒对方基地获胜',
@@ -443,7 +443,7 @@ const GAME_WORLD_DATA = {
         },
         {
             id: 'action',
-            name: '动作游戏',
+            name: 'Action · 动作',
             fullName: 'Action Game',
             nameCn: '动作游戏',
             description: '强调操作技巧、反应速度的战斗游戏',
