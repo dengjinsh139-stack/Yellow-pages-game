@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频应用中心 | ⚡ 我的工作站</title>
+    <script>
+        // 访问权限检查
+        (function() {
+            var SESSION_KEY = 'audio_hub_access_granted';
+            var SESSION_DURATION = 24 * 60 * 60 * 1000;
+            
+            var session = localStorage.getItem(SESSION_KEY);
+            if (!session) {
+                window.location.href = 'audio-hub-login.html';
+                return;
+            }
+            
+            var data = JSON.parse(session);
+            if (Date.now() - data.timestamp >= SESSION_DURATION) {
+                localStorage.removeItem(SESSION_KEY);
+                window.location.href = 'audio-hub-login.html';
+            }
+        })();
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --bg-card-hover: #222230;
+            --primary: #00d4aa;
+            --primary-dark: #00a884;
+            --secondary: #7c3aed;
+            --accent-orange: #f59e0b;
+            --accent-blue: #3b82f6;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-blue) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        /* 头部区域 */
+        .header-section {
+            text-align: center;
+            padding: 60px 24px 40px;
+            background: linear-gradient(180deg, rgba(0, 212, 170, 0.05) 0%, transparent 100%);
+        }
+
+        .header-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 32px rgba(0, 212, 170, 0.3);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(0, 212, 170, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(0, 212, 170, 0.4); }
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* 子导航标签 */
+        .sub-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 0 24px 40px;
+            flex-wrap: wrap;
+        }
+
+        .sub-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .sub-nav-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .sub-nav-btn.active {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .sub-nav-btn .icon {
+            font-size: 1.3rem;
+        }
+
+        /* 应用卡片网格 */
+        .apps-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .app-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .app-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .app-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(0, 212, 170, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-card.sound {
+            --card-accent: var(--accent-orange);
+        }
+
+        .app-card.music {
+            --card-accent: var(--accent-blue);
+        }
+
+        .app-card.wwise {
+            --card-accent: var(--primary);
+        }
+
+        .app-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .app-card.sound .app-icon {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.05) 100%);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .app-card.music .app-icon {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .app-card.wwise .app-icon {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.2) 0%, rgba(0, 212, 170, 0.05) 100%);
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.2);
+        }
+
+        .app-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .app-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .app-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .feature-tag {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .app-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--bg-primary);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .app-btn:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.4);
+        }
+
+        .app-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .app-btn.secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        /* 底部信息 */
+        .footer-info {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-info p {
+            margin-bottom: 8px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 1.8rem;
+            }
+
+            .apps-grid {
+                grid-template-columns: 1fr;
+                padding: 0 16px 40px;
+            }
+
+            .sub-nav {
+                padding: 0 16px 32px;
+            }
+
+            .sub-nav-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* 加载动画 */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站 <span class="nav-version" data-version>v2.5.9</span></span>
+            </a>
+            <div class="nav-links" id="nav-links"></div>
+        </div>
+    </nav>
+
+    <!-- 头部 -->
+    <header class="header-section fade-in">
+        <div class="header-icon">🎵</div>
+        <h1 class="header-title">音频应用中心</h1>
+        <p class="header-subtitle">专业音频工具集合 · 音效管理 · 音乐知识 · Wwise集成</p>
+    </header>
+
+    <!-- 子导航 -->
+    <nav class="sub-nav fade-in">
+        <a href="#sound" class="sub-nav-btn active" onclick="switchTab('sound')">
+            <span class="icon">🔊</span>
+            <span>音效相关</span>
+        </a>
+        <a href="#music" class="sub-nav-btn" onclick="switchTab('music')">
+            <span class="icon">🎵</span>
+            <span>音乐百科</span>
+        </a>
+        <a href="#wwise" class="sub-nav-btn" onclick="switchTab('wwise')">
+            <span class="icon">🎮</span>
+            <span>Wwise</span>
+        </a>
+    </nav>
+
+    <!-- 应用卡片 -->
+    <main class="apps-grid">
+        <!-- 音效相关 -->
+        <article class="app-card sound fade-in" id="sound-card">
+            <div class="app-icon">🔊</div>
+            <h2 class="app-title">音效管理中心</h2>
+            <p class="app-description">
+                专业的音效资源管理平台，包含音效名词表、Soundminer指南、音效库管理等功能。
+            </p>
+            <div class="app-features">
+                <span class="feature-tag">📚 音效名词表</span>
+                <span class="feature-tag">🔍 Soundminer</span>
+                <span class="feature-tag">📁 资源管理</span>
+            </div>
+            <a href="sound-effects/sound-effects-hub.html" class="app-btn">
+                <span>进入音效中心</span>
+                <span>→</span>
+            </a>
+        </article>
+
+        <!-- 音乐百科 -->
+        <article class="app-card music fade-in" id="music-card">
+            <div class="app-icon">🎵</div>
+            <h2 class="app-title">音乐百科全书</h2>
+            <p class="app-description">
+                全面的音乐知识库，涵盖音乐流派、音乐理论、制作技巧等专业内容。
+            </p>
+            <div class="app-features">
+                <span class="feature-tag">🎸 音乐流派</span>
+                <span class="feature-tag">🎼 音乐理论</span>
+                <span class="feature-tag">🎹 制作技巧</span>
+            </div>
+            <a href="music/music-genres.html" class="app-btn">
+                <span>进入音乐百科</span>
+                <span>→</span>
+            </a>
+        </article>
+
+        <!-- Wwise -->
+        <article class="app-card wwise fade-in" id="wwise-card">
+            <div class="app-icon">🎮</div>
+            <h2 class="app-title">Wwise 音频引擎</h2>
+            <p class="app-description">
+                游戏音频中间件 Wwise 的集成指南、项目配置、最佳实践文档。
+            </p>
+            <div class="app-features">
+                <span class="feature-tag">⚙️ 项目配置</span>
+                <span class="feature-tag">📖 集成指南</span>
+                <span class="feature-tag">💡 最佳实践</span>
+            </div>
+            <a href="wwise/wwise.html" class="app-btn">
+                <span>进入 Wwise</span>
+                <span>→</span>
+            </a>
+        </article>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="footer-info">
+        <p>⚡ 我的工作站 <span data-version>v2.5.9</span> | 音频应用中心</p>
+        <p>© 2026 个人游戏开发实验室 🎮</p>
+    </footer>
+
+    <!-- 导航配置 -->
+    <script src="nav-config.js"></script>
+    
+    <script>
+        // 子标签切换
+        function switchTab(tab) {
+            // 更新按钮状态
+            document.querySelectorAll('.sub-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.sub-nav-btn').classList.add('active');
+            
+            // 滚动到对应卡片
+            const card = document.getElementById(tab + '-card');
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 高亮效果
+                card.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                }, 300);
+            }
+        }
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.app-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
+/* Cache bust: 1774344700 */
