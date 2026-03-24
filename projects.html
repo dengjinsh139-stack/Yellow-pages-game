@@ -483,6 +483,18 @@
             min-width: 120px;
         }
         
+        /* 下拉框选项样式 */
+        .filter-group select option {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 8px;
+        }
+        
+        .filter-group select option:hover {
+            background: #00d4aa;
+            color: #000;
+        }
+        
         .filter-group input {
             min-width: 200px;
         }
@@ -991,10 +1003,12 @@
                 <!-- 快捷筛选 -->
                 <div style="margin-bottom: 20px; padding: 15px; background: var(--bg-card); border-radius: 8px;">
                     <span style="color: var(--text-muted); font-size: 0.85rem; margin-right: 10px;">⚡ 快捷筛选:</span>
+                    <button onclick="quickFilter('batch', '第一批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); border-radius: 4px; color: #4caf50; font-size: 0.85rem; cursor: pointer;">第一批</button>
+                    <button onclick="quickFilter('batch', '第二批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(33,150,243,0.1); border: 1px solid rgba(33,150,243,0.3); border-radius: 4px; color: #2196f3; font-size: 0.85rem; cursor: pointer;">第二批</button>
+                    <button onclick="quickFilter('batch', '第2.5批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(156,39,176,0.1); border: 1px solid rgba(156,39,176,0.3); border-radius: 4px; color: #9c27b0; font-size: 0.85rem; cursor: pointer;">第2.5批</button>
                     <button onclick="quickFilter('batch', '第三批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3); border-radius: 4px; color: var(--primary); font-size: 0.85rem; cursor: pointer;">第三批</button>
                     <button onclick="quickFilter('status', '待录制')" style="margin-right: 8px; padding: 6px 12px; background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); border-radius: 4px; color: #ff9800; font-size: 0.85rem; cursor: pointer;">待录制</button>
-                    <button onclick="quickFilter('batch', '第一批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); border-radius: 4px; color: #4caf50; font-size: 0.85rem; cursor: pointer;">第一批</button>
-                    <button onclick="quickFilter('status', '已录完')" style="padding: 6px 12px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); border-radius: 4px; color: #4caf50; font-size: 0.85rem; cursor: pointer;">已录完</button>
+                    <button onclick="quickFilter('status', '已录完')" style="padding: 6px 12px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); border-radius: 4px; color: #00c853; font-size: 0.85rem; cursor: pointer;">已录完</button>
                 </div>
                 
                 <!-- 角色明细弹窗 -->
