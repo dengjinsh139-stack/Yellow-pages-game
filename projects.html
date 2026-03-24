@@ -1097,9 +1097,23 @@
     <script>
         // 配音数据从 data/g42-voice-data.js 加载
         
-        let filteredData = [...voiceData];
+        let filteredData = [];
         let currentPage = 1;
         const itemsPerPage = 10;
+        
+        // 初始化数据
+        function initData() {
+            if (typeof voiceData !== 'undefined' && voiceData.length > 0) {
+                filteredData = [...voiceData];
+                updateStats();
+                initCharacterSelect();
+                updateBatchInfo();
+                renderTable();
+            } else {
+                // 数据未加载完成，稍后重试
+                setTimeout(initData, 100);
+            }
+        }
 
         // 计算统计数据
         function updateStats() {
@@ -1385,16 +1399,13 @@
             
             // 如果是语音页，初始化表格
             if (tabId === 'g42-voice') {
-                initCharacterSelect();
-                updateStats();
-                renderTable();
+                initData();
             }
         }
 
         // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', () => {
-            updateStats();
-            renderTable();
+            initData();
         });
     </script>
     <script src="data/g42-voice-data.js"></script>
