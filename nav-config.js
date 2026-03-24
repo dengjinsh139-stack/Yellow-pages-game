@@ -5,7 +5,7 @@
  */
 
 // 全局版本号 - 修改这里即可同步全站
-const APP_VERSION = 'v2.5.6';
+const APP_VERSION = 'v2.5.7';
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
