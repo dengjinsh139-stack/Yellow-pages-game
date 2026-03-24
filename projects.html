@@ -967,7 +967,7 @@
                 <div class="filter-bar">
                     <div class="filter-group">
                         <label>批次:</label>
-                        <select id="filter-batch" onchange="updateCharacterSelect(); filterTable()">
+                        <select id="filter-batch" onchange="updateCharacterSelect(); updateBatchInfo(); filterTable()">
                             <option value="">全部</option>
                             <option value="第一批">第一批</option>
                             <option value="第二批">第二批</option>
@@ -1000,6 +1000,19 @@
                     </div>
                 </div>
                 
+                <!-- 批次信息显示 -->
+                <div id="batch-info" style="display: none; margin: 15px 0; padding: 15px; background: rgba(0,212,170,0.05); border: 1px solid rgba(0,212,170,0.2); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="color: var(--primary); font-weight: bold; font-size: 1.1rem;" id="batch-name"></span>
+                            <span style="color: var(--text-muted); margin-left: 10px;">角色数: <strong id="batch-characters" style="color: var(--text);">0</strong> | 
+                            台词数: <strong id="batch-lines" style="color: var(--text);">0</strong> | 
+                            已录制: <strong id="batch-recorded" style="color: #4caf50;">0</strong> | 
+                            进度: <strong id="batch-progress" style="color: var(--primary);">0%</strong></span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 快捷筛选 -->
                 <div style="margin-bottom: 20px; padding: 15px; background: var(--bg-card); border-radius: 8px;">
                     <span style="color: var(--text-muted); font-size: 0.85rem; margin-right: 10px;">⚡ 快捷筛选:</span>
@@ -1099,6 +1112,30 @@
             document.getElementById('stat-lines').textContent = totalLines;
             document.getElementById('stat-recorded').textContent = recordedLines;
             document.getElementById('stat-progress').textContent = progress + '%';
+        }
+        
+        // 更新批次信息显示
+        function updateBatchInfo() {
+            const batch = document.getElementById('filter-batch').value;
+            const batchInfoDiv = document.getElementById('batch-info');
+            
+            if (!batch) {
+                batchInfoDiv.style.display = 'none';
+                return;
+            }
+            
+            const batchData = voiceData.filter(d => d.batch === batch);
+            const uniqueChars = new Set(batchData.map(d => d.character)).size;
+            const totalLines = batchData.length;
+            const recordedLines = batchData.filter(d => d.status === '已录完').length;
+            const progress = totalLines > 0 ? Math.round((recordedLines / totalLines) * 100) : 0;
+            
+            document.getElementById('batch-name').textContent = batch;
+            document.getElementById('batch-characters').textContent = uniqueChars;
+            document.getElementById('batch-lines').textContent = totalLines;
+            document.getElementById('batch-recorded').textContent = recordedLines;
+            document.getElementById('batch-progress').textContent = progress + '%';
+            batchInfoDiv.style.display = 'block';
         }
 
         // 获取批次样式类
