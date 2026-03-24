@@ -22,24 +22,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Dark Souls III',
                             developer: 'FromSoftware',
                             developerUrl: 'https://www.fromsoftware.jp/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=cWBwFhUv1-8',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLD6B1F7E4B4C8B6E7'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bs411D7R6',
+                            cgUrl: 'https://www.bilibili.com/video/BV1es411D73e',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Wx41187RS'
                         },
                         {
                             name: '巫师3：狂猎',
                             nameEn: 'The Witcher 3: Wild Hunt',
                             developer: 'CD Projekt Red',
                             developerUrl: 'https://www.cdprojekt.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=c0i88tKZRMo',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1fx411A7mu',
+                            cgUrl: 'https://www.bilibili.com/video/BV1gx411A7gg',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411D7E4'
                         },
                         {
                             name: '艾尔登法环',
                             nameEn: 'Elden Ring',
                             developer: 'FromSoftware',
                             developerUrl: 'https://www.fromsoftware.jp/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=E3Huy2cdih0',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1jY411G7sW',
+                            cgUrl: 'https://www.bilibili.com/video/BV1x64y1a7Bf',
+                            ostUrl: 'https://www.bilibili.com/video/BV1NS4y1F7X3'
                         }
                     ]
                 },
@@ -55,24 +58,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Fire Emblem: Three Houses',
                             developer: 'Intelligent Systems',
                             developerUrl: 'https://www.intsys.co.jp/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=8V5L6v1a3v8',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1At411n77y',
+                            cgUrl: 'https://www.bilibili.com/video/BV1it411n7Mc',
+                            ostUrl: 'https://www.bilibili.com/video/BV1B4411z7ET'
                         },
                         {
                             name: '最终幻想战略版',
                             nameEn: 'Final Fantasy Tactics',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Bx411N7oc',
+                            cgUrl: 'https://www.bilibili.com/video/BV1px411N7sQ',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411P7NZ'
                         },
                         {
                             name: 'XCOM 2',
                             nameEn: 'XCOM 2',
                             developer: 'Firaxis Games',
                             developerUrl: 'https://www.firaxis.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Us411X7Bg',
+                            cgUrl: 'https://www.bilibili.com/video/BV1es411X7Hd',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du'
                         }
                     ]
                 },
@@ -88,24 +94,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Final Fantasy VII Remake',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=ERgrFVhL-n4',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1j7411w7xP',
+                            cgUrl: 'https://www.bilibili.com/video/BV1X4411x7Sj',
+                            ostUrl: 'https://www.bilibili.com/video/BV1A7411w7SC'
                         },
                         {
                             name: '女神异闻录5 皇家版',
                             nameEn: 'Persona 5 Royal',
                             developer: 'Atlus',
                             developerUrl: 'https://www.atlus.co.jp/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=2n1zB8r8e1o',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1y4411M7yT',
+                            cgUrl: 'https://www.bilibili.com/video/BV1nx411a7nj',
+                            ostUrl: 'https://www.bilibili.com/video/BV1tx411a7S7'
                         },
                         {
                             name: '勇者斗恶龙XI',
                             nameEn: 'Dragon Quest XI',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411x7MJ',
+                            cgUrl: 'https://www.bilibili.com/video/BV1vx411x7hQ',
+                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7Cu'
                         }
                     ]
                 },
@@ -121,24 +130,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'World of Warcraft',
                             developer: 'Blizzard Entertainment',
                             developerUrl: 'https://www.blizzard.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=jSJr3dXZfcg',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7ZX',
+                            cgUrl: 'https://www.bilibili.com/video/BV1bx411w7ZX',
+                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7tg'
                         },
                         {
                             name: '最终幻想XIV',
                             nameEn: 'Final Fantasy XIV',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=4fV0vS6X2xE',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1xW411j7B9',
+                            cgUrl: 'https://www.bilibili.com/video/BV1xW411j7B9',
+                            ostUrl: 'https://www.bilibili.com/video/BV1nx41137BF'
                         },
                         {
                             name: '原神',
                             nameEn: 'Genshin Impact',
                             developer: 'miHoYo',
                             developerUrl: 'https://www.mihoyo.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=SF4l5C6T2zA',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1At4y1q7Eu',
+                            cgUrl: 'https://www.bilibili.com/video/BV1yp4y1x7SN',
+                            ostUrl: 'https://www.bilibili.com/video/BV1D64y1f7ij'
                         }
                     ]
                 }
@@ -165,24 +177,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Counter-Strike 2',
                             developer: 'Valve',
                             developerUrl: 'https://www.valvesoftware.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=c8L_h9h3x7s',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1eu4y1C7ow',
+                            cgUrl: 'https://www.bilibili.com/video/BV1zh4y1P7c3',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Xh411T7cL'
                         },
                         {
                             name: '彩虹六号：围攻',
-                            nameEn: 'Tom Clancy\'s Rainbow Six Siege',
+                            nameEn: "Tom Clancy's Rainbow Six Siege",
                             developer: 'Ubisoft',
                             developerUrl: 'https://www.ubisoft.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=weR3zX9U5Rk',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Us411d7TV',
+                            cgUrl: 'https://www.bilibili.com/video/BV1es411d7Xj',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411d7Ha'
                         },
                         {
                             name: 'Valorant',
                             nameEn: 'Valorant',
                             developer: 'Riot Games',
                             developerUrl: 'https://www.riotgames.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=e_E9W2vsRbQ',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1ka4y1i7NR',
+                            cgUrl: 'https://www.bilibili.com/video/BV1Q54y1D7GH',
+                            ostUrl: 'https://www.bilibili.com/video/BV1HZ4y1s7jm'
                         }
                     ]
                 },
@@ -198,24 +213,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'DOOM Eternal',
                             developer: 'id Software',
                             developerUrl: 'https://www.idsoftware.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=H9f9T-xV3i4',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1CJ411x7Ve',
+                            cgUrl: 'https://www.bilibili.com/video/BV1CJ411x7Ve',
+                            ostUrl: 'https://www.bilibili.com/video/BV1nJ41187A4'
                         },
                         {
                             name: '雷神之锤：冠军',
                             nameEn: 'Quake Champions',
                             developer: 'id Software',
                             developerUrl: 'https://www.idsoftware.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=3r8u0w8b6e1',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Ex41187hC',
+                            cgUrl: 'https://www.bilibili.com/video/BV1px41187hH',
+                            ostUrl: 'https://www.bilibili.com/video/BV1tx41187Xr'
                         },
                         {
                             name: '虚幻竞技场',
                             nameEn: 'Unreal Tournament',
                             developer: 'Epic Games',
                             developerUrl: 'https://www.epicgames.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx41187Xs',
+                            cgUrl: 'https://www.bilibili.com/video/BV1vx41187Cj',
+                            ostUrl: 'https://www.bilibili.com/video/BV1ix41187Mo'
                         }
                     ]
                 },
@@ -231,24 +249,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'PUBG: Battlegrounds',
                             developer: 'KRAFTON',
                             developerUrl: 'https://www.krafton.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=OUeQjwzS4xQ',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1ex411x7vD',
+                            cgUrl: 'https://www.bilibili.com/video/BV1xx411x7xS',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Jx411x7PM'
                         },
                         {
                             name: 'Apex英雄',
                             nameEn: 'Apex Legends',
                             developer: 'Respawn Entertainment',
                             developerUrl: 'https://www.respawn.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=7My2U5q3r6g',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1nb411U7wT',
+                            cgUrl: 'https://www.bilibili.com/video/BV1nb411U7wT',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Tb411U79K'
                         },
                         {
                             name: '使命召唤：战区',
                             nameEn: 'Call of Duty: Warzone',
                             developer: 'Infinity Ward',
                             developerUrl: 'https://www.infinityward.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=0E3z4E8d9r0',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1D7411s7ZK',
+                            cgUrl: 'https://www.bilibili.com/video/BV1D7411s7ZK',
+                            ostUrl: 'https://www.bilibili.com/video/BV1A7411s7Yc'
                         }
                     ]
                 }
@@ -275,24 +296,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'StarCraft II',
                             developer: 'Blizzard Entertainment',
                             developerUrl: 'https://www.blizzard.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=MIr0hJ8T4zQ',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7Rg',
+                            cgUrl: 'https://www.bilibili.com/video/BV1bx411w7Rg',
+                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7rY'
                         },
                         {
                             name: '帝国时代4',
                             nameEn: 'Age of Empires IV',
                             developer: 'Relic Entertainment',
                             developerUrl: 'https://www.relic.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5TnYV3l0z4o',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1rL411G7Pe',
+                            cgUrl: 'https://www.bilibili.com/video/BV1rL411G7Pe',
+                            ostUrl: 'https://www.bilibili.com/video/BV1SL411G7uK'
                         },
                         {
                             name: '全面战争：三国',
                             nameEn: 'Total War: Three Kingdoms',
                             developer: 'Creative Assembly',
                             developerUrl: 'https://www.creative-assembly.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=1n0yL3k2m9s',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Vb411L7xW',
+                            cgUrl: 'https://www.bilibili.com/video/BV1Vb411L7xW',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Sb411L7mY'
                         }
                     ]
                 },
@@ -305,27 +329,30 @@ const GAME_WORLD_DATA = {
                     games: [
                         {
                             name: '文明6',
-                            nameEn: 'Sid Meier\'s Civilization VI',
+                            nameEn: "Sid Meier's Civilization VI",
                             developer: 'Firaxis Games',
                             developerUrl: 'https://www.firaxis.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7og',
+                            cgUrl: 'https://www.bilibili.com/video/BV1xs411x7og',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iA'
                         },
                         {
                             name: 'XCOM 2',
                             nameEn: 'XCOM 2',
                             developer: 'Firaxis Games',
                             developerUrl: 'https://www.firaxis.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Us411X7Bg',
+                            cgUrl: 'https://www.bilibili.com/video/BV1es411X7Hd',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du'
                         },
                         {
                             name: '神界：原罪2',
                             nameEn: 'Divinity: Original Sin 2',
                             developer: 'Larian Studios',
                             developerUrl: 'https://www.larian.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5oL3c8b7z9w',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Ax411x7rT',
+                            cgUrl: 'https://www.bilibili.com/video/BV1Ax411x7rT',
+                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7bc'
                         }
                     ]
                 },
@@ -341,24 +368,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Stellaris',
                             developer: 'Paradox Interactive',
                             developerUrl: 'https://www.paradoxinteractive.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=1d8m7z9o9q8',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7oQ',
+                            cgUrl: 'https://www.bilibili.com/video/BV1xs411x7oQ',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7ih'
                         },
                         {
                             name: '无尽空间2',
                             nameEn: 'Endless Space 2',
                             developer: 'Amplitude Studios',
                             developerUrl: 'https://www.amplitude-studios.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Ax411x7WE',
+                            cgUrl: 'https://www.bilibili.com/video/BV1Ax411x7WE',
+                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7Qm'
                         },
                         {
                             name: '银河文明3',
                             nameEn: 'Galactic Civilizations III',
                             developer: 'Stardock',
                             developerUrl: 'https://www.stardock.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411x7oy',
+                            cgUrl: 'https://www.bilibili.com/video/BV1vx411x7oT',
+                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7oN'
                         }
                     ]
                 }
@@ -385,24 +415,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'League of Legends',
                             developer: 'Riot Games',
                             developerUrl: 'https://www.riotgames.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=0qoPv3-kZQY',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1nx411G77t',
+                            cgUrl: 'https://www.bilibili.com/video/BV1nx411G77t',
+                            ostUrl: 'https://www.bilibili.com/video/BV1jx411G7FH'
                         },
                         {
                             name: 'DOTA2',
                             nameEn: 'Dota 2',
                             developer: 'Valve',
                             developerUrl: 'https://www.valvesoftware.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=Smn1_liD_Xk',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Gx411w7qw',
+                            cgUrl: 'https://www.bilibili.com/video/BV1Gx411w7qw',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411w7RB'
                         },
                         {
                             name: '风暴英雄',
                             nameEn: 'Heroes of the Storm',
                             developer: 'Blizzard Entertainment',
                             developerUrl: 'https://www.blizzard.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7Fe',
+                            cgUrl: 'https://www.bilibili.com/video/BV1bx411w7Fe',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Vx411w7cy'
                         }
                     ]
                 },
@@ -418,24 +451,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Honor of Kings',
                             developer: 'Tencent Games',
                             developerUrl: 'https://www.tencent.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7j8',
+                            cgUrl: 'https://www.bilibili.com/video/BV1bx411C7j8',
+                            ostUrl: 'https://www.bilibili.com/video/BV1fx411C7oG'
                         },
                         {
                             name: '英雄联盟手游',
                             nameEn: 'League of Legends: Wild Rift',
                             developer: 'Riot Games',
                             developerUrl: 'https://www.riotgames.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1iK4y1E7MB',
+                            cgUrl: 'https://www.bilibili.com/video/BV1iK4y1E7MB',
+                            ostUrl: 'https://www.bilibili.com/video/BV1eK4y1E7vY'
                         },
                         {
                             name: '无尽对决',
                             nameEn: 'Mobile Legends: Bang Bang',
                             developer: 'Moonton',
                             developerUrl: 'https://www.moonton.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7mY',
+                            cgUrl: 'https://www.bilibili.com/video/BV1bx411C7mY',
+                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7Ty'
                         }
                     ]
                 }
@@ -462,24 +498,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'God of War',
                             developer: 'Santa Monica Studio',
                             developerUrl: 'https://www.santamonicastudio.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=4E4y9b0w8v4',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1nW411j7Xv',
+                            cgUrl: 'https://www.bilibili.com/video/BV1nW411j7Xv',
+                            ostUrl: 'https://www.bilibili.com/video/BV1zW411j7wS'
                         },
                         {
                             name: '鬼泣5',
                             nameEn: 'Devil May Cry 5',
                             developer: 'Capcom',
                             developerUrl: 'https://www.capcom.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Bt411d7Nt',
+                            cgUrl: 'https://www.bilibili.com/video/BV1Bt411d7Nt',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Jt411d7A7'
                         },
                         {
                             name: '猎天使魔女2',
                             nameEn: 'Bayonetta 2',
                             developer: 'PlatinumGames',
                             developerUrl: 'https://www.platinumgames.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1Dx411C7gJ',
+                            cgUrl: 'https://www.bilibili.com/video/BV1Dx411C7gJ',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411C7h6'
                         }
                     ]
                 },
@@ -495,24 +534,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Super Mario Odyssey',
                             developer: 'Nintendo',
                             developerUrl: 'https://www.nintendo.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1nx411u7vs',
+                            cgUrl: 'https://www.bilibili.com/video/BV1nx411u7vs',
+                            ostUrl: 'https://www.bilibili.com/video/BV1hx411u7AS'
                         },
                         {
                             name: '空洞骑士',
                             nameEn: 'Hollow Knight',
                             developer: 'Team Cherry',
                             developerUrl: 'https://www.teamcherry.com.au/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1vx411x7oy',
+                            cgUrl: 'https://www.bilibili.com/video/BV1vx411x7oy',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411x7SA'
                         },
                         {
                             name: '蔚蓝',
                             nameEn: 'Celeste',
                             developer: 'Maddy Makes Games',
                             developerUrl: 'http://www.maddymakesgames.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1kx411x7uc',
+                            cgUrl: 'https://www.bilibili.com/video/BV1kx411x7uc',
+                            ostUrl: 'https://www.bilibili.com/video/BV1bx411x7yw'
                         }
                     ]
                 },
@@ -528,24 +570,27 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Metal Gear Solid V: The Phantom Pain',
                             developer: 'Kojima Productions',
                             developerUrl: 'https://www.kojimaproductions.jp/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PL0f0Lh8V2eJz1Wb1yK3x8L3Y8k9Y7uI6T'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7KJ',
+                            cgUrl: 'https://www.bilibili.com/video/BV1bx411C7KJ',
+                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7yZ'
                         },
                         {
                             name: '刺客信条：英灵殿',
-                            nameEn: 'Assassin\'s Creed Valhalla',
+                            nameEn: "Assassin's Creed Valhalla",
                             developer: 'Ubisoft',
                             developerUrl: 'https://www.ubisoft.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=5k8G6d8C7e9',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLv3bW8g7Xz8K8eP2r5tY6uI9o0p1q2w3e'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1DA41177wU',
+                            cgUrl: 'https://www.bilibili.com/video/BV1DA41177wU',
+                            ostUrl: 'https://www.bilibili.com/video/BV1iA41177rs'
                         },
                         {
                             name: '耻辱2',
                             nameEn: 'Dishonored 2',
                             developer: 'Arkane Studios',
                             developerUrl: 'https://www.arkane-studios.com/',
-                            gameplayUrl: 'https://www.youtube.com/watch?v=9e4L3R8m5n7',
-                            ostUrl: 'https://www.youtube.com/playlist?list=PLoP4m2y8b0qR7sT9uV2wX4yZ5aB6cD8eF'
+                            gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7oM',
+                            cgUrl: 'https://www.bilibili.com/video/BV1xs411x7oM',
+                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iN'
                         }
                     ]
                 }
