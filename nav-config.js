@@ -14,6 +14,18 @@ const NAV_CONFIG = {
         { id: 'home', label: '🏠 首页', href: 'index.html', active: false },
         { id: 'games', label: '🎮 游戏中心', href: 'index.html#games', active: false },
         { 
+            id: 'game-world', 
+            label: '🎮 游戏世界', 
+            href: 'game-world.html', 
+            active: false,
+            children: [
+                { id: 'rpg', label: '🎭 RPG', href: 'game-world.html#rpg' },
+                { id: 'fps', label: '🎯 FPS', href: 'game-world.html#fps' },
+                { id: 'slg', label: '⚔️ SLG', href: 'game-world.html#slg' },
+                { id: 'moba', label: '⚡ MOBA', href: 'game-world.html#moba' }
+            ]
+        },
+        { 
             id: 'audio', 
             label: '🎵 音频应用', 
             href: 'audio-hub.html', 
