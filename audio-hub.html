@@ -4,25 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音频应用中心 | ⚡ 我的工作站</title>
-    <script>
-        // 访问权限检查
-        (function() {
-            var SESSION_KEY = 'audio_hub_access_granted';
-            var SESSION_DURATION = 24 * 60 * 60 * 1000;
-            
-            var session = localStorage.getItem(SESSION_KEY);
-            if (!session) {
-                window.location.href = 'audio-hub-login.html';
-                return;
-            }
-            
-            var data = JSON.parse(session);
-            if (Date.now() - data.timestamp >= SESSION_DURATION) {
-                localStorage.removeItem(SESSION_KEY);
-                window.location.href = 'audio-hub-login.html';
-            }
-        })();
-    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
         
