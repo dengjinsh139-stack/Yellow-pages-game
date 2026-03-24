@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏配乐设计师手册 | ⚡ 我的工作站</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --bg-card-hover: #222230;
+            --primary: #00d4aa;
+            --primary-dark: #00a884;
+            --secondary: #7c3aed;
+            --accent-gold: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* 导航栏 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        /* 头部 */
+        .hero {
+            text-align: center;
+            padding: 80px 24px 60px;
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.1) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #d97706 100%);
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin: 0 auto 32px;
+            box-shadow: 0 20px 60px rgba(245, 158, 11, 0.3);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #fcd34d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 内容区 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        /* 手册章节 */
+        .chapter {
+            margin-bottom: 80px;
+        }
+
+        .chapter-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .chapter-number {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #d97706 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--bg-primary);
+        }
+
+        .chapter-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .chapter-desc {
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* 内容卡片 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-gold);
+            transform: translateY(-4px);
+        }
+
+        .content-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--accent-gold);
+        }
+
+        .content-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .content-card ul {
+            margin-top: 12px;
+            padding-left: 20px;
+            color: var(--text-secondary);
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        /* 技巧提示 */
+        .tip-box {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .tip-box::before {
+            content: '💡 ';
+            font-size: 1.2rem;
+        }
+
+        .tip-box strong {
+            color: var(--accent-gold);
+        }
+
+        /* 工作流程图 */
+        .workflow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .workflow-step {
+            flex: 1;
+            min-width: 150px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .workflow-step::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+        }
+
+        .workflow-step:last-child::after {
+            display: none;
+        }
+
+        .workflow-step .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .workflow-step h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .workflow-step p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* 工具表格 */
+        .tools-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+        }
+
+        .tools-table th,
+        .tools-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tools-table th {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .tools-table tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .workflow {
+                flex-direction: column;
+            }
+
+            .workflow-step::after {
+                content: '↓';
+                right: 50%;
+                top: 100%;
+                transform: translateX(50%);
+            }
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站 <span class="nav-version" data-version>v2.6.9</span></span>
+            </a>
+            <div class="nav-links" id="nav-links"></div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-icon">🎼</div>
+        <h1>游戏配乐设计师手册</h1>
+        <p>从入门到精通 · 游戏音频设计完整指南 · 专业作曲家必备参考</p>
+    </header>
+
+    <main class="container">
+        <!-- 第一章：基础知识 -->
+        <section class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">01</div>
+                <div>
+                    <h2 class="chapter-title">游戏配乐基础</h2>
+                    <p class="chapter-desc">理解游戏音乐与传统音乐的核心差异</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>🎮 交互性音乐</h3>
+                    <p>游戏音乐必须响应玩家行为，与传统线性音乐不同。学习水平层叠、垂直重混音、分支结构等交互音乐技术。</p>
+                    <ul>
+                        <li>Horizontal Re-sequencing（水平重排序）</li>
+                        <li>Vertical Re-mixing（垂直重混音）</li>
+                        <li>Stinger（刺音）与Transition（过渡）</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3>🔄 循环与变化</h3>
+                    <p>游戏音乐通常需要无缝循环播放，同时避免单调。掌握循环点设置、多层循环、随机变化技术。</p>
+                    <ul>
+                        <li>无缝循环设计（Looping）</li>
+                        <li>多段落循环结构</li>
+                        <li>随机元素与变化系统</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3>🎯 情绪与氛围</h3>
+                    <p>音乐是游戏情绪传达的核心工具。学习如何根据游戏场景、剧情、玩家状态调整音乐情绪。</p>
+                    <ul>
+                        <li>动态情绪映射</li>
+                        <li>探索/战斗/剧情音乐分层</li>
+                        <li>玩家心流与音乐节奏匹配</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二章：工作流程 -->
+        <section class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">02</div>
+                <div>
+                    <h2 class="chapter-title">工作流程</h2>
+                    <p class="chapter-desc">从概念到实现的完整制作流程</p>
+                </div>
+            </div>
+
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="icon">📋</div>
+                    <h4>需求分析</h4>
+                    <p>游戏设计文档<br>音乐需求清单</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="icon">✏️</div>
+                    <h4>概念设计</h4>
+                    <p>情绪板制作<br>参考曲目收集</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="icon">🎹</div>
+                    <h4>作曲制作</h4>
+                    <p>主题创作<br>变奏与分层</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="icon">🔧</div>
+                    <h4>技术实现</h4>
+                    <p>Wwise/FMOD集成<br>交互逻辑编程</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="icon">🎮</div>
+                    <h4>测试迭代</h4>
+                    <p>游戏内测试<br>反馈调整</p>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>专业提示：</strong>在项目早期就与音频程序员建立沟通，了解技术限制可以避免后期大量返工。
+            </div>
+        </section>
+
+        <!-- 第三章：技术工具 -->
+        <section class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">03</div>
+                <div>
+                    <h2 class="chapter-title">工具与软件</h2>
+                    <p class="chapter-desc">游戏配乐师必备工具链</p>
+                </div>
+            </div>
+
+            <table class="tools-table">
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>工具</th>
+                        <th>用途</th>
+                        <th>推荐程度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DAW</td>
+                        <td>Logic Pro X / Cubase / Reaper</td>
+                        <td>音乐制作与编曲</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>音频中间件</td>
+                        <td>Wwise / FMOD Studio</td>
+                        <td>游戏音频集成</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>采样库</td>
+                        <td>Kontakt / Spitfire / Orchestral Tools</td>
+                        <td>管弦乐/电子音色</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>合成器</td>
+                        <td>Serum / Massive / Omnisphere</td>
+                        <td>电子音乐/音效设计</td>
+                        <td>⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>音效处理</td>
+                        <td>RX Pro / Pro Sound Effects</td>
+                        <td>音频修复/音效库</td>
+                        <td>⭐⭐⭐⭐</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 第四章：音乐风格 -->
+        <section class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">04</div>
+                <div>
+                    <h2 class="chapter-title">游戏音乐风格指南</h2>
+                    <p class="chapter-desc">不同类型游戏的音乐创作要点</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>⚔️ RPG 角色扮演</h3>
+                    <p>宏大的管弦乐、民族乐器、主题变奏。注重叙事性与情感深度，需要大量不同情绪的音乐素材。</p>
+                    <ul>
+                        <li>主题音乐（Character Themes）</li>
+                        <li>区域音乐（Zone Music）</li>
+                        <li>战斗音乐分层系统</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3>🔫 FPS 射击游戏</h3>
+                    <p>紧张的节奏、低频冲击、动态强度。音乐需要随战斗强度实时变化，从潜行到激战的无缝过渡。</p>
+                    <ul>
+                        <li>强度分层系统（Intensity Layers）</li>
+                        <li>低频节奏驱动</li>
+                        <li>肾上腺素激增音效</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3>🏗️ 策略/模拟</h3>
+                    <p>氛围营造为主，不干扰玩家思考。使用pad音色、环境音效、轻快的背景音乐。</p>
+                    <ul>
+                        <li>Ambient Soundscapes</li>
+                        <li>不分散注意力的轻音乐</li>
+                        <li>反馈音效设计</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3>🎪 独立/像素</h3>
+                    <p>芯片音乐（Chiptune）、复古合成器、极简编排。注重旋律记忆点与复古情怀。</p>
+                    <ul>
+                        <li>8-bit / 16-bit 风格</li>
+                        <li>合成器波（Synthwave）</li>
+                        <li>极简主义编曲</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第五章：最佳实践 -->
+        <section class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">05</div>
+                <div>
+                    <h2 class="chapter-title">专业最佳实践</h2>
+                    <p class="chapter-desc">来自行业专家的经验总结</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>🎚️ 混音与母带</h3>
+                    <p>游戏音频的混音标准与音乐专辑不同，需要为语音和音效留出空间。</p>
+                    <ul>
+                        <li>动态范围控制（-14 LUFS标准）</li>
+                        <li>中频避让（为语音留出1-4kHz）</li>
+                        <li>低频管理（避免与爆炸音效冲突）</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3>📁 资产管理</h3>
+                    <p>良好的文件管理习惯可以节省大量时间，尤其是在大型项目中。</p>
+                    <ul>
+                        <li>命名规范：Project_Section_Version</li>
+                        <li>版本控制与备份策略</li>
+                        <li>元数据标记（BPM、调性、情绪）</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3>🤝 协作沟通</h3>
+                    <p>与游戏设计师、程序员、音效师的协作是项目成功的关键。</p>
+                    <ul>
+                        <li>参与早期设计讨论</li>
+                        <li>清晰的音频设计文档</li>
+                        <li>定期playtest反馈收集</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>⚡ 我的工作站 <span data-version>v2.6.9</span> | 游戏配乐设计师手册</p>
+        <p>© 2026 个人游戏音频实验室 🎵</p>
+    </footer>
+
+    <script src="../nav-config.js"></script>
+</body>
+</html>
