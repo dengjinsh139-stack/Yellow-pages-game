@@ -1,11 +1,11 @@
 /**
- * 统一导航栏组件 v2.4.9
+ * 统一导航栏组件 v2.6.0
  * 使用方式：在需要导航栏的页面引入此文件
  * <script src="nav-config.js"></script>
  */
 
 // 全局版本号 - 修改这里即可同步全站
-const APP_VERSION = 'v2.5.9';
+const APP_VERSION = 'v2.6.0';
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
