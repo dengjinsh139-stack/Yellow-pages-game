@@ -5,7 +5,7 @@
  */
 
 // 全局版本号 - 修改这里即可同步全站
-const APP_VERSION = 'v2.6.18';
+const APP_VERSION = 'v2.7.1';
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
@@ -99,4 +99,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 /* Cache bust: 1774364737 */
 /* Cache bust: 1774365774 */
-/* Cache bust: 1774372509 */
+/* Cache bust: 1774409381 */
