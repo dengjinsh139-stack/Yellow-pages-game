@@ -8,6 +8,8 @@
 (function() {
     'use strict';
 
+    console.log('[MusicGlobal] 脚本加载中...');
+
     const STORAGE_KEY = 'yellow_pages_music_state';
     const MUSIC_URL = 'assets/audio/bg-music.mp3';
     
@@ -119,8 +121,10 @@
 
     // 初始化音乐系统
     function initMusicSystem() {
+        console.log('[MusicGlobal] 初始化音乐系统...');
         createMusicButton();
         initAudioElement();
+        console.log('[MusicGlobal] 按钮创建完成:', document.getElementById('musicFloatBtn') ? '成功' : '失败');
 
         // 如果有音频元素，尝试自动播放
         if (bgMusic) {
