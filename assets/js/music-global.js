@@ -88,66 +88,72 @@
                     bottom: 85px;
                     right: 30px;
                     width: 140px;
-                    background: rgba(15, 15, 23, 0.98);
+                    background: linear-gradient(180deg, rgba(20, 20, 30, 0.98) 0%, rgba(15, 15, 23, 0.98) 100%);
                     backdrop-filter: blur(20px);
-                    border: 1px solid rgba(0, 212, 170, 0.2);
-                    border-radius: 12px;
-                    padding: 16px 12px 12px 32px;
+                    border: 1px solid rgba(0, 212, 170, 0.25);
+                    border-radius: 16px;
+                    padding: 20px 14px 14px 34px;
                     z-index: 9997;
                     opacity: 0;
                     transition: all 0.3s ease;
                     pointer-events: none;
                     font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
-                    box-shadow: 0 0 40px rgba(0, 212, 170, 0.1);
+                    box-shadow: 
+                        0 0 60px rgba(0, 212, 170, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
                 }
                 .level-meter.active {
                     opacity: 1;
                 }
                 .level-meter-title {
-                    font-size: 12px;
+                    font-size: 13px;
                     font-weight: 700;
                     text-align: center;
-                    margin-bottom: 12px;
-                    letter-spacing: 2px;
+                    margin-bottom: 16px;
+                    letter-spacing: 3px;
                     color: #00d4aa;
                     text-transform: uppercase;
+                    text-shadow: 0 0 20px rgba(0, 212, 170, 0.5);
                 }
                 .level-meter-scale {
                     position: absolute;
                     left: 10px;
-                    top: 42px;
-                    bottom: 48px;
+                    top: 50px;
+                    bottom: 52px;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    font-size: 10px;
-                    color: rgba(255, 255, 255, 0.4);
+                    font-size: 9px;
+                    color: rgba(255, 255, 255, 0.5);
                     text-align: right;
                     width: 20px;
                     line-height: 1;
                     font-family: 'Orbitron', monospace;
+                    font-weight: 500;
                 }
                 .level-meter-scale .db-0 {
-                    color: #ef4444;
+                    color: #ff6b6b;
                     font-weight: 700;
-                    font-size: 11px;
+                    font-size: 10px;
                 }
                 .level-meter-scale .db-inf {
                     color: rgba(255, 255, 255, 0.3);
+                    font-size: 8px;
                 }
                 .level-bars-container {
                     display: flex;
                     justify-content: center;
-                    gap: 12px;
-                    height: calc(100% - 80px);
+                    gap: 14px;
+                    height: calc(100% - 90px);
                     margin-left: 6px;
                 }
                 .level-bar-wrap {
-                    width: 36px;
+                    width: 38px;
                     height: 100%;
                     position: relative;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     overflow: hidden;
+                    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
                 }
                 .level-bar-bg {
                     position: absolute;
@@ -155,8 +161,8 @@
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: rgba(0, 0, 0, 0.6);
-                    border-radius: 4px;
+                    background: rgba(0, 0, 0, 0.7);
+                    border-radius: 6px;
                 }
                 .level-grid {
                     position: absolute;
@@ -168,42 +174,44 @@
                         to top,
                         transparent,
                         transparent calc(10% - 1px),
-                        rgba(255, 255, 255, 0.08) calc(10% - 1px),
-                        rgba(255, 255, 255, 0.08) 10%
+                        rgba(255, 255, 255, 0.06) calc(10% - 1px),
+                        rgba(255, 255, 255, 0.06) 10%
                     );
                     pointer-events: none;
-                    border-radius: 4px;
+                    border-radius: 6px;
                 }
                 .level-fill {
                     position: absolute;
                     bottom: 0;
-                    left: 0;
-                    right: 0;
+                    left: 2px;
+                    right: 2px;
                     height: 0%;
                     background: linear-gradient(to top, 
                         #00d4aa 0%, 
-                        #00d4aa 50%, 
+                        #00d4aa 30%, 
+                        #00e5c0 50%, 
                         #00a8e8 70%, 
-                        #f59e0b 85%, 
-                        #ef4444 95%, 
-                        #ef4444 100%);
+                        #f59e0b 88%, 
+                        #ff6b6b 95%, 
+                        #ff4757 100%);
                     border-radius: 4px;
                     transition: height 0.04s ease-out;
-                    box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
+                    box-shadow: 0 0 25px rgba(0, 212, 170, 0.4);
                 }
                 .level-fill.high {
-                    box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+                    box-shadow: 0 0 35px rgba(255, 107, 107, 0.6);
                 }
                 .level-peak {
                     position: absolute;
-                    left: 0;
-                    right: 0;
+                    left: 2px;
+                    right: 2px;
                     height: 3px;
-                    background: #fff;
-                    box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+                    background: linear-gradient(90deg, #fff 0%, #00d4aa 50%, #fff 100%);
+                    box-shadow: 0 0 15px #fff, 0 0 30px rgba(0, 212, 170, 0.8);
                     opacity: 0;
                     transition: bottom 0.1s ease-out;
                     pointer-events: none;
+                    border-radius: 2px;
                 }
                 .level-peak.active {
                     opacity: 1;
@@ -211,23 +219,26 @@
                 .level-labels {
                     display: flex;
                     justify-content: center;
-                    gap: 12px;
+                    gap: 14px;
                     margin-left: 6px;
-                    margin-top: 12px;
+                    margin-top: 14px;
                 }
                 .level-labels span {
-                    width: 36px;
+                    width: 38px;
                     text-align: center;
                     font-size: 14px;
                     font-weight: 700;
                     font-family: 'Orbitron', monospace;
-                    color: rgba(255, 255, 255, 0.5);
+                    color: rgba(255, 255, 255, 0.6);
+                    letter-spacing: 1px;
                 }
                 .level-labels .channel-l {
                     color: #00d4aa;
+                    text-shadow: 0 0 15px rgba(0, 212, 170, 0.5);
                 }
                 .level-labels .channel-r {
                     color: #00a8e8;
+                    text-shadow: 0 0 15px rgba(0, 168, 232, 0.5);
                 }
                 @media (max-width: 768px) {
                     .level-meter {
