@@ -1,5 +1,5 @@
 /**
- * 全局音乐悬浮按钮组件 v2.9.5
+ * 全局音乐悬浮按钮组件 v2.9.6
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
  * 会自动创建音乐按钮、音频元素和电平表
  * 特性：跨页面持续播放、自动同步状态、保持播放进度、音频可视化
@@ -83,13 +83,14 @@
                     position: fixed;
                     bottom: 85px;
                     right: 30px;
-                    width: 90px;
-                    height: 380px;
+                    width: 100px;
+                    height: calc(100vh - 120px);
+                    max-height: 700px;
                     background: rgba(15, 15, 23, 0.98);
                     backdrop-filter: blur(20px);
                     border: 1px solid rgba(0, 212, 170, 0.2);
-                    border-radius: 10px;
-                    padding: 12px 8px 10px 24px;
+                    border-radius: 12px;
+                    padding: 16px 12px 12px 28px;
                     z-index: 9997;
                     opacity: 0;
                     transition: all 0.3s ease;
@@ -101,48 +102,49 @@
                     opacity: 1;
                 }
                 .level-meter-title {
-                    font-size: 10px;
+                    font-size: 12px;
                     font-weight: 700;
                     text-align: center;
-                    margin-bottom: 8px;
-                    letter-spacing: 1px;
+                    margin-bottom: 12px;
+                    letter-spacing: 2px;
                     color: #00d4aa;
                     text-transform: uppercase;
                 }
                 .level-meter-scale {
                     position: absolute;
-                    left: 6px;
-                    top: 34px;
-                    bottom: 38px;
+                    left: 8px;
+                    top: 42px;
+                    bottom: 48px;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    font-size: 7px;
-                    color: rgba(255, 255, 255, 0.35);
+                    font-size: 9px;
+                    color: rgba(255, 255, 255, 0.4);
                     text-align: right;
-                    width: 16px;
+                    width: 18px;
                     line-height: 1;
                     font-family: 'Orbitron', monospace;
                 }
                 .level-meter-scale .db-0 {
                     color: #ef4444;
                     font-weight: 700;
+                    font-size: 10px;
                 }
                 .level-meter-scale .db-inf {
-                    color: rgba(255, 255, 255, 0.25);
+                    color: rgba(255, 255, 255, 0.3);
                 }
                 .level-bars-container {
                     display: flex;
                     justify-content: center;
-                    gap: 6px;
-                    height: 300px;
+                    gap: 8px;
+                    height: calc(100% - 80px);
                     margin-left: 4px;
                 }
                 .level-bar-wrap {
-                    width: 24px;
+                    width: 28px;
                     height: 100%;
                     position: relative;
-                    border-radius: 3px;
+                    border-radius: 4px;
                     overflow: hidden;
                 }
                 .level-bar-bg {
@@ -152,7 +154,7 @@
                     right: 0;
                     bottom: 0;
                     background: rgba(0, 0, 0, 0.6);
-                    border-radius: 3px;
+                    border-radius: 4px;
                 }
                 .level-grid {
                     position: absolute;
@@ -168,7 +170,7 @@
                         rgba(255, 255, 255, 0.08) 10%
                     );
                     pointer-events: none;
-                    border-radius: 3px;
+                    border-radius: 4px;
                 }
                 .level-fill {
                     position: absolute;
@@ -183,20 +185,20 @@
                         #f59e0b 85%, 
                         #ef4444 95%, 
                         #ef4444 100%);
-                    border-radius: 3px;
+                    border-radius: 4px;
                     transition: height 0.04s ease-out;
-                    box-shadow: 0 0 15px rgba(0, 212, 170, 0.3);
+                    box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
                 }
                 .level-fill.high {
-                    box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+                    box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
                 }
                 .level-peak {
                     position: absolute;
                     left: 0;
                     right: 0;
-                    height: 2px;
+                    height: 3px;
                     background: #fff;
-                    box-shadow: 0 0 8px #fff, 0 0 16px #fff;
+                    box-shadow: 0 0 10px #fff, 0 0 20px #fff;
                     opacity: 0;
                     transition: bottom 0.1s ease-out;
                     pointer-events: none;
@@ -207,14 +209,14 @@
                 .level-labels {
                     display: flex;
                     justify-content: center;
-                    gap: 6px;
+                    gap: 8px;
                     margin-left: 4px;
-                    margin-top: 8px;
+                    margin-top: 12px;
                 }
                 .level-labels span {
-                    width: 24px;
+                    width: 28px;
                     text-align: center;
-                    font-size: 11px;
+                    font-size: 13px;
                     font-weight: 700;
                     font-family: 'Orbitron', monospace;
                     color: rgba(255, 255, 255, 0.5);
