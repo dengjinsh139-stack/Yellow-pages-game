@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-03-25T11:46:26.996737",
+  "timestamp": "2026-03-25T14:26:28.344883",
   "load": {
-    "percentage": 32,
-    "cpu": 15,
+    "percentage": 40,
+    "cpu": 31,
     "memory": 50,
     "level": "low",
     "status_text": "低负载 - 运行良好",
@@ -18,8 +18,8 @@
     }
   },
   "stats": {
-    "commits_today": 24,
-    "files_modified": 20
+    "commits_today": 25,
+    "files_modified": 22
   },
   "sessions": {
     "active": 1,
@@ -65,18 +65,18 @@
     }
   ],
   "history": [
-    33,
-    43,
-    41,
-    38,
-    40,
-    36,
     36,
     33,
     38,
     37,
     41,
-    32
+    32,
+    36,
+    44,
+    41,
+    36,
+    44,
+    40
   ],
   "current_work": {
     "title": "系统监控",

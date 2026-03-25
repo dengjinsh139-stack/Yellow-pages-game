@@ -22,9 +22,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Dark Souls III',
                             developer: 'FromSoftware',
                             developerUrl: 'https://www.fromsoftware.jp/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bs411D7R6',
-                            cgUrl: 'https://www.bilibili.com/video/BV1es411D73e',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Wx41187RS',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=ciNQLPOaQ3M',
+                            cgUrl: 'https://www.youtube.com/watch?v=5axA5M4X91c',
+                            ostUrl: 'https://www.youtube.com/watch?v=WE-bt82UKOk',
                             worldDescription: '洛斯里克王国的火焰即将熄灭，不死人被唤醒执行传火使命。在破败的城堡与阴森的地下墓穴中，玩家将面对昔日的英雄与堕落的神明，探索火之时代的终结与轮回的宿命。'
                         },
                         {
@@ -32,9 +32,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'The Witcher 3: Wild Hunt',
                             developer: 'CD Projekt Red',
                             developerUrl: 'https://www.cdprojekt.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1fx411A7mu',
-                            cgUrl: 'https://www.bilibili.com/video/BV1gx411A7gg',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411D7E4',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=c0i88tKZ11Y',
+                            cgUrl: 'https://www.youtube.com/watch?v=1-l29HlKkXU',
+                            ostUrl: 'https://www.youtube.com/watch?v=DfQlT9gyGqQ',
                             worldDescription: '在大陆战火纷飞的年代，猎魔人杰洛特寻找失踪的养女希里。政治阴谋、种族冲突与超自然威胁交织，玩家的每一个选择都将影响这片大陆的命运走向。'
                         },
                         {
@@ -42,9 +42,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Elden Ring',
                             developer: 'FromSoftware',
                             developerUrl: 'https://www.fromsoftware.jp/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1jY411G7sW',
-                            cgUrl: 'https://www.bilibili.com/video/BV1x64y1a7Bf',
-                            ostUrl: 'https://www.bilibili.com/video/BV1NS4y1F7X3',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=JldMvQHF_6U',
+                            cgUrl: 'https://www.youtube.com/watch?v=AKXiKBZPMJA',
+                            ostUrl: 'https://www.youtube.com/watch?v=6oaKe0KxI_8',
                             worldDescription: '交界地的艾尔登法环破碎，半神们争夺大卢恩引发破碎战争。被玷污者重返这片土地，探索黄金树下的秘密，挑战半神，最终成为艾尔登之王或带来新时代的秩序。'
                         }
                     ]
@@ -61,9 +61,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Fire Emblem: Three Houses',
                             developer: 'Intelligent Systems',
                             developerUrl: 'https://www.intsys.co.jp/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1At411n77y',
-                            cgUrl: 'https://www.bilibili.com/video/BV1it411n7Mc',
-                            ostUrl: 'https://www.bilibili.com/video/BV1B4411z7ET',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=3k0a_4-R9VU',
+                            cgUrl: 'https://www.youtube.com/watch?v=8NwVN_mR4b0',
+                            ostUrl: 'https://www.youtube.com/watch?v=5FvQRkGwn_k',
                             worldDescription: '芙朵拉大陆上，三国鼎立。玩家作为士官学校教师，培养来自三个国家的年轻贵族。在学院日常与战场厮杀中，揭开千年历史的真相，决定大陆的未来。'
                         },
                         {
@@ -71,9 +71,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Final Fantasy Tactics',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Bx411N7oc',
-                            cgUrl: 'https://www.bilibili.com/video/BV1px411N7sQ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411P7NZ',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=ppNjR9h9QfQ',
+                            cgUrl: 'https://www.youtube.com/watch?v=5z_d0x7hGJk',
+                            ostUrl: 'https://www.youtube.com/watch?v=foiB_mnLZ5A',
                             worldDescription: '伊瓦利斯王国，两个贵族家族争夺王位的狮子战争。主角拉姆萨在阴谋与背叛中，逐渐揭开圣石背后的黑暗真相，挑战操纵历史的教会势力。'
                         },
                         {
@@ -81,9 +81,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'XCOM 2',
                             developer: 'Firaxis Games',
                             developerUrl: 'https://www.firaxis.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Us411X7Bg',
-                            cgUrl: 'https://www.bilibili.com/video/BV1es411X7Hd',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=jHBg0nF7hvQ',
+                            cgUrl: 'https://www.youtube.com/watch?v=azXRN_BroQg',
+                            ostUrl: 'https://www.youtube.com/watch?v=QqYFHnP4k8Y',
                             worldDescription: '外星征服者统治地球已二十年，XCOM组织沦为抵抗军。玩家指挥地下游击队，从废墟城市中招募战士，夺回地球自由，揭露外星人改造人类的阴谋。'
                         }
                     ]
@@ -100,9 +100,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Final Fantasy VII Remake',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1j7411w7xP',
-                            cgUrl: 'https://www.bilibili.com/video/BV1X4411x7Sj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1A7411w7SC',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=4e7pPvzZ1Zk',
+                            cgUrl: 'https://www.youtube.com/watch?v=ERgrFVhL-n4',
+                            ostUrl: 'https://www.youtube.com/watch?v=tq_gE10fOh8',
                             worldDescription: '米德加都市，神罗公司榨取星球生命能源。前神罗战士克劳德加入雪崩组织，在破坏魔晄炉的任务中，逐渐发现自己过去的真相与星球命运的联系。'
                         },
                         {
@@ -110,9 +110,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Persona 5 Royal',
                             developer: 'Atlus',
                             developerUrl: 'https://www.atlus.co.jp/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1y4411M7yT',
-                            cgUrl: 'https://www.bilibili.com/video/BV1nx411a7nj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1tx411a7S7',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=2tVf2JHh1_g',
+                            cgUrl: 'https://www.youtube.com/watch?v=SKpSpvFCZRw',
+                            ostUrl: 'https://www.youtube.com/watch?v=UbkqE4mp1Sg',
                             worldDescription: '东京，心灵扭曲的大人构建腐败社会。一群高中生觉醒人格面具力量，潜入恶人内心的认知空间"宫殿"，偷取扭曲的欲望，让恶人悔改，成为侠盗团的革命物语。'
                         },
                         {
@@ -120,9 +120,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Dragon Quest XI',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411x7MJ',
-                            cgUrl: 'https://www.bilibili.com/video/BV1vx411x7hQ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7Cu',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=XJQJP8wQGz4',
+                            cgUrl: 'https://www.youtube.com/watch?v=ry2X4C3K6QI',
+                            ostUrl: 'https://www.youtube.com/watch?v=0j_eGoC4E3w',
                             worldDescription: '勇者诞生时即被预言将毁灭世界，故乡被魔王军攻陷后踏上旅程。在洛特泽塔西亚大陆上，勇者集结伙伴，揭开自己身世的秘密，对抗黑暗势力。'
                         }
                     ]
@@ -139,9 +139,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'World of Warcraft',
                             developer: 'Blizzard Entertainment',
                             developerUrl: 'https://www.blizzard.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7ZX',
-                            cgUrl: 'https://www.bilibili.com/video/BV1bx411w7ZX',
-                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7tg',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=7tO6Y2gQpyk',
+                            cgUrl: 'https://www.youtube.com/watch?v=jSJr3dXZfcg',
+                            ostUrl: 'https://www.youtube.com/watch?v=sM9v9p7S7bE',
                             worldDescription: '艾泽拉斯大陆，联盟与部落战火绵延。从东部王国到外域，从诺森德到潘达利亚，英雄们对抗燃烧军团、古神低语与亡灵天灾，书写属于自己的传奇。'
                         },
                         {
@@ -149,9 +149,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Final Fantasy XIV',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1xW411j7B9',
-                            cgUrl: 'https://www.bilibili.com/video/BV1xW411j7B9',
-                            ostUrl: 'https://www.bilibili.com/video/BV1nx41137BF',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=2iQD0_4N17E',
+                            cgUrl: 'https://www.youtube.com/watch?v=4ibP1L33e70',
+                            ostUrl: 'https://www.youtube.com/watch?v=J5qCj1pZ9XQ',
                             worldDescription: '海德林与佐迪亚克，光与暗的星球。冒险者从普通冒险者成长为光之战士，穿越第一世界与第十三世界，阻止末日降临，探索古代文明灭亡的真相。'
                         },
                         {
@@ -159,9 +159,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Genshin Impact',
                             developer: 'miHoYo',
                             developerUrl: 'https://www.mihoyo.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1At4y1q7Eu',
-                            cgUrl: 'https://www.bilibili.com/video/BV1yp4y1x7SN',
-                            ostUrl: 'https://www.bilibili.com/video/BV1D64y1f7ij',
+                            gameplayUrl: 'https://www.youtube.com/watch?v=7_VCP2zL_LU',
+                            cgUrl: 'https://www.youtube.com/watch?v=TAlKhR_U0qU',
+                            ostUrl: 'https://www.youtube.com/watch?v=MADbJ6KqXa4',
                             worldDescription: '旅行者寻找失散的血亲，游历提瓦特七国。每座城邦对应一种元素与一种理念，在探索中揭开"天理"与"神之眼"的秘密，见证神明的陨落与新秩序的建立。'
                         }
                     ]
