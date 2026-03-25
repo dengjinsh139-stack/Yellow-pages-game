@@ -1,5 +1,5 @@
 /**
- * 全局音乐悬浮按钮组件 v2.9.8
+ * 全局音乐悬浮按钮组件 v2.9.9
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
  * 会自动创建音乐按钮、音频元素和电平表
  * 特性：跨页面持续播放、自动同步状态、保持播放进度、音频可视化
@@ -255,38 +255,46 @@
 
     // 初始化音频分析
     function initAudioAnalyser() {
-        if (!bgMusic || audioContext) return;
+        if (!bgMusic) return;
+        
+        // 如果动画已经在运行，不需要重新初始化
+        if (animationId) return;
 
         try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // 如果 audioContext 不存在，创建新的
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 创建声道分离器
+                splitter = audioContext.createChannelSplitter(2);
+                
+                // 为左右声道分别创建分析器
+                analyserLeft = audioContext.createAnalyser();
+                analyserRight = audioContext.createAnalyser();
+                analyserLeft.fftSize = 256;
+                analyserRight.fftSize = 256;
+                
+                // 连接音频源
+                source = audioContext.createMediaElementSource(bgMusic);
+                source.connect(splitter);
+                
+                // 左声道 -> 左分析器
+                splitter.connect(analyserLeft, 0);
+                // 右声道 -> 右分析器
+                splitter.connect(analyserRight, 1);
+                
+                // 连接到输出
+                source.connect(audioContext.destination);
+                
+                const bufferLengthLeft = analyserLeft.frequencyBinCount;
+                const bufferLengthRight = analyserRight.frequencyBinCount;
+                dataArrayLeft = new Uint8Array(bufferLengthLeft);
+                dataArrayRight = new Uint8Array(bufferLengthRight);
+                
+                createLevelMeter();
+            }
             
-            // 创建声道分离器
-            splitter = audioContext.createChannelSplitter(2);
-            
-            // 为左右声道分别创建分析器
-            analyserLeft = audioContext.createAnalyser();
-            analyserRight = audioContext.createAnalyser();
-            analyserLeft.fftSize = 256;
-            analyserRight.fftSize = 256;
-            
-            // 连接音频源
-            source = audioContext.createMediaElementSource(bgMusic);
-            source.connect(splitter);
-            
-            // 左声道 -> 左分析器
-            splitter.connect(analyserLeft, 0);
-            // 右声道 -> 右分析器
-            splitter.connect(analyserRight, 1);
-            
-            // 连接到输出
-            source.connect(audioContext.destination);
-            
-            const bufferLengthLeft = analyserLeft.frequencyBinCount;
-            const bufferLengthRight = analyserRight.frequencyBinCount;
-            dataArrayLeft = new Uint8Array(bufferLengthLeft);
-            dataArrayRight = new Uint8Array(bufferLengthRight);
-            
-            createLevelMeter();
+            // 启动动画循环
             updateLevelMeter();
         } catch (e) {
             console.log('[MusicGlobal] 音频分析初始化失败:', e);
@@ -641,6 +649,10 @@
                     updateMusicUI();
                     broadcastState('playing');
                     initAudioAnalyser();
+                    // 确保电平表动画重新启动
+                    if (!animationId) {
+                        updateLevelMeter();
+                    }
                 });
             } else {
                 isMusicPlaying = true;
@@ -648,6 +660,10 @@
                 updateMusicUI();
                 broadcastState('playing');
                 initAudioAnalyser();
+                // 确保电平表动画重新启动
+                if (!animationId) {
+                    updateLevelMeter();
+                }
             }
         }
     }
