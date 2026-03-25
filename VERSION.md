@@ -1,5 +1,14 @@
 # 版本历史
 
+## v2.9.9 (2026-03-25)
+
+### Bug修复
+- 🐛 **修复暂停后播放电平表不显示的bug**
+  - 问题：暂停时 `stopLevelMeter()` 取消了动画循环，`animationId` 设为 null
+  - 再次播放时 `initAudioAnalyser()` 因 `audioContext` 已存在而直接返回
+  - 修复：检查 `animationId`，如果为 null 则重新启动 `updateLevelMeter()`
+  - 现在暂停后再播放，电平表能正常显示
+
 ## v2.9.8 (2026-03-25)
 
 ### Bug修复
