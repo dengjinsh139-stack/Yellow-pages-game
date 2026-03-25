@@ -1,5 +1,5 @@
 /**
- * 全局音乐悬浮按钮组件 v2.9.4
+ * 全局音乐悬浮按钮组件 v2.9.5
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
  * 会自动创建音乐按钮、音频元素和电平表
  * 特性：跨页面持续播放、自动同步状态、保持播放进度、音频可视化
@@ -28,12 +28,10 @@
     let animationId = null;
 
     // 峰值保持数据
-    let peakLeft = 0;
-    let peakRight = 0;
-    let peakDecayLeft = 0;
-    let peakDecayRight = 0;
+    let peakHoldLeft = 0;
+    let peakHoldRight = 0;
 
-    // 创建电平表（夸张霓虹风格，频谱可视化）
+    // 创建电平表（Wwise风格，高垂直电平表，与页面风格一致）
     function createLevelMeter() {
         if (document.getElementById('levelMeter')) return;
 
@@ -41,212 +39,202 @@
         meter.id = 'levelMeter';
         meter.className = 'level-meter';
         meter.innerHTML = `
-            <div class="level-meter-glow"></div>
-            <div class="level-meter-header">⚡ AUDIO ⚡</div>
-            <div class="spectrum-container" id="spectrumLeft"></div>
-            <div class="spectrum-container" id="spectrumRight"></div>
-            <div class="peak-bars">
-                <div class="peak-bar-wrap">
-                    <div class="peak-bar" id="peakBarLeft"></div>
-                    <div class="peak-hold" id="peakHoldLeft"></div>
+            <div class="level-meter-title">MASTER</div>
+            <div class="level-meter-scale">
+                <span class="db-0">0</span>
+                <span>-6</span>
+                <span>-12</span>
+                <span>-18</span>
+                <span>-24</span>
+                <span>-30</span>
+                <span>-36</span>
+                <span>-42</span>
+                <span>-48</span>
+                <span>-54</span>
+                <span class="db-inf">-∞</span>
+            </div>
+            <div class="level-bars-container">
+                <div class="level-bar-wrap">
+                    <div class="level-bar-bg"></div>
+                    <div class="level-grid"></div>
+                    <div class="level-fill" id="levelLeft"></div>
+                    <div class="level-peak" id="peakLeft"></div>
                 </div>
-                <div class="peak-bar-wrap">
-                    <div class="peak-bar" id="peakBarRight"></div>
-                    <div class="peak-hold" id="peakHoldRight"></div>
+                <div class="level-bar-wrap">
+                    <div class="level-bar-bg"></div>
+                    <div class="level-grid"></div>
+                    <div class="level-fill" id="levelRight"></div>
+                    <div class="level-peak" id="peakRight"></div>
                 </div>
             </div>
-            <div class="level-meter-labels">
-                <span class="channel-label neon-green">L</span>
-                <span class="channel-label neon-pink">R</span>
+            <div class="level-labels">
+                <span class="channel-l">L</span>
+                <span class="channel-r">R</span>
             </div>
         `;
         document.body.appendChild(meter);
 
-        // 创建频谱条
-        createSpectrumBars('spectrumLeft', 24);
-        createSpectrumBars('spectrumRight', 24);
-
-        // 添加样式
+        // 添加样式 - 与页面风格一致（Orbitron字体，青色主题）
         if (!document.getElementById('level-meter-styles')) {
             const style = document.createElement('style');
             style.id = 'level-meter-styles';
             style.textContent = `
-                @keyframes neonPulse {
-                    0%, 100% { opacity: 1; filter: brightness(1); }
-                    50% { opacity: 0.8; filter: brightness(1.3); }
-                }
-                @keyframes glowPulse {
-                    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 255, 136, 0.1); }
-                    50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.5), inset 0 0 30px rgba(0, 255, 136, 0.2); }
-                }
-                @keyframes scanline {
-                    0% { transform: translateY(-100%); }
-                    100% { transform: translateY(200px); }
-                }
                 .level-meter {
                     position: fixed;
-                    bottom: 100px;
-                    right: 20px;
-                    background: linear-gradient(180deg, #0a0a0f 0%, #151520 50%, #0a0a0f 100%);
-                    border: 3px solid #00ff88;
-                    border-radius: 16px;
-                    padding: 20px 16px 16px;
-                    width: 140px;
+                    bottom: 85px;
+                    right: 30px;
+                    width: 90px;
+                    height: 380px;
+                    background: rgba(15, 15, 23, 0.98);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid rgba(0, 212, 170, 0.2);
+                    border-radius: 10px;
+                    padding: 12px 8px 10px 24px;
                     z-index: 9997;
                     opacity: 0;
                     transition: all 0.3s ease;
                     pointer-events: none;
-                    font-family: 'Courier New', monospace;
-                    animation: glowPulse 2s ease-in-out infinite;
+                    font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+                    box-shadow: 0 0 40px rgba(0, 212, 170, 0.1);
                 }
                 .level-meter.active {
                     opacity: 1;
                 }
-                .level-meter-glow {
-                    position: absolute;
-                    top: -2px;
-                    left: -2px;
-                    right: -2px;
-                    bottom: -2px;
-                    background: linear-gradient(45deg, #00ff88, #00d4ff, #ff00ff, #00ff88);
-                    border-radius: 14px;
-                    z-index: -1;
-                    opacity: 0.3;
-                    filter: blur(10px);
-                    animation: neonPulse 1.5s ease-in-out infinite;
-                }
-                .level-meter-header {
-                    font-size: 16px;
-                    font-weight: bold;
+                .level-meter-title {
+                    font-size: 10px;
+                    font-weight: 700;
                     text-align: center;
-                    margin-bottom: 16px;
-                    letter-spacing: 3px;
-                    color: #00ff88;
-                    text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
-                    animation: neonPulse 1s ease-in-out infinite;
+                    margin-bottom: 8px;
+                    letter-spacing: 1px;
+                    color: #00d4aa;
+                    text-transform: uppercase;
                 }
-                .spectrum-container {
+                .level-meter-scale {
+                    position: absolute;
+                    left: 6px;
+                    top: 34px;
+                    bottom: 38px;
                     display: flex;
+                    flex-direction: column;
                     justify-content: space-between;
-                    gap: 3px;
-                    height: 120px;
-                    margin-bottom: 12px;
-                    align-items: flex-end;
+                    font-size: 7px;
+                    color: rgba(255, 255, 255, 0.35);
+                    text-align: right;
+                    width: 16px;
+                    line-height: 1;
+                    font-family: 'Orbitron', monospace;
                 }
-                .spectrum-bar {
-                    flex: 1;
-                    background: linear-gradient(to top, #00ff88, #ffff00, #ff0088);
-                    border-radius: 2px;
-                    min-height: 4px;
-                    transition: height 0.08s ease-out;
-                    box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+                .level-meter-scale .db-0 {
+                    color: #ef4444;
+                    font-weight: 700;
                 }
-                .spectrum-bar.high {
-                    background: linear-gradient(to top, #ffff00, #ff0000, #ff00ff);
-                    box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+                .level-meter-scale .db-inf {
+                    color: rgba(255, 255, 255, 0.25);
                 }
-                .peak-bars {
+                .level-bars-container {
                     display: flex;
-                    justify-content: space-between;
-                    gap: 12px;
-                    margin: 16px 0;
+                    justify-content: center;
+                    gap: 6px;
+                    height: 300px;
+                    margin-left: 4px;
                 }
-                .peak-bar-wrap {
-                    flex: 1;
-                    height: 20px;
-                    background: rgba(0, 0, 0, 0.5);
-                    border-radius: 10px;
-                    overflow: hidden;
-                    position: relative;
-                    border: 2px solid rgba(0, 255, 136, 0.3);
-                }
-                .peak-bar {
+                .level-bar-wrap {
+                    width: 24px;
                     height: 100%;
-                    width: 0%;
-                    background: linear-gradient(90deg, #00ff88 0%, #00ff88 60%, #ffff00 80%, #ff0000 100%);
-                    border-radius: 10px;
-                    transition: width 0.05s ease-out;
-                    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+                    position: relative;
+                    border-radius: 3px;
+                    overflow: hidden;
                 }
-                }
-                .peak-bar.high {
-                    background: linear-gradient(90deg, #ffff00, #ff0000);
-                    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
-                    animation: neonPulse 0.1s ease-in-out infinite;
-                }
-                .peak-hold {
+                .level-bar-bg {
                     position: absolute;
                     top: 0;
+                    left: 0;
                     right: 0;
-                    width: 4px;
-                    height: 100%;
-                    background: #fff;
-                    opacity: 0;
-                    box-shadow: 0 0 15px #fff, 0 0 30px #fff;
-                    transition: right 0.1s ease-out, opacity 0.2s;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.6);
+                    border-radius: 3px;
                 }
-                .peak-hold.active {
+                .level-grid {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: repeating-linear-gradient(
+                        to top,
+                        transparent,
+                        transparent calc(10% - 1px),
+                        rgba(255, 255, 255, 0.08) calc(10% - 1px),
+                        rgba(255, 255, 255, 0.08) 10%
+                    );
+                    pointer-events: none;
+                    border-radius: 3px;
+                }
+                .level-fill {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 0%;
+                    background: linear-gradient(to top, 
+                        #00d4aa 0%, 
+                        #00d4aa 50%, 
+                        #00a8e8 70%, 
+                        #f59e0b 85%, 
+                        #ef4444 95%, 
+                        #ef4444 100%);
+                    border-radius: 3px;
+                    transition: height 0.04s ease-out;
+                    box-shadow: 0 0 15px rgba(0, 212, 170, 0.3);
+                }
+                .level-fill.high {
+                    box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+                }
+                .level-peak {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    height: 2px;
+                    background: #fff;
+                    box-shadow: 0 0 8px #fff, 0 0 16px #fff;
+                    opacity: 0;
+                    transition: bottom 0.1s ease-out;
+                    pointer-events: none;
+                }
+                .level-peak.active {
                     opacity: 1;
                 }
-                .level-meter-labels {
+                .level-labels {
                     display: flex;
-                    justify-content: space-between;
-                    padding: 0 8px;
-                    margin-top: 12px;
+                    justify-content: center;
+                    gap: 6px;
+                    margin-left: 4px;
+                    margin-top: 8px;
                 }
-                .channel-label {
-                    font-size: 20px;
-                    font-weight: bold;
-                    width: 48px;
+                .level-labels span {
+                    width: 24px;
                     text-align: center;
-                    border-radius: 8px;
-                    padding: 4px 0;
+                    font-size: 11px;
+                    font-weight: 700;
+                    font-family: 'Orbitron', monospace;
+                    color: rgba(255, 255, 255, 0.5);
                 }
-                .neon-green {
-                    color: #00ff88;
-                    background: rgba(0, 255, 136, 0.15);
-                    border: 1px solid #00ff88;
-                    text-shadow: 0 0 10px #00ff88;
-                    animation: neonPulse 2s ease-in-out infinite;
+                .level-labels .channel-l {
+                    color: #00d4aa;
                 }
-                .neon-pink {
-                    color: #ff00ff;
-                    background: rgba(255, 0, 255, 0.15);
-                    border: 1px solid #ff00ff;
-                    text-shadow: 0 0 10px #ff00ff;
-                    animation: neonPulse 2s ease-in-out infinite 0.5s;
-                }
-                .db-value {
-                    position: absolute;
-                    top: 38px;
-                    right: 12px;
-                    font-size: 9px;
-                    color: #00ff88;
-                    font-family: 'Courier New', monospace;
-                    text-shadow: 0 0 5px #00ff88;
+                .level-labels .channel-r {
+                    color: #00a8e8;
                 }
                 @media (max-width: 768px) {
                     .level-meter {
-                        bottom: 90px;
-                        right: 10px;
-                        transform: scale(0.7);
+                        bottom: 80px;
+                        right: 15px;
+                        transform: scale(0.75);
                         transform-origin: bottom right;
                     }
                 }
             `;
             document.head.appendChild(style);
-        }
-    }
-
-    // 创建频谱条
-    function createSpectrumBars(containerId, count) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        for (let i = 0; i < count; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'spectrum-bar';
-            bar.style.height = '2px';
-            container.appendChild(bar);
         }
     }
 
@@ -273,34 +261,27 @@
         }
     }
 
-    // 更新电平表（夸张霓虹风格）
+    // 更新电平表（Wwise风格）
     function updateLevelMeter() {
         if (!analyser || !dataArray) return;
 
         analyser.getByteFrequencyData(dataArray);
 
-        // 获取左右声道数据
+        // 分别计算左右声道
         const leftData = dataArray.slice(0, dataArray.length / 2);
         const rightData = dataArray.slice(dataArray.length / 2);
         
-        // 更新左声道频谱
-        updateSpectrum('spectrumLeft', leftData);
-        // 更新右声道频谱
-        updateSpectrum('spectrumRight', rightData);
+        const leftLevel = calculateLevel(leftData);
+        const rightLevel = calculateLevel(rightData);
         
-        // 计算RMS电平
-        const leftRms = calculateRMS(leftData);
-        const rightRms = calculateRMS(rightData);
-        
-        // 更新峰值条
-        updatePeakBar('peakBarLeft', 'peakHoldLeft', leftRms);
-        updatePeakBar('peakBarRight', 'peakHoldRight', rightRms);
+        // 更新显示
+        updateBar('levelLeft', 'peakLeft', leftLevel, 'left');
+        updateBar('levelRight', 'peakRight', rightLevel, 'right');
         
         // 显示/隐藏电平表
         const meter = document.getElementById('levelMeter');
         if (meter) {
-            const avgLevel = (leftRms + rightRms) / 2;
-            if (isMusicPlaying && !isMuted && avgLevel > 1) {
+            if (isMusicPlaying && !isMuted && (leftLevel > 1 || rightLevel > 1)) {
                 meter.classList.add('active');
             } else if (!isMusicPlaying || isMuted) {
                 meter.classList.remove('active');
@@ -310,51 +291,52 @@
         animationId = requestAnimationFrame(updateLevelMeter);
     }
 
-    // 计算RMS值
-    function calculateRMS(data) {
-        const sum = data.reduce((acc, val) => acc + val * val, 0);
-        return Math.sqrt(sum / data.length);
+    // 计算电平值（转换为0-100%）
+    function calculateLevel(data) {
+        const sum = data.reduce((acc, val) => acc + val, 0);
+        const avg = sum / data.length;
+        // 增强敏感度，让电平更明显
+        return Math.min(100, (avg / 255) * 100 * 2.5);
     }
 
-    // 更新频谱显示
-    function updateSpectrum(containerId, data) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+    // 更新单个电平条
+    function updateBar(fillId, peakId, level, channel) {
+        const fill = document.getElementById(fillId);
+        const peak = document.getElementById(peakId);
+        if (!fill) return;
         
-        const bars = container.querySelectorAll('.spectrum-bar');
-        const step = Math.floor(data.length / bars.length);
+        fill.style.height = level + '%';
+        fill.classList.toggle('high', level > 85);
         
-        bars.forEach((bar, i) => {
-            const value = data[i * step] || 0;
-            const height = Math.max(2, (value / 255) * 100);
-            bar.style.height = height + '%';
-            bar.classList.toggle('high', value > 200);
-        });
-    }
-
-    // 更新峰值条
-    function updatePeakBar(barId, holdId, rmsValue) {
-        const bar = document.getElementById(barId);
-        const hold = document.getElementById(holdId);
-        if (!bar) return;
-        
-        // 转换为百分比
-        const level = Math.min(100, (rmsValue / 128) * 100 * 1.5);
-        bar.style.width = level + '%';
-        bar.classList.toggle('high', level > 80);
-        
-        // 峰值保持
-        if (hold) {
-            const currentPeak = parseFloat(hold.style.right) || 0;
-            const holdPos = 100 - level;
-            
-            if (level > (100 - currentPeak)) {
-                hold.style.right = holdPos + '%';
-                hold.classList.add('active');
-                // 2秒后淡出峰值保持
-                setTimeout(() => {
-                    hold.classList.remove('active');
-                }, 2000);
+        // 峰值保持逻辑
+        if (channel === 'left') {
+            if (level > peakHoldLeft) {
+                peakHoldLeft = level;
+                if (peak) {
+                    peak.style.bottom = peakHoldLeft + '%';
+                    peak.classList.add('active');
+                }
+            } else {
+                // 缓慢衰减
+                peakHoldLeft = Math.max(0, peakHoldLeft - 0.5);
+                if (peak) {
+                    peak.style.bottom = peakHoldLeft + '%';
+                    if (peakHoldLeft <= 0) peak.classList.remove('active');
+                }
+            }
+        } else {
+            if (level > peakHoldRight) {
+                peakHoldRight = level;
+                if (peak) {
+                    peak.style.bottom = peakHoldRight + '%';
+                    peak.classList.add('active');
+                }
+            } else {
+                peakHoldRight = Math.max(0, peakHoldRight - 0.5);
+                if (peak) {
+                    peak.style.bottom = peakHoldRight + '%';
+                    if (peakHoldRight <= 0) peak.classList.remove('active');
+                }
             }
         }
     }
@@ -367,6 +349,8 @@
         }
         const meter = document.getElementById('levelMeter');
         if (meter) meter.classList.remove('active');
+        peakHoldLeft = 0;
+        peakHoldRight = 0;
     }
 
     // 初始化广播通道
