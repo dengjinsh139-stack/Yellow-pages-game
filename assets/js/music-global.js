@@ -1,34 +1,102 @@
 /**
- * 全局音乐悬浮按钮组件 v2.8.6
+ * 全局音乐悬浮按钮组件 v2.8.11
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
  * 会自动创建音乐按钮和音频元素
- * 特性：跨页面持续播放、自动同步状态
+ * 特性：跨页面持续播放、自动同步状态、保持播放进度
  */
 
 (function() {
     'use strict';
 
-    console.log('[MusicGlobal] 脚本加载中...');
-
     const STORAGE_KEY = 'yellow_pages_music_state';
+    const PROGRESS_KEY = 'yellow_pages_music_progress';
     const MUSIC_URL = 'assets/audio/bg-music.mp3';
+    const CHANNEL_NAME = 'yellow_pages_music_channel';
     
     let bgMusic = null;
     let isMusicPlaying = false;
     let isMuted = true;
     let syncInterval = null;
+    let broadcastChannel = null;
+    let isActiveController = false; // 当前页面是否是控制页面
 
-    // 检查是否已有其他页面在播放
-    function isAnotherPagePlaying() {
-        const savedState = localStorage.getItem(STORAGE_KEY);
-        const savedTime = parseInt(localStorage.getItem(STORAGE_KEY + '_time') || '0');
-        // 如果3秒内有状态更新，说明其他页面在控制
-        return (savedState === 'playing' && Date.now() - savedTime < 3000);
+    // 初始化广播通道（用于页面间实时通信）
+    function initBroadcastChannel() {
+        if (typeof BroadcastChannel !== 'undefined') {
+            broadcastChannel = new BroadcastChannel(CHANNEL_NAME);
+            broadcastChannel.onmessage = (event) => {
+                const data = event.data;
+                if (data.type === 'ping') {
+                    // 其他页面询问谁在播放
+                    if (isActiveController && isMusicPlaying) {
+                        broadcastChannel.postMessage({
+                            type: 'pong',
+                            currentTime: bgMusic ? bgMusic.currentTime : 0,
+                            timestamp: Date.now()
+                        });
+                    }
+                } else if (data.type === 'pong') {
+                    // 收到其他页面的响应，说明有其他页面在播放
+                    if (!isActiveController && data.currentTime > 0) {
+                        // 同步播放进度
+                        const savedProgress = parseFloat(localStorage.getItem(PROGRESS_KEY) || '0');
+                        if (bgMusic && Math.abs(bgMusic.currentTime - savedProgress) > 1) {
+                            bgMusic.currentTime = savedProgress;
+                        }
+                    }
+                } else if (data.type === 'state_change') {
+                    handleStateChange(data.state, data.currentTime);
+                } else if (data.type === 'progress_update') {
+                    localStorage.setItem(PROGRESS_KEY, data.currentTime);
+                }
+            };
+        }
     }
 
-    // 创建音乐悬浮按钮（统一样式：圆角长条形）
+    // 处理状态变化
+    function handleStateChange(state, currentTime) {
+        if (state === 'playing') {
+            if (!isMusicPlaying) {
+                isMusicPlaying = true;
+                isMuted = false;
+                if (bgMusic) {
+                    bgMusic.muted = false;
+                    if (currentTime > 0) {
+                        bgMusic.currentTime = currentTime;
+                    }
+                    bgMusic.play().catch(() => {});
+                }
+            }
+        } else if (state === 'paused') {
+            if (bgMusic) bgMusic.pause();
+            isMusicPlaying = false;
+        } else if (state === 'muted') {
+            isMuted = true;
+            if (bgMusic) bgMusic.muted = true;
+        }
+        updateMusicUI();
+    }
+
+    // 广播状态变化
+    function broadcastState(state) {
+        if (broadcastChannel) {
+            broadcastChannel.postMessage({
+                type: 'state_change',
+                state: state,
+                currentTime: bgMusic ? bgMusic.currentTime : 0,
+                timestamp: Date.now()
+            });
+        }
+        // 同时保存到 localStorage
+        localStorage.setItem(STORAGE_KEY, state);
+        localStorage.setItem(STORAGE_KEY + '_time', Date.now());
+        if (bgMusic) {
+            localStorage.setItem(PROGRESS_KEY, bgMusic.currentTime);
+        }
+    }
+
+    // 创建音乐悬浮按钮
     function createMusicButton() {
-        // 如果已存在则不创建
         if (document.getElementById('musicFloatBtn')) return;
 
         const btn = document.createElement('div');
@@ -41,7 +109,6 @@
         btn.onclick = toggleGlobalMusic;
         document.body.appendChild(btn);
 
-        // 添加统一样式（如果不存在）
         if (!document.getElementById('music-global-styles')) {
             const style = document.createElement('style');
             style.id = 'music-global-styles';
@@ -92,20 +159,11 @@
         }
     }
 
-    // 创建或获取音频元素
+    // 创建音频元素
     function initAudioElement() {
-        // 检查是否已有音频元素
         const existingAudio = document.getElementById('bgMusic');
         if (existingAudio) {
             bgMusic = existingAudio;
-            return;
-        }
-
-        // 检查是否其他页面正在播放（通过检查localStorage时间戳）
-        if (isAnotherPagePlaying()) {
-            console.log('[MusicGlobal] 其他页面正在播放，不创建新音频实例');
-            // 只创建按钮，不创建音频（跟随其他页面的状态）
-            bgMusic = null;
             return;
         }
 
@@ -116,58 +174,121 @@
         bgMusic.preload = 'auto';
         bgMusic.volume = 0.5;
         bgMusic.muted = true;
+        
+        // 恢复上次的播放进度
+        const savedProgress = parseFloat(localStorage.getItem(PROGRESS_KEY) || '0');
+        if (savedProgress > 0) {
+            bgMusic.currentTime = savedProgress;
+        }
+        
         document.body.appendChild(bgMusic);
+
+        // 定期保存播放进度
+        setInterval(() => {
+            if (bgMusic && isMusicPlaying && !bgMusic.paused) {
+                localStorage.setItem(PROGRESS_KEY, bgMusic.currentTime);
+                if (broadcastChannel) {
+                    broadcastChannel.postMessage({
+                        type: 'progress_update',
+                        currentTime: bgMusic.currentTime
+                    });
+                }
+            }
+        }, 1000);
+    }
+
+    // 询问其他页面谁在播放
+    function queryOtherPages() {
+        return new Promise((resolve) => {
+            if (!broadcastChannel) {
+                resolve(false);
+                return;
+            }
+            
+            let responded = false;
+            const timeout = setTimeout(() => {
+                if (!responded) {
+                    resolve(false);
+                }
+            }, 500);
+
+            const handler = (event) => {
+                if (event.data.type === 'pong') {
+                    responded = true;
+                    clearTimeout(timeout);
+                    broadcastChannel.removeEventListener('message', handler);
+                    resolve(true);
+                }
+            };
+            
+            broadcastChannel.addEventListener('message', handler);
+            broadcastChannel.postMessage({ type: 'ping', timestamp: Date.now() });
+        });
     }
 
     // 初始化音乐系统
-    function initMusicSystem() {
+    async function initMusicSystem() {
         console.log('[MusicGlobal] 初始化音乐系统...');
+        
+        initBroadcastChannel();
         createMusicButton();
-        initAudioElement();
-        console.log('[MusicGlobal] 按钮创建完成:', document.getElementById('musicFloatBtn') ? '成功' : '失败');
-
-        // 如果有音频元素，尝试自动播放
-        if (bgMusic) {
-            bgMusic.muted = true;
+        
+        // 检查是否有其他页面在播放
+        const hasOtherPage = await queryOtherPages();
+        
+        if (hasOtherPage) {
+            console.log('[MusicGlobal] 检测到其他页面正在播放');
+            // 创建音频但不自动播放，等待同步
+            initAudioElement();
+            syncMusicState();
+        } else {
+            console.log('[MusicGlobal] 没有其他页面播放，成为控制页面');
+            isActiveController = true;
+            initAudioElement();
             
-            const playPromise = bgMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isMusicPlaying = true;
-                    updateMusicUI();
-                    
-                    // 检查是否之前已开启声音
-                    const savedState = localStorage.getItem(STORAGE_KEY);
-                    if (savedState === 'playing') {
-                        unmuteMusic();
-                    }
-                }).catch(err => {
-                    console.log('[MusicGlobal] 自动播放被阻止:', err);
-                    isMusicPlaying = false;
-                    updateMusicUI();
+            // 检查之前的播放状态
+            const savedState = localStorage.getItem(STORAGE_KEY);
+            if (savedState === 'playing') {
+                bgMusic.muted = false;
+                isMuted = false;
+                const playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isMusicPlaying = true;
+                        updateMusicUI();
+                    }).catch(err => {
+                        console.log('[MusicGlobal] 自动播放被阻止:', err);
+                        isMusicPlaying = false;
+                        updateMusicUI();
+                    });
+                }
+            }
+        }
+
+        // 监听其他页面的状态变化
+        window.addEventListener('storage', (e) => {
+            if (e.key === STORAGE_KEY) {
+                syncMusicState();
+            }
+        });
+
+        // 定期同步
+        syncInterval = setInterval(syncMusicState, 1000);
+
+        // 页面卸载时保存进度
+        window.addEventListener('beforeunload', () => {
+            if (bgMusic) {
+                localStorage.setItem(PROGRESS_KEY, bgMusic.currentTime);
+            }
+            if (isActiveController && broadcastChannel) {
+                broadcastChannel.postMessage({
+                    type: 'controller_leaving',
+                    currentTime: bgMusic ? bgMusic.currentTime : 0
                 });
             }
+        });
 
-            // 监听其他页面的音乐状态变化
-            window.addEventListener('storage', (e) => {
-                if (e.key === STORAGE_KEY) {
-                    syncMusicState();
-                }
-            });
-
-            // 定期同步状态
-            syncInterval = setInterval(syncMusicState, 1000);
-        } else {
-            // 其他页面在播放，当前页面只同步UI
-            syncMusicState();
-            // 仍然需要监听状态变化
-            window.addEventListener('storage', (e) => {
-                if (e.key === STORAGE_KEY) {
-                    syncMusicState();
-                }
-            });
-            syncInterval = setInterval(syncMusicState, 1000);
-        }
+        console.log('[MusicGlobal] 按钮创建完成:', document.getElementById('musicFloatBtn') ? '成功' : '失败');
     }
 
     // 取消静音
@@ -176,26 +297,18 @@
         if (bgMusic) {
             bgMusic.muted = false;
             
-            if (!isMusicPlaying) {
+            if (!isMusicPlaying || bgMusic.paused) {
                 bgMusic.play().then(() => {
                     isMusicPlaying = true;
+                    isActiveController = true;
                     updateMusicUI();
-                    saveMusicState('playing');
+                    broadcastState('playing');
                 });
             } else {
+                isMusicPlaying = true;
+                isActiveController = true;
                 updateMusicUI();
-                saveMusicState('playing');
-            }
-        } else {
-            // 如果当前页面没有音频，创建一个新的
-            initAudioElement();
-            if (bgMusic) {
-                bgMusic.muted = false;
-                bgMusic.play().then(() => {
-                    isMusicPlaying = true;
-                    updateMusicUI();
-                    saveMusicState('playing');
-                });
+                broadcastState('playing');
             }
         }
     }
@@ -205,7 +318,7 @@
         isMuted = true;
         if (bgMusic) bgMusic.muted = true;
         updateMusicUI();
-        saveMusicState('muted');
+        broadcastState('muted');
     }
 
     // 暂停音乐
@@ -213,24 +326,12 @@
         if (bgMusic) bgMusic.pause();
         isMusicPlaying = false;
         updateMusicUI();
-        saveMusicState('paused');
-    }
-
-    // 恢复播放
-    function resumeMusic() {
-        if (!bgMusic) initAudioElement();
-        if (bgMusic) {
-            bgMusic.play().then(() => {
-                isMusicPlaying = true;
-                updateMusicUI();
-                saveMusicState(isMuted ? 'muted' : 'playing');
-            });
-        }
+        broadcastState('paused');
     }
 
     // 切换全局音乐
     function toggleGlobalMusic() {
-        if (!isMusicPlaying) {
+        if (!isMusicPlaying || bgMusic.paused) {
             unmuteMusic();
         } else if (isMuted) {
             unmuteMusic();
@@ -245,58 +346,50 @@
         const floatIcon = document.getElementById('musicFloatIcon');
         const floatText = document.getElementById('musicFloatText');
 
-        const savedState = localStorage.getItem(STORAGE_KEY);
-        const isActuallyPlaying = savedState === 'playing' || (isMusicPlaying && !isMuted);
-
-        if (!isMusicPlaying && savedState !== 'playing') {
-            // 暂停状态
+        if (!isMusicPlaying || bgMusic.paused) {
             if (floatIcon) floatIcon.textContent = '▶️';
             if (floatText) floatText.textContent = '播放音乐';
             if (floatBtn) floatBtn.classList.remove('playing');
-        } else if ((isMuted && !isMusicPlaying) || savedState === 'muted') {
-            // 静音状态
+        } else if (isMuted) {
             if (floatIcon) floatIcon.textContent = '🔇';
             if (floatText) floatText.textContent = '开启音乐';
             if (floatBtn) floatBtn.classList.remove('playing');
-        } else if (isActuallyPlaying) {
-            // 正常播放
+        } else {
             if (floatIcon) floatIcon.textContent = '🔊';
             if (floatText) floatText.textContent = '音乐播放中';
             if (floatBtn) floatBtn.classList.add('playing');
         }
     }
 
-    // 保存状态
-    function saveMusicState(state) {
-        localStorage.setItem(STORAGE_KEY, state);
-        localStorage.setItem(STORAGE_KEY + '_time', Date.now());
-    }
-
     // 同步音乐状态
     function syncMusicState() {
         const savedState = localStorage.getItem(STORAGE_KEY);
         const savedTime = parseInt(localStorage.getItem(STORAGE_KEY + '_time') || '0');
+        const savedProgress = parseFloat(localStorage.getItem(PROGRESS_KEY) || '0');
         
-        // 只处理最近5秒内的状态变化
         if (Date.now() - savedTime > 5000) return;
 
         if (savedState === 'playing') {
-            // 其他页面开始播放
-            if (!isMusicPlaying) {
+            if (!isMusicPlaying || bgMusic.paused) {
                 isMusicPlaying = true;
                 isMuted = false;
-                // 如果当前页面有音频，跟随播放
                 if (bgMusic) {
                     bgMusic.muted = false;
+                    // 同步播放进度
+                    if (savedProgress > 0 && Math.abs(bgMusic.currentTime - savedProgress) > 2) {
+                        bgMusic.currentTime = savedProgress;
+                    }
                     bgMusic.play().catch(() => {});
                 }
-            } else if (isMuted && bgMusic) {
-                isMuted = false;
-                bgMusic.muted = false;
+            } else if (savedProgress > 0 && Math.abs(bgMusic.currentTime - savedProgress) > 2) {
+                // 播放进度偏差超过2秒，同步进度
+                bgMusic.currentTime = savedProgress;
             }
             updateMusicUI();
         } else if (savedState === 'paused') {
-            if (bgMusic) bgMusic.pause();
+            if (bgMusic && !bgMusic.paused) {
+                bgMusic.pause();
+            }
             isMusicPlaying = false;
             updateMusicUI();
         } else if (savedState === 'muted') {
@@ -306,14 +399,7 @@
         }
     }
 
-    // 页面卸载时清理
-    window.addEventListener('beforeunload', () => {
-        if (syncInterval) {
-            clearInterval(syncInterval);
-        }
-    });
-
-    // 暴露全局函数供其他脚本调用
+    // 暴露全局函数
     window.toggleGlobalMusic = toggleGlobalMusic;
 
     // 页面加载完成后初始化
