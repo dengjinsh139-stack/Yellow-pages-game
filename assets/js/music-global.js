@@ -1,5 +1,5 @@
 /**
- * 全局音乐悬浮按钮组件 v2.9.6
+ * 全局音乐悬浮按钮组件 v2.9.8
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
  * 会自动创建音乐按钮、音频元素和电平表
  * 特性：跨页面持续播放、自动同步状态、保持播放进度、音频可视化
@@ -22,10 +22,13 @@
     
     // 音频分析相关
     let audioContext = null;
-    let analyser = null;
-    let dataArray = null;
+    let analyserLeft = null;
+    let analyserRight = null;
+    let dataArrayLeft = null;
+    let dataArrayRight = null;
     let source = null;
     let animationId = null;
+    let splitter = null;
 
     // 峰值保持数据
     let peakHoldLeft = 0;
@@ -256,15 +259,32 @@
 
         try {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
             
+            // 创建声道分离器
+            splitter = audioContext.createChannelSplitter(2);
+            
+            // 为左右声道分别创建分析器
+            analyserLeft = audioContext.createAnalyser();
+            analyserRight = audioContext.createAnalyser();
+            analyserLeft.fftSize = 256;
+            analyserRight.fftSize = 256;
+            
+            // 连接音频源
             source = audioContext.createMediaElementSource(bgMusic);
-            source.connect(analyser);
-            analyser.connect(audioContext.destination);
+            source.connect(splitter);
             
-            const bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
+            // 左声道 -> 左分析器
+            splitter.connect(analyserLeft, 0);
+            // 右声道 -> 右分析器
+            splitter.connect(analyserRight, 1);
+            
+            // 连接到输出
+            source.connect(audioContext.destination);
+            
+            const bufferLengthLeft = analyserLeft.frequencyBinCount;
+            const bufferLengthRight = analyserRight.frequencyBinCount;
+            dataArrayLeft = new Uint8Array(bufferLengthLeft);
+            dataArrayRight = new Uint8Array(bufferLengthRight);
             
             createLevelMeter();
             updateLevelMeter();
@@ -275,21 +295,20 @@
 
     // 更新电平表（Wwise风格）
     function updateLevelMeter() {
-        if (!analyser || !dataArray) return;
+        if (!analyserLeft || !analyserRight || !dataArrayLeft || !dataArrayRight) return;
 
-        analyser.getByteFrequencyData(dataArray);
+        // 分别获取左右声道的频域数据
+        analyserLeft.getByteFrequencyData(dataArrayLeft);
+        analyserRight.getByteFrequencyData(dataArrayRight);
 
-        // 分别计算左右声道
-        const leftData = dataArray.slice(0, dataArray.length / 2);
-        const rightData = dataArray.slice(dataArray.length / 2);
-        
-        const leftLevel = calculateLevel(leftData);
-        const rightLevel = calculateLevel(rightData);
-        
+        // 计算左右声道电平
+        const leftLevel = calculateLevel(dataArrayLeft);
+        const rightLevel = calculateLevel(dataArrayRight);
+
         // 更新显示
         updateBar('levelLeft', 'peakLeft', leftLevel, 'left');
         updateBar('levelRight', 'peakRight', rightLevel, 'right');
-        
+
         // 显示/隐藏电平表
         const meter = document.getElementById('levelMeter');
         if (meter) {
@@ -299,7 +318,7 @@
                 meter.classList.remove('active');
             }
         }
-        
+
         animationId = requestAnimationFrame(updateLevelMeter);
     }
 
