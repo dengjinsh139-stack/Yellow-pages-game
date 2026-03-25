@@ -1,8 +1,8 @@
 /**
- * 全局音乐悬浮按钮组件 v2.8.11
+ * 全局音乐悬浮按钮组件 v2.9.0
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
- * 会自动创建音乐按钮和音频元素
- * 特性：跨页面持续播放、自动同步状态、保持播放进度
+ * 会自动创建音乐按钮、音频元素和电平表
+ * 特性：跨页面持续播放、自动同步状态、保持播放进度、音频可视化
  */
 
 (function() {
@@ -18,16 +18,214 @@
     let isMuted = true;
     let syncInterval = null;
     let broadcastChannel = null;
-    let isActiveController = false; // 当前页面是否是控制页面
+    let isActiveController = false;
+    
+    // 音频分析相关
+    let audioContext = null;
+    let analyser = null;
+    let dataArray = null;
+    let source = null;
+    let animationId = null;
 
-    // 初始化广播通道（用于页面间实时通信）
+    // 创建电平表
+    function createLevelMeter() {
+        if (document.getElementById('levelMeter')) return;
+
+        const meter = document.createElement('div');
+        meter.id = 'levelMeter';
+        meter.className = 'level-meter';
+        meter.innerHTML = `
+            <div class="level-meter-title">🎵 音频电平</div>
+            <div class="level-meter-channels">
+                <div class="level-channel">
+                    <span class="channel-label">L</span>
+                    <div class="level-bar">
+                        <div class="level-fill" id="levelLeft"></div>
+                    </div>
+                </div>
+                <div class="level-channel">
+                    <span class="channel-label">R</span>
+                    <div class="level-bar">
+                        <div class="level-fill" id="levelRight"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="level-peaks">
+                <div class="peak-indicator" id="peakLeft">-∞ dB</div>
+                <div class="peak-indicator" id="peakRight">-∞ dB</div>
+            </div>
+        `;
+        document.body.appendChild(meter);
+
+        // 添加样式
+        if (!document.getElementById('level-meter-styles')) {
+            const style = document.createElement('style');
+            style.id = 'level-meter-styles';
+            style.textContent = `
+                .level-meter {
+                    position: fixed;
+                    top: 50%;
+                    right: 20px;
+                    transform: translateY(-50%);
+                    background: rgba(15, 15, 23, 0.95);
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(0, 212, 170, 0.3);
+                    border-radius: 12px;
+                    padding: 15px;
+                    width: 60px;
+                    z-index: 9998;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    pointer-events: none;
+                }
+                .level-meter.active {
+                    opacity: 1;
+                }
+                .level-meter-title {
+                    font-size: 10px;
+                    color: #00d4aa;
+                    text-align: center;
+                    margin-bottom: 10px;
+                    font-weight: 600;
+                    white-space: nowrap;
+                }
+                .level-meter-channels {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+                .level-channel {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+                .channel-label {
+                    font-size: 9px;
+                    color: #a1a1aa;
+                    width: 12px;
+                    text-align: center;
+                }
+                .level-bar {
+                    flex: 1;
+                    height: 8px;
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 4px;
+                    overflow: hidden;
+                    position: relative;
+                }
+                .level-fill {
+                    height: 100%;
+                    width: 0%;
+                    background: linear-gradient(90deg, #00d4aa 0%, #00d4aa 60%, #f59e0b 80%, #ef4444 100%);
+                    border-radius: 4px;
+                    transition: width 0.05s ease-out;
+                }
+                .level-peaks {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 8px;
+                    font-size: 8px;
+                    color: #71717a;
+                }
+                @media (max-width: 1200px) {
+                    .level-meter {
+                        right: 10px;
+                        padding: 10px;
+                        width: 50px;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // 初始化音频分析
+    function initAudioAnalyser() {
+        if (!bgMusic || audioContext) return;
+
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            
+            source = audioContext.createMediaElementSource(bgMusic);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+            
+            createLevelMeter();
+            updateLevelMeter();
+        } catch (e) {
+            console.log('[MusicGlobal] 音频分析初始化失败:', e);
+        }
+    }
+
+    // 更新电平表
+    function updateLevelMeter() {
+        if (!analyser || !dataArray) return;
+
+        analyser.getByteFrequencyData(dataArray);
+
+        // 计算左右声道平均值
+        const leftSum = dataArray.slice(0, dataArray.length / 2).reduce((a, b) => a + b, 0);
+        const rightSum = dataArray.slice(dataArray.length / 2).reduce((a, b) => a + b, 0);
+        
+        const leftAvg = leftSum / (dataArray.length / 2);
+        const rightAvg = rightSum / (dataArray.length / 2);
+        
+        // 转换为百分比
+        const leftLevel = Math.min((leftAvg / 255) * 100 * 1.5, 100);
+        const rightLevel = Math.min((rightAvg / 255) * 100 * 1.5, 100);
+        
+        // 更新显示
+        const leftFill = document.getElementById('levelLeft');
+        const rightFill = document.getElementById('levelRight');
+        const peakLeft = document.getElementById('peakLeft');
+        const peakRight = document.getElementById('peakRight');
+        const meter = document.getElementById('levelMeter');
+        
+        if (leftFill) leftFill.style.width = leftLevel + '%';
+        if (rightFill) rightFill.style.width = rightLevel + '%';
+        
+        // 计算 dB 值
+        const leftDb = leftAvg > 0 ? Math.round(20 * Math.log10(leftAvg / 255)) : -Infinity;
+        const rightDb = rightAvg > 0 ? Math.round(20 * Math.log10(rightAvg / 255)) : -Infinity;
+        
+        if (peakLeft) peakLeft.textContent = leftDb > -60 ? leftDb + ' dB' : '-∞ dB';
+        if (peakRight) peakRight.textContent = rightDb > -60 ? rightDb + ' dB' : '-∞ dB';
+        
+        // 显示/隐藏电平表
+        if (meter) {
+            if (isMusicPlaying && !isMuted && (leftLevel > 1 || rightLevel > 1)) {
+                meter.classList.add('active');
+            } else if (!isMusicPlaying || isMuted) {
+                meter.classList.remove('active');
+            }
+        }
+        
+        animationId = requestAnimationFrame(updateLevelMeter);
+    }
+
+    // 停止电平表更新
+    function stopLevelMeter() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        const meter = document.getElementById('levelMeter');
+        if (meter) meter.classList.remove('active');
+    }
+
+    // 初始化广播通道
     function initBroadcastChannel() {
         if (typeof BroadcastChannel !== 'undefined') {
             broadcastChannel = new BroadcastChannel(CHANNEL_NAME);
             broadcastChannel.onmessage = (event) => {
                 const data = event.data;
                 if (data.type === 'ping') {
-                    // 其他页面询问谁在播放
                     if (isActiveController && isMusicPlaying) {
                         broadcastChannel.postMessage({
                             type: 'pong',
@@ -36,9 +234,7 @@
                         });
                     }
                 } else if (data.type === 'pong') {
-                    // 收到其他页面的响应，说明有其他页面在播放
                     if (!isActiveController && data.currentTime > 0) {
-                        // 同步播放进度
                         const savedProgress = parseFloat(localStorage.getItem(PROGRESS_KEY) || '0');
                         if (bgMusic && Math.abs(bgMusic.currentTime - savedProgress) > 1) {
                             bgMusic.currentTime = savedProgress;
@@ -67,14 +263,16 @@
                     bgMusic.play().catch(() => {});
                 }
             }
+            updateMusicUI();
         } else if (state === 'paused') {
             if (bgMusic) bgMusic.pause();
             isMusicPlaying = false;
+            updateMusicUI();
         } else if (state === 'muted') {
             isMuted = true;
             if (bgMusic) bgMusic.muted = true;
+            updateMusicUI();
         }
-        updateMusicUI();
     }
 
     // 广播状态变化
@@ -87,7 +285,6 @@
                 timestamp: Date.now()
             });
         }
-        // 同时保存到 localStorage
         localStorage.setItem(STORAGE_KEY, state);
         localStorage.setItem(STORAGE_KEY + '_time', Date.now());
         if (bgMusic) {
@@ -142,18 +339,10 @@
                     animation: floatPulse 2s infinite;
                 }
                 @keyframes floatPulse {
-                    0%, 100% { 
-                        box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
-                        transform: scale(1);
-                    }
-                    50% { 
-                        box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5);
-                        transform: scale(1.02);
-                    }
+                    0%, 100% { box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3); transform: scale(1); }
+                    50% { box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5); transform: scale(1.02); }
                 }
-                #musicFloatIcon {
-                    font-size: 1rem;
-                }
+                #musicFloatIcon { font-size: 1rem; }
             `;
             document.head.appendChild(style);
         }
@@ -175,7 +364,6 @@
         bgMusic.volume = 0.5;
         bgMusic.muted = true;
         
-        // 恢复上次的播放进度
         const savedProgress = parseFloat(localStorage.getItem(PROGRESS_KEY) || '0');
         if (savedProgress > 0) {
             bgMusic.currentTime = savedProgress;
@@ -183,7 +371,6 @@
         
         document.body.appendChild(bgMusic);
 
-        // 定期保存播放进度
         setInterval(() => {
             if (bgMusic && isMusicPlaying && !bgMusic.paused) {
                 localStorage.setItem(PROGRESS_KEY, bgMusic.currentTime);
@@ -197,19 +384,16 @@
         }, 1000);
     }
 
-    // 询问其他页面谁在播放
+    // 询问其他页面
     function queryOtherPages() {
         return new Promise((resolve) => {
             if (!broadcastChannel) {
                 resolve(false);
                 return;
             }
-            
             let responded = false;
             const timeout = setTimeout(() => {
-                if (!responded) {
-                    resolve(false);
-                }
+                if (!responded) resolve(false);
             }, 500);
 
             const handler = (event) => {
@@ -220,7 +404,6 @@
                     resolve(true);
                 }
             };
-            
             broadcastChannel.addEventListener('message', handler);
             broadcastChannel.postMessage({ type: 'ping', timestamp: Date.now() });
         });
@@ -228,25 +411,18 @@
 
     // 初始化音乐系统
     async function initMusicSystem() {
-        console.log('[MusicGlobal] 初始化音乐系统...');
-        
         initBroadcastChannel();
         createMusicButton();
         
-        // 检查是否有其他页面在播放
         const hasOtherPage = await queryOtherPages();
         
         if (hasOtherPage) {
-            console.log('[MusicGlobal] 检测到其他页面正在播放');
-            // 创建音频但不自动播放，等待同步
             initAudioElement();
             syncMusicState();
         } else {
-            console.log('[MusicGlobal] 没有其他页面播放，成为控制页面');
             isActiveController = true;
             initAudioElement();
             
-            // 检查之前的播放状态
             const savedState = localStorage.getItem(STORAGE_KEY);
             if (savedState === 'playing') {
                 bgMusic.muted = false;
@@ -256,6 +432,8 @@
                     playPromise.then(() => {
                         isMusicPlaying = true;
                         updateMusicUI();
+                        // 初始化音频分析器
+                        initAudioAnalyser();
                     }).catch(err => {
                         console.log('[MusicGlobal] 自动播放被阻止:', err);
                         isMusicPlaying = false;
@@ -265,17 +443,14 @@
             }
         }
 
-        // 监听其他页面的状态变化
         window.addEventListener('storage', (e) => {
             if (e.key === STORAGE_KEY) {
                 syncMusicState();
             }
         });
 
-        // 定期同步
         syncInterval = setInterval(syncMusicState, 1000);
 
-        // 页面卸载时保存进度
         window.addEventListener('beforeunload', () => {
             if (bgMusic) {
                 localStorage.setItem(PROGRESS_KEY, bgMusic.currentTime);
@@ -287,8 +462,6 @@
                 });
             }
         });
-
-        console.log('[MusicGlobal] 按钮创建完成:', document.getElementById('musicFloatBtn') ? '成功' : '失败');
     }
 
     // 取消静音
@@ -303,12 +476,15 @@
                     isActiveController = true;
                     updateMusicUI();
                     broadcastState('playing');
+                    // 初始化音频分析
+                    initAudioAnalyser();
                 });
             } else {
                 isMusicPlaying = true;
                 isActiveController = true;
                 updateMusicUI();
                 broadcastState('playing');
+                initAudioAnalyser();
             }
         }
     }
@@ -319,6 +495,7 @@
         if (bgMusic) bgMusic.muted = true;
         updateMusicUI();
         broadcastState('muted');
+        stopLevelMeter();
     }
 
     // 暂停音乐
@@ -327,6 +504,7 @@
         isMusicPlaying = false;
         updateMusicUI();
         broadcastState('paused');
+        stopLevelMeter();
     }
 
     // 切换全局音乐
@@ -375,15 +553,11 @@
                 isMuted = false;
                 if (bgMusic) {
                     bgMusic.muted = false;
-                    // 同步播放进度
                     if (savedProgress > 0 && Math.abs(bgMusic.currentTime - savedProgress) > 2) {
                         bgMusic.currentTime = savedProgress;
                     }
                     bgMusic.play().catch(() => {});
                 }
-            } else if (savedProgress > 0 && Math.abs(bgMusic.currentTime - savedProgress) > 2) {
-                // 播放进度偏差超过2秒，同步进度
-                bgMusic.currentTime = savedProgress;
             }
             updateMusicUI();
         } else if (savedState === 'paused') {
