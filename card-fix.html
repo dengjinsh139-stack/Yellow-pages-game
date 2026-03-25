@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音频应用中心</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #0d0d12;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* 卡片容器 - Flexbox 等高 */
+    .card-container {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* 单个卡片 */
+    .card {
+      flex: 1;
+      min-width: 300px;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      padding: 28px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #1a1a2e 0%, #16162a 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 图标区域 */
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+
+    .card:nth-child(1) .card-icon {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card:nth-child(2) .card-icon {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .card:nth-child(3) .card-icon {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    /* 标题 */
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    /* 描述文字 - 撑开空间 */
+    .card-desc {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #8b8b9a;
+      margin-bottom: 20px;
+      flex: 1; /* 关键：让描述区域自动撑开 */
+    }
+
+    /* 标签区域 */
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .tag {
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      font-size: 12px;
+      color: #a0a0b0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag-icon {
+      font-size: 12px;
+    }
+
+    /* 按钮 - 固定在底部 */
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      margin-top: auto; /* 关键：按钮推到最底部 */
+      width: fit-content;
+    }
+
+    .card-btn:hover {
+      opacity: 0.9;
+    }
+
+    .card-btn.secondary {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .card-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      opacity: 1;
+    }
+
+    .card-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      color: #6b6b7a;
+      font-size: 13px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: #8b8b9a;
+    }
+
+    .footer-brand-icon {
+      color: #667eea;
+    }
+
+    /* 响应式 */
+    @media (max-width: 992px) {
+      .card-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .card {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card-container">
+      <!-- 卡片1: 音效管理中心 -->
+      <div class="card">
+        <div class="card-icon">🔊</div>
+        <h3 class="card-title">音效管理中心</h3>
+        <p class="card-desc">专业的音效资源管理平台，包含音效名词表、Soundminer指南、音效库管理等功能。</p>
+        <div class="card-tags">
+          <span class="tag"><span class="tag-icon">📑</span>音效名词表</span>
+          <span class="tag"><span class="tag-icon">🔍</span>Soundminer</span>
+          <span class="tag"><span class="tag-icon">📁</span>资源管理</span>
+        </div>
+        <button class="card-btn">进入音效中心 →</button>
+      </div>
+
+      <!-- 卡片2: 音乐百科全书 -->
+      <div class="card">
+        <div class="card-icon">🎵</div>
+        <h3 class="card-title">音乐百科全书</h3>
+        <p class="card-desc">全面的音乐知识库，涵盖音乐流派、音乐理论、制作技巧等专业内容。</p>
+        <div class="card-tags">
+          <span class="tag"><span class="tag-icon">🎸</span>音乐流派</span>
+          <span class="tag"><span class="tag-icon">🎹</span>音乐理论</span>
+          <span class="tag"><span class="tag-icon">🎛️</span>制作技巧</span>
+        </div>
+        <div class="card-btn-group">
+          <button class="card-btn">进入音乐百科 →</button>
+          <button class="card-btn secondary">📑 配乐设计师手册 →</button>
+        </div>
+      </div>
+
+      <!-- 卡片3: Wwise 音频引擎 -->
+      <div class="card">
+        <div class="card-icon">🎮</div>
+        <h3 class="card-title">Wwise 音频引擎</h3>
+        <p class="card-desc">游戏音频中间件 Wwise 的集成指南、项目配置、最佳实践文档。</p>
+        <div class="card-tags">
+          <span class="tag"><span class="tag-icon">⚙️</span>项目配置</span>
+          <span class="tag"><span class="tag-icon">📖</span>集成指南</span>
+          <span class="tag"><span class="tag-icon">💡</span>最佳实践</span>
+        </div>
+        <button class="card-btn">进入 Wwise →</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-brand">
+        <span class="footer-brand-icon">⚡</span>
+        <span>我的工作站 v2.6.10 | 音频应用中心</span>
+      </div>
+      <div>© 2026 个人游戏开发实验室 🎮</div>
+    </div>
+  </div>
+</body>
+</html>
