@@ -189,9 +189,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Counter-Strike 2',
                             developer: 'Valve',
                             developerUrl: 'https://www.valvesoftware.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1eu4y1C7ow',
-                            cgUrl: 'https://www.bilibili.com/video/BV1zh4y1P7c3',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Xh411T7cL',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Counter-Strike+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Counter-Strike+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Counter-Strike+2+soundtrack',
                             worldDescription: '全球反恐精英与恐怖分子之间的对抗。从炙热沙城到核子危机，经典的爆破模式与人质模式考验团队配合，是全球电竞史上最经典的FPS竞技游戏。'
                         },
                         {
@@ -199,9 +199,9 @@ const GAME_WORLD_DATA = {
                             nameEn: "Tom Clancy's Rainbow Six Siege",
                             developer: 'Ubisoft',
                             developerUrl: 'https://www.ubisoft.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Us411d7TV',
-                            cgUrl: 'https://www.bilibili.com/video/BV1es411d7Xj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411d7Ha',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Rainbow+Six+Siege+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Rainbow+Six+Siege+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Rainbow+Six+Siege+soundtrack',
                             worldDescription: '全球反恐特种部队彩虹小队，面对白面具恐怖组织。可破坏的墙体、独特的干员技能、高度战术化的室内近距离作战，重新定义战术射击游戏体验。'
                         },
                         {
@@ -209,9 +209,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Valorant',
                             developer: 'Riot Games',
                             developerUrl: 'https://www.riotgames.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1ka4y1i7NR',
-                            cgUrl: 'https://www.bilibili.com/video/BV1Q54y1D7GH',
-                            ostUrl: 'https://www.bilibili.com/video/BV1HZ4y1s7jm',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Valorant+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Valorant+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Valorant+soundtrack',
                             worldDescription: '近未来的地球，一场名为"First Light"的事件让部分人类获得超能力。特工们装备符文科技武器，在回合制战术射击中运用独特技能争夺胜利。'
                         }
                     ]
@@ -228,9 +228,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'DOOM Eternal',
                             developer: 'id Software',
                             developerUrl: 'https://www.idsoftware.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1CJ411x7Ve',
-                            cgUrl: 'https://www.bilibili.com/video/BV1CJ411x7Ve',
-                            ostUrl: 'https://www.bilibili.com/video/BV1nJ41187A4',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=DOOM+Eternal+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=DOOM+Eternal+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=DOOM+Eternal+soundtrack',
                             worldDescription: '地狱大军入侵地球，毁灭战士从地狱要塞苏醒。在火星与地狱的战场中，以狂暴的近战与火器撕裂恶魔，阻止地狱祭司吞噬人类灵魂的阴谋。'
                         },
                         {
@@ -238,9 +238,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Quake Champions',
                             developer: 'id Software',
                             developerUrl: 'https://www.idsoftware.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Ex41187hC',
-                            cgUrl: 'https://www.bilibili.com/video/BV1px41187hH',
-                            ostUrl: 'https://www.bilibili.com/video/BV1tx41187Xr',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Quake+Champions+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Quake+Champions+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Quake+Champions+soundtrack',
                             worldDescription: '雷神之锤宇宙中的竞技场，来自不同时空的战士们为荣耀而战。火箭跳、空中转身、超高速移动，经典竞技场FPS的现代化演绎。'
                         },
                         {
@@ -248,9 +248,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Unreal Tournament',
                             developer: 'Epic Games',
                             developerUrl: 'https://www.epicgames.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx41187Xs',
-                            cgUrl: 'https://www.bilibili.com/video/BV1vx41187Cj',
-                            ostUrl: 'https://www.bilibili.com/video/BV1ix41187Mo',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Unreal+Tournament+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Unreal+Tournament+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Unreal+Tournament+soundtrack',
                             worldDescription: '新地球政府的血腥竞技场赛事，参赛者使用各种未来武器互相厮杀。从传统的死亡竞赛到独特的占旗模式，纯粹的竞技射击体验。'
                         }
                     ]
@@ -267,9 +267,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'PUBG: Battlegrounds',
                             developer: 'KRAFTON',
                             developerUrl: 'https://www.krafton.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1ex411x7vD',
-                            cgUrl: 'https://www.bilibili.com/video/BV1xx411x7xS',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Jx411x7PM',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=PUBG+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=PUBG+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=PUBG+soundtrack',
                             worldDescription: '在废弃的东欧岛屿上，一百名玩家空投作战。搜集武器、装备，在不断缩小的安全区内生存，成为最后站立的胜利者，开创大逃杀游戏类型。'
                         },
                         {
@@ -277,9 +277,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Apex Legends',
                             developer: 'Respawn Entertainment',
                             developerUrl: 'https://www.respawn.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1nb411U7wT',
-                            cgUrl: 'https://www.bilibili.com/video/BV1nb411U7wT',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Tb411U79K',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Apex+Legends+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Apex+Legends+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Apex+Legends+soundtrack',
                             worldDescription: '边境星系，Apex竞技场比赛。来自泰坦陨落宇宙的传奇角色，三人小队合作，利用角色独特技能在快节奏战斗中生存，揭开源氏与IMC战争的后续。'
                         },
                         {
@@ -287,9 +287,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Call of Duty: Warzone',
                             developer: 'Infinity Ward',
                             developerUrl: 'https://www.infinityward.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1D7411s7ZK',
-                            cgUrl: 'https://www.bilibili.com/video/BV1D7411s7ZK',
-                            ostUrl: 'https://www.bilibili.com/video/BV1A7411s7Yc',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Call+of+Duty+Warzone+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Call+of+Duty+Warzone+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Call+of+Duty+Warzone+soundtrack',
                             worldDescription: '佛丹斯科战区，150人同场竞技。从使命召唤现代战争宇宙中延伸，结合系列经典武器系统与载具，提供快节奏的大逃杀体验。'
                         }
                     ]
@@ -317,9 +317,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'StarCraft II',
                             developer: 'Blizzard Entertainment',
                             developerUrl: 'https://www.blizzard.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7Rg',
-                            cgUrl: 'https://www.bilibili.com/video/BV1bx411w7Rg',
-                            ostUrl: 'https://www.bilibili.com/video/BV1wx411G7rY',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=StarCraft+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=StarCraft+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=StarCraft+2+soundtrack',
                             worldDescription: '科普鲁星区，人族、虫族、神族三足鼎立。吉姆·雷诺、凯瑞甘、阿塔尼斯等英雄的命运交织，对抗堕落的萨尔纳加与虚空中的黑暗。'
                         },
                         {
@@ -327,9 +327,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Age of Empires IV',
                             developer: 'Relic Entertainment',
                             developerUrl: 'https://www.relic.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1rL411G7Pe',
-                            cgUrl: 'https://www.bilibili.com/video/BV1rL411G7Pe',
-                            ostUrl: 'https://www.bilibili.com/video/BV1SL411G7uK',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Age+of+Empires+4+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Age+of+Empires+4+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Age+of+Empires+4+soundtrack',
                             worldDescription: '从黑暗时代到帝国时代，指挥历史上的伟大文明。英格兰、蒙古、中国等文明拥有独特单位与科技树，在中世纪战场上书写帝国兴衰。'
                         },
                         {
@@ -337,9 +337,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Total War: Three Kingdoms',
                             developer: 'Creative Assembly',
                             developerUrl: 'https://www.creative-assembly.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Vb411L7xW',
-                            cgUrl: 'https://www.bilibili.com/video/BV1Vb411L7xW',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Sb411L7mY',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Total+War+Three+Kingdoms+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Total+War+Three+Kingdoms+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Total+War+Three+Kingdoms+soundtrack',
                             worldDescription: '东汉末年，群雄逐鹿。扮演曹操、刘备、孙权等诸侯，通过回合制战略管理内政外交，实时战斗指挥千军万马，体验三国英雄的史诗篇章。'
                         }
                     ]
@@ -356,9 +356,9 @@ const GAME_WORLD_DATA = {
                             nameEn: "Sid Meier's Civilization VI",
                             developer: 'Firaxis Games',
                             developerUrl: 'https://www.firaxis.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7og',
-                            cgUrl: 'https://www.bilibili.com/video/BV1xs411x7og',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iA',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Civilization+6+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Civilization+6+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Civilization+6+soundtrack',
                             worldDescription: '从石器时代到信息时代，领导文明跨越六千年。秦始皇、甘地、彼得大帝等领袖登场，发展科技、文化、宗教，建立能经受时间考验的帝国。'
                         },
                         {
@@ -366,9 +366,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'XCOM 2',
                             developer: 'Firaxis Games',
                             developerUrl: 'https://www.firaxis.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Us411X7Bg',
-                            cgUrl: 'https://www.bilibili.com/video/BV1es411X7Hd',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Us411X7Du',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=XCOM+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=XCOM+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=XCOM+2+soundtrack',
                             worldDescription: '外星征服者统治地球已二十年，XCOM组织沦为抵抗军。玩家指挥地下游击队，从废墟城市中招募战士，夺回地球自由，揭露外星人改造人类的阴谋。'
                         },
                         {
@@ -376,9 +376,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Divinity: Original Sin 2',
                             developer: 'Larian Studios',
                             developerUrl: 'https://www.larian.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Ax411x7rT',
-                            cgUrl: 'https://www.bilibili.com/video/BV1Ax411x7rT',
-                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7bc',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Divinity+Original+Sin+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Divinity+Original+Sin+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Divinity+Original+Sin+2+soundtrack',
                             worldDescription: '绿维珑世界，秘源术士被净源导师迫害。玩家扮演被囚禁的秘源术士，在浮空城中逃生，寻找成为神的方法，同时揭开虚空异兽入侵的真相。'
                         }
                     ]
@@ -395,9 +395,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Stellaris',
                             developer: 'Paradox Interactive',
                             developerUrl: 'https://www.paradoxinteractive.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7oQ',
-                            cgUrl: 'https://www.bilibili.com/video/BV1xs411x7oQ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7ih',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Stellaris+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Stellaris+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Stellaris+soundtrack',
                             worldDescription: '银河系，数千星辰等待探索。从单一星球文明发展为星际帝国，遭遇外星种族、上古文明遗迹、维度裂缝。外交、战争、科技、种族特性，打造独特的太空史诗。'
                         },
                         {
@@ -405,9 +405,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Endless Space 2',
                             developer: 'Amplitude Studios',
                             developerUrl: 'https://www.amplitude-studios.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Ax411x7WE',
-                            cgUrl: 'https://www.bilibili.com/video/BV1Ax411x7WE',
-                            ostUrl: 'https://www.bilibili.com/video/BV1sx411x7Qm',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Endless+Space+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Endless+Space+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Endless+Space+2+soundtrack',
                             worldDescription: '无尽宇宙，多个独特种族争夺银河霸权。每个种族拥有专属任务链与胜利条件，从吞噬星球的藤智者到数字生命的虚拟族，体验完全不同的太空文明发展之路。'
                         },
                         {
@@ -415,9 +415,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Galactic Civilizations III',
                             developer: 'Stardock',
                             developerUrl: 'https://www.stardock.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411x7oy',
-                            cgUrl: 'https://www.bilibili.com/video/BV1vx411x7oT',
-                            ostUrl: 'https://www.bilibili.com/video/BV1ix411x7oN',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Galactic+Civilizations+3+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Galactic+Civilizations+3+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Galactic+Civilizations+3+soundtrack',
                             worldDescription: '23世纪，人类首次接触外星文明。选择人类或外星种族，在巨大的银河地图上建立帝国。深度的飞船设计与外交系统，塑造属于你的太空文明传奇。'
                         }
                     ]
@@ -445,9 +445,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'League of Legends',
                             developer: 'Riot Games',
                             developerUrl: 'https://www.riotgames.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1nx411G77t',
-                            cgUrl: 'https://www.bilibili.com/video/BV1nx411G77t',
-                            ostUrl: 'https://www.bilibili.com/video/BV1jx411G7FH',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=League+of+Legends+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=League+of+Legends+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=League+of+Legends+soundtrack',
                             worldDescription: '符文之地，众多城邦与势力纷争不断。召唤师召唤英雄在正义之地战斗解决争端。从德玛西亚的骑士到诺克萨斯的刺客，每位英雄都有独特的背景故事与能力。'
                         },
                         {
@@ -455,9 +455,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Dota 2',
                             developer: 'Valve',
                             developerUrl: 'https://www.valvesoftware.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Gx411w7qw',
-                            cgUrl: 'https://www.bilibili.com/video/BV1Gx411w7qw',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Ex411w7RB',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Dota+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Dota+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Dota+2+soundtrack',
                             worldDescription: '天辉与夜魇两座远古遗迹矗立在战场上。英雄们为各自阵营而战，争夺神秘的神杖与不朽之守护。起源于魔兽争霸3的经典地图，电竞奖金最高的赛事之一。'
                         },
                         {
@@ -465,9 +465,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Heroes of the Storm',
                             developer: 'Blizzard Entertainment',
                             developerUrl: 'https://www.blizzard.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411w7Fe',
-                            cgUrl: 'https://www.bilibili.com/video/BV1bx411w7Fe',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Vx411w7cy',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Heroes+of+the+Storm+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Heroes+of+the+Storm+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Heroes+of+the+Storm+soundtrack',
                             worldDescription: '时空枢纽，暴雪所有宇宙的交汇点。萨尔、迪亚波罗、凯瑞甘等传奇英雄跨越世界并肩作战。独特的团队经验共享机制与多样化战场目标，团队合作的极致体现。'
                         }
                     ]
@@ -484,9 +484,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Honor of Kings',
                             developer: 'Tencent Games',
                             developerUrl: 'https://www.tencent.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7j8',
-                            cgUrl: 'https://www.bilibili.com/video/BV1bx411C7j8',
-                            ostUrl: 'https://www.bilibili.com/video/BV1fx411C7oG',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Honor+of+Kings+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Honor+of+Kings+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Honor+of+Kings+soundtrack',
                             worldDescription: '王者峡谷，东西方历史与神话人物齐聚一堂。李白、貂蝉、亚瑟等英雄在5v5战场上对决。专为手机优化的操作体验，全球最火爆的移动端MOBA游戏。'
                         },
                         {
@@ -494,9 +494,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'League of Legends: Wild Rift',
                             developer: 'Riot Games',
                             developerUrl: 'https://www.riotgames.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1iK4y1E7MB',
-                            cgUrl: 'https://www.bilibili.com/video/BV1iK4y1E7MB',
-                            ostUrl: 'https://www.bilibili.com/video/BV1eK4y1E7vY',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Wild+Rift+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Wild+Rift+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Wild+Rift+soundtrack',
                             worldDescription: '符文之地的移动端版本，保留英雄联盟核心玩法与英雄技能，针对触屏操作重新设计。同样的史诗战场，随时随地的5v5竞技体验。'
                         },
                         {
@@ -504,9 +504,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Mobile Legends: Bang Bang',
                             developer: 'Moonton',
                             developerUrl: 'https://www.moonton.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7mY',
-                            cgUrl: 'https://www.bilibili.com/video/BV1bx411C7mY',
-                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7Ty',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Mobile+Legends+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Mobile+Legends+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Mobile+Legends+soundtrack',
                             worldDescription: '幻境大陆，东西方神话融合的世界。每局10秒匹配，10分钟一局，快节奏的移动端MOBA体验。在东南亚与全球市场广受欢迎，国际化的电竞赛事体系。'
                         }
                     ]
@@ -534,9 +534,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'God of War',
                             developer: 'Santa Monica Studio',
                             developerUrl: 'https://www.santamonicastudio.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1nW411j7Xv',
-                            cgUrl: 'https://www.bilibili.com/video/BV1nW411j7Xv',
-                            ostUrl: 'https://www.bilibili.com/video/BV1zW411j7wS',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=God+of+War+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=God+of+War+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=God+of+War+soundtrack',
                             worldDescription: '北欧神话世界，奎托斯带着儿子阿特柔斯踏上旅程。在米德加尔特的冰天雪地中，父子将面对诸神黄昏的预言，揭开神族与巨人的恩怨。'
                         },
                         {
@@ -544,9 +544,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Devil May Cry 5',
                             developer: 'Capcom',
                             developerUrl: 'https://www.capcom.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Bt411d7Nt',
-                            cgUrl: 'https://www.bilibili.com/video/BV1Bt411d7Nt',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Jt411d7A7',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Devil+May+Cry+5+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Devil+May+Cry+5+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Devil+May+Cry+5+soundtrack',
                             worldDescription: '恶魔猎人但丁、尼禄与新角色V联手对抗恶魔之王尤里曾。在风格化的战斗中施展华丽连击，揭开红魔之树事件的真相，系列15周年的巅峰之作。'
                         },
                         {
@@ -554,9 +554,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Bayonetta 2',
                             developer: 'PlatinumGames',
                             developerUrl: 'https://www.platinumgames.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1Dx411C7gJ',
-                            cgUrl: 'https://www.bilibili.com/video/BV1Dx411C7gJ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411C7h6',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Bayonetta+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Bayonetta+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Bayonetta+2+soundtrack',
                             worldDescription: '魔女贝优妮塔为了拯救好友贞德，深入地狱与天使大军战斗。在神曲风格的地狱景观中，以变身、召唤魔物与华丽的格斗技巧击败神话中的神明。'
                         }
                     ]
@@ -573,9 +573,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Super Mario Odyssey',
                             developer: 'Nintendo',
                             developerUrl: 'https://www.nintendo.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1nx411u7vs',
-                            cgUrl: 'https://www.bilibili.com/video/BV1nx411u7vs',
-                            ostUrl: 'https://www.bilibili.com/video/BV1hx411u7AS',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Super+Mario+Odyssey+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Super+Mario+Odyssey+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Super+Mario+Odyssey+soundtrack',
                             worldDescription: '马里奥的帽子凯比拥有附身能力。在沙之国、森之国等独特的王国中冒险，收集月亮力量阻止酷霸王与桃花公主的婚礼，开启3D平台跳跃新纪元。'
                         },
                         {
@@ -583,9 +583,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Hollow Knight',
                             developer: 'Team Cherry',
                             developerUrl: 'https://www.teamcherry.com.au/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1vx411x7oy',
-                            cgUrl: 'https://www.bilibili.com/video/BV1vx411x7oy',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Tx411x7SA',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Hollow+Knight+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Hollow+Knight+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Hollow+Knight+soundtrack',
                             worldDescription: '圣巢王国，一座巨大的地下昆虫文明废墟。玩家扮演沉默的骑士探索交错的地道，与疯狂的神明后裔战斗，揭开瘟疫的源头与自身存在的意义。'
                         },
                         {
@@ -593,9 +593,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Celeste',
                             developer: 'Maddy Makes Games',
                             developerUrl: 'http://www.maddymakesgames.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1kx411x7uc',
-                            cgUrl: 'https://www.bilibili.com/video/BV1kx411x7uc',
-                            ostUrl: 'https://www.bilibili.com/video/BV1bx411x7yw',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Celeste+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Celeste+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Celeste+soundtrack',
                             worldDescription: '玛德琳攀登塞莱斯特山，一座能实现愿望的神秘山峰。在精准的平台跳跃中，她面对内心的焦虑与抑郁，用毅力征服山峰也征服内心的恶魔。'
                         }
                     ]
@@ -612,9 +612,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Metal Gear Solid V: The Phantom Pain',
                             developer: 'Kojima Productions',
                             developerUrl: 'https://www.kojimaproductions.jp/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1bx411C7KJ',
-                            cgUrl: 'https://www.bilibili.com/video/BV1bx411C7KJ',
-                            ostUrl: 'https://www.bilibili.com/video/BV1vx411C7yZ',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Metal+Gear+Solid+5+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Metal+Gear+Solid+5+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Metal+Gear+Solid+5+soundtrack',
                             worldDescription: '1984年，大首领从昏迷中苏醒建立钻石犬佣兵团。在阿富汗与非洲的开放世界中执行潜行任务，建立基地、招募士兵，寻找摧毁MSF的凶手，揭开身份之谜。'
                         },
                         {
@@ -622,9 +622,9 @@ const GAME_WORLD_DATA = {
                             nameEn: "Assassin's Creed Valhalla",
                             developer: 'Ubisoft',
                             developerUrl: 'https://www.ubisoft.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1DA41177wU',
-                            cgUrl: 'https://www.bilibili.com/video/BV1DA41177wU',
-                            ostUrl: 'https://www.bilibili.com/video/BV1iA41177rs',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Assassins+Creed+Valhalla+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Assassins+Creed+Valhalla+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Assassins+Creed+Valhalla+soundtrack',
                             worldDescription: '维京时代，艾沃尔带领族人从挪威来到英格兰。在劫掠、定居与政治联盟中，与撒克逊国王和上古维序者斗争，同时揭开刺客与圣殿骑士千年战争的序幕。'
                         },
                         {
@@ -632,9 +632,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Dishonored 2',
                             developer: 'Arkane Studios',
                             developerUrl: 'https://www.arkane-studios.com/',
-                            gameplayUrl: 'https://www.bilibili.com/video/BV1xs411x7oM',
-                            cgUrl: 'https://www.bilibili.com/video/BV1xs411x7oM',
-                            ostUrl: 'https://www.bilibili.com/video/BV1Fs411x7iN',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Dishonored+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Dishonored+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Dishonored+2+soundtrack',
                             worldDescription: '卡纳卡城邦，女巫德莱拉篡夺王位。玩家扮演科沃或艾米丽，利用超自然印记能力，在蒸汽朋克风格的城市中潜行或杀戮，夺回帝国的王座。'
                         }
                     ]
