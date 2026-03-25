@@ -273,7 +273,10 @@
     </div>
 
     <script>
-        // 密码配置
+        // 密码保护已取消 - 直接跳转到音效中心
+        window.location.href = 'sound-effects/sound-effects-hub.html';
+
+        /* 原密码配置（已禁用）
         var CORRECT_PASSWORD = '661139';
         var REDIRECT_URL = 'sound-effects/sound-effects-hub.html';
         var SESSION_KEY = 'sfx_access_granted';
@@ -298,6 +301,7 @@
         if (checkExistingSession()) {
             // 已登录，会跳转
         }
+        */
 
         // 切换密码显示
         function togglePassword() {
