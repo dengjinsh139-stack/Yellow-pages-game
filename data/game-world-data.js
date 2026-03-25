@@ -22,9 +22,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Dark Souls III',
                             developer: 'FromSoftware',
                             developerUrl: 'https://www.fromsoftware.jp/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Dark+Souls+3+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Dark+Souls+3+opening+cinematic+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Dark+Souls+3+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Dark+Souls+3+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Dark+Souls+3+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Dark+Souls+3+soundtrack',
                             worldDescription: '洛斯里克王国的火焰即将熄灭，不死人被唤醒执行传火使命。在破败的城堡与阴森的地下墓穴中，玩家将面对昔日的英雄与堕落的神明，探索火之时代的终结与轮回的宿命。'
                         },
                         {
@@ -32,9 +32,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'The Witcher 3: Wild Hunt',
                             developer: 'CD Projekt Red',
                             developerUrl: 'https://www.cdprojekt.com/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=The+Witcher+3+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=The+Witcher+3+a+night+to+remember+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=The+Witcher+3+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=The+Witcher+3+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=The+Witcher+3+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=The+Witcher+3+soundtrack',
                             worldDescription: '在大陆战火纷飞的年代，猎魔人杰洛特寻找失踪的养女希里。政治阴谋、种族冲突与超自然威胁交织，玩家的每一个选择都将影响这片大陆的命运走向。'
                         },
                         {
@@ -42,9 +42,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Elden Ring',
                             developer: 'FromSoftware',
                             developerUrl: 'https://www.fromsoftware.jp/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Elden+Ring+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Elden+Ring+official+story+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Elden+Ring+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Elden+Ring+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Elden+Ring+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Elden+Ring+soundtrack',
                             worldDescription: '交界地的艾尔登法环破碎，半神们争夺大卢恩引发破碎战争。被玷污者重返这片土地，探索黄金树下的秘密，挑战半神，最终成为艾尔登之王或带来新时代的秩序。'
                         }
                     ]
@@ -61,9 +61,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Fire Emblem: Three Houses',
                             developer: 'Intelligent Systems',
                             developerUrl: 'https://www.intsys.co.jp/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Fire+Emblem+Three+Houses+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Fire+Emblem+Three+Houses+launch+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Fire+Emblem+Three+Houses+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Fire+Emblem+Three+Houses+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Fire+Emblem+Three+Houses+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Fire+Emblem+Three+Houses+soundtrack',
                             worldDescription: '芙朵拉大陆上，三国鼎立。玩家作为士官学校教师，培养来自三个国家的年轻贵族。在学院日常与战场厮杀中，揭开千年历史的真相，决定大陆的未来。'
                         },
                         {
@@ -72,8 +72,8 @@ const GAME_WORLD_DATA = {
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
                             gameplayUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+Tactics+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+Tactics+opening+movie',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+Tactics+official+soundtrack',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+Tactics+opening',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+Tactics+soundtrack',
                             worldDescription: '伊瓦利斯王国，两个贵族家族争夺王位的狮子战争。主角拉姆萨在阴谋与背叛中，逐渐揭开圣石背后的黑暗真相，挑战操纵历史的教会势力。'
                         },
                         {
@@ -81,9 +81,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'XCOM 2',
                             developer: 'Firaxis Games',
                             developerUrl: 'https://www.firaxis.com/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=XCOM+2+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=XCOM+2+official+announcement+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=XCOM+2+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=XCOM+2+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=XCOM+2+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=XCOM+2+soundtrack',
                             worldDescription: '外星征服者统治地球已二十年，XCOM组织沦为抵抗军。玩家指挥地下游击队，从废墟城市中招募战士，夺回地球自由，揭露外星人改造人类的阴谋。'
                         }
                     ]
@@ -100,9 +100,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Final Fantasy VII Remake',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+7+Remake+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+7+Remake+official+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+7+Remake+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+7+Remake+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+7+Remake+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+7+Remake+soundtrack',
                             worldDescription: '米德加都市，神罗公司榨取星球生命能源。前神罗战士克劳德加入雪崩组织，在破坏魔晄炉的任务中，逐渐发现自己过去的真相与星球命运的联系。'
                         },
                         {
@@ -110,9 +110,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Persona 5 Royal',
                             developer: 'Atlus',
                             developerUrl: 'https://www.atlus.co.jp/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Persona+5+Royal+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Persona+5+Royal+official+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Persona+5+Royal+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Persona+5+Royal+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Persona+5+Royal+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Persona+5+Royal+soundtrack',
                             worldDescription: '东京，心灵扭曲的大人构建腐败社会。一群高中生觉醒人格面具力量，潜入恶人内心的认知空间"宫殿"，偷取扭曲的欲望，让恶人悔改，成为侠盗团的革命物语。'
                         },
                         {
@@ -120,9 +120,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Dragon Quest XI',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Dragon+Quest+11+S+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Dragon+Quest+11+S+opening+movie',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Dragon+Quest+11+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Dragon+Quest+11+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Dragon+Quest+11+opening',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Dragon+Quest+11+soundtrack',
                             worldDescription: '勇者诞生时即被预言将毁灭世界，故乡被魔王军攻陷后踏上旅程。在洛特泽塔西亚大陆上，勇者集结伙伴，揭开自己身世的秘密，对抗黑暗势力。'
                         }
                     ]
@@ -140,8 +140,8 @@ const GAME_WORLD_DATA = {
                             developer: 'Blizzard Entertainment',
                             developerUrl: 'https://www.blizzard.com/',
                             gameplayUrl: 'https://www.youtube.com/results?search_query=World+of+Warcraft+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=World+of+Warcraft+cinematic+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=World+of+Warcraft+official+soundtrack',
+                            cgUrl: 'https://www.youtube.com/results?search_query=World+of+Warcraft+cinematic',
+                            ostUrl: 'https://www.youtube.com/results?search_query=World+of+Warcraft+soundtrack',
                             worldDescription: '艾泽拉斯大陆，联盟与部落战火绵延。从东部王国到外域，从诺森德到潘达利亚，英雄们对抗燃烧军团、古神低语与亡灵天灾，书写属于自己的传奇。'
                         },
                         {
@@ -149,9 +149,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Final Fantasy XIV',
                             developer: 'Square Enix',
                             developerUrl: 'https://www.square-enix.com/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+14+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+14+Endwalker+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+14+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+14+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+14+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Final+Fantasy+14+soundtrack',
                             worldDescription: '海德林与佐迪亚克，光与暗的星球。冒险者从普通冒险者成长为光之战士，穿越第一世界与第十三世界，阻止末日降临，探索古代文明灭亡的真相。'
                         },
                         {
@@ -159,9 +159,9 @@ const GAME_WORLD_DATA = {
                             nameEn: 'Genshin Impact',
                             developer: 'miHoYo',
                             developerUrl: 'https://www.mihoyo.com/',
-                            gameplayUrl: 'https://www.youtube.com/results?search_query=Genshin+Impact+official+gameplay',
-                            cgUrl: 'https://www.youtube.com/results?search_query=Genshin+Impact+official+launch+trailer',
-                            ostUrl: 'https://www.youtube.com/results?search_query=Genshin+Impact+official+soundtrack',
+                            gameplayUrl: 'https://www.youtube.com/results?search_query=Genshin+Impact+gameplay',
+                            cgUrl: 'https://www.youtube.com/results?search_query=Genshin+Impact+trailer',
+                            ostUrl: 'https://www.youtube.com/results?search_query=Genshin+Impact+soundtrack',
                             worldDescription: '旅行者寻找失散的血亲，游历提瓦特七国。每座城邦对应一种元素与一种理念，在探索中揭开"天理"与"神之眼"的秘密，见证神明的陨落与新秩序的建立。'
                         }
                     ]
