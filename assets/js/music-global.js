@@ -1,5 +1,5 @@
 /**
- * 全局音乐悬浮按钮组件 v2.9.9
+ * 全局音乐悬浮按钮组件 v2.9.10
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
  * 会自动创建音乐按钮、音频元素和电平表
  * 特性：跨页面持续播放、自动同步状态、保持播放进度、音频可视化
@@ -330,12 +330,20 @@
         animationId = requestAnimationFrame(updateLevelMeter);
     }
 
-    // 计算电平值（转换为0-100%）
+    // 计算电平值（转换为0-100%），带压缩和限制，避免顶满
     function calculateLevel(data) {
-        const sum = data.reduce((acc, val) => acc + val, 0);
-        const avg = sum / data.length;
-        // 增强敏感度，让电平更明显
-        return Math.min(100, (avg / 255) * 100 * 2.5);
+        const sum = data.reduce((acc, val) => acc + val * val, 0);
+        const rms = Math.sqrt(sum / data.length);
+        
+        // 使用对数压缩，让高音量区域有更多动态
+        // 255 是最大值，但我们希望 200 左右就达到 100%
+        const normalized = rms / 200;
+        
+        // 对数压缩：高音量时增长变慢，避免顶满
+        const compressed = Math.log10(1 + normalized * 9) / Math.log10(10);
+        
+        // 限制最大 90%，永远留一点空间，保持律动感
+        return Math.min(90, compressed * 100);
     }
 
     // 更新单个电平条
