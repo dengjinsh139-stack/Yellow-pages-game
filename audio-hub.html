@@ -306,8 +306,9 @@
         .app-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            padding: 10px 18px;
+            padding: 10px 16px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: var(--bg-primary);
             text-decoration: none;
@@ -317,16 +318,18 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            align-self: flex-start;
+            flex: 1;
+            min-width: 120px;
+            max-width: 160px;
         }
 
         .app-btn-group {
             margin-top: auto;
             display: flex;
-            flex-direction: row;
-            gap: 12px;
+            flex-direction: row !important;
+            gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
+            justify-content: flex-start;
         }
 
         .app-btn:hover {
@@ -334,16 +337,15 @@
             box-shadow: 0 4px 20px rgba(0, 212, 170, 0.4);
         }
 
-        /* 统一按钮颜色，secondary 样式移除 */
+        /* 次要按钮样式 - 统一主色调 */
         .app-btn.secondary {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.15) 0%, rgba(0, 168, 132, 0.15) 100%);
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.2) 0%, rgba(0, 168, 132, 0.2) 100%);
             color: var(--primary);
-            border: 1px solid rgba(0, 212, 170, 0.3);
+            border: 1px solid var(--primary);
         }
 
         .app-btn.secondary:hover {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.25) 0%, rgba(0, 168, 132, 0.25) 100%);
-            color: var(--primary);
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.3) 0%, rgba(0, 168, 132, 0.3) 100%);
             box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
         }
 
@@ -453,7 +455,7 @@
             </div>
             <div class="app-btn-group">
                 <a href="sound-effects/sound-effects-hub.html" class="app-btn">
-                    <span>进入音效中心 <small>v2.6.13</small></span>
+                    <span>进入音效中心</span>
                     <span>→</span>
                 </a>
             </div>
@@ -473,7 +475,7 @@
             </div>
             <div class="app-btn-group">
                 <a href="music/music-genres.html" class="app-btn">
-                    <span>进入音乐百科 <small>v2.6.13</small></span>
+                    <span>进入音乐百科</span>
                     <span>→</span>
                 </a>
                 <a href="music/game-music-handbook.html" class="app-btn secondary">
@@ -497,7 +499,7 @@
             </div>
             <div class="app-btn-group">
                 <a href="wwise/wwise.html" class="app-btn">
-                    <span>进入 Wwise <small>v2.6.13</small></span>
+                    <span>进入 Wwise</span>
                     <span>→</span>
                 </a>
             </div>
