@@ -285,6 +285,7 @@
             font-size: 0.95rem;
             margin-bottom: 20px;
             line-height: 1.6;
+            flex: 1;
         }
 
         .app-features {
@@ -316,8 +317,15 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            margin-top: auto;
             align-self: flex-start;
+        }
+
+        .app-btn-group {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
         }
 
         .app-btn:hover {
@@ -441,10 +449,12 @@
                 <span class="feature-tag">🔍 Soundminer</span>
                 <span class="feature-tag">📁 资源管理</span>
             </div>
-            <a href="sound-effects/sound-effects-hub.html" class="app-btn">
-                <span>进入音效中心</span>
-                <span>→</span>
-            </a>
+            <div class="app-btn-group">
+                <a href="sound-effects/sound-effects-hub.html" class="app-btn">
+                    <span>进入音效中心</span>
+                    <span>→</span>
+                </a>
+            </div>
         </article>
 
         <!-- 音乐百科 -->
@@ -459,14 +469,16 @@
                 <span class="feature-tag">🎼 音乐理论</span>
                 <span class="feature-tag">🎹 制作技巧</span>
             </div>
-            <a href="music/music-genres.html" class="app-btn">
-                <span>进入音乐百科</span>
-                <span>→</span>
-            </a>
-            <a href="music/game-music-handbook.html" class="app-btn secondary" style="margin-top: 12px;">
-                <span>🎼 配乐设计师手册</span>
-                <span>→</span>
-            </a>
+            <div class="app-btn-group">
+                <a href="music/music-genres.html" class="app-btn">
+                    <span>进入音乐百科</span>
+                    <span>→</span>
+                </a>
+                <a href="music/game-music-handbook.html" class="app-btn secondary">
+                    <span>🎼 配乐设计师手册</span>
+                    <span>→</span>
+                </a>
+            </div>
         </article>
 
         <!-- Wwise -->
@@ -481,10 +493,12 @@
                 <span class="feature-tag">📖 集成指南</span>
                 <span class="feature-tag">💡 最佳实践</span>
             </div>
-            <a href="wwise/wwise.html" class="app-btn">
-                <span>进入 Wwise</span>
-                <span>→</span>
-            </a>
+            <div class="app-btn-group">
+                <a href="wwise/wwise.html" class="app-btn">
+                    <span>进入 Wwise</span>
+                    <span>→</span>
+                </a>
+            </div>
         </article>
     </main>
 
