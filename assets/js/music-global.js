@@ -81,16 +81,15 @@
             style.textContent = `
                 .level-meter {
                     position: fixed;
+                    top: 100px;
                     bottom: 85px;
                     right: 30px;
-                    width: 100px;
-                    height: calc(100vh - 120px);
-                    max-height: 700px;
+                    width: 140px;
                     background: rgba(15, 15, 23, 0.98);
                     backdrop-filter: blur(20px);
                     border: 1px solid rgba(0, 212, 170, 0.2);
                     border-radius: 12px;
-                    padding: 16px 12px 12px 28px;
+                    padding: 16px 12px 12px 32px;
                     z-index: 9997;
                     opacity: 0;
                     transition: all 0.3s ease;
@@ -112,23 +111,23 @@
                 }
                 .level-meter-scale {
                     position: absolute;
-                    left: 8px;
+                    left: 10px;
                     top: 42px;
                     bottom: 48px;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    font-size: 9px;
+                    font-size: 10px;
                     color: rgba(255, 255, 255, 0.4);
                     text-align: right;
-                    width: 18px;
+                    width: 20px;
                     line-height: 1;
                     font-family: 'Orbitron', monospace;
                 }
                 .level-meter-scale .db-0 {
                     color: #ef4444;
                     font-weight: 700;
-                    font-size: 10px;
+                    font-size: 11px;
                 }
                 .level-meter-scale .db-inf {
                     color: rgba(255, 255, 255, 0.3);
@@ -136,12 +135,12 @@
                 .level-bars-container {
                     display: flex;
                     justify-content: center;
-                    gap: 8px;
+                    gap: 12px;
                     height: calc(100% - 80px);
-                    margin-left: 4px;
+                    margin-left: 6px;
                 }
                 .level-bar-wrap {
-                    width: 28px;
+                    width: 36px;
                     height: 100%;
                     position: relative;
                     border-radius: 4px;
@@ -209,14 +208,14 @@
                 .level-labels {
                     display: flex;
                     justify-content: center;
-                    gap: 8px;
-                    margin-left: 4px;
+                    gap: 12px;
+                    margin-left: 6px;
                     margin-top: 12px;
                 }
                 .level-labels span {
-                    width: 28px;
+                    width: 36px;
                     text-align: center;
-                    font-size: 13px;
+                    font-size: 14px;
                     font-weight: 700;
                     font-family: 'Orbitron', monospace;
                     color: rgba(255, 255, 255, 0.5);
@@ -229,10 +228,21 @@
                 }
                 @media (max-width: 768px) {
                     .level-meter {
+                        top: 80px;
                         bottom: 80px;
                         right: 15px;
-                        transform: scale(0.75);
-                        transform-origin: bottom right;
+                        width: 120px;
+                        padding: 12px 10px 10px 26px;
+                    }
+                    .level-bar-wrap {
+                        width: 30px;
+                    }
+                    .level-bars-container {
+                        gap: 8px;
+                    }
+                    .level-labels span {
+                        width: 30px;
+                        font-size: 12px;
                     }
                 }
             `;
