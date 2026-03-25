@@ -308,45 +308,43 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 10px 16px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: var(--bg-primary);
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            flex: 1;
-            min-width: 120px;
-            max-width: 160px;
+            white-space: nowrap;
+            height: 44px;
         }
 
         .app-btn-group {
             margin-top: auto;
             display: flex;
-            flex-direction: row !important;
-            gap: 10px;
+            flex-direction: row;
+            gap: 12px;
             align-items: center;
-            justify-content: flex-start;
         }
 
         .app-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.35);
         }
 
-        /* 次要按钮样式 - 统一主色调 */
+        /* 次要按钮 - 统一风格，实心但颜色不同 */
         .app-btn.secondary {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.2) 0%, rgba(0, 168, 132, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.15) 0%, rgba(0, 168, 132, 0.15) 100%);
             color: var(--primary);
             border: 1px solid var(--primary);
         }
 
         .app-btn.secondary:hover {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.3) 0%, rgba(0, 168, 132, 0.3) 100%);
-            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.25) 0%, rgba(0, 168, 132, 0.25) 100%);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.25);
         }
 
         /* 底部信息 */
@@ -479,7 +477,7 @@
                     <span>→</span>
                 </a>
                 <a href="music/game-music-handbook.html" class="app-btn secondary">
-                    <span>🎼 配乐设计师手册</span>
+                    <span>设计师手册</span>
                     <span>→</span>
                 </a>
             </div>
