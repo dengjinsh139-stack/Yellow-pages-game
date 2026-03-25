@@ -439,6 +439,11 @@
             color: var(--text-muted);
         }
         
+        /* 锚点偏移 - 避免被sticky导航栏遮挡 */
+        #games, #home {
+            scroll-margin-top: 80px;
+        }
+        
         /* 响应式 */
         @media (max-width: 768px) {
             .main-title { font-size: 2.5rem; }
