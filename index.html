@@ -465,8 +465,8 @@
                 </div>
             </a>
             <div class="nav-links" id="nav-links">
-                <a href="index.html" class="nav-link active">🏠 首页</a>
-                <a href="index.html#games" class="nav-link">🎮 游戏中心</a>
+                <a href="index.html" class="nav-link active" onclick="showSection('home'); return false;">🏠 首页</a>
+                <a href="index.html#games" class="nav-link" onclick="showSection('games'); return false;">🎮 游戏中心</a>
                 <a href="sound-effects-login.html" class="nav-link">🔊 音效相关</a>
                 <a href="music/music-genres.html" class="nav-link">🎵 音乐百科</a>
                 <a href="projects-login.html" class="nav-link">📁 项目</a>
@@ -671,11 +671,14 @@
 
     <script>
         // 页面切换
-        function showSection(sectionId) {
+        function showSection(sectionId, event) {
+            if (!event) event = window.event;
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
             document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
         }
         
         // 游戏分类筛选
@@ -861,7 +864,14 @@
         }
 
         // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', initMusicSystem);
+        document.addEventListener('DOMContentLoaded', function() {
+            initMusicSystem();
+            // 根据 URL hash 显示对应 section
+            const hash = window.location.hash.replace('#', '');
+            if (hash && document.getElementById(hash)) {
+                showSection(hash, { target: document.querySelector('[href*="#' + hash + '"]') });
+            }
+        });
     </script>
     <script src="nav-config.js"></script>
 </body>
