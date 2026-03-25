@@ -465,8 +465,8 @@
                 </div>
             </a>
             <div class="nav-links" id="nav-links">
-                <a href="index.html" class="nav-link active" onclick="showSection('home'); return false;">🏠 首页</a>
-                <a href="index.html#games" class="nav-link" onclick="showSection('games'); return false;">🎮 游戏中心</a>
+                <a href="#home" class="nav-link active" onclick="showSection('home'); return false;">🏠 首页</a>
+                <a href="#games" class="nav-link" onclick="showSection('games'); return false;">🎮 游戏中心</a>
                 <a href="sound-effects-login.html" class="nav-link">🔊 音效相关</a>
                 <a href="music/music-genres.html" class="nav-link">🎵 音乐百科</a>
                 <a href="projects-login.html" class="nav-link">📁 项目</a>
@@ -866,11 +866,20 @@
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             initMusicSystem();
+            
             // 根据 URL hash 显示对应 section
-            const hash = window.location.hash.replace('#', '');
-            if (hash && document.getElementById(hash)) {
-                showSection(hash, { target: document.querySelector('[href*="#' + hash + '"]') });
+            function handleHash() {
+                const hash = window.location.hash.replace('#', '');
+                if (hash && document.getElementById(hash)) {
+                    showSection(hash, { target: document.querySelector('[href="#' + hash + '"]') });
+                }
             }
+            
+            // 初始检查 hash
+            handleHash();
+            
+            // 监听 hash 变化（浏览器前进/后退）
+            window.addEventListener('hashchange', handleHash);
         });
     </script>
     <script src="nav-config.js"></script>
