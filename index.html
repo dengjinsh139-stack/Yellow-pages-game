@@ -481,10 +481,6 @@
     <header>
         <h1 class="main-title">⚡ 我的工作站</h1>
         <p class="subtitle">个人游戏开发实验室</p>
-        <button class="music-btn" id="musicBtn" onclick="toggleGlobalMusic()">
-            <span id="musicText">🎵 背景音乐</span>
-        </button>
-        <audio id="bgMusic" src="assets/audio/bg-music.mp3" loop preload="auto"></audio>
     </header>
     
     <div class="container">
@@ -663,12 +659,6 @@
         <p>⚡ 我的工作站 | 个人游戏开发实验室 🎮</p>
     </footer>
     
-    <!-- 悬浮音乐控制按钮 -->
-    <div id="musicFloatBtn" class="music-float-btn" onclick="toggleGlobalMusic()">
-        <span id="musicFloatIcon">🔇</span>
-        <span id="musicFloatText">开启音乐</span>
-    </div>
-
     <script>
         // 页面切换
         function showSection(sectionId, event) {
@@ -701,172 +691,8 @@
             window.open(url, '_blank');
         }
 
-        // ==================== 全局音乐控制系统 ====================
-        const bgMusic = document.getElementById('bgMusic');
-        const STORAGE_KEY = 'yellow_pages_music_state';
-        let isMusicPlaying = false;
-        let isMuted = true;
-
-        // 初始化音乐系统
-        function initMusicSystem() {
-            // 尝试自动播放（静音）
-            bgMusic.muted = true;
-            bgMusic.volume = 0.5;
-            
-            const playPromise = bgMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isMusicPlaying = true;
-                    updateMusicUI();
-                    
-                    // 检查是否之前已开启声音
-                    const savedState = localStorage.getItem(STORAGE_KEY);
-                    if (savedState === 'playing') {
-                        unmuteMusic();
-                    }
-                }).catch(err => {
-                    console.log('自动播放被阻止:', err);
-                    isMusicPlaying = false;
-                    updateMusicUI();
-                });
-            }
-
-            // 监听其他页面的音乐状态变化
-            window.addEventListener('storage', (e) => {
-                if (e.key === STORAGE_KEY) {
-                    syncMusicState();
-                }
-            });
-
-            // 定期同步（防止多标签页状态不一致）
-            setInterval(syncMusicState, 1000);
-        }
-
-        // 取消静音（用户交互后调用）
-        function unmuteMusic() {
-            isMuted = false;
-            bgMusic.muted = false;
-            
-            if (!isMusicPlaying) {
-                bgMusic.play().then(() => {
-                    isMusicPlaying = true;
-                    updateMusicUI();
-                    saveMusicState('playing');
-                });
-            } else {
-                updateMusicUI();
-                saveMusicState('playing');
-            }
-        }
-
-        // 静音
-        function muteMusic() {
-            isMuted = true;
-            bgMusic.muted = true;
-            updateMusicUI();
-            saveMusicState('muted');
-        }
-
-        // 暂停音乐
-        function pauseMusic() {
-            bgMusic.pause();
-            isMusicPlaying = false;
-            updateMusicUI();
-            saveMusicState('paused');
-        }
-
-        // 恢复播放
-        function resumeMusic() {
-            bgMusic.play().then(() => {
-                isMusicPlaying = true;
-                updateMusicUI();
-                saveMusicState(isMuted ? 'muted' : 'playing');
-            });
-        }
-
-        // 切换全局音乐
-        function toggleGlobalMusic() {
-            if (!isMusicPlaying) {
-                // 如果还没播放，开始播放
-                unmuteMusic();
-            } else if (isMuted) {
-                // 如果正在播放但是静音，取消静音
-                unmuteMusic();
-            } else {
-                // 如果正在播放且有声音，暂停
-                pauseMusic();
-            }
-        }
-
-        // 更新UI
-        function updateMusicUI() {
-            const floatBtn = document.getElementById('musicFloatBtn');
-            const floatIcon = document.getElementById('musicFloatIcon');
-            const floatText = document.getElementById('musicFloatText');
-            const headerBtn = document.getElementById('musicBtn');
-            const headerText = document.getElementById('musicText');
-
-            if (!isMusicPlaying) {
-                // 暂停状态
-                if (floatIcon) floatIcon.textContent = '▶️';
-                if (floatText) floatText.textContent = '播放音乐';
-                if (floatBtn) floatBtn.classList.remove('playing');
-                if (headerText) headerText.textContent = '🎵 已暂停';
-            } else if (isMuted) {
-                // 静音状态（自动播放中）
-                if (floatIcon) floatIcon.textContent = '🔇';
-                if (floatText) floatText.textContent = '开启音乐';
-                if (floatBtn) floatBtn.classList.remove('playing');
-                if (headerText) headerText.textContent = '🎵 点击开启';
-            } else {
-                // 正常播放
-                if (floatIcon) floatIcon.textContent = '🔊';
-                if (floatText) floatText.textContent = '音乐播放中';
-                if (floatBtn) floatBtn.classList.add('playing');
-                if (headerText) headerText.textContent = '🎵 播放中...';
-            }
-        }
-
-        // 保存状态到 localStorage
-        function saveMusicState(state) {
-            localStorage.setItem(STORAGE_KEY, state);
-            localStorage.setItem(STORAGE_KEY + '_time', Date.now());
-        }
-
-        // 同步音乐状态
-        function syncMusicState() {
-            const savedState = localStorage.getItem(STORAGE_KEY);
-            const savedTime = parseInt(localStorage.getItem(STORAGE_KEY + '_time') || '0');
-            
-            // 只处理最近3秒内的状态变化
-            if (Date.now() - savedTime > 3000) return;
-
-            if (savedState === 'playing' && (!isMusicPlaying || isMuted)) {
-                isMuted = false;
-                bgMusic.muted = false;
-                if (!isMusicPlaying) {
-                    bgMusic.play().then(() => {
-                        isMusicPlaying = true;
-                        updateMusicUI();
-                    });
-                } else {
-                    updateMusicUI();
-                }
-            } else if (savedState === 'paused' && isMusicPlaying) {
-                bgMusic.pause();
-                isMusicPlaying = false;
-                updateMusicUI();
-            } else if (savedState === 'muted' && !isMuted) {
-                isMuted = true;
-                bgMusic.muted = true;
-                updateMusicUI();
-            }
-        }
-
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
-            initMusicSystem();
-            
             // 根据 URL hash 显示对应 section
             function handleHash() {
                 const hash = window.location.hash.replace('#', '');
@@ -883,5 +709,6 @@
         });
     </script>
     <script src="nav-config.js"></script>
+    <script src="assets/js/music-global.js"></script>
 </body>
 </html>
