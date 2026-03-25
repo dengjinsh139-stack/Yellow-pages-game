@@ -27,7 +27,7 @@
     let source = null;
     let animationId = null;
 
-    // 创建电平表
+    // 创建电平表（垂直柱状风格，右下角）
     function createLevelMeter() {
         if (document.getElementById('levelMeter')) return;
 
@@ -35,24 +35,33 @@
         meter.id = 'levelMeter';
         meter.className = 'level-meter';
         meter.innerHTML = `
-            <div class="level-meter-title">🎵 音频电平</div>
-            <div class="level-meter-channels">
-                <div class="level-channel">
-                    <span class="channel-label">L</span>
-                    <div class="level-bar">
-                        <div class="level-fill" id="levelLeft"></div>
-                    </div>
+            <div class="level-meter-header">Master</div>
+            <div class="level-meter-scale">
+                <span>0</span>
+                <span>-6</span>
+                <span>-12</span>
+                <span>-18</span>
+                <span>-24</span>
+                <span>-30</span>
+                <span>-36</span>
+                <span>-42</span>
+                <span>-48</span>
+                <span>-54</span>
+                <span>-60</span>
+            </div>
+            <div class="level-meter-bars">
+                <div class="level-bar-vertical">
+                    <div class="level-fill-vertical" id="levelLeft"></div>
+                    <div class="level-peak-marker" id="peakLeftMarker"></div>
                 </div>
-                <div class="level-channel">
-                    <span class="channel-label">R</span>
-                    <div class="level-bar">
-                        <div class="level-fill" id="levelRight"></div>
-                    </div>
+                <div class="level-bar-vertical">
+                    <div class="level-fill-vertical" id="levelRight"></div>
+                    <div class="level-peak-marker" id="peakRightMarker"></div>
                 </div>
             </div>
-            <div class="level-peaks">
-                <div class="peak-indicator" id="peakLeft">-∞ dB</div>
-                <div class="peak-indicator" id="peakRight">-∞ dB</div>
+            <div class="level-meter-labels">
+                <span>L</span>
+                <span>R</span>
             </div>
         `;
         document.body.appendChild(meter);
@@ -64,75 +73,112 @@
             style.textContent = `
                 .level-meter {
                     position: fixed;
-                    top: 50%;
+                    bottom: 100px;
                     right: 20px;
-                    transform: translateY(-50%);
-                    background: rgba(15, 15, 23, 0.95);
+                    background: rgba(20, 20, 28, 0.95);
                     backdrop-filter: blur(10px);
-                    border: 1px solid rgba(0, 212, 170, 0.3);
-                    border-radius: 12px;
-                    padding: 15px;
-                    width: 60px;
-                    z-index: 9998;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 8px;
+                    padding: 12px 10px 10px;
+                    width: 70px;
+                    z-index: 9997;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
                     opacity: 0;
                     transition: opacity 0.3s ease;
                     pointer-events: none;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                 }
                 .level-meter.active {
                     opacity: 1;
                 }
-                .level-meter-title {
-                    font-size: 10px;
-                    color: #00d4aa;
+                .level-meter-header {
+                    font-size: 9px;
+                    color: #888;
                     text-align: center;
-                    margin-bottom: 10px;
-                    font-weight: 600;
-                    white-space: nowrap;
+                    margin-bottom: 8px;
+                    letter-spacing: 0.5px;
+                    text-transform: uppercase;
                 }
-                .level-meter-channels {
+                .level-meter-scale {
+                    position: absolute;
+                    left: 4px;
+                    top: 28px;
+                    bottom: 32px;
                     display: flex;
                     flex-direction: column;
-                    gap: 8px;
+                    justify-content: space-between;
+                    font-size: 7px;
+                    color: #666;
+                    text-align: right;
+                    width: 16px;
+                    line-height: 1;
                 }
-                .level-channel {
+                .level-meter-bars {
                     display: flex;
-                    align-items: center;
-                    gap: 5px;
+                    justify-content: center;
+                    gap: 6px;
+                    margin-left: 12px;
+                    height: 150px;
                 }
-                .channel-label {
+                .level-bar-vertical {
+                    width: 16px;
+                    height: 100%;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 2px;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .level-fill-vertical {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 0%;
+                    background: linear-gradient(to top, 
+                        #4ade80 0%, 
+                        #4ade80 60%, 
+                        #facc15 75%, 
+                        #facc15 85%, 
+                        #ef4444 90%, 
+                        #ef4444 100%);
+                    border-radius: 2px;
+                    transition: height 0.05s ease-out;
+                    box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+                }
+                .level-fill-vertical.high {
+                    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+                }
+                .level-peak-marker {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    height: 2px;
+                    background: rgba(255, 255, 255, 0.8);
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                }
+                .level-peak-marker.active {
+                    opacity: 1;
+                }
+                .level-meter-labels {
+                    display: flex;
+                    justify-content: center;
+                    gap: 6px;
+                    margin-left: 12px;
+                    margin-top: 6px;
                     font-size: 9px;
-                    color: #a1a1aa;
-                    width: 12px;
+                    color: #888;
+                }
+                .level-meter-labels span {
+                    width: 16px;
                     text-align: center;
                 }
-                .level-bar {
-                    flex: 1;
-                    height: 8px;
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 4px;
-                    overflow: hidden;
-                    position: relative;
-                }
-                .level-fill {
-                    height: 100%;
-                    width: 0%;
-                    background: linear-gradient(90deg, #00d4aa 0%, #00d4aa 60%, #f59e0b 80%, #ef4444 100%);
-                    border-radius: 4px;
-                    transition: width 0.05s ease-out;
-                }
-                .level-peaks {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 8px;
-                    font-size: 8px;
-                    color: #71717a;
-                }
-                @media (max-width: 1200px) {
+                @media (max-width: 768px) {
                     .level-meter {
+                        bottom: 90px;
                         right: 10px;
-                        padding: 10px;
-                        width: 50px;
+                        transform: scale(0.85);
+                        transform-origin: bottom right;
                     }
                 }
             `;
@@ -176,30 +222,31 @@
         const leftAvg = leftSum / (dataArray.length / 2);
         const rightAvg = rightSum / (dataArray.length / 2);
         
-        // 转换为百分比
-        const leftLevel = Math.min((leftAvg / 255) * 100 * 1.5, 100);
-        const rightLevel = Math.min((rightAvg / 255) * 100 * 1.5, 100);
+        // 转换为dB并映射到高度 (0-255 -> -60dB to 0dB)
+        const leftDb = leftAvg > 0 ? 20 * Math.log10(leftAvg / 255) : -60;
+        const rightDb = rightAvg > 0 ? 20 * Math.log10(rightAvg / 255) : -60;
+        
+        // 映射到百分比 (-60dB = 0%, 0dB = 100%)
+        const leftLevel = Math.max(0, Math.min(100, (leftDb + 60) / 60 * 100));
+        const rightLevel = Math.max(0, Math.min(100, (rightDb + 60) / 60 * 100));
         
         // 更新显示
         const leftFill = document.getElementById('levelLeft');
         const rightFill = document.getElementById('levelRight');
-        const peakLeft = document.getElementById('peakLeft');
-        const peakRight = document.getElementById('peakRight');
         const meter = document.getElementById('levelMeter');
         
-        if (leftFill) leftFill.style.width = leftLevel + '%';
-        if (rightFill) rightFill.style.width = rightLevel + '%';
-        
-        // 计算 dB 值
-        const leftDb = leftAvg > 0 ? Math.round(20 * Math.log10(leftAvg / 255)) : -Infinity;
-        const rightDb = rightAvg > 0 ? Math.round(20 * Math.log10(rightAvg / 255)) : -Infinity;
-        
-        if (peakLeft) peakLeft.textContent = leftDb > -60 ? leftDb + ' dB' : '-∞ dB';
-        if (peakRight) peakRight.textContent = rightDb > -60 ? rightDb + ' dB' : '-∞ dB';
+        if (leftFill) {
+            leftFill.style.height = leftLevel + '%';
+            leftFill.classList.toggle('high', leftLevel > 85);
+        }
+        if (rightFill) {
+            rightFill.style.height = rightLevel + '%';
+            rightFill.classList.toggle('high', rightLevel > 85);
+        }
         
         // 显示/隐藏电平表
         if (meter) {
-            if (isMusicPlaying && !isMuted && (leftLevel > 1 || rightLevel > 1)) {
+            if (isMusicPlaying && !isMuted && (leftLevel > 2 || rightLevel > 2)) {
                 meter.classList.add('active');
             } else if (!isMusicPlaying || isMuted) {
                 meter.classList.remove('active');
@@ -432,7 +479,6 @@
                     playPromise.then(() => {
                         isMusicPlaying = true;
                         updateMusicUI();
-                        // 初始化音频分析器
                         initAudioAnalyser();
                     }).catch(err => {
                         console.log('[MusicGlobal] 自动播放被阻止:', err);
@@ -476,7 +522,6 @@
                     isActiveController = true;
                     updateMusicUI();
                     broadcastState('playing');
-                    // 初始化音频分析
                     initAudioAnalyser();
                 });
             } else {
