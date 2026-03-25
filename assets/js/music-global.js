@@ -1,5 +1,5 @@
 /**
- * 全局音乐悬浮按钮组件 v2.9.3
+ * 全局音乐悬浮按钮组件 v2.9.4
  * 使用方法：在任意页面引入 <script src="assets/js/music-global.js"></script>
  * 会自动创建音乐按钮、音频元素和电平表
  * 特性：跨页面持续播放、自动同步状态、保持播放进度、音频可视化
@@ -63,8 +63,8 @@
         document.body.appendChild(meter);
 
         // 创建频谱条
-        createSpectrumBars('spectrumLeft', 16);
-        createSpectrumBars('spectrumRight', 16);
+        createSpectrumBars('spectrumLeft', 24);
+        createSpectrumBars('spectrumRight', 24);
 
         // 添加样式
         if (!document.getElementById('level-meter-styles')) {
@@ -88,10 +88,10 @@
                     bottom: 100px;
                     right: 20px;
                     background: linear-gradient(180deg, #0a0a0f 0%, #151520 50%, #0a0a0f 100%);
-                    border: 2px solid #00ff88;
-                    border-radius: 12px;
-                    padding: 15px 12px 12px;
-                    width: 100px;
+                    border: 3px solid #00ff88;
+                    border-radius: 16px;
+                    padding: 20px 16px 16px;
+                    width: 140px;
                     z-index: 9997;
                     opacity: 0;
                     transition: all 0.3s ease;
@@ -116,30 +116,30 @@
                     animation: neonPulse 1.5s ease-in-out infinite;
                 }
                 .level-meter-header {
-                    font-size: 10px;
+                    font-size: 16px;
                     font-weight: bold;
                     text-align: center;
-                    margin-bottom: 12px;
-                    letter-spacing: 2px;
+                    margin-bottom: 16px;
+                    letter-spacing: 3px;
                     color: #00ff88;
-                    text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+                    text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
                     animation: neonPulse 1s ease-in-out infinite;
                 }
                 .spectrum-container {
                     display: flex;
                     justify-content: space-between;
-                    gap: 2px;
-                    height: 60px;
-                    margin-bottom: 8px;
+                    gap: 3px;
+                    height: 120px;
+                    margin-bottom: 12px;
                     align-items: flex-end;
                 }
                 .spectrum-bar {
                     flex: 1;
                     background: linear-gradient(to top, #00ff88, #ffff00, #ff0088);
-                    border-radius: 1px;
-                    min-height: 2px;
+                    border-radius: 2px;
+                    min-height: 4px;
                     transition: height 0.08s ease-out;
-                    box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+                    box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
                 }
                 .spectrum-bar.high {
                     background: linear-gradient(to top, #ffff00, #ff0000, #ff00ff);
@@ -148,25 +148,26 @@
                 .peak-bars {
                     display: flex;
                     justify-content: space-between;
-                    gap: 8px;
-                    margin: 10px 0;
+                    gap: 12px;
+                    margin: 16px 0;
                 }
                 .peak-bar-wrap {
                     flex: 1;
-                    height: 12px;
+                    height: 20px;
                     background: rgba(0, 0, 0, 0.5);
-                    border-radius: 6px;
+                    border-radius: 10px;
                     overflow: hidden;
                     position: relative;
-                    border: 1px solid rgba(0, 255, 136, 0.3);
+                    border: 2px solid rgba(0, 255, 136, 0.3);
                 }
                 .peak-bar {
                     height: 100%;
                     width: 0%;
                     background: linear-gradient(90deg, #00ff88 0%, #00ff88 60%, #ffff00 80%, #ff0000 100%);
-                    border-radius: 6px;
+                    border-radius: 10px;
                     transition: width 0.05s ease-out;
-                    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+                    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+                }
                 }
                 .peak-bar.high {
                     background: linear-gradient(90deg, #ffff00, #ff0000);
@@ -177,11 +178,11 @@
                     position: absolute;
                     top: 0;
                     right: 0;
-                    width: 3px;
+                    width: 4px;
                     height: 100%;
                     background: #fff;
                     opacity: 0;
-                    box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+                    box-shadow: 0 0 15px #fff, 0 0 30px #fff;
                     transition: right 0.1s ease-out, opacity 0.2s;
                 }
                 .peak-hold.active {
@@ -190,16 +191,16 @@
                 .level-meter-labels {
                     display: flex;
                     justify-content: space-between;
-                    padding: 0 4px;
-                    margin-top: 8px;
+                    padding: 0 8px;
+                    margin-top: 12px;
                 }
                 .channel-label {
-                    font-size: 14px;
+                    font-size: 20px;
                     font-weight: bold;
-                    width: 32px;
+                    width: 48px;
                     text-align: center;
-                    border-radius: 4px;
-                    padding: 2px 0;
+                    border-radius: 8px;
+                    padding: 4px 0;
                 }
                 .neon-green {
                     color: #00ff88;
@@ -228,7 +229,7 @@
                     .level-meter {
                         bottom: 90px;
                         right: 10px;
-                        transform: scale(0.8);
+                        transform: scale(0.7);
                         transform-origin: bottom right;
                     }
                 }
