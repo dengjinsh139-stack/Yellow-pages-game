@@ -335,16 +335,16 @@
             box-shadow: 0 8px 25px rgba(0, 212, 170, 0.35);
         }
 
-        /* 次要按钮 - 统一风格，实心但颜色不同 */
+        /* 次要按钮 - 与主按钮相同颜色 */
         .app-btn.secondary {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.15) 0%, rgba(0, 168, 132, 0.15) 100%);
-            color: var(--primary);
-            border: 1px solid var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--bg-primary);
+            border: none;
         }
 
         .app-btn.secondary:hover {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.25) 0%, rgba(0, 168, 132, 0.25) 100%);
-            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.35);
         }
 
         /* 底部信息 */
