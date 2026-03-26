@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻译助手 | 音效中心 | ⚡ 我的工作站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover { color: #667eea; }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-title p {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        /* 翻译器主容器 */
+        .translator-container {
+            background: linear-gradient(135deg, rgba(30, 30, 45, 0.9) 0%, rgba(25, 25, 40, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* 语言切换 */
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .lang-btn {
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #888;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .swap-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .swap-btn:hover {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+            transform: rotate(180deg);
+        }
+
+        /* 输入区域 */
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-box {
+            position: relative;
+        }
+
+        .input-box label {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .input-area {
+            width: 100%;
+            min-height: 180px;
+            background: rgba(15, 15, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        .input-area:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.1);
+        }
+
+        .output-area {
+            background: rgba(15, 15, 26, 0.5);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 10px;
+            right: 12px;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tool-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-btn:hover {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+            border-color: rgba(0, 212, 170, 0.3);
+        }
+
+        .tool-btn.primary {
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .tool-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+        }
+
+        /* 专业术语快速查询 */
+        .quick-terms {
+            background: rgba(15, 15, 26, 0.5);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .quick-terms h3 {
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .term-categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .term-cat-btn {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .term-cat-btn.active {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+            border-color: rgba(0, 212, 170, 0.4);
+        }
+
+        .term-cat-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .terms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .term-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .term-item:hover {
+            background: rgba(0, 212, 170, 0.1);
+            border-color: rgba(0, 212, 170, 0.3);
+            transform: translateX(5px);
+        }
+
+        .term-en {
+            color: #00d4aa;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .term-cn {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        /* 搜索框 */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: rgba(15, 15, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        /* 提示信息 */
+        .offline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 20px;
+            color: #00d4aa;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+        }
+
+        .tips-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 20px;
+        }
+
+        .tips-box h4 {
+            color: #ffc107;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .tips-box ul {
+            color: #aaa;
+            font-size: 0.85rem;
+            padding-left: 18px;
+            line-height: 1.8;
+        }
+
+        .tips-box li {
+            margin-bottom: 4px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+
+            .lang-switcher {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .swap-btn {
+                transform: rotate(90deg);
+            }
+
+            .swap-btn:hover {
+                transform: rotate(270deg);
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站</span>
+            </a>
+            <div class="nav-links" id="nav-links"></div>
+        </div>
+    </nav>
+
+    <header>
+        <div class="header-content">
+            <a href="sound-effects-hub.html" class="back-btn">
+                ← 返回音效中心
+            </a>
+            <span class="logo">🌐 翻译助手</span>
+            <div></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-title">
+            <h1>🌐 翻译助手</h1>
+            <p>离线可用的音频专业术语翻译工具</p>
+        </div>
+
+        <div class="translator-container">
+            <div style="text-align: center;">
+                <span class="offline-badge">
+                    ✅ 离线可用
+                </span>
+            </div>
+
+            <!-- 语言切换 -->
+            <div class="lang-switcher">
+                <button class="lang-btn active" id="btnZh" onclick="setDirection('zh-en')">中文 → 英文</button>
+                <button class="swap-btn" onclick="swapDirection()">⇄</button>
+                <button class="lang-btn" id="btnEn" onclick="setDirection('en-zh')">英文 → 中文</button>
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="input-section">
+                <div class="input-box">
+                    <label id="inputLabel">输入中文</label>
+                    <textarea 
+                        class="input-area" 
+                        id="inputText" 
+                        placeholder="在此输入要翻译的文本..."
+                        oninput="updateCharCount()"
+                    ></textarea>
+                    <span class="char-count"><span id="charCount">0</span> 字符</span>
+                </div>
+                <div class="input-box">
+                    <label>翻译结果</label>
+                    <textarea class="input-area output-area" id="outputText" readonly placeholder="翻译结果将显示在这里..."></textarea>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <button class="tool-btn primary" onclick="translate()">
+                    🚀 翻译
+                </button>
+                <button class="tool-btn" onclick="copyResult()">
+                    📋 复制结果
+                </button>
+                <button class="tool-btn" onclick="clearAll()">
+                    🗑️ 清空
+                </button>
+                <button class="tool-btn" onclick="useOnline()">
+                    🌐 在线翻译
+                </button>
+            </div>
+
+            <!-- 使用提示 -->
+            <div class="tips-box">
+                <h4>💡 使用提示</h4>
+                <ul>
+                    <li>点击下方专业术语可快速填入翻译框</li>
+                    <li>支持常用音效、音频、DAW相关术语</li>
+                    <li>复杂句子建议使用"在线翻译"获取更准确结果</li>
+                    <li>所有数据仅在本地处理，不会上传到服务器</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 专业术语快速查询 -->
+        <div class="quick-terms">
+            <h3>📚 音频专业术语库</h3>
+            
+            <!-- 搜索 -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="termSearch" placeholder="搜索术语..." oninput="filterTerms()">
+            </div>
+
+            <!-- 分类 -->
+            <div class="term-categories">
+                <button class="term-cat-btn active" onclick="filterCategory('all')">全部</button>
+                <button class="term-cat-btn" onclick="filterCategory('basic')">基础术语</button>
+                <button class="term-cat-btn" onclick="filterCategory('effect')">音效类型</button>
+                <button class="term-cat-btn" onclick="filterCategory('tech')">技术参数</button>
+                <button class="term-cat-btn" onclick="filterCategory('daw')">DAW/软件</button>
+                <button class="term-cat-btn" onclick="filterCategory('common')">常用短语</button>
+            </div>
+
+            <!-- 术语列表 -->
+            <div class="terms-grid" id="termsGrid">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p data-version>⚡ 我的工作站 | 翻译助手</p>
+    </footer>
+
+    <script src="../nav-config.js"></script>
+    <script>
+        // 翻译方向
+        let currentDirection = 'zh-en';
+
+        // 专业术语库
+        const termDatabase = {
+            basic: [
+                { en: 'Sound Effect', cn: '音效', example: 'We need more sound effects for this scene.' },
+                { en: 'Ambience', cn: '环境音/氛围音', example: 'Add some room ambience.' },
+                { en: 'Foley', cn: '拟音', example: 'The foley sounds are too loud.' },
+                { en: 'Dialogue', cn: '对白', example: 'Clean up the dialogue tracks.' },
+                { en: 'Voice Over', cn: '旁白/画外音', example: 'Record a voice over for the intro.' },
+                { en: 'SFX', cn: '音效（缩写）', example: 'SFX library' },
+                { en: 'BGM', cn: '背景音乐', example: 'The BGM is too distracting.' },
+                { en: 'Audio', cn: '音频', example: 'Audio quality check' },
+                { en: 'Sample', cn: '采样', example: 'Load this sample into the sampler.' },
+                { en: 'Loop', cn: '循环', example: 'This loop needs to be seamless.' },
+            ],
+            effect: [
+                { en: 'Reverb', cn: '混响', example: 'Add some reverb to the vocals.' },
+                { en: 'Delay', cn: '延迟', example: 'Use delay for the guitar solo.' },
+                { en: 'EQ', cn: '均衡器', example: 'Cut the low end with EQ.' },
+                { en: 'Compression', cn: '压缩', example: 'Apply compression to control dynamics.' },
+                { en: 'Distortion', cn: '失真', example: 'Add distortion for grit.' },
+                { en: 'Chorus', cn: '合唱效果', example: 'Widen the sound with chorus.' },
+                { en: 'Filter', cn: '滤波器', example: 'Apply a low-pass filter.' },
+                { en: 'Pitch Shift', cn: '音高调整', example: 'Pitch shift the sample down.' },
+                { en: 'Time Stretch', cn: '时间拉伸', example: 'Time stretch the audio to fit.' },
+                { en: 'Fade In/Out', cn: '淡入/淡出', example: 'Add a fade out at the end.' },
+            ],
+            tech: [
+                { en: 'Sample Rate', cn: '采样率', example: '44.1kHz sample rate' },
+                { en: 'Bit Depth', cn: '位深度', example: '24-bit depth' },
+                { en: 'Frequency', cn: '频率', example: 'High frequency content' },
+                { en: 'Amplitude', cn: '振幅', example: 'Adjust the amplitude.' },
+                { en: 'Decibel (dB)', cn: '分贝', example: 'Peak at -6dB' },
+                { en: 'Hz', cn: '赫兹', example: 'Low cut at 80Hz' },
+                { en: 'kHz', cn: '千赫兹', example: 'High shelf at 10kHz' },
+                { en: 'Stereo', cn: '立体声', example: 'Widen the stereo image.' },
+                { en: 'Mono', cn: '单声道', example: 'Convert to mono.' },
+                { en: 'Pan', cn: '声像', example: 'Pan the guitar to the left.' },
+                { en: 'Gain', cn: '增益', example: 'Increase the gain.' },
+                { en: 'Volume', cn: '音量', example: 'Lower the volume.' },
+                { en: 'Loudness', cn: '响度', example: 'LUFS loudness standard' },
+                { en: 'Dynamic Range', cn: '动态范围', example: 'Preserve dynamic range.' },
+            ],
+            daw: [
+                { en: 'Track', cn: '音轨', example: 'Create a new track.' },
+                { en: 'Channel', cn: '通道', example: 'Route to channel 1.' },
+                { en: 'Bus', cn: '总线', example: 'Send to the reverb bus.' },
+                { en: 'Send', cn: '发送', example: 'Add a send effect.' },
+                { en: 'Return', cn: '返回', example: 'Adjust the return level.' },
+                { en: 'Aux', cn: '辅助', example: 'Aux channel for effects' },
+                { en: 'Master', cn: '主输出', example: 'Check the master meter.' },
+                { en: 'Mix', cn: '混音', example: 'The mix sounds great.' },
+                { en: 'Mastering', cn: '母带处理', example: 'Send for mastering.' },
+                { en: 'Bounce', cn: '导出/混缩', example: 'Bounce the final mix.' },
+                { en: 'Render', cn: '渲染', example: 'Render the audio.' },
+                { en: 'Freeze', cn: '冻结', example: 'Freeze the track to save CPU.' },
+                { en: 'Solo', cn: '独奏', example: 'Solo this track.' },
+                { en: 'Mute', cn: '静音', example: 'Mute the background tracks.' },
+            ],
+            common: [
+                { en: 'Cut', cn: '切除/剪切', example: 'Cut the low frequencies.' },
+                { en: 'Boost', cn: '提升', example: 'Boost the highs.' },
+                { en: 'Attenuate', cn: '衰减', example: 'Attenuate the signal.' },
+                { en: 'Normalize', cn: '标准化', example: 'Normalize to -1dB.' },
+                { en: 'Trim', cn: '修剪', example: 'Trim the silence.' },
+                { en: 'Align', cn: '对齐', example: 'Align the waveforms.' },
+                { en: 'Sync', cn: '同步', example: 'Sync the audio with video.' },
+                { en: 'Export', cn: '导出', example: 'Export as WAV.' },
+                { en: 'Import', cn: '导入', example: 'Import the audio file.' },
+                { en: 'Duplicate', cn: '复制', example: 'Duplicate the track.' },
+                { en: 'Replace', cn: '替换', example: 'Replace the sound.' },
+                { en: 'Adjust', cn: '调整', example: 'Adjust the level.' },
+                { en: 'Balance', cn: '平衡', example: 'Balance the mix.' },
+                { en: 'Layer', cn: '叠加', example: 'Layer multiple sounds.' },
+                { en: 'Blend', cn: '融合', example: 'Blend the sounds together.' },
+            ]
+        };
+
+        // 简单词典（用于基础翻译）
+        const dictionary = {
+            '音效': 'sound effect',
+            '声音': 'sound',
+            '音频': 'audio',
+            '音乐': 'music',
+            '音量': 'volume',
+            '混音': 'mixing',
+            '录音': 'recording',
+            '播放': 'playback',
+            '编辑': 'edit',
+            '导出': 'export',
+            '导入': 'import',
+            '保存': 'save',
+            '打开': 'open',
+            '新建': 'new',
+            '删除': 'delete',
+            '复制': 'copy',
+            '粘贴': 'paste',
+            '剪切': 'cut',
+            '撤销': 'undo',
+            '重做': 'redo',
+            '放大': 'zoom in',
+            '缩小': 'zoom out',
+            '选择': 'select',
+            '全选': 'select all',
+            '取消': 'cancel',
+            '确定': 'confirm',
+            '关闭': 'close',
+            '帮助': 'help',
+            '设置': 'settings',
+            '文件': 'file',
+            '工具': 'tools',
+            '视图': 'view',
+            '窗口': 'window',
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTerms('all');
+        });
+
+        // 设置翻译方向
+        function setDirection(direction) {
+            currentDirection = direction;
+            const btnZh = document.getElementById('btnZh');
+            const btnEn = document.getElementById('btnEn');
+            const inputLabel = document.getElementById('inputLabel');
+            const inputText = document.getElementById('inputText');
+
+            if (direction === 'zh-en') {
+                btnZh.classList.add('active');
+                btnEn.classList.remove('active');
+                inputLabel.textContent = '输入中文';
+                inputText.placeholder = '在此输入要翻译的中文...';
+            } else {
+                btnZh.classList.remove('active');
+                btnEn.classList.add('active');
+                inputLabel.textContent = '输入英文';
+                inputText.placeholder = 'Enter English text here...';
+            }
+
+            // 清空结果
+            document.getElementById('outputText').value = '';
+        }
+
+        // 切换方向
+        function swapDirection() {
+            const newDirection = currentDirection === 'zh-en' ? 'en-zh' : 'zh-en';
+            setDirection(newDirection);
+        }
+
+        // 更新字符计数
+        function updateCharCount() {
+            const text = document.getElementById('inputText').value;
+            document.getElementById('charCount').textContent = text.length;
+        }
+
+        // 翻译功能（简化版）
+        function translate() {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) return;
+
+            let result = '';
+
+            if (currentDirection === 'zh-en') {
+                // 中译英：尝试词典匹配
+                result = translateZhToEn(input);
+            } else {
+                // 英译中：简单处理
+                result = translateEnToZh(input);
+            }
+
+            document.getElementById('outputText').value = result;
+        }
+
+        // 中译英
+        function translateZhToEn(text) {
+            // 先检查是否在词典中
+            if (dictionary[text]) {
+                return dictionary[text];
+            }
+
+            // 尝试匹配专业术语
+            for (const category in termDatabase) {
+                for (const term of termDatabase[category]) {
+                    if (text.includes(term.cn) || term.cn.includes(text)) {
+                        return term.en + '\n（' + term.example + '）';
+                    }
+                }
+            }
+
+            // 返回提示信息
+            return `[离线翻译] 未找到完全匹配\n\n推荐操作：\n1. 尝试搜索下方专业术语库\n2. 使用"在线翻译"获取更准确结果\n\n输入内容：${text}`;
+        }
+
+        // 英译中
+        function translateEnToZh(text) {
+            // 尝试匹配专业术语
+            const lowerText = text.toLowerCase();
+            
+            for (const category in termDatabase) {
+                for (const term of termDatabase[category]) {
+                    if (lowerText.includes(term.en.toLowerCase())) {
+                        return term.cn + '\n（例句：' + term.example + '）';
+                    }
+                }
+            }
+
+            // 反向查词典
+            for (const [cn, en] of Object.entries(dictionary)) {
+                if (en.toLowerCase() === lowerText) {
+                    return cn;
+                }
+            }
+
+            return `[离线翻译] 未找到完全匹配\n\n推荐操作：\n1. 尝试搜索下方专业术语库\n2. 使用"在线翻译"获取更准确结果\n\n输入内容：${text}`;
+        }
+
+        // 复制结果
+        function copyResult() {
+            const output = document.getElementById('outputText');
+            if (!output.value) return;
+
+            output.select();
+            document.execCommand('copy');
+            
+            // 显示提示
+            showToast('已复制到剪贴板！');
+        }
+
+        // 清空
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            updateCharCount();
+        }
+
+        // 使用在线翻译
+        function useOnline() {
+            const text = document.getElementById('inputText').value.trim();
+            if (!text) {
+                showToast('请先输入要翻译的文本');
+                return;
+            }
+
+            // 打开 Google Translate
+            const url = `https://translate.google.com/?sl=${currentDirection === 'zh-en' ? 'zh-CN' : 'en'}&tl=${currentDirection === 'zh-en' ? 'en' : 'zh-CN'}&text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // 渲染术语列表
+        function renderTerms(category) {
+            const grid = document.getElementById('termsGrid');
+            grid.innerHTML = '';
+
+            let terms = [];
+            if (category === 'all') {
+                for (const cat in termDatabase) {
+                    terms = terms.concat(termDatabase[cat]);
+                }
+            } else {
+                terms = termDatabase[category] || [];
+            }
+
+            terms.forEach(term => {
+                const item = document.createElement('div');
+                item.className = 'term-item';
+                item.onclick = () => useTerm(term);
+                item.innerHTML = `
+                    <div class="term-en">${term.en}</div>
+                    <div class="term-cn">${term.cn}</div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // 使用术语
+        function useTerm(term) {
+            const input = document.getElementById('inputText');
+            
+            if (currentDirection === 'zh-en') {
+                input.value = term.cn;
+                document.getElementById('outputText').value = term.en + '\n\n例句：' + term.example;
+            } else {
+                input.value = term.en;
+                document.getElementById('outputText').value = term.cn + '\n\n例句：' + term.example;
+            }
+            
+            updateCharCount();
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 过滤分类
+        function filterCategory(category) {
+            // 更新按钮状态
+            document.querySelectorAll('.term-cat-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderTerms(category);
+        }
+
+        // 搜索术语
+        function filterTerms() {
+            const query = document.getElementById('termSearch').value.toLowerCase();
+            const grid = document.getElementById('termsGrid');
+            grid.innerHTML = '';
+
+            if (!query) {
+                renderTerms('all');
+                return;
+            }
+
+            let results = [];
+            for (const cat in termDatabase) {
+                for (const term of termDatabase[cat]) {
+                    if (term.en.toLowerCase().includes(query) || 
+                        term.cn.includes(query)) {
+                        results.push(term);
+                    }
+                }
+            }
+
+            results.forEach(term => {
+                const item = document.createElement('div');
+                item.className = 'term-item';
+                item.onclick = () => useTerm(term);
+                item.innerHTML = `
+                    <div class="term-en">${term.en}</div>
+                    <div class="term-cn">${term.cn}</div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // 显示提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 212, 170, 0.9);
+                color: #fff;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                z-index: 9999;
+                animation: fadeInOut 2s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+                20%, 80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+/* Cache bust: 1774375000 */
