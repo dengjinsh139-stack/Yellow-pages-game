@@ -689,17 +689,17 @@
         };
 
         // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             renderTerms('all');
         });
 
         // 设置翻译方向
         function setDirection(direction) {
             currentDirection = direction;
-            const btnZh = document.getElementById('btnZh');
-            const btnEn = document.getElementById('btnEn');
-            const inputLabel = document.getElementById('inputLabel');
-            const inputText = document.getElementById('inputText');
+            var btnZh = document.getElementById('btnZh');
+            var btnEn = document.getElementById('btnEn');
+            var inputLabel = document.getElementById('inputLabel');
+            var inputText = document.getElementById('inputText');
 
             if (direction === 'zh-en') {
                 btnZh.classList.add('active');
@@ -719,22 +719,22 @@
 
         // 切换方向
         function swapDirection() {
-            const newDirection = currentDirection === 'zh-en' ? 'en-zh' : 'zh-en';
+            var newDirection = currentDirection === 'zh-en' ? 'en-zh' : 'zh-en';
             setDirection(newDirection);
         }
 
         // 更新字符计数
         function updateCharCount() {
-            const text = document.getElementById('inputText').value;
+            var text = document.getElementById('inputText').value;
             document.getElementById('charCount').textContent = text.length;
         }
 
         // 翻译功能（简化版）
         function translate() {
-            const input = document.getElementById('inputText').value.trim();
+            var input = document.getElementById('inputText').value.trim();
             if (!input) return;
 
-            let result = '';
+            var result = '';
 
             if (currentDirection === 'zh-en') {
                 // 中译英：尝试词典匹配
@@ -755,44 +755,48 @@
             }
 
             // 尝试匹配专业术语
-            for (const category in termDatabase) {
-                for (const term of termDatabase[category]) {
-                    if (text.includes(term.cn) || term.cn.includes(text)) {
+            for (var category in termDatabase) {
+                var terms = termDatabase[category];
+                for (var i = 0; i < terms.length; i++) {
+                    var term = terms[i];
+                    if (text.indexOf(term.cn) !== -1 || term.cn.indexOf(text) !== -1) {
                         return term.en + '\n（' + term.example + '）';
                     }
                 }
             }
 
             // 返回提示信息
-            return `[离线翻译] 未找到完全匹配\n\n推荐操作：\n1. 尝试搜索下方专业术语库\n2. 使用"在线翻译"获取更准确结果\n\n输入内容：${text}`;
+            return '[离线翻译] 未找到完全匹配\n\n推荐操作：\n1. 尝试搜索下方专业术语库\n2. 使用"在线翻译"获取更准确结果\n\n输入内容：' + text;
         }
 
         // 英译中
         function translateEnToZh(text) {
             // 尝试匹配专业术语
-            const lowerText = text.toLowerCase();
+            var lowerText = text.toLowerCase();
             
-            for (const category in termDatabase) {
-                for (const term of termDatabase[category]) {
-                    if (lowerText.includes(term.en.toLowerCase())) {
+            for (var category in termDatabase) {
+                var terms = termDatabase[category];
+                for (var i = 0; i < terms.length; i++) {
+                    var term = terms[i];
+                    if (lowerText.indexOf(term.en.toLowerCase()) !== -1) {
                         return term.cn + '\n（例句：' + term.example + '）';
                     }
                 }
             }
 
             // 反向查词典
-            for (const [cn, en] of Object.entries(dictionary)) {
-                if (en.toLowerCase() === lowerText) {
+            for (var cn in dictionary) {
+                if (dictionary[cn].toLowerCase() === lowerText) {
                     return cn;
                 }
             }
 
-            return `[离线翻译] 未找到完全匹配\n\n推荐操作：\n1. 尝试搜索下方专业术语库\n2. 使用"在线翻译"获取更准确结果\n\n输入内容：${text}`;
+            return '[离线翻译] 未找到完全匹配\n\n推荐操作：\n1. 尝试搜索下方专业术语库\n2. 使用"在线翻译"获取更准确结果\n\n输入内容：' + text;
         }
 
         // 复制结果
         function copyResult() {
-            const output = document.getElementById('outputText');
+            var output = document.getElementById('outputText');
             if (!output.value) return;
 
             output.select();
@@ -811,46 +815,46 @@
 
         // 使用在线翻译
         function useOnline() {
-            const text = document.getElementById('inputText').value.trim();
+            var text = document.getElementById('inputText').value.trim();
             if (!text) {
                 showToast('请先输入要翻译的文本');
                 return;
             }
 
             // 打开 Google Translate
-            const url = `https://translate.google.com/?sl=${currentDirection === 'zh-en' ? 'zh-CN' : 'en'}&tl=${currentDirection === 'zh-en' ? 'en' : 'zh-CN'}&text=${encodeURIComponent(text)}`;
+            var url = 'https://translate.google.com/?sl=' + (currentDirection === 'zh-en' ? 'zh-CN' : 'en') + '&tl=' + (currentDirection === 'zh-en' ? 'en' : 'zh-CN') + '&text=' + encodeURIComponent(text);
             window.open(url, '_blank');
         }
 
         // 渲染术语列表
         function renderTerms(category) {
-            const grid = document.getElementById('termsGrid');
+            var grid = document.getElementById('termsGrid');
             grid.innerHTML = '';
 
-            let terms = [];
+            var terms = [];
             if (category === 'all') {
-                for (const cat in termDatabase) {
+                for (var cat in termDatabase) {
                     terms = terms.concat(termDatabase[cat]);
                 }
             } else {
                 terms = termDatabase[category] || [];
             }
 
-            terms.forEach(term => {
-                const item = document.createElement('div');
+            for (var i = 0; i < terms.length; i++) {
+                var term = terms[i];
+                var item = document.createElement('div');
                 item.className = 'term-item';
-                item.onclick = () => useTerm(term);
-                item.innerHTML = `
-                    <div class="term-en">${term.en}</div>
-                    <div class="term-cn">${term.cn}</div>
-                `;
+                item.onclick = (function(t) {
+                    return function() { useTerm(t); };
+                })(term);
+                item.innerHTML = '<div class="term-en">' + term.en + '</div><div class="term-cn">' + term.cn + '</div>';
                 grid.appendChild(item);
-            });
+            }
         }
 
         // 使用术语
         function useTerm(term) {
-            const input = document.getElementById('inputText');
+            var input = document.getElementById('inputText');
             
             if (currentDirection === 'zh-en') {
                 input.value = term.cn;
@@ -863,24 +867,27 @@
             updateCharCount();
             
             // 滚动到顶部
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo(0, 0);
         }
 
         // 过滤分类
         function filterCategory(category) {
             // 更新按钮状态
-            document.querySelectorAll('.term-cat-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+            var btns = document.querySelectorAll('.term-cat-btn');
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].classList.remove('active');
+            }
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
 
             renderTerms(category);
         }
 
         // 搜索术语
         function filterTerms() {
-            const query = document.getElementById('termSearch').value.toLowerCase();
-            const grid = document.getElementById('termsGrid');
+            var query = document.getElementById('termSearch').value.toLowerCase();
+            var grid = document.getElementById('termsGrid');
             grid.innerHTML = '';
 
             if (!query) {
@@ -888,60 +895,45 @@
                 return;
             }
 
-            let results = [];
-            for (const cat in termDatabase) {
-                for (const term of termDatabase[cat]) {
-                    if (term.en.toLowerCase().includes(query) || 
-                        term.cn.includes(query)) {
+            var results = [];
+            for (var cat in termDatabase) {
+                var terms = termDatabase[cat];
+                for (var i = 0; i < terms.length; i++) {
+                    var term = terms[i];
+                    if (term.en.toLowerCase().indexOf(query) !== -1 || 
+                        term.cn.indexOf(query) !== -1) {
                         results.push(term);
                     }
                 }
             }
 
-            results.forEach(term => {
-                const item = document.createElement('div');
+            for (var i = 0; i < results.length; i++) {
+                var term = results[i];
+                var item = document.createElement('div');
                 item.className = 'term-item';
-                item.onclick = () => useTerm(term);
-                item.innerHTML = `
-                    <div class="term-en">${term.en}</div>
-                    <div class="term-cn">${term.cn}</div>
-                `;
+                item.onclick = (function(t) {
+                    return function() { useTerm(t); };
+                })(term);
+                item.innerHTML = '<div class="term-en">' + term.en + '</div><div class="term-cn">' + term.cn + '</div>';
                 grid.appendChild(item);
-            });
+            }
         }
 
         // 显示提示
         function showToast(message) {
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 212, 170, 0.9);
-                color: #fff;
-                padding: 12px 24px;
-                border-radius: 8px;
-                font-size: 0.9rem;
-                z-index: 9999;
-                animation: fadeInOut 2s ease;
-            `;
+            var toast = document.createElement('div');
+            toast.style.cssText = 'position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0, 212, 170, 0.9); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; z-index: 9999; animation: fadeInOut 2s ease;';
             toast.textContent = message;
             document.body.appendChild(toast);
 
-            setTimeout(() => {
+            setTimeout(function() {
                 toast.remove();
             }, 2000);
         }
 
         // 添加动画样式
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInOut {
-                0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
-                20%, 80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            }
-        `;
+        var style = document.createElement('style');
+        style.textContent = '@keyframes fadeInOut { 0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); } 20%, 80% { opacity: 1; transform: translateX(-50%) translateY(0); } }';
         document.head.appendChild(style);
     </script>
 </body>
