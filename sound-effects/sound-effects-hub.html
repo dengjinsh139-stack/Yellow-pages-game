@@ -95,11 +95,6 @@
             color: #fff;
         }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
 
         .user-badge {
             background: rgba(102, 126, 234, 0.2);
@@ -112,22 +107,7 @@
             gap: 5px;
         }
 
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #888;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
 
-        .logout-btn:hover {
-            background: rgba(231, 76, 60, 0.2);
-            border-color: rgba(231, 76, 60, 0.4);
-            color: #e74c3c;
-        }
 
         main {
             max-width: 1200px;
@@ -352,14 +332,6 @@
         <div class="header-content">
             <div class="header-left">
                 <span class="logo">🔊 音效中心</span>
-            </div>
-            <div class="header-right">
-                <span class="user-badge">
-                    🔓 已验证
-                </span>
-                <button class="logout-btn" onclick="logout()">
-                    退出
-                </button>
             </div>
         </div>
     </header>
