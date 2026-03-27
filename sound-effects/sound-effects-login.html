@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音效相关 - 访问验证 | 我的工作站</title>
+    <title>音效相关 - 正在进入 | 我的工作站</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -15,229 +15,104 @@
             justify-content: center;
             padding: 20px;
         }
-        .login-container {
+        .loading-container {
             background: rgba(30, 30, 45, 0.9);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 40px;
+            padding: 60px 40px;
             width: 100%;
             max-width: 420px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
-        .logo { text-align: center; margin-bottom: 30px; }
         .logo-icon {
             width: 80px; height: 80px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 20px;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px;
+            margin: 0 auto 25px;
             font-size: 40px;
+            animation: pulse 2s infinite;
         }
-        .logo h1 { color: #fff; font-size: 1.5rem; margin-bottom: 8px; }
-        .logo p { color: #888; font-size: 0.9rem; }
-        .section-badge {
-            background: rgba(102, 126, 234, 0.2);
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(102, 126, 234, 0.2); }
+        }
+        h1 { color: #fff; font-size: 1.6rem; margin-bottom: 12px; }
+        p { color: #888; font-size: 0.95rem; margin-bottom: 30px; }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            animation: progress 1.5s ease-out forwards;
+        }
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+        .loading-text {
             color: #667eea;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            display: inline-flex;
+            font-size: 0.9rem;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 25px;
+            justify-content: center;
+            gap: 8px;
         }
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block;
-            color: #aaa;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
-        .password-input-wrap { position: relative; }
-        .password-input {
-            width: 100%;
-            padding: 14px 45px 14px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        .password-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-        .password-input.error {
-            border-color: #e74c3c;
-            animation: shake 0.5s;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #888;
-            cursor: pointer;
-            padding: 5px;
-            font-size: 1.1rem;
-        }
-        .toggle-password:hover { color: #fff; }
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .error-message {
-            color: #e74c3c;
-            font-size: 0.9rem;
-            margin-top: 12px;
-            text-align: center;
-            display: none;
-        }
-        .error-message.show { display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
         .back-link {
-            text-align: center;
-            margin-top: 25px;
+            margin-top: 30px;
         }
         .back-link a {
             color: #888;
             text-decoration: none;
             font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
             transition: color 0.3s;
         }
         .back-link a:hover { color: #667eea; }
-        .hint-box {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-top: 20px;
-        }
-        .hint-box p {
-            color: #ffc107;
-            font-size: 0.85rem;
-            margin: 0;
-        }
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .success-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        .success-overlay.show { opacity: 1; visibility: visible; }
-        .success-content { text-align: center; color: #fff; }
-        .success-icon {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 40px;
-            animation: scaleIn 0.5s ease;
-        }
-        @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
-        }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <div class="logo-icon">🔊</div>
-            <h1>音效相关</h1>
-            <p>Sound Effects Resources</p>
+    <div class="loading-container">
+        <div class="logo-icon">🔊</div>
+        <h1>音效相关</h1>
+        <p>Sound Effects Resources</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
         </div>
-
-        <div style="text-align: center;">
-            <span class="section-badge">🔒 受保护内容</span>
+        
+        <div class="loading-text">
+            <span class="spinner"></span>
+            正在进入音效中心...
         </div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="password">访问密码</label>
-                <div class="password-input-wrap">
-                    <input type="password" id="password" class="password-input" placeholder="请输入密码" autocomplete="off">
-                    <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
-                </div>
-            </div>
-
-            <button type="submit" class="submit-btn" id="submitBtn">进入音效中心</button>
-
-            <div class="error-message" id="errorMessage">❌ 密码错误，请重试</div>
-        </form>
-
-        <div class="hint-box">
-            <p>💡 提示：默认密码为 <strong>661139</strong></p>
-        </div>
-
+        
         <div class="back-link">
             <a href="../index.html">← 返回工作站首页</a>
         </div>
     </div>
 
-    <div class="success-overlay" id="successOverlay">
-        <div class="success-content">
-            <div class="success-icon">✓</div>
-            <h2>验证成功</h2>
-            <p>正在进入音效中心...</p>
-        </div>
-    </div>
-
     <script>
-        // 密码保护已取消 - 直接跳转到音效中心
-        window.location.href = 'sound-effects-hub.html';
+        // 1.5秒后自动跳转到音效中心
+        setTimeout(function() {
+            window.location.href = 'sound-effects-hub.html';
+        }, 1500);
     </script>
 </body>
 </html>
