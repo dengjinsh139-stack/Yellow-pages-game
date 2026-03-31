@@ -25034,5 +25034,82 @@ const voiceData = [
     "text": "那——我把雒阳烧给你！",
     "status": "待录制",
     "fileName": "CG"
+  },
+  {
+    "id": 2277,
+    "character": "路人男青年",
+    "actor": "待定",
+    "batch": "第3期",
+    "type": "主线",
+    "scene": "拉屏",
+    "text": "又要征关税！？",
+    "status": "待录制",
+    "fileName": ""
+  },
+  {
+    "id": 2278,
+    "character": "西凉军-兵卒",
+    "actor": "待定",
+    "batch": "第3期",
+    "type": "主线",
+    "scene": "拉屏",
+    "text": "啊啊啊啊！",
+    "status": "待录制",
+    "fileName": ""
+  },
+  {
+    "id": 2279,
+    "character": "董卓",
+    "actor": "待定",
+    "batch": "第3期",
+    "type": "主线",
+    "scene": "一箭惊城-箱庭",
+    "text": "嗟乎！",
+    "status": "待录制",
+    "fileName": ""
+  },
+  {
+    "id": 2280,
+    "character": "马帮主",
+    "actor": "待定",
+    "batch": "第3期",
+    "type": "主线",
+    "scene": "一箭惊城-箱庭",
+    "text": "王刚！住口！",
+    "status": "待录制",
+    "fileName": ""
+  },
+  {
+    "id": 2281,
+    "character": "张雷",
+    "actor": "待定",
+    "batch": "第3期",
+    "type": "主线",
+    "scene": "一箭惊城-箱庭",
+    "text": "静！",
+    "status": "待录制",
+    "fileName": ""
+  },
+  {
+    "id": 2282,
+    "character": "燎原火",
+    "actor": "待定",
+    "batch": "第3期",
+    "type": "主线",
+    "scene": "一箭惊城-箱庭",
+    "text": "收到了——————",
+    "status": "待录制",
+    "fileName": ""
+  },
+  {
+    "id": 2283,
+    "character": "西凉军-兵卒",
+    "actor": "待定",
+    "batch": "第3期",
+    "type": "主线",
+    "scene": "出逃-关卡",
+    "text": "————追！",
+    "status": "待录制",
+    "fileName": ""
   }
 ];
