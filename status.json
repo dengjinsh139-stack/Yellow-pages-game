@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-04-01T17:56:36.759441",
+  "timestamp": "2026-04-02T00:03:24.439677",
   "load": {
-    "percentage": 31,
-    "cpu": 15,
+    "percentage": 39,
+    "cpu": 32,
     "memory": 47,
     "level": "low",
     "status_text": "低负载 - 运行良好",
@@ -18,8 +18,8 @@
     }
   },
   "stats": {
-    "commits_today": 1,
-    "files_modified": 8
+    "commits_today": 0,
+    "files_modified": 2
   },
   "sessions": {
     "active": 1,
@@ -27,8 +27,8 @@
     "processing": 0
   },
   "backup": {
-    "last_backup": "2026-04-01 12:03",
-    "next_check": "2026-04-01 18:03",
+    "last_backup": "2026-04-01 18:01",
+    "next_check": "2026-04-02 00:01",
     "total_backups": 10,
     "changes_detected": true
   },
@@ -65,18 +65,18 @@
     }
   ],
   "history": [
-    42,
-    38,
-    43,
-    40,
-    38,
-    37,
-    36,
-    31,
-    34,
     41,
-    43,
-    31
+    41,
+    33,
+    30,
+    46,
+    39,
+    46,
+    36,
+    38,
+    42,
+    31,
+    39
   ],
   "current_work": {
     "title": "系统监控",
