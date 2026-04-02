@@ -1,91 +1,36 @@
 {
-  "timestamp": "2026-04-02T17:21:23.501438",
+  "timestamp": "2026-04-02T22:41:39.150999",
+  "agent": {
+    "version": "2.5.6",
+    "status": "running"
+  },
   "load": {
-    "percentage": 37,
-    "cpu": 27,
-    "memory": 47,
-    "level": "low",
-    "status_text": "低负载 - 运行良好",
-    "raw": {
-      "cpu_percent": 0.5,
-      "memory_percent": 41.8,
-      "memory_used_gb": 1.27,
-      "memory_total_gb": 3.76,
-      "disk_percent": 55.2,
-      "disk_used_gb": 20.65,
-      "disk_total_gb": 39.07,
-      "uptime_hours": 176.4
-    }
+    "cpu": 25,
+    "memory": 50,
+    "percentage": 37
   },
-  "stats": {
-    "commits_today": 2,
-    "files_modified": 7
-  },
-  "sessions": {
-    "active": 1,
-    "pending": 0,
-    "processing": 0
-  },
+  "history": [
+    33,
+    32,
+    31,
+    30,
+    32,
+    33,
+    32,
+    31,
+    30,
+    37,
+    36,
+    37
+  ],
   "backup": {
-    "last_backup": "2026-04-02 00:07",
-    "next_check": "2026-04-02 06:07",
+    "last_backup": "2026-04-02 18:04",
+    "next_check": "2026-04-03 00:04",
     "total_backups": 10,
     "changes_detected": true
   },
-  "recent_activity": [
-    {
-      "time": "刚刚",
-      "text": "系统状态更新"
-    },
-    {
-      "time": "5分钟前",
-      "text": "Git 同步完成"
-    },
-    {
-      "time": "10分钟前",
-      "text": "数据备份完成"
-    }
-  ],
-  "tasks": [
-    {
-      "status": "completed",
-      "text": "系统初始化"
-    },
-    {
-      "status": "completed",
-      "text": "数据加载"
-    },
-    {
-      "status": "active",
-      "text": "实时监控"
-    },
-    {
-      "status": "pending",
-      "text": "待处理任务"
-    }
-  ],
-  "history": [
-    40,
-    31,
-    41,
-    40,
-    33,
-    30,
-    39,
-    33,
-    31,
-    36,
-    39,
-    37
-  ],
-  "current_work": {
-    "title": "系统监控",
-    "description": "实时监控系统状态",
-    "files_modified": 2,
-    "progress": 41,
-    "eta": "运行中"
-  },
-  "agent": {
-    "version": "2.5.6"
+  "stats": {
+    "commits_today": 3,
+    "files_modified": 10
   }
 }
