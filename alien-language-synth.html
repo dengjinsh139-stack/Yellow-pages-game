@@ -1087,8 +1087,13 @@
         }
 
         // 播放合成音
-        function playSynthesizedSound(frequency, duration = null) {
+        async function playSynthesizedSound(frequency, duration = null) {
             if (!audioContext) return;
+            
+            // 如果音频上下文被暂停（浏览器自动挂起），尝试恢复
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
 
             // 停止之前的音
             stopPlaying();
@@ -1771,7 +1776,7 @@
                     
                     // 播放声音（空格和标点不发音）
                     if (freq > 0) {
-                        playSynthesizedSound(freq, speed / 1000 * 0.8);
+                        await playSynthesizedSound(freq, speed / 1000 * 0.8);
                     }
                     
                     // 等待
