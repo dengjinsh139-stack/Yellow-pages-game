@@ -921,7 +921,13 @@
         <div class="info-section">
             <div class="info-card">
                 <h3>🎵 设计理念</h3>
-                <p>基于《挽救计划》中洛基的多声调语言设计。硅基生物通过体内多个气囊同时振动产生和弦，音高变化表达情感，节奏密度传递紧急程度。</p>
+                <p><strong>灵感来源：</strong>基于安迪·威尔《挽救计划》中洛基的多声调语言设计。硅基生物通过体内多个气囊同时振动产生和弦，音高变化表达情感，节奏密度传递紧急程度。</p>
+                <p style="margin-top: 10px;"><strong>核心功能：</strong></p>
+                <ul style="margin-left: 15px; font-size: 0.85rem;">
+                    <li><strong>音素映射(Option A)：</strong>每个字符映射到独特频率。中文字符基于拼音韵母(220-1046Hz)，英文字母A-Z(220-932Hz)，数字0-9，标点符号控制停顿。使用Unicode码点作为回退映射。</li>
+                    <li><strong>情感匹配(Option B)：</strong>自动分析文案情感(问候/疑问/警告/喜悦/悲伤/愤怒)，实时调整音色参数。以264Hz中性基频为基准按比例缩放，让不同情感呈现明显音高差异。</li>
+                    <li><strong>多振荡器合成：</strong>基频+谐波+颤音+滤波器，模拟多气囊共振效果。</li>
+                </ul>
             </div>
             <div class="info-card">
                 <h3>⌨️ 快捷键</h3>
