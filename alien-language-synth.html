@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外星语言声音模拟器 | Alien Language Synth</title>
+    <style>
+        :root {
+            --primary: #00d4aa;
+            --secondary: #00a8e8;
+            --bg-dark: #0a0f14;
+            --bg-card: #111820;
+            --text: #e0f7ff;
+            --text-dim: #8aa4b8;
+            --accent: #00ffaa;
+            --danger: #ff4757;
+            --warning: #ffa502;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, var(--primary) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--secondary) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, var(--accent) 0%, transparent 30%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-5%, 5%) rotate(180deg); }
+        }
+
+        /* 网格背景 */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 170, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 主容器 */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 头部 */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid rgba(0, 212, 170, 0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 1rem;
+            letter-spacing: 3px;
+        }
+
+        /* 主面板 */
+        .main-panel {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 面板卡片 */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title::before {
+            content: '◆';
+            font-size: 0.6rem;
+        }
+
+        /* 可视化区域 */
+        .visualizer-container {
+            position: relative;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        #visualizer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .visualizer-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-family: monospace;
+        }
+
+        /* 控制器 */
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .control-value {
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        /* 滑块 */
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+            border: 2px solid var(--bg-dark);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid var(--bg-dark);
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+        }
+
+        /* 按钮 */
+        .btn {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.2), rgba(0, 168, 232, 0.2));
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.2), rgba(255, 71, 87, 0.1));
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            border-color: var(--warning);
+            color: var(--warning);
+            background: linear-gradient(135deg, rgba(255, 165, 2, 0.2), rgba(255, 165, 2, 0.1));
+        }
+
+        .btn-warning:hover {
+            background: var(--warning);
+            color: var(--bg-dark);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 频谱指示器 */
+        .spectrum-display {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+            height: 80px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 170, 0.1);
+        }
+
+        .spectrum-bar {
+            width: 8px;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 2px;
+            transition: height 0.05s ease;
+            opacity: 0.8;
+        }
+
+        /* 预设面板 */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .preset-btn {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: var(--text);
+            padding: 15px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .preset-btn:hover {
+            background: rgba(0, 212, 170, 0.2);
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .preset-btn .icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .preset-btn .label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        /* 键盘区域 */
+        .keyboard-section {
+            margin-top: 20px;
+        }
+
+        .keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        .key {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, rgba(0, 212, 170, 0.1), rgba(0, 168, 232, 0.1));
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+
+        .key:hover {
+            background: linear-gradient(145deg, rgba(0, 212, 170, 0.2), rgba(0, 168, 232, 0.2));
+            transform: translateY(-2px);
+        }
+
+        .key:active, .key.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg-dark);
+            transform: translateY(2px);
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.5);
+        }
+
+        .key .note {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        .key .letter {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* 底部信息 */
+        .info-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .info-card p, .info-card li {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .info-card ul {
+            padding-left: 20px;
+        }
+
+        .info-card li {
+            margin-bottom: 5px;
+        }
+
+        /* 快捷键提示 */
+        .shortcut {
+            display: inline-block;
+            background: rgba(0, 212, 170, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 0 2px;
+        }
+
+        /* 启动遮罩 */
+        .start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 20, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .start-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .start-overlay h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .start-overlay p {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+
+        /* 状态指示器 */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.active {
+            background: var(--accent);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 录音指示 */
+        .recording-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .recording-indicator.recording {
+            display: flex;
+        }
+
+        .recording-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景动画 -->
+    <div class="bg-animation"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- 启动遮罩 -->
+    <div class="start-overlay" id="startOverlay">
+        <h2>🎵 外星语言声音模拟器</h2>
+        <p>点击按钮启动音频引擎</p>
+        <button class="btn" onclick="initAudio()" style="font-size: 1.1rem; padding: 15px 40px;">
+            启动系统
+        </button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>👽 外星语言声音模拟器</h1>
+            <p class="subtitle">ALIEN LANGUAGE SYNTHESIZER v1.0</p>
+        </header>
+
+        <div class="main-panel">
+            <!-- 左侧面板：声音合成器 -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span class="status-indicator" id="audioStatus"></span>
+                    声音合成器
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>主频率 (Base Freq)</span>
+                        <span class="control-value" id="freqValue">220 Hz</span>
+                    </div>
+                    <input type="range" id="baseFreq" min="50" max="800" value="220" oninput="updateParams()">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>谐波数量 (Harmonics)</span>
+                        <span class="control-value" id="harmValue">3</span>
+                    </div>
+                    <input type="range" id="harmonics" min="1" max="5" value="3" oninput="updateParams()">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>共鸣度 (Resonance)</span>
+                        <span class="control-value" id="resValue">50%</span>
+                    </div>
+                    <input type="range" id="resonance" min="0" max="100" value="50" oninput="updateParams()">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>颤音速率 (Vibrato)</span>
+                        <span class="control-value" id="vibValue">5 Hz</span>
+                    </div>
+                    <input type="range" id="vibrato" min="0" max="20" value="5" oninput="updateParams()">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>包络 (Envelope)</span>
+                        <span class="control-value" id="envValue">Medium</span>
+                    </div>
+                    <input type="range" id="envelope" min="10" max="2000" value="500" oninput="updateParams()">
+                </div>
+
+                <div class="spectrum-display" id="spectrum">
+                    <!-- 动态生成频谱条 -->
+                </div>
+            </div>
+
+            <!-- 中间面板：可视化与播放 -->
+            <div class="panel">
+                <div class="panel-title">波形可视化</div>
+                
+                <div class="visualizer-container">
+                    <canvas id="visualizer"></canvas>
+                    <div class="visualizer-overlay">
+                        <span id="waveInfo">Osc: 3 | Freq: 220Hz</span>
+                    </div>
+                </div>
+
+                <div class="btn-grid" style="margin-top: 20px;">
+                    <button class="btn" onclick="playTone()">▶ 播放测试音</button>
+                    <button class="btn btn-warning" onclick="playRandomPhrase()">🎲 随机短语</button>
+                    <button class="btn" onclick="startRecording()" id="recordBtn">⏺ 录制</button>
+                    <button class="btn btn-danger" onclick="stopRecording()" id="stopBtn" style="display:none;">⏹ 停止</button>
+                </div>
+
+                <div class="recording-indicator" id="recordingIndicator">
+                    <div class="recording-dot"></div>
+                    <span>录制中... <span id="recordTime">0</span>s</span>
+                </div>
+
+                <div class="keyboard-section">
+                    <div class="panel-title">实时演奏 (键盘快捷键)</div>
+                    <div class="keyboard" id="keyboard">
+                        <!-- 动态生成键盘 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧面板：预设 -->
+            <div class="panel">
+                <div class="panel-title">预设短语</div>
+                
+                <div class="preset-grid">
+                    <div class="preset-btn" onclick="playPreset('greeting')">
+                        <span class="icon">👋</span>
+                        <span class="label">问候</span>
+                    </div>
+                    <div class="preset-btn" onclick="playPreset('question')">
+                        <span class="icon">❓</span>
+                        <span class="label">疑问</span>
+                    </div>
+                    <div class="preset-btn" onclick="playPreset('warning')">
+                        <span class="icon">⚠️</span>
+                        <span class="label">警告</span>
+                    </div>
+                    <div class="preset-btn" onclick="playPreset('happy')">
+                        <span class="icon">✨</span>
+                        <span class="label">喜悦</span>
+                    </div>
+                    <div class="preset-btn" onclick="playPreset('sad')">
+                        <span class="icon">💧</span>
+                        <span class="label">悲伤</span>
+                    </div>
+                    <div class="preset-btn" onclick="playPreset('numbers')">
+                        <span class="icon">🔢</span>
+                        <span class="label">数字</span>
+                    </div>
+                    <div class="preset-btn" onclick="playPreset('name')">
+                        <span class="icon">📝</span>
+                        <span class="label">名字</span>
+                    </div>
+                    <div class="preset-btn" onclick="playPreset('goodbye')">
+                        <span class="icon">🌟</span>
+                        <span class="label">告别</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div class="panel-title">历史记录</div>
+                    <div id="history" style="max-height: 150px; overflow-y: auto; font-size: 0.8rem; color: var(--text-dim);">
+                        <div style="padding: 5px; border-bottom: 1px solid rgba(0,212,170,0.1);">系统就绪...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部信息 -->
+        <div class="info-section">
+            <div class="info-card">
+                <h3>🎵 设计理念</h3>
+                <p>基于《挽救计划》中洛基的多声调语言设计。硅基生物通过体内多个气囊同时振动产生和弦，音高变化表达情感，节奏密度传递紧急程度。</p>
+            </div>
+            <div class="info-card">
+                <h3>⌨️ 快捷键</h3>
+                <ul>
+                    <li><span class="shortcut">A-K</span> 播放音阶</li>
+                    <li><span class="shortcut">Space</span> 播放测试音</li>
+                    <li><span class="shortcut">R</span> 开始/停止录制</li>
+                    <li><span class="shortcut">1-8</span> 触发预设短语</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>🔧 技术说明</h3>
+                <p>使用 Web Audio API 实现多振荡器合成。支持实时参数调节、波形可视化、录制与回放功能。所有处理在本地完成，无需服务器。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let audioContext;
+        let isPlaying = false;
+        let currentOscillators = [];
+        let analyser;
+        let canvas, canvasCtx;
+        let animationId;
+        let mediaRecorder;
+        let recordedChunks = [];
+        let isRecording = false;
+        let recordInterval;
+
+        // 参数
+        const params = {
+            baseFreq: 220,
+            harmonics: 3,
+            resonance: 0.5,
+            vibrato: 5,
+            envelope: 500
+        };
+
+        // 音阶频率 (基于A-K键)
+        const noteFrequencies = {
+            'a': 130.81,  // C3
+            's': 146.83,  // D3
+            'd': 164.81,  // E3
+            'f': 174.61,  // F3
+            'g': 196.00,  // G3
+            'h': 220.00,  // A3
+            'j': 246.94,  // B3
+            'k': 261.63,  // C4
+            'l': 293.66,  // D4
+            ';': 329.63   // E4
+        };
+
+        // 初始化
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+            
+            canvas = document.getElementById('visualizer');
+            canvasCtx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // 创建频谱显示
+            createSpectrumBars();
+            
+            // 创建键盘
+            createKeyboard();
+            
+            // 开始可视化
+            visualize();
+            
+            // 隐藏启动遮罩
+            document.getElementById('startOverlay').classList.add('hidden');
+            document.getElementById('audioStatus').classList.add('active');
+            
+            addToHistory('音频引擎已启动');
+        }
+
+        // 创建频谱条
+        function createSpectrumBars() {
+            const spectrum = document.getElementById('spectrum');
+            spectrum.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'spectrum-bar';
+                bar.style.height = '5px';
+                spectrum.appendChild(bar);
+            }
+        }
+
+        // 创建键盘
+        function createKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            const keys = [
+                { key: 'A', note: 'C3', freq: 130.81 },
+                { key: 'S', note: 'D3', freq: 146.83 },
+                { key: 'D', note: 'E3', freq: 164.81 },
+                { key: 'F', note: 'F3', freq: 174.61 },
+                { key: 'G', note: 'G3', freq: 196.00 },
+                { key: 'H', note: 'A3', freq: 220.00 },
+                { key: 'J', note: 'B3', freq: 246.94 },
+                { key: 'K', note: 'C4', freq: 261.63 },
+                { key: 'L', note: 'D4', freq: 293.66 },
+                { key: ';', note: 'E4', freq: 329.63 }
+            ];
+
+            keys.forEach(k => {
+                const keyDiv = document.createElement('div');
+                keyDiv.className = 'key';
+                keyDiv.dataset.key = k.key.toLowerCase();
+                keyDiv.dataset.freq = k.freq;
+                keyDiv.innerHTML = `
+                    <span class="note">${k.note}</span>
+                    <span class="letter">${k.key}</span>
+                `;
+                keyDiv.addEventListener('mousedown', () => playKeyboardNote(k.freq, keyDiv));
+                keyDiv.addEventListener('mouseup', () => stopPlaying());
+                keyDiv.addEventListener('mouseleave', () => stopPlaying());
+                keyboard.appendChild(keyDiv);
+            });
+        }
+
+        // 更新参数
+        function updateParams() {
+            params.baseFreq = parseInt(document.getElementById('baseFreq').value);
+            params.harmonics = parseInt(document.getElementById('harmonics').value);
+            params.resonance = parseInt(document.getElementById('resonance').value) / 100;
+            params.vibrato = parseInt(document.getElementById('vibrato').value);
+            params.envelope = parseInt(document.getElementById('envelope').value);
+
+            document.getElementById('freqValue').textContent = params.baseFreq + ' Hz';
+            document.getElementById('harmValue').textContent = params.harmonics;
+            document.getElementById('resValue').textContent = Math.round(params.resonance * 100) + '%';
+            document.getElementById('vibValue').textContent = params.vibrato + ' Hz';
+            
+            const envLabels = { 10: 'Short', 500: 'Medium', 2000: 'Long' };
+            const envVal = params.envelope;
+            let envLabel = 'Custom';
+            if (envVal <= 100) envLabel = 'Short';
+            else if (envVal <= 1000) envLabel = 'Medium';
+            else envLabel = 'Long';
+            document.getElementById('envValue').textContent = envLabel;
+
+            document.getElementById('waveInfo').textContent = 
+                `Osc: ${params.harmonics} | Freq: ${params.baseFreq}Hz | Res: ${Math.round(params.resonance * 100)}%`;
+        }
+
+        // 播放合成音
+        function playSynthesizedSound(frequency, duration = null) {
+            if (!audioContext) return;
+
+            // 停止之前的音
+            stopPlaying();
+
+            const oscCount = params.harmonics;
+            const baseFreq = frequency || params.baseFreq;
+            const dur = duration || params.envelope / 1000;
+
+            // 创建多个振荡器（模拟多声调）
+            for (let i = 0; i < oscCount; i++) {
+                const osc = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const filter = audioContext.createBiquadFilter();
+
+                // 设置波形类型
+                osc.type = i === 0 ? 'sine' : (i % 2 === 0 ? 'triangle' : 'sawtooth');
+                
+                // 设置频率（基频 + 谐波）
+                const harmonicFreq = baseFreq * (i + 1) * (1 + i * 0.1);
+                osc.frequency.setValueAtTime(harmonicFreq, audioContext.currentTime);
+
+                // 颤音效果
+                if (params.vibrato > 0) {
+                    const vibratoOsc = audioContext.createOscillator();
+                    const vibratoGain = audioContext.createGain();
+                    vibratoOsc.frequency.setValueAtTime(params.vibrato, audioContext.currentTime);
+                    vibratoGain.gain.setValueAtTime(harmonicFreq * 0.02, audioContext.currentTime);
+                    vibratoOsc.connect(vibratoGain);
+                    vibratoGain.connect(osc.frequency);
+                    vibratoOsc.start();
+                    currentOscillators.push(vibratoOsc);
+                }
+
+                // 滤波器（共鸣效果）
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(200 + params.resonance * 3000, audioContext.currentTime);
+                filter.Q.setValueAtTime(5 + params.resonance * 15, audioContext.currentTime);
+
+                // 音量包络
+                const vol = 0.3 / (i + 1); // 谐波音量递减
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(vol, audioContext.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + dur);
+
+                // 连接节点
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioContext.destination);
+
+                osc.start();
+                osc.stop(audioContext.currentTime + dur);
+
+                currentOscillators.push(osc, gainNode, filter);
+
+                // 自动停止
+                setTimeout(() => {
+                    if (i === 0) stopPlaying();
+                }, dur * 1000);
+            }
+
+            isPlaying = true;
+            updateSpectrum();
+        }
+
+        // 停止播放
+        function stopPlaying() {
+            currentOscillators.forEach(node => {
+                try {
+                    node.stop();
+                } catch (e) {}
+            });
+            currentOscillators = [];
+            isPlaying = false;
+            
+            document.querySelectorAll('.key').forEach(k => k.classList.remove('active'));
+        }
+
+        // 键盘音符
+        function playKeyboardNote(freq, keyElement) {
+            if (keyElement) keyElement.classList.add('active');
+            playSynthesizedSound(freq, 0.3);
+        }
+
+        // 播放测试音
+        function playTone() {
+            playSynthesizedSound();
+            addToHistory(`播放测试音: ${params.baseFreq}Hz`);
+        }
+
+        // 播放预设
+        function playPreset(type) {
+            const presets = {
+                greeting: { freq: 220, harmonics: 3, vibrato: 3, pattern: [1, 0.8, 1.2, 1] },
+                question: { freq: 330, harmonics: 2, vibrato: 8, pattern: [1, 1.2, 1.5] },
+                warning: { freq: 150, harmonics: 4, vibrato: 12, pattern: [1, 0.5, 1, 0.5] },
+                happy: { freq: 440, harmonics: 3, vibrato: 6, pattern: [1, 1.1, 0.9, 1.2] },
+                sad: { freq: 180, harmonics: 2, vibrato: 2, pattern: [1, 0.9, 0.8] },
+                numbers: { freq: 264, harmonics: 3, vibrato: 4, pattern: [1, 1.1, 1.2, 1.3, 1.4] },
+                name: { freq: 352, harmonics: 3, vibrato: 5, pattern: [1, 0.8, 1.1, 0.9] },
+                goodbye: { freq: 196, harmonics: 2, vibrato: 4, pattern: [1, 0.7, 0.5] }
+            };
+
+            const preset = presets[type];
+            if (!preset) return;
+
+            // 应用预设参数
+            document.getElementById('harmonics').value = preset.harmonics;
+            document.getElementById('vibrato').value = preset.vibrato;
+            updateParams();
+
+            // 播放模式
+            let delay = 0;
+            preset.pattern.forEach((mult, i) => {
+                setTimeout(() => {
+                    playSynthesizedSound(preset.freq * mult, 0.4);
+                }, delay);
+                delay += 400;
+            });
+
+            const labels = {
+                greeting: '问候', question: '疑问', warning: '警告',
+                happy: '喜悦', sad: '悲伤', numbers: '数字',
+                name: '名字', goodbye: '告别'
+            };
+            addToHistory(`播放预设: ${labels[type]}`);
+        }
+
+        // 随机短语
+        function playRandomPhrase() {
+            const types = ['greeting', 'question', 'warning', 'happy', 'sad'];
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            playPreset(randomType);
+            addToHistory('生成随机短语');
+        }
+
+        // 录制功能
+        async function startRecording() {
+            if (!audioContext) return;
+            
+            recordedChunks = [];
+            const dest = audioContext.createMediaStreamDestination();
+            analyser.connect(dest);
+            
+            mediaRecorder = new MediaRecorder(dest.stream);
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+            
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `alien-language-${Date.now()}.webm`;
+                a.click();
+                addToHistory('录音已保存');
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            
+            document.getElementById('recordBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            document.getElementById('recordingIndicator').classList.add('recording');
+            
+            let seconds = 0;
+            recordInterval = setInterval(() => {
+                seconds++;
+                document.getElementById('recordTime').textContent = seconds;
+                if (seconds >= 30) stopRecording(); // 最长30秒
+            }, 1000);
+            
+            addToHistory('开始录制...');
+        }
+
+        function stopRecording() {
+            if (!isRecording) return;
+            
+            mediaRecorder.stop();
+            isRecording = false;
+            clearInterval(recordInterval);
+            
+            document.getElementById('recordBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('recordingIndicator').classList.remove('recording');
+            document.getElementById('recordTime').textContent = '0';
+        }
+
+        // 可视化
+        function visualize() {
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            function draw() {
+                animationId = requestAnimationFrame(draw);
+                
+                analyser.getByteTimeDomainData(dataArray);
+                
+                canvasCtx.fillStyle = 'rgba(10, 15, 20, 0.2)';
+                canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                canvasCtx.lineWidth = 2;
+                canvasCtx.strokeStyle = '#00d4aa';
+                canvasCtx.beginPath();
+                
+                const sliceWidth = canvas.width * 1.0 / bufferLength;
+                let x = 0;
+                
+                for (let i = 0; i < bufferLength; i++) {
+                    const v = dataArray[i] / 128.0;
+                    const y = v * canvas.height / 2;
+                    
+                    if (i === 0) canvasCtx.moveTo(x, y);
+                    else canvasCtx.lineTo(x, y);
+                    
+                    x += sliceWidth;
+                }
+                
+                canvasCtx.lineTo(canvas.width, canvas.height / 2);
+                canvasCtx.stroke();
+                
+                // 添加渐变效果
+                const gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, 'rgba(0, 212, 170, 0.3)');
+                gradient.addColorStop(0.5, 'rgba(0, 168, 232, 0.1)');
+                gradient.addColorStop(1, 'rgba(0, 212, 170, 0.3)');
+                canvasCtx.fillStyle = gradient;
+                canvasCtx.fill();
+            }
+            
+            draw();
+        }
+
+        // 更新频谱显示
+        function updateSpectrum() {
+            if (!isPlaying) {
+                document.querySelectorAll('.spectrum-bar').forEach(bar => {
+                    bar.style.height = '5px';
+                });
+                return;
+            }
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+            
+            const bars = document.querySelectorAll('.spectrum-bar');
+            const step = Math.floor(bufferLength / bars.length);
+            
+            bars.forEach((bar, i) => {
+                const value = dataArray[i * step];
+                const height = Math.max(5, (value / 255) * 70);
+                bar.style.height = height + 'px';
+            });
+            
+            requestAnimationFrame(updateSpectrum);
+        }
+
+        // 添加到历史
+        function addToHistory(text) {
+            const history = document.getElementById('history');
+            const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+            const entry = document.createElement('div');
+            entry.style.cssText = 'padding: 5px; border-bottom: 1px solid rgba(0,212,170,0.1);';
+            entry.innerHTML = `<span style="color: var(--primary); font-size: 0.75rem;">[${time}]</span> ${text}`;
+            history.insertBefore(entry, history.firstChild);
+            
+            // 限制历史记录数量
+            while (history.children.length > 20) {
+                history.removeChild(history.lastChild);
+            }
+        }
+
+        // 键盘事件监听
+        document.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            
+            const key = e.key.toLowerCase();
+            
+            if (noteFrequencies[key]) {
+                const keyEl = document.querySelector(`.key[data-key="${key}"]`);
+                playKeyboardNote(noteFrequencies[key], keyEl);
+            } else if (key === ' ') {
+                e.preventDefault();
+                playTone();
+            } else if (key === 'r') {
+                if (isRecording) stopRecording();
+                else startRecording();
+            } else if (key >= '1' && key <= '8') {
+                const presets = ['greeting', 'question', 'warning', 'happy', 'sad', 'numbers', 'name', 'goodbye'];
+                const index = parseInt(key) - 1;
+                if (presets[index]) playPreset(presets[index]);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (noteFrequencies[e.key.toLowerCase()]) {
+                stopPlaying();
+            }
+        });
+
+        // 窗口调整
+        window.addEventListener('resize', () => {
+            if (canvas) {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+        });
+
+        // 初始化显示
+        updateParams();
+    </script>
+</body>
+</html>
