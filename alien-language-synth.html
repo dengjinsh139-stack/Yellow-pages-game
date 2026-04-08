@@ -1103,62 +1103,78 @@
             const oscCount = params.harmonics;
             const baseFreq = frequency || params.baseFreq;
             const dur = duration || params.envelope / 1000;
-
-            // 创建多个振荡器（模拟多声调）
-            for (let i = 0; i < oscCount; i++) {
-                const osc = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                const filter = audioContext.createBiquadFilter();
-
-                // 设置波形类型
-                osc.type = i === 0 ? 'sine' : (i % 2 === 0 ? 'triangle' : 'sawtooth');
+            
+            // 返回 Promise，在声音播放完成后 resolve
+            return new Promise((resolve) => {
+                const oscillators = [];
                 
-                // 设置频率（基频 + 谐波）
-                const harmonicFreq = baseFreq * (i + 1) * (1 + i * 0.1);
-                osc.frequency.setValueAtTime(harmonicFreq, audioContext.currentTime);
+                // 创建多个振荡器（模拟多声调）
+                for (let i = 0; i < oscCount; i++) {
+                    const osc = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    const filter = audioContext.createBiquadFilter();
 
-                // 颤音效果
-                if (params.vibrato > 0) {
-                    const vibratoOsc = audioContext.createOscillator();
-                    const vibratoGain = audioContext.createGain();
-                    vibratoOsc.frequency.setValueAtTime(params.vibrato, audioContext.currentTime);
-                    vibratoGain.gain.setValueAtTime(harmonicFreq * 0.02, audioContext.currentTime);
-                    vibratoOsc.connect(vibratoGain);
-                    vibratoGain.connect(osc.frequency);
-                    vibratoOsc.start();
-                    currentOscillators.push(vibratoOsc);
+                    // 设置波形类型
+                    osc.type = i === 0 ? 'sine' : (i % 2 === 0 ? 'triangle' : 'sawtooth');
+                    
+                    // 设置频率（基频 + 谐波）
+                    const harmonicFreq = baseFreq * (i + 1) * (1 + i * 0.1);
+                    osc.frequency.setValueAtTime(harmonicFreq, audioContext.currentTime);
+
+                    // 颤音效果
+                    if (params.vibrato > 0) {
+                        const vibratoOsc = audioContext.createOscillator();
+                        const vibratoGain = audioContext.createGain();
+                        vibratoOsc.frequency.setValueAtTime(params.vibrato, audioContext.currentTime);
+                        vibratoGain.gain.setValueAtTime(harmonicFreq * 0.02, audioContext.currentTime);
+                        vibratoOsc.connect(vibratoGain);
+                        vibratoGain.connect(osc.frequency);
+                        vibratoOsc.start();
+                        oscillators.push(vibratoOsc);
+                    }
+
+                    // 滤波器（共鸣效果）
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(200 + params.resonance * 3000, audioContext.currentTime);
+                    filter.Q.setValueAtTime(5 + params.resonance * 15, audioContext.currentTime);
+
+                    // 音量包络
+                    const vol = 0.3 / (i + 1); // 谐波音量递减
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(vol, audioContext.currentTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + dur);
+
+                    // 连接节点
+                    osc.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(analyser);
+                    analyser.connect(audioContext.destination);
+
+                    osc.start();
+                    osc.stop(audioContext.currentTime + dur);
+
+                    oscillators.push(osc, gainNode, filter);
+                }
+                
+                // 添加到全局数组（如果 stopPrevious 为 true）
+                if (stopPrevious) {
+                    currentOscillators.push(...oscillators);
                 }
 
-                // 滤波器（共鸣效果）
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(200 + params.resonance * 3000, audioContext.currentTime);
-                filter.Q.setValueAtTime(5 + params.resonance * 15, audioContext.currentTime);
-
-                // 音量包络
-                const vol = 0.3 / (i + 1); // 谐波音量递减
-                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                gainNode.gain.linearRampToValueAtTime(vol, audioContext.currentTime + 0.05);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + dur);
-
-                // 连接节点
-                osc.connect(filter);
-                filter.connect(gainNode);
-                gainNode.connect(analyser);
-                analyser.connect(audioContext.destination);
-
-                osc.start();
-                osc.stop(audioContext.currentTime + dur);
-
-                currentOscillators.push(osc, gainNode, filter);
-
-                // 自动停止
+                // 声音播放完成后 resolve
                 setTimeout(() => {
-                    if (i === 0) stopPlaying();
+                    // 清理振荡器
+                    oscillators.forEach(node => {
+                        try {
+                            node.stop();
+                        } catch (e) {}
+                    });
+                    resolve();
                 }, dur * 1000);
-            }
-
-            isPlaying = true;
-            updateSpectrum();
+                
+                isPlaying = true;
+                updateSpectrum();
+            });
         }
 
         // 停止播放
