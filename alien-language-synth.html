@@ -636,6 +636,83 @@
             width: 0%;
             transition: width 0.1s ease;
         }
+
+        /* 情感标签样式 */
+        .emotion-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .emotion-greeting {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+            border: 1px solid rgba(0, 212, 170, 0.4);
+        }
+
+        .emotion-question {
+            background: rgba(0, 168, 232, 0.2);
+            color: #00a8e8;
+            border: 1px solid rgba(0, 168, 232, 0.4);
+        }
+
+        .emotion-warning {
+            background: rgba(255, 165, 2, 0.2);
+            color: #ffa502;
+            border: 1px solid rgba(255, 165, 2, 0.4);
+        }
+
+        .emotion-happy {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+
+        .emotion-sad {
+            background: rgba(100, 149, 237, 0.2);
+            color: #6495ed;
+            border: 1px solid rgba(100, 149, 237, 0.4);
+        }
+
+        .emotion-angry {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.4);
+        }
+
+        .emotion-neutral {
+            background: rgba(138, 164, 184, 0.2);
+            color: #8aa4b8;
+            border: 1px solid rgba(138, 164, 184, 0.4);
+        }
+
+        .emotion-tag.playing {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* 句子高亮 */
+        .sentence-box {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .sentence-box.playing {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.3), rgba(0, 168, 232, 0.3));
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body>
@@ -814,8 +891,23 @@
                         </div>
                     </div>
 
+                    <!-- 情感分析开关 -->
+                    <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                            <input type="checkbox" id="emotionEnabled" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            <span>启用情感匹配</span>
+                        </label>
+                        <span id="detectedEmotion" style="font-size: 0.8rem; color: var(--accent); display: none;"></span>
+                    </div>
+
                     <div class="progress-bar">
                         <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <!-- 情感分段显示 -->
+                    <div id="emotionSegments" style="margin-top: 10px; display: none;">
+                        <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 5px;">情感分段:</div>
+                        <div id="segmentDisplay" style="display: flex; flex-wrap: wrap; gap: 5px;"></div>
                     </div>
 
                     <div class="char-display" id="charDisplay">
@@ -1294,6 +1386,182 @@
 
         // ========== 音素映射系统 ==========
         
+        // 情感分析配置
+        const emotionConfig = {
+            greeting: {
+                name: '问候',
+                icon: '👋',
+                class: 'emotion-greeting',
+                params: { harmonics: 3, vibrato: 3, baseFreq: 220, envelope: 600 },
+                keywords: ['你好', '您好', 'hello', 'hi', 'hey', '欢迎', '早上好', '晚上好', '下午好', 'hallo', 'greetings']
+            },
+            question: {
+                name: '疑问',
+                icon: '❓',
+                class: 'emotion-question',
+                params: { harmonics: 2, vibrato: 8, baseFreq: 330, envelope: 500 },
+                keywords: ['吗', '呢', '什么', '为什么', '怎么', '谁', '哪里', '多少', 'what', 'why', 'how', 'who', 'where', 'when', '?', '？']
+            },
+            warning: {
+                name: '警告',
+                icon: '⚠️',
+                class: 'emotion-warning',
+                params: { harmonics: 4, vibrato: 12, baseFreq: 150, envelope: 300 },
+                keywords: ['警告', '危险', '小心', '注意', '别', '不要', '禁止', 'stop', 'danger', 'warning', 'caution', 'alert', ' careful', '别动']
+            },
+            happy: {
+                name: '喜悦',
+                icon: '✨',
+                class: 'emotion-happy',
+                params: { harmonics: 3, vibrato: 6, baseFreq: 440, envelope: 500 },
+                keywords: ['好', '棒', '优秀', '开心', '快乐', '赞', '恭喜', '谢谢', '感谢', 'great', 'good', 'excellent', 'happy', 'joy', 'thanks', 'congratulations', 'awesome', 'wonderful', 'love', '喜欢']
+            },
+            sad: {
+                name: '悲伤',
+                icon: '💧',
+                class: 'emotion-sad',
+                params: { harmonics: 2, vibrato: 2, baseFreq: 180, envelope: 800 },
+                keywords: ['难过', '伤心', '抱歉', '对不起', '遗憾', 'sad', 'sorry', 'apologize', 'regret', 'miss', '失去', '别走', '再见', 'farewell']
+            },
+            angry: {
+                name: '愤怒',
+                icon: '💢',
+                class: 'emotion-angry',
+                params: { harmonics: 5, vibrato: 15, baseFreq: 120, envelope: 200 },
+                keywords: ['可恶', '混蛋', '生气', '愤怒', '讨厌', '恨', 'angry', 'hate', 'damn', 'stupid', 'idiot', 'fuck', 'shit', '生气', '气死']
+            },
+            neutral: {
+                name: '中性',
+                icon: '⚪',
+                class: 'emotion-neutral',
+                params: { harmonics: 3, vibrato: 4, baseFreq: 264, envelope: 500 },
+                keywords: []
+            }
+        };
+        
+        // 分析文本情感
+        function analyzeEmotion(text) {
+            text = text.toLowerCase();
+            const scores = {};
+            
+            for (const [emotion, config] of Object.entries(emotionConfig)) {
+                if (emotion === 'neutral') continue;
+                scores[emotion] = 0;
+                for (const keyword of config.keywords) {
+                    const regex = new RegExp(keyword, 'gi');
+                    const matches = text.match(regex);
+                    if (matches) {
+                        scores[emotion] += matches.length;
+                    }
+                }
+            }
+            
+            // 找到得分最高的情感
+            let maxScore = 0;
+            let detectedEmotion = 'neutral';
+            
+            for (const [emotion, score] of Object.entries(scores)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    detectedEmotion = emotion;
+                }
+            }
+            
+            return {
+                emotion: detectedEmotion,
+                config: emotionConfig[detectedEmotion],
+                score: maxScore
+            };
+        }
+        
+        // 将文本分段（按句子分割）
+        function segmentText(text) {
+            // 按标点符号分割句子
+            const sentences = text.split(/([。！？.!?;；]+)/).filter(s => s.trim());
+            const segments = [];
+            
+            for (let i = 0; i < sentences.length; i += 2) {
+                const content = sentences[i];
+                const punctuation = sentences[i + 1] || '';
+                const fullSentence = content + punctuation;
+                
+                if (fullSentence.trim()) {
+                    const analysis = analyzeEmotion(fullSentence);
+                    segments.push({
+                        text: fullSentence.trim(),
+                        emotion: analysis.emotion,
+                        config: analysis.config,
+                        charCount: fullSentence.length
+                    });
+                }
+            }
+            
+            // 如果没有标点符号，就按固定长度分段
+            if (segments.length === 0 && text.trim()) {
+                const analysis = analyzeEmotion(text);
+                segments.push({
+                    text: text.trim(),
+                    emotion: analysis.emotion,
+                    config: analysis.config,
+                    charCount: text.length
+                });
+            }
+            
+            return segments;
+        }
+        
+        // 显示情感分段
+        function displayEmotionSegments(segments) {
+            const container = document.getElementById('emotionSegments');
+            const display = document.getElementById('segmentDisplay');
+            
+            if (!segments || segments.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            display.innerHTML = segments.map((seg, i) => `
+                <div class="sentence-box" id="sentence-${i}" data-emotion="${seg.emotion}">
+                    <span class="emotion-tag ${seg.config.class}">
+                        ${seg.config.icon} ${seg.config.name}
+                    </span>
+                    <span style="margin-left: 5px;">${seg.text.substring(0, 15)}${seg.text.length > 15 ? '...' : ''}</span>
+                </div>
+            `).join('');
+        }
+        
+        // 更新检测到的情感显示
+        function updateDetectedEmotion(segments) {
+            const display = document.getElementById('detectedEmotion');
+            if (!segments || segments.length === 0) {
+                display.style.display = 'none';
+                return;
+            }
+            
+            display.style.display = 'inline';
+            
+            // 统计各情感数量
+            const emotionCounts = {};
+            segments.forEach(seg => {
+                emotionCounts[seg.emotion] = (emotionCounts[seg.emotion] || 0) + 1;
+            });
+            
+            // 找出主导情感
+            let dominantEmotion = 'neutral';
+            let maxCount = 0;
+            for (const [emotion, count] of Object.entries(emotionCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    dominantEmotion = emotion;
+                }
+            }
+            
+            const config = emotionConfig[dominantEmotion];
+            display.innerHTML = `<span class="emotion-tag ${config.class}">${config.icon} 主导: ${config.name}</span>
+                ${segments.length > 1 ? `(${segments.length}段)` : ''}`;
+        }
+
         // 字符到频率的映射表
         const phonemeMap = {
             // 中文声母映射
@@ -1366,11 +1634,14 @@
             const charCount = document.getElementById('charCount');
             const estDuration = document.getElementById('estDuration');
             const speed = parseInt(document.getElementById('playSpeed').value);
+            const emotionEnabled = document.getElementById('emotionEnabled').checked;
             
             if (!text.trim()) {
                 display.innerHTML = '<span style="color: var(--text-dim); font-size: 0.8rem;">输入文字后显示音素映射...</span>';
                 charCount.textContent = '0';
                 estDuration.textContent = '0';
+                document.getElementById('emotionSegments').style.display = 'none';
+                document.getElementById('detectedEmotion').style.display = 'none';
                 return;
             }
             
@@ -1388,6 +1659,16 @@
                     </div>
                 `;
             }).join('');
+            
+            // 如果启用了情感匹配，显示情感分段
+            if (emotionEnabled) {
+                const segments = segmentText(text);
+                displayEmotionSegments(segments);
+                updateDetectedEmotion(segments);
+            } else {
+                document.getElementById('emotionSegments').style.display = 'none';
+                document.getElementById('detectedEmotion').style.display = 'none';
+            }
         }
         
         // 播放文本
@@ -1400,7 +1681,7 @@
                 return;
             }
             
-            const chars = text.split('');
+            const emotionEnabled = document.getElementById('emotionEnabled').checked;
             const speed = parseInt(document.getElementById('playSpeed').value);
             
             isPlayingText = true;
@@ -1410,73 +1691,89 @@
             document.getElementById('playTextBtn').style.display = 'none';
             document.getElementById('stopTextBtn').style.display = 'inline-block';
             
-            // 更新显示
-            updateCharDisplay(text);
-            addToHistory(`开始播放文案: "${text.substring(0, 20)}${text.length > 20 ? '...' : ''}"`);
-            
-            // 播放每个字符
-            function playNextChar() {
-                if (!isPlayingText || currentCharIndex >= chars.length) {
-                    stopTextPlayback();
-                    return;
-                }
-                
-                const char = chars[currentCharIndex];
-                const freq = getCharFrequency(char);
-                
-                // 更新进度
-                const progress = ((currentCharIndex + 1) / chars.length) * 100;
-                document.getElementById('progressFill').style.width = progress + '%';
-                
-                // 高亮当前字符
-                document.querySelectorAll('.char-box').forEach((box, i) => {
-                    box.classList.toggle('active', i === currentCharIndex);
-                });
-                
-                // 播放声音（空格和标点不发音）
-                if (freq > 0) {
-                    // 根据字符类型调整参数
-                    const isVowel = /[aeiouAEIOUaeiouv]/.test(char);
-                    const isChinese = /[\u4e00-\u9fa5]/.test(char);
-                    
-                    // 临时调整参数
-                    const originalHarmonics = params.harmonics;
-                    const originalVibrato = params.vibrato;
-                    
-                    if (isChinese) {
-                        params.harmonics = 4;  // 中文用更多谐波
-                        params.vibrato = 6;
-                    } else if (isVowel) {
-                        params.harmonics = 2;  // 元音用较少谐波
-                        params.vibrato = 4;
-                    } else {
-                        params.harmonics = 3;
-                        params.vibrato = 3;
-                    }
-                    
-                    playSynthesizedSound(freq, speed / 1000 * 0.8);
-                    
-                    // 恢复参数
-                    setTimeout(() => {
-                        params.harmonics = originalHarmonics;
-                        params.vibrato = originalVibrato;
-                    }, speed * 0.5);
-                }
-                
-                currentCharIndex++;
-                textPlaybackInterval = setTimeout(playNextChar, speed);
+            // 获取分段
+            let segments;
+            if (emotionEnabled) {
+                segments = segmentText(text);
+                displayEmotionSegments(segments);
+            } else {
+                segments = [{
+                    text: text,
+                    emotion: 'neutral',
+                    config: emotionConfig.neutral,
+                    charCount: text.length
+                }];
             }
             
-            playNextChar();
+            addToHistory(`开始播放文案: "${text.substring(0, 20)}${text.length > 20 ? '...' : ''}"${emotionEnabled ? ' (情感匹配开启)' : ''}`);
+            
+            // 保存原始参数
+            const originalParams = { ...params };
+            
+            // 逐段播放
+            for (let segIndex = 0; segIndex < segments.length; segIndex++) {
+                if (!isPlayingText) break;
+                
+                const segment = segments[segIndex];
+                const chars = segment.text.split('');
+                
+                // 应用当前段的情感参数
+                if (emotionEnabled) {
+                    Object.assign(params, segment.config.params);
+                    updateParams();
+                    
+                    // 高亮当前句子
+                    document.querySelectorAll('.sentence-box').forEach((box, i) => {
+                        box.classList.toggle('playing', i === segIndex);
+                    });
+                    
+                    addToHistory(`段落 ${segIndex + 1}: ${segment.config.name} - "${segment.text.substring(0, 15)}${segment.text.length > 15 ? '...' : ''}"`);
+                }
+                
+                // 播放该段的每个字符
+                for (let charIdx = 0; charIdx < chars.length; charIdx++) {
+                    if (!isPlayingText) break;
+                    
+                    const char = chars[charIdx];
+                    const freq = getCharFrequency(char);
+                    const globalIndex = currentCharIndex + charIdx;
+                    
+                    // 更新进度
+                    const progress = ((globalIndex + 1) / text.length) * 100;
+                    document.getElementById('progressFill').style.width = progress + '%';
+                    
+                    // 高亮当前字符
+                    document.querySelectorAll('.char-box').forEach((box, i) => {
+                        box.classList.toggle('active', i === globalIndex);
+                    });
+                    
+                    // 播放声音（空格和标点不发音）
+                    if (freq > 0) {
+                        playSynthesizedSound(freq, speed / 1000 * 0.8);
+                    }
+                    
+                    // 等待
+                    await new Promise(resolve => setTimeout(resolve, speed));
+                }
+                
+                currentCharIndex += chars.length;
+                
+                // 段落间短暂停顿
+                if (emotionEnabled && segIndex < segments.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            }
+            
+            // 恢复原始参数
+            Object.assign(params, originalParams);
+            updateParams();
+            
+            stopTextPlayback();
         }
         
         // 停止文本播放
         function stopTextPlayback() {
             isPlayingText = false;
-            if (textPlaybackInterval) {
-                clearTimeout(textPlaybackInterval);
-                textPlaybackInterval = null;
-            }
             stopPlaying();
             
             // 恢复UI
@@ -1484,11 +1781,23 @@
             document.getElementById('stopTextBtn').style.display = 'none';
             document.getElementById('progressFill').style.width = '0%';
             document.querySelectorAll('.char-box').forEach(box => box.classList.remove('active'));
+            document.querySelectorAll('.sentence-box').forEach(box => box.classList.remove('playing'));
+            
+            // 恢复原始参数
+            updateParams();
         }
         
         // 监听文本输入
         document.getElementById('textInput').addEventListener('input', function() {
             updateCharDisplay(this.value);
+        });
+        
+        // 监听情感匹配开关
+        document.getElementById('emotionEnabled').addEventListener('change', function() {
+            const text = document.getElementById('textInput').value;
+            if (text) {
+                updateCharDisplay(text);
+            }
         });
         
         // 监听速度变化
