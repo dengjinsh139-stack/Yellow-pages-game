@@ -1651,19 +1651,33 @@
         let isPlayingText = false;
         let currentCharIndex = 0;
         
-        // 获取字符对应的频率
-        function getCharFrequency(char) {
+        // 获取字符对应的频率（支持情感基频偏移）
+        function getCharFrequency(char, emotionBaseFreq = null) {
             // 直接查找
-            if (phonemeMap[char]) return phonemeMap[char];
+            let baseFreq = phonemeMap[char];
             
             // 转换为小写查找
-            const lower = char.toLowerCase();
-            if (phonemeMap[lower]) return phonemeMap[lower];
+            if (!baseFreq) {
+                const lower = char.toLowerCase();
+                baseFreq = phonemeMap[lower];
+            }
             
-            // 使用字符的Unicode码点生成频率
-            const code = char.charCodeAt(0);
-            // 映射到 150-900 Hz 范围
-            return 150 + (code % 50) * 15;
+            // 未找到映射，使用字符的Unicode码点生成频率
+            if (!baseFreq) {
+                const code = char.charCodeAt(0);
+                baseFreq = 150 + (code % 50) * 15;
+            }
+            
+            // 如果指定了情感基频，按比例缩放（让情感影响音高）
+            if (emotionBaseFreq && baseFreq > 0) {
+                // 以 264Hz（中性基频）为基准进行比例缩放
+                const neutralBase = 264;
+                const ratio = emotionBaseFreq / neutralBase;
+                // 限制频率范围在 80-2000Hz 之间
+                return Math.max(80, Math.min(2000, Math.round(baseFreq * ratio)));
+            }
+            
+            return baseFreq;
         }
         
         // 更新字符显示
@@ -1780,7 +1794,8 @@
                     if (!isPlayingText) break;
                     
                     const char = chars[charIdx];
-                    const freq = getCharFrequency(char);
+                    const emotionBaseFreq = emotionEnabled ? segment.config.params.baseFreq : params.baseFreq;
+                    const freq = getCharFrequency(char, emotionBaseFreq);
                     const globalIndex = currentCharIndex + charIdx;
                     
                     // 更新进度
@@ -1794,11 +1809,14 @@
                     
                     // 播放声音（空格和标点不发音）
                     if (freq > 0) {
-                        await playSynthesizedSound(freq, speed / 1000 * 0.8, false);
+                        // 并行播放和等待，加快播放速度
+                        const playPromise = playSynthesizedSound(freq, speed / 1000 * 0.6, false);
+                        const waitPromise = new Promise(resolve => setTimeout(resolve, speed));
+                        await Promise.all([playPromise, waitPromise]);
+                    } else {
+                        // 标点停顿
+                        await new Promise(resolve => setTimeout(resolve, speed * 1.5));
                     }
-                    
-                    // 等待
-                    await new Promise(resolve => setTimeout(resolve, speed));
                 }
                 
                 currentCharIndex += chars.length;
