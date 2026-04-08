@@ -519,6 +519,123 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+
+        /* 文本输入面板 */
+        .text-input-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        .text-input-area {
+            width: 100%;
+            min-height: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .text-input-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.2);
+        }
+
+        .text-input-area::placeholder {
+            color: var(--text-dim);
+        }
+
+        .play-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .speed-control input[type="range"] {
+            width: 80px;
+        }
+
+        .char-display {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            min-height: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .char-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .char-box.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg-dark);
+            border-color: var(--accent);
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+        }
+
+        .char-box .freq {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .char-box.active .freq {
+            color: var(--bg-dark);
+        }
+
+        .text-stats {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.1s ease;
+        }
     </style>
 </head>
 <body>
@@ -668,6 +785,41 @@
                     <div class="panel-title">历史记录</div>
                     <div id="history" style="max-height: 150px; overflow-y: auto; font-size: 0.8rem; color: var(--text-dim);">
                         <div style="padding: 5px; border-bottom: 1px solid rgba(0,212,170,0.1);">系统就绪...</div>
+                    </div>
+                </div>
+
+                <!-- 文案转语音 -->
+                <div class="text-input-section">
+                    <div class="panel-title">📝 文案转语音</div>
+                    
+                    <textarea 
+                        class="text-input-area" 
+                        id="textInput" 
+                        placeholder="输入中文或英文，每个字符会映射到独特的音高组合...&#10;例如：你好世界 / Hello World"
+                    ></textarea>
+                    
+                    <div class="text-stats">
+                        <span>字符数: <span id="charCount">0</span></span>
+                        <span>预计时长: <span id="estDuration">0</span>s</span>
+                    </div>
+
+                    <div class="play-controls">
+                        <button class="btn" onclick="playText()" id="playTextBtn">▶ 播放文案</button>
+                        <button class="btn btn-danger" onclick="stopTextPlayback()" id="stopTextBtn" style="display:none;">⏹ 停止</button>
+                        
+                        <div class="speed-control">
+                            <span>速度:</span>
+                            <input type="range" id="playSpeed" min="200" max="1000" value="400">
+                            <span id="speedValue">400ms</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="char-display" id="charDisplay">
+                        <span style="color: var(--text-dim); font-size: 0.8rem;">输入文字后显示音素映射...</span>
                     </div>
                 </div>
             </div>
@@ -1140,7 +1292,217 @@
             }
         });
 
-        // 初始化显示
+        // ========== 音素映射系统 ==========
+        
+        // 字符到频率的映射表
+        const phonemeMap = {
+            // 中文声母映射
+            'b': 130, 'p': 146, 'm': 164, 'f': 174,
+            'd': 196, 't': 220, 'n': 246, 'l': 261,
+            'g': 293, 'k': 329, 'h': 349,
+            'j': 392, 'q': 440, 'x': 493,
+            'zh': 523, 'ch': 587, 'sh': 659, 'r': 698,
+            'z': 783, 'c': 880, 's': 987,
+            'y': 261, 'w': 293,
+            
+            // 中文韵母映射
+            'a': 220, 'o': 246, 'e': 261, 'i': 293,
+            'u': 329, 'v': 349, 'ai': 392, 'ei': 440,
+            'ao': 493, 'ou': 523, 'an': 587, 'en': 659,
+            'ang': 698, 'eng': 783, 'ong': 880,
+            'ia': 220, 'iao': 261, 'ian': 293, 'iang': 329,
+            'ie': 349, 'in': 392, 'ing': 440, 'iong': 493,
+            'ua': 523, 'uo': 587, 'uai': 659, 'ui': 698,
+            'uan': 783, 'un': 880, 'uang': 987, 'ong': 1046,
+            'ue': 440, 'un': 493,
+            
+            // 英文字母映射
+            'a': 220, 'b': 233, 'c': 246, 'd': 261, 'e': 277,
+            'f': 293, 'g': 311, 'h': 329, 'i': 349, 'j': 369,
+            'k': 392, 'l': 415, 'm': 440, 'n': 466, 'o': 493,
+            'p': 523, 'q': 554, 'r': 587, 's': 622, 't': 659,
+            'u': 698, 'v': 739, 'w': 783, 'x': 830, 'y': 880,
+            'z': 932,
+            
+            // 数字映射
+            '0': 261, '1': 293, '2': 329, '3': 349, '4': 392,
+            '5': 440, '6': 493, '7': 523, '8': 587, '9': 659,
+            
+            // 标点符号映射
+            ' ': 0,      // 空格停顿
+            '，': 0,     // 逗号停顿
+            '。': 0,     // 句号停顿
+            ',': 0,
+            '.': 0,
+            '!': 880,    // 感叹号高音
+            '?': 196,    // 问号低音
+            '！': 880,
+            '？': 196,
+        };
+        
+        // 文本播放控制
+        let textPlaybackInterval = null;
+        let isPlayingText = false;
+        let currentCharIndex = 0;
+        
+        // 获取字符对应的频率
+        function getCharFrequency(char) {
+            // 直接查找
+            if (phonemeMap[char]) return phonemeMap[char];
+            
+            // 转换为小写查找
+            const lower = char.toLowerCase();
+            if (phonemeMap[lower]) return phonemeMap[lower];
+            
+            // 使用字符的Unicode码点生成频率
+            const code = char.charCodeAt(0);
+            // 映射到 150-900 Hz 范围
+            return 150 + (code % 50) * 15;
+        }
+        
+        // 更新字符显示
+        function updateCharDisplay(text) {
+            const display = document.getElementById('charDisplay');
+            const charCount = document.getElementById('charCount');
+            const estDuration = document.getElementById('estDuration');
+            const speed = parseInt(document.getElementById('playSpeed').value);
+            
+            if (!text.trim()) {
+                display.innerHTML = '<span style="color: var(--text-dim); font-size: 0.8rem;">输入文字后显示音素映射...</span>';
+                charCount.textContent = '0';
+                estDuration.textContent = '0';
+                return;
+            }
+            
+            const chars = text.split('');
+            charCount.textContent = chars.length;
+            estDuration.textContent = ((chars.length * speed) / 1000).toFixed(1);
+            
+            display.innerHTML = chars.map((char, i) => {
+                const freq = getCharFrequency(char);
+                const isPause = freq === 0;
+                return `
+                    <div class="char-box" id="char-${i}" style="${isPause ? 'opacity: 0.4;' : ''}">
+                        <span>${char === ' ' ? '␣' : char}</span>
+                        <span class="freq">${isPause ? '—' : freq + 'Hz'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 播放文本
+        async function playText() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text || !audioContext) return;
+            
+            if (isPlayingText) {
+                stopTextPlayback();
+                return;
+            }
+            
+            const chars = text.split('');
+            const speed = parseInt(document.getElementById('playSpeed').value);
+            
+            isPlayingText = true;
+            currentCharIndex = 0;
+            
+            // 更新UI
+            document.getElementById('playTextBtn').style.display = 'none';
+            document.getElementById('stopTextBtn').style.display = 'inline-block';
+            
+            // 更新显示
+            updateCharDisplay(text);
+            addToHistory(`开始播放文案: "${text.substring(0, 20)}${text.length > 20 ? '...' : ''}"`);
+            
+            // 播放每个字符
+            function playNextChar() {
+                if (!isPlayingText || currentCharIndex >= chars.length) {
+                    stopTextPlayback();
+                    return;
+                }
+                
+                const char = chars[currentCharIndex];
+                const freq = getCharFrequency(char);
+                
+                // 更新进度
+                const progress = ((currentCharIndex + 1) / chars.length) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+                
+                // 高亮当前字符
+                document.querySelectorAll('.char-box').forEach((box, i) => {
+                    box.classList.toggle('active', i === currentCharIndex);
+                });
+                
+                // 播放声音（空格和标点不发音）
+                if (freq > 0) {
+                    // 根据字符类型调整参数
+                    const isVowel = /[aeiouAEIOUaeiouv]/.test(char);
+                    const isChinese = /[\u4e00-\u9fa5]/.test(char);
+                    
+                    // 临时调整参数
+                    const originalHarmonics = params.harmonics;
+                    const originalVibrato = params.vibrato;
+                    
+                    if (isChinese) {
+                        params.harmonics = 4;  // 中文用更多谐波
+                        params.vibrato = 6;
+                    } else if (isVowel) {
+                        params.harmonics = 2;  // 元音用较少谐波
+                        params.vibrato = 4;
+                    } else {
+                        params.harmonics = 3;
+                        params.vibrato = 3;
+                    }
+                    
+                    playSynthesizedSound(freq, speed / 1000 * 0.8);
+                    
+                    // 恢复参数
+                    setTimeout(() => {
+                        params.harmonics = originalHarmonics;
+                        params.vibrato = originalVibrato;
+                    }, speed * 0.5);
+                }
+                
+                currentCharIndex++;
+                textPlaybackInterval = setTimeout(playNextChar, speed);
+            }
+            
+            playNextChar();
+        }
+        
+        // 停止文本播放
+        function stopTextPlayback() {
+            isPlayingText = false;
+            if (textPlaybackInterval) {
+                clearTimeout(textPlaybackInterval);
+                textPlaybackInterval = null;
+            }
+            stopPlaying();
+            
+            // 恢复UI
+            document.getElementById('playTextBtn').style.display = 'inline-block';
+            document.getElementById('stopTextBtn').style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+            document.querySelectorAll('.char-box').forEach(box => box.classList.remove('active'));
+        }
+        
+        // 监听文本输入
+        document.getElementById('textInput').addEventListener('input', function() {
+            updateCharDisplay(this.value);
+        });
+        
+        // 监听速度变化
+        document.getElementById('playSpeed').addEventListener('input', function() {
+            document.getElementById('speedValue').textContent = this.value + 'ms';
+            const text = document.getElementById('textInput').value;
+            if (text) {
+                const speed = parseInt(this.value);
+                const chars = text.split('');
+                document.getElementById('estDuration').textContent = ((chars.length * speed) / 1000).toFixed(1);
+            }
+        });
+
+        // ========== 初始化显示 ==========
         updateParams();
     </script>
 </body>
