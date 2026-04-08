@@ -1046,7 +1046,7 @@
             });
         }
 
-        // 更新参数
+        // 更新参数 - 从UI读取到params
         function updateParams() {
             params.baseFreq = parseInt(document.getElementById('baseFreq').value);
             params.harmonics = parseInt(document.getElementById('harmonics').value);
@@ -1054,12 +1054,27 @@
             params.vibrato = parseInt(document.getElementById('vibrato').value);
             params.envelope = parseInt(document.getElementById('envelope').value);
 
+            updateParamLabels();
+        }
+        
+        // 从params更新UI显示（用于情感匹配等场景）
+        function updateUIFromParams() {
+            document.getElementById('baseFreq').value = params.baseFreq;
+            document.getElementById('harmonics').value = params.harmonics;
+            document.getElementById('resonance').value = Math.round(params.resonance * 100);
+            document.getElementById('vibrato').value = params.vibrato;
+            document.getElementById('envelope').value = params.envelope;
+            
+            updateParamLabels();
+        }
+        
+        // 更新参数标签显示
+        function updateParamLabels() {
             document.getElementById('freqValue').textContent = params.baseFreq + ' Hz';
             document.getElementById('harmValue').textContent = params.harmonics;
             document.getElementById('resValue').textContent = Math.round(params.resonance * 100) + '%';
             document.getElementById('vibValue').textContent = params.vibrato + ' Hz';
             
-            const envLabels = { 10: 'Short', 500: 'Medium', 2000: 'Long' };
             const envVal = params.envelope;
             let envLabel = 'Custom';
             if (envVal <= 100) envLabel = 'Short';
@@ -1720,7 +1735,7 @@
                 // 应用当前段的情感参数
                 if (emotionEnabled) {
                     Object.assign(params, segment.config.params);
-                    updateParams();
+                    updateUIFromParams();
                     
                     // 高亮当前句子
                     document.querySelectorAll('.sentence-box').forEach((box, i) => {
@@ -1783,8 +1798,8 @@
             document.querySelectorAll('.char-box').forEach(box => box.classList.remove('active'));
             document.querySelectorAll('.sentence-box').forEach(box => box.classList.remove('playing'));
             
-            // 恢复原始参数
-            updateParams();
+            // 恢复原始参数到UI
+            updateUIFromParams();
         }
         
         // 监听文本输入
