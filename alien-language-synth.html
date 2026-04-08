@@ -1689,7 +1689,14 @@
         // 播放文本
         async function playText() {
             const text = document.getElementById('textInput').value.trim();
-            if (!text || !audioContext) return;
+            if (!text) return;
+            
+            // 如果音频引擎未启动，先启动
+            if (!audioContext) {
+                initAudio();
+                // 等待音频上下文初始化完成
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
             
             if (isPlayingText) {
                 stopTextPlayback();
