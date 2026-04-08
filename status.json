@@ -24,10 +24,10 @@
     35
   ],
   "backup": {
-    "last_backup": "2026-04-04 06:04",
-    "next_check": "2026-04-04 12:04",
-    "total_backups": 10,
-    "changes_detected": true
+    "last_backup": "12\u65f605\u5206",
+    "next_check": "18:00",
+    "changes_detected": true,
+    "total_backups": 28
   },
   "stats": {
     "commits_today": 17,
