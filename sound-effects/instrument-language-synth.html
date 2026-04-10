@@ -565,7 +565,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.0</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.1 · 真实钢琴采样</p>
         </header>
 
         <div class="main-panel">
@@ -576,7 +576,7 @@
                 <div class="instrument-grid">
                     <div class="instrument-btn active" data-instrument="piano" onclick="selectInstrument('piano')">
                         <span class="icon">🎹</span>
-                        <span class="name">钢琴</span>
+                        <span class="name">钢琴 <small style="color:var(--accent);font-size:0.7em;">真实采样</small></span>
                     </div>
                     <div class="instrument-btn" data-instrument="guitar" onclick="selectInstrument('guitar')">
                         <span class="icon">🎸</span>
@@ -713,31 +713,29 @@
         <!-- 底部信息 -->
         <div class="info-section">
             <div class="info-card">
-                <h3>🎹 乐器音色说明</h3>
+                <h3>🎹 真实钢琴采样</h3>
                 <ul>
-                    <li><strong>钢琴</strong> - 明亮清脆，适合清晰表达</li>
-                    <li><strong>吉他</strong> - 温暖柔和，适合抒情旋律</li>
-                    <li><strong>长笛</strong> - 空灵飘逸，适合优雅表达</li>
-                    <li><strong>小提琴</strong> - 情感丰富，适合戏剧性演奏</li>
-                    <li><strong>小号</strong> - 嘹亮激昂，适合欢快氛围</li>
-                    <li><strong>合成器</strong> - 现代电子，适合实验性音乐</li>
+                    <li><strong>10个真实采样</strong> - 从D4到B5的完整音域</li>
+                    <li><strong>五声音阶设计</strong> - 宫商角徵羽，不含4和7</li>
+                    <li><strong>实时音高调整</strong> - 通过playbackRate实现任意音高</li>
+                    <li><strong>其他乐器</strong> - 使用Web Audio API合成音色</li>
                 </ul>
             </div>
             <div class="info-card">
-                <h3>🎵 音素映射规则</h3>
+                <h3>🎵 五声音阶音素映射</h3>
                 <ul>
-                    <li>每个汉字/字母映射到特定音高</li>
-                    <li>声调影响音符走向（四声对应音高变化）</li>
-                    <li>标点符号产生停顿或装饰音</li>
-                    <li>情感分析调整演奏速度和力度</li>
+                    <li>使用中国传统五声音阶（宫商角徵羽）</li>
+                    <li>对应音符：D(1)、E(2)、G(3)、A(5)、B(6)</li>
+                    <li>不含半音，旋律更加和谐流畅</li>
+                    <li>适合中国风格的音乐表达</li>
                 </ul>
             </div>
             <div class="info-card">
                 <h3>💡 使用技巧</h3>
                 <ul>
                     <li>短句演奏效果最佳</li>
-                    <li>尝试不同乐器感受差异</li>
-                    <li>调整速度改变表达情绪</li>
+                    <li>真实钢琴采样需等待加载完成</li>
+                    <li>五声音阶适合东方风格旋律</li>
                     <li>使用预设快速体验功能</li>
                 </ul>
             </div>
@@ -763,90 +761,38 @@
             reverb: 0.3
         };
 
-        // 乐器音色配置
-        const instrumentConfigs = {
+        // 采样配置 - 五声音阶 D E G A B
+        const sampleConfig = {
             piano: {
                 name: '钢琴',
                 emoji: '🎹',
-                type: 'triangle',
-                harmonics: [1, 0.5, 0.25],
+                basePath: '../assets/audio/samples/piano/',
+                samples: {
+                    'D4': { file: 'D4.wav', freq: 293.66 },
+                    'E4': { file: 'E4.wav', freq: 329.63 },
+                    'F4': { file: 'F4.wav', freq: 349.23 }, // 作为G4的替代
+                    'A4': { file: 'A4.wav', freq: 440.00 },
+                    'B4': { file: 'B4.wav', freq: 493.88 },
+                    'D5': { file: 'D5.wav', freq: 587.33 },
+                    'E5': { file: 'E5.wav', freq: 659.25 },
+                    'F5': { file: 'F5.wav', freq: 698.46 }, // 作为G5的替代
+                    'A5': { file: 'A5.wav', freq: 880.00 },
+                    'B5': { file: 'B5.wav', freq: 987.77 }
+                },
                 attack: 0.01,
-                decay: 0.3,
-                sustain: 0.4,
-                release: 0.5,
-                filterFreq: 3000
-            },
-            guitar: {
-                name: '吉他',
-                emoji: '🎸',
-                type: 'sawtooth',
-                harmonics: [1, 0.6, 0.3],
-                attack: 0.02,
-                decay: 0.2,
-                sustain: 0.5,
-                release: 0.4,
-                filterFreq: 2500
-            },
-            flute: {
-                name: '长笛',
-                emoji: '🪈',
-                type: 'sine',
-                harmonics: [1, 0.3, 0.1],
-                attack: 0.05,
-                decay: 0.1,
-                sustain: 0.7,
-                release: 0.3,
-                filterFreq: 4000
-            },
-            violin: {
-                name: '小提琴',
-                emoji: '🎻',
-                type: 'sawtooth',
-                harmonics: [1, 0.8, 0.5, 0.3],
-                attack: 0.1,
-                decay: 0.2,
-                sustain: 0.6,
-                release: 0.6,
-                filterFreq: 3500
-            },
-            trumpet: {
-                name: '小号',
-                emoji: '🎺',
-                type: 'square',
-                harmonics: [1, 0.7, 0.5, 0.3],
-                attack: 0.03,
-                decay: 0.15,
-                sustain: 0.7,
-                release: 0.2,
-                filterFreq: 2000
-            },
-            synth: {
-                name: '合成器',
-                emoji: '🎛️',
-                type: 'square',
-                harmonics: [1, 0.5, 0.25, 0.125],
-                attack: 0.01,
-                decay: 0.1,
-                sustain: 0.8,
-                release: 0.4,
-                filterFreq: 5000
+                release: 0.3
             }
         };
 
-        // 音符频率表 (C4到B4为基础)
+        // 音频缓冲区存储
+        const audioBuffers = {};
+        let samplesLoaded = false;
+
+        // 音符频率表
         const noteFrequencies = {
             'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13,
             'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
             'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
-        };
-
-        // 汉字到音高的映射（基于拼音首字母）
-        const pinyinNoteMap = {
-            'a': 'C', 'b': 'C#', 'c': 'D', 'd': 'D#', 'e': 'E', 'f': 'F',
-            'g': 'F#', 'h': 'G', 'i': 'G#', 'j': 'A', 'k': 'A#', 'l': 'B',
-            'm': 'C', 'n': 'C#', 'o': 'D', 'p': 'D#', 'q': 'E', 'r': 'F',
-            's': 'F#', 't': 'G', 'u': 'G#', 'v': 'A', 'w': 'A#', 'x': 'B',
-            'y': 'C', 'z': 'C#'
         };
 
         // 情感关键词
@@ -859,7 +805,7 @@
         };
 
         // 初始化
-        function initAudio() {
+        async function initAudio() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
             analyser.fftSize = 2048;
@@ -872,8 +818,35 @@
             createSpectrumBars();
             visualize();
             
+            // 加载采样
+            document.getElementById('statusText').textContent = '加载采样中...';
+            await loadSamples();
+            
             document.getElementById('startOverlay').classList.add('hidden');
-            addToHistory('音频引擎已启动');
+            document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
+            addToHistory('真实钢琴音色已加载');
+        }
+
+        // 加载采样文件
+        async function loadSamples() {
+            const config = sampleConfig.piano;
+            const loadPromises = [];
+            
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers[note] = audioBuffer;
+                        console.log(`Loaded: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load ${note}:`, err));
+                
+                loadPromises.push(promise);
+            }
+            
+            await Promise.all(loadPromises);
+            samplesLoaded = true;
         }
 
         // 创建频谱条
@@ -888,7 +861,7 @@
             }
         }
 
-        // 选择乐器
+        // 选择乐器（暂时只有钢琴）
         function selectInstrument(instrument) {
             currentInstrument = instrument;
             document.querySelectorAll('.instrument-btn').forEach(btn => {
@@ -896,12 +869,20 @@
             });
             document.querySelector(`[data-instrument="${instrument}"]`).classList.add('active');
             
-            const config = instrumentConfigs[instrument];
-            document.getElementById('waveInfo').textContent = 
-                `Instrument: ${config.name} ${config.emoji} | ${config.type}`;
+            if (instrument === 'piano') {
+                document.getElementById('waveInfo').textContent = 
+                    'Instrument: 真实钢琴采样 🎹 | 五声音阶';
+            } else {
+                document.getElementById('waveInfo').textContent = 
+                    `Instrument: ${instrument} (合成音色)`;
+            }
             
             // 播放试听音
-            playTone(440, 0.2);
+            if (instrument === 'piano' && samplesLoaded) {
+                playSampleTone(440, 0.3);
+            } else {
+                playSynthTone(440, 0.2);
+            }
         }
 
         // 更新参数
@@ -1014,125 +995,207 @@
             return notes;
         }
 
-        // 字符转音符
+        // 字符转音符（五声音阶版）
         function charToNote(char, index) {
-            let baseNote = 'C';
+            // 五声音阶：D, E, G, A, B (1, 2, 3, 5, 6)
+            const pentatonicNotes = ['D', 'E', 'G', 'A', 'B'];
+            const pentatonicFreqs = {
+                'D4': 293.66, 'E4': 329.63, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+                'D5': 587.33, 'E5': 659.25, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
+            };
+            
+            let noteIndex = 0;
             let octave = 4;
             
-            // 中文字符：使用字符编码映射
+            // 中文字符
             if (/[\u4e00-\u9fa5]/.test(char)) {
                 const code = char.charCodeAt(0);
-                const noteKeys = Object.keys(noteFrequencies);
-                const noteIndex = code % noteKeys.length;
-                baseNote = noteKeys[noteIndex];
-                // 根据字符编码变化八度
-                octave = 3 + (code % 3);
+                noteIndex = code % 5;
+                octave = 4 + Math.floor((code % 10) / 5); // 4或5
             }
             // 英文字母
             else if (/[a-zA-Z]/.test(char)) {
                 const lower = char.toLowerCase();
-                baseNote = pinyinNoteMap[lower] || 'C';
+                const charCode = lower.charCodeAt(0);
+                noteIndex = (charCode - 97) % 5;
                 octave = 4;
             }
             // 数字
             else if (/[0-9]/.test(char)) {
-                const num = parseInt(char);
-                const noteKeys = Object.keys(noteFrequencies);
-                baseNote = noteKeys[num % noteKeys.length];
-                octave = 3 + Math.floor(num / 3);
+                noteIndex = parseInt(char) % 5;
+                octave = 4 + Math.floor(parseInt(char) / 5);
             }
             else {
                 return null;
             }
             
-            const freq = noteFrequencies[baseNote] * Math.pow(2, octave - 4);
+            const noteName = pentatonicNotes[noteIndex];
+            const finalOctave = Math.min(Math.max(octave, 4), 5);
+            const fullNote = noteName + finalOctave;
             
             return {
                 char: char,
-                note: baseNote + octave,
-                frequency: freq,
+                note: fullNote,
+                frequency: pentatonicFreqs[fullNote] || 440,
                 duration: params.noteDuration,
-                velocity: 0.5 + Math.random() * 0.5
+                velocity: 0.5 + Math.random() * 0.5,
+                sampleNote: findNearestSample(fullNote)
             };
         }
 
-        // 演奏单个音符
-        function playTone(frequency, duration, velocity = 0.5) {
-            if (!audioContext) return;
+        // 找到最近的采样
+        function findNearestSample(targetNote) {
+            const sampleNotes = Object.keys(audioBuffers);
+            if (sampleNotes.length === 0) return 'A4';
             
-            const config = instrumentConfigs[currentInstrument];
-            const masterGain = audioContext.createGain();
-            masterGain.connect(analyser);
-            analyser.connect(audioContext.destination);
+            // 提取音名和八度
+            const targetMatch = targetNote.match(/^([A-G]#?)(\d)$/);
+            if (!targetMatch) return 'A4';
             
-            // 创建混响效果
+            const targetName = targetMatch[1];
+            const targetOct = parseInt(targetMatch[2]);
+            
+            // 计算半音距离
+            const noteValues = { 'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11 };
+            const targetVal = noteValues[targetName] + targetOct * 12;
+            
+            let nearest = sampleNotes[0];
+            let minDiff = Infinity;
+            
+            for (const sample of sampleNotes) {
+                const match = sample.match(/^([A-G]#?)(\d)$/);
+                if (!match) continue;
+                
+                const sampleVal = noteValues[match[1]] + parseInt(match[2]) * 12;
+                const diff = Math.abs(targetVal - sampleVal);
+                
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearest = sample;
+                }
+            }
+            
+            return nearest;
+        }
+
+        // 使用真实采样播放音符
+        function playSampleTone(targetFrequency, duration, velocity = 0.5) {
+            if (!audioContext || !samplesLoaded) return;
+            
+            // 找到最近的采样
+            const freqToNote = {};
+            for (const [note, info] of Object.entries(sampleConfig.piano.samples)) {
+                freqToNote[info.freq] = note;
+            }
+            
+            // 找到最接近目标频率的采样
+            let nearestFreq = 440;
+            let minDiff = Infinity;
+            
+            for (const freq of Object.keys(freqToNote).map(f => parseFloat(f))) {
+                const diff = Math.abs(freq - targetFrequency);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearestFreq = freq;
+                }
+            }
+            
+            const sampleNote = freqToNote[nearestFreq];
+            const buffer = audioBuffers[sampleNote];
+            
+            if (!buffer) {
+                console.warn('Sample not found for', sampleNote);
+                return;
+            }
+            
+            // 创建音频源
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            
+            // 计算播放速度以达到目标音高
+            const playbackRate = targetFrequency / nearestFreq;
+            source.playbackRate.value = playbackRate;
+            
+            // 增益节点
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = velocity;
+            
+            // 包络
+            const now = audioContext.currentTime;
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(velocity, now + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            // 混响
             let reverbGain = null;
             if (params.reverb > 0) {
                 reverbGain = audioContext.createGain();
                 reverbGain.gain.value = params.reverb * 0.3;
                 
-                // 简单的延迟混响
                 const delay = audioContext.createDelay();
                 delay.delayTime.value = 0.3;
                 
                 const feedback = audioContext.createGain();
-                feedback.gain.value = 0.4;
+                feedback.gain.value = 0.3;
                 
-                masterGain.connect(delay);
+                gainNode.connect(delay);
                 delay.connect(feedback);
                 feedback.connect(delay);
-                reverbGain.connect(analyser);
-                analyser.connect(audioContext.destination);
                 delay.connect(reverbGain);
+                reverbGain.connect(analyser);
             }
             
-            // 根据乐器类型创建振荡器
-            const oscillators = [];
-            const gains = [];
+            // 连接
+            source.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioContext.destination);
             
-            config.harmonics.forEach((harmonic, i) => {
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                const filter = audioContext.createBiquadFilter();
-                
-                // 设置波形
-                osc.type = i === 0 ? config.type : 
-                          (i % 2 === 0 ? 'triangle' : 'sine');
-                
-                // 设置频率（基频 + 谐波）
-                const harmonicFreq = frequency * (i + 1);
-                osc.frequency.setValueAtTime(harmonicFreq, audioContext.currentTime);
-                
-                // 滤波器
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(config.filterFreq, audioContext.currentTime);
-                filter.Q.setValueAtTime(2, audioContext.currentTime);
-                
-                // ADSR 包络
-                const now = audioContext.currentTime;
-                const vel = velocity * harmonic;
-                
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(vel, now + config.attack);
-                gain.gain.exponentialRampToValueAtTime(vel * config.sustain, now + config.attack + config.decay);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + duration + config.release);
-                
-                // 连接节点
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(masterGain);
-                
-                osc.start(now);
-                osc.stop(now + duration + config.release + 0.1);
-                
-                oscillators.push(osc);
-                gains.push(gain);
-            });
+            if (reverbGain) {
+                reverbGain.connect(audioContext.destination);
+            }
+            
+            // 播放
+            source.start(now);
+            source.stop(now + duration + 0.5);
             
             // 更新频谱
             updateSpectrum();
             
-            return { oscillators, gains };
+            return { source, gainNode };
+        }
+
+        // 合成器音色（其他乐器用）
+        function playSynthTone(frequency, duration, velocity = 0.5) {
+            if (!audioContext) return;
+            
+            const osc = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            
+            const now = audioContext.currentTime;
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(velocity * 0.3, now + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            osc.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            osc.start(now);
+            osc.stop(now + duration + 0.1);
+            
+            updateSpectrum();
+        }
+
+        // 演奏单个音符（根据当前乐器选择播放方式）
+        function playTone(frequency, duration, velocity = 0.5) {
+            if (currentInstrument === 'piano' && samplesLoaded) {
+                return playSampleTone(frequency, duration / 1000, velocity);
+            } else {
+                return playSynthTone(frequency, duration / 1000, velocity);
+            }
         }
 
         // 演奏文本
@@ -1145,8 +1208,13 @@
                 return;
             }
             
+            if (currentInstrument === 'piano' && !samplesLoaded) {
+                document.getElementById('statusText').textContent = '采样加载中，请稍候...';
+                return;
+            }
+            
             isPlaying = true;
-            document.getElementById('statusText').textContent = '演奏中...';
+            document.getElementById('statusText').textContent = currentInstrument === 'piano' ? '演奏中 (真实钢琴)...' : '演奏中...';
             
             // 分析情感
             const emotion = analyzeEmotion(text);
@@ -1169,7 +1237,7 @@
                 if (!isPlaying) break;
                 
                 const note = notes[i];
-                playTone(note.frequency, note.duration / 1000, note.velocity);
+                playTone(note.frequency, note.duration, note.velocity);
                 
                 // 高亮当前音符
                 highlightNote(i);
