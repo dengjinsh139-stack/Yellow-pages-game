@@ -400,6 +400,74 @@
             font-size: 0.8rem;
         }
 
+        /* 音符键盘 */
+        .note-keyboard {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .note-key {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, rgba(255, 107, 107, 0.15), rgba(78, 205, 196, 0.15));
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .note-key:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            background: linear-gradient(145deg, rgba(255, 107, 107, 0.25), rgba(78, 205, 196, 0.25));
+        }
+
+        .note-key:active, .note-key.active {
+            transform: translateY(2px) scale(0.95);
+            border-color: var(--secondary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .note-key .note-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .note-key .note-freq {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .note-key.active .note-name,
+        .note-key.active .note-freq {
+            color: #fff;
+        }
+
+        .note-keyboard-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .note-keyboard-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
         /* 预设短语 */
         .preset-grid {
             display: grid;
@@ -565,7 +633,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.1 · 真实钢琴采样</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.2 · 10键实时演奏</p>
         </header>
 
         <div class="main-panel">
@@ -672,6 +740,12 @@
                     <button class="btn btn-secondary" onclick="playRandomText()">🎲 随机示例</button>
                     <button class="btn btn-secondary" onclick="clearText()">🗑️ 清空</button>
                     <button class="btn btn-secondary" onclick="stopPlaying()">⏹ 停止</button>
+                </div>
+
+                <!-- 10键音符面板 -->
+                <div class="panel-title" style="margin-top: 15px;">音符键盘 <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: normal;">点击演奏</span></div>
+                <div class="note-keyboard" id="noteKeyboard">
+                    <!-- 动态生成10个音符按钮 -->
                 </div>
 
                 <div class="panel-title" style="margin-top: 15px;">音符序列</div>
@@ -822,6 +896,9 @@
             document.getElementById('statusText').textContent = '加载采样中...';
             await loadSamples();
             
+            // 生成音符键盘
+            generateNoteKeyboard();
+            
             document.getElementById('startOverlay').classList.add('hidden');
             document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
             addToHistory('真实钢琴音色已加载');
@@ -877,12 +954,92 @@
                     `Instrument: ${instrument} (合成音色)`;
             }
             
+            // 重新生成音符键盘
+            generateNoteKeyboard();
+            
             // 播放试听音
             if (instrument === 'piano' && samplesLoaded) {
                 playSampleTone(440, 0.3);
             } else {
                 playSynthTone(440, 0.2);
             }
+        }
+
+        // 生成10键音符键盘
+        function generateNoteKeyboard() {
+            const keyboard = document.getElementById('noteKeyboard');
+            keyboard.innerHTML = '';
+            
+            // 获取当前乐器的10个音符配置
+            const notes = getCurrentInstrumentNotes();
+            
+            notes.forEach((noteInfo, index) => {
+                const key = document.createElement('div');
+                key.className = 'note-key';
+                key.dataset.note = noteInfo.note;
+                key.dataset.freq = noteInfo.freq;
+                key.dataset.index = index;
+                
+                key.innerHTML = `
+                    <span class="note-name">${noteInfo.note}</span>
+                    <span class="note-freq">${Math.round(noteInfo.freq)}Hz</span>
+                `;
+                
+                // 鼠标点击
+                key.addEventListener('mousedown', () => playNoteKey(noteInfo, key));
+                key.addEventListener('mouseup', () => releaseNoteKey(key));
+                key.addEventListener('mouseleave', () => releaseNoteKey(key));
+                
+                // 触摸支持
+                key.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    playNoteKey(noteInfo, key);
+                });
+                key.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    releaseNoteKey(key);
+                });
+                
+                keyboard.appendChild(key);
+            });
+        }
+
+        // 获取当前乐器的10个音符
+        function getCurrentInstrumentNotes() {
+            // 目前只有钢琴有真实采样，其他乐器使用合成音色但同样的音高
+            const pianoNotes = [
+                { note: 'D4', freq: 293.66 },
+                { note: 'E4', freq: 329.63 },
+                { note: 'F4', freq: 349.23 },
+                { note: 'A4', freq: 440.00 },
+                { note: 'B4', freq: 493.88 },
+                { note: 'D5', freq: 587.33 },
+                { note: 'E5', freq: 659.25 },
+                { note: 'F5', freq: 698.46 },
+                { note: 'A5', freq: 880.00 },
+                { note: 'B5', freq: 987.77 }
+            ];
+            
+            return pianoNotes;
+        }
+
+        // 演奏音符按钮
+        function playNoteKey(noteInfo, keyElement) {
+            keyElement.classList.add('active');
+            
+            if (currentInstrument === 'piano' && samplesLoaded) {
+                playSampleTone(noteInfo.freq, 0.5, 0.7);
+            } else {
+                playSynthTone(noteInfo.freq, 0.5, 0.7);
+            }
+            
+            // 添加到历史
+            addToHistory(`♪ ${noteInfo.note}`);
+        }
+
+        // 释放音符按钮
+        function releaseNoteKey(keyElement) {
+            keyElement.classList.remove('active');
         }
 
         // 更新参数
