@@ -838,6 +838,15 @@
                     <div class="preset-btn" onclick="playPreset('thankyou')">🙏 谢谢</div>
                     <div class="preset-btn" onclick="playPreset('congrats')">🎉 恭喜</div>
                     <div class="preset-btn" onclick="playPreset('goodluck')">🍀 祝好运</div>
+                    <div class="preset-btn" onclick="playPreset('happy')" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
+                </div>
+
+                <div class="panel-title">🎹 MIDI 导入</div>
+                <div style="padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 10px;">
+                    <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">上传 MIDI 文件，用五声音阶演奏</p>
+                    <input type="file" id="midiFileInput" accept=".mid,.midi" style="display: none;" onchange="handleMidiFile(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('midiFileInput').click()" style="width: 100%;">📁 选择 MIDI 文件</button>
+                    <div id="midiStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 5px; text-align: center;"></div>
                 </div>
 
                 <div class="panel-title">演奏历史</div>
@@ -1806,12 +1815,17 @@
                 goodnight: '晚安，愿你有个甜美的梦',
                 thankyou: '谢谢你的帮助和关心',
                 congrats: '恭喜你，真是太棒了',
-                goodluck: '祝你好运，相信自己'
+                goodluck: '祝你好运，相信自己',
+                happy: '今天真开心！世界真美好！加油！耶！'
             };
             
             const text = presets[type];
             if (text) {
                 document.getElementById('textInput').value = text;
+                // 开心预设使用快乐情感
+                if (type === 'happy') {
+                    adjustParamsByEmotion('happy');
+                }
                 playText();
             }
         }
@@ -1824,6 +1838,286 @@
             }
             const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             history.innerHTML = `<div style="padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">[${time}] ${text}</div>` + history.innerHTML;
+        }
+
+        // ==================== MIDI 导入功能 ====================
+        
+        // MIDI 音符到频率的映射（五声音阶）
+        const midiToFreq = {
+            62: 293.66,  // D4
+            64: 329.63,  // E4
+            67: 392.00,  // G4
+            69: 440.00,  // A4
+            71: 493.88,  // B4
+            74: 587.33,  // D5
+            76: 659.25,  // E5
+            79: 783.99,  // G5
+            81: 880.00,  // A5
+            83: 987.77   // B5
+        };
+
+        // 将任意 MIDI 音符映射到最近的五声音阶音符
+        function mapToPentatonic(midiNote) {
+            const pentatonicNotes = [62, 64, 67, 69, 71, 74, 76, 79, 81, 83]; // D4-B5
+            let nearest = pentatonicNotes[0];
+            let minDiff = Math.abs(midiNote - nearest);
+            
+            for (const note of pentatonicNotes) {
+                const diff = Math.abs(midiNote - note);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearest = note;
+                }
+            }
+            
+            return nearest;
+        }
+
+        // 解析 MIDI 文件
+        async function handleMidiFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('midiStatus');
+            statusDiv.textContent = '正在解析 MIDI...';
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const midiData = parseMidi(arrayBuffer);
+                
+                statusDiv.textContent = `解析成功！${midiData.tracks.length} 个音轨`;
+                
+                // 演奏 MIDI
+                playMidi(midiData);
+            } catch (err) {
+                console.error('MIDI 解析错误:', err);
+                statusDiv.textContent = '解析失败: ' + err.message;
+            }
+        }
+
+        // 简化的 MIDI 解析器
+        function parseMidi(arrayBuffer) {
+            const data = new Uint8Array(arrayBuffer);
+            let pos = 0;
+            
+            // 读取文件头
+            const headerChunk = readChunk(data, pos);
+            if (headerChunk.id !== 'MThd') {
+                throw new Error('无效的 MIDI 文件');
+            }
+            pos = headerChunk.end;
+            
+            const format = (headerChunk.data[0] << 8) | headerChunk.data[1];
+            const numTracks = (headerChunk.data[2] << 8) | headerChunk.data[3];
+            const timeDivision = (headerChunk.data[4] << 8) | headerChunk.data[5];
+            
+            const tracks = [];
+            
+            // 读取所有音轨
+            for (let i = 0; i < numTracks; i++) {
+                const trackChunk = readChunk(data, pos);
+                if (trackChunk.id !== 'MTrk') {
+                    throw new Error('无效的音轨');
+                }
+                pos = trackChunk.end;
+                
+                const events = parseTrackEvents(trackChunk.data, timeDivision);
+                tracks.push(events);
+            }
+            
+            return { format, numTracks, timeDivision, tracks };
+        }
+
+        // 读取 MIDI Chunk
+        function readChunk(data, start) {
+            const id = String.fromCharCode(...data.slice(start, start + 4));
+            const length = (data[start + 4] << 24) | (data[start + 5] << 16) | 
+                          (data[start + 6] << 8) | data[start + 7];
+            const dataStart = start + 8;
+            const end = dataStart + length;
+            
+            return {
+                id,
+                length,
+                data: data.slice(dataStart, end),
+                end
+            };
+        }
+
+        // 解析音轨事件
+        function parseTrackEvents(trackData, timeDivision) {
+            const events = [];
+            let pos = 0;
+            let runningStatus = 0;
+            let absoluteTime = 0;
+            
+            while (pos < trackData.length) {
+                // 读取变长 Delta Time
+                let deltaTime = 0;
+                let byte;
+                do {
+                    byte = trackData[pos++];
+                    deltaTime = (deltaTime << 7) | (byte & 0x7F);
+                } while (byte & 0x80);
+                
+                absoluteTime += deltaTime;
+                
+                // 读取事件类型
+                let status = trackData[pos];
+                
+                // 系统事件或元事件
+                if (status === 0xFF) {
+                    pos++;
+                    const metaType = trackData[pos++];
+                    let length = 0;
+                    do {
+                        byte = trackData[pos++];
+                        length = (length << 7) | (byte & 0x7F);
+                    } while (byte & 0x80);
+                    
+                    // 跳过元事件数据
+                    pos += length;
+                    continue;
+                }
+                
+                // 系统独占消息
+                if (status === 0xF0 || status === 0xF7) {
+                    pos++;
+                    while (trackData[pos++] !== 0xF7) {}
+                    continue;
+                }
+                
+                // 使用运行状态
+                if (status < 0x80) {
+                    status = runningStatus;
+                } else {
+                    runningStatus = status;
+                    pos++;
+                }
+                
+                const eventType = status & 0xF0;
+                const channel = status & 0x0F;
+                
+                // 音符开事件
+                if (eventType === 0x90) {
+                    const note = trackData[pos++];
+                    const velocity = trackData[pos++];
+                    if (velocity > 0) {
+                        events.push({
+                            type: 'noteOn',
+                            time: absoluteTime,
+                            note,
+                            velocity
+                        });
+                    }
+                }
+                // 音符关事件
+                else if (eventType === 0x80 || (eventType === 0x90 && trackData[pos + 1] === 0)) {
+                    const note = trackData[pos++];
+                    pos++; // 跳过力度
+                    events.push({
+                        type: 'noteOff',
+                        time: absoluteTime,
+                        note
+                    });
+                }
+                // 其他事件 - 跳过
+                else if (eventType === 0xA0 || eventType === 0xB0 || eventType === 0xE0) {
+                    pos += 2;
+                } else if (eventType === 0xC0 || eventType === 0xD0) {
+                    pos += 1;
+                }
+            }
+            
+            return events;
+        }
+
+        // 演奏 MIDI 数据
+        async function playMidi(midiData) {
+            if (isPlaying) return;
+            if (currentInstrument === 'piano' && !samplesLoaded) {
+                document.getElementById('midiStatus').textContent = '采样加载中...';
+                return;
+            }
+            
+            isPlaying = true;
+            document.getElementById('statusText').textContent = '演奏 MIDI...';
+            
+            // 合并所有音轨的音符开事件
+            const allNotes = [];
+            for (const track of midiData.tracks) {
+                for (const event of track) {
+                    if (event.type === 'noteOn') {
+                        allNotes.push(event);
+                    }
+                }
+            }
+            
+            // 按时间排序
+            allNotes.sort((a, b) => a.time - b.time);
+            
+            // 计算时间比例（将 MIDI tick 转换为毫秒）
+            const msPerTick = 60000 / (120 * midiData.timeDivision); // 假设 120 BPM
+            
+            // 显示 MIDI 音符序列
+            displayMidiNotes(allNotes);
+            
+            // 依次演奏
+            let lastTime = 0;
+            for (let i = 0; i < allNotes.length; i++) {
+                if (!isPlaying) break;
+                
+                const note = allNotes[i];
+                const waitMs = (note.time - lastTime) * msPerTick;
+                
+                if (waitMs > 0) {
+                    await sleep(waitMs);
+                }
+                lastTime = note.time;
+                
+                // 映射到五声音阶
+                const pentatonicNote = mapToPentatonic(note.note);
+                const freq = midiToFreq[pentatonicNote];
+                const noteName = noteNumberToName(pentatonicNote);
+                
+                if (freq) {
+                    const velocity = (note.velocity / 127) * params.masterVolume;
+                    playTone(freq, noteName, params.noteDuration, velocity);
+                    highlightMidiNote(i);
+                }
+            }
+            
+            isPlaying = false;
+            document.getElementById('statusText').textContent = 'MIDI 演奏完成';
+            addToHistory('🎹 MIDI 文件');
+        }
+
+        // MIDI 音符编号转音符名称
+        function noteNumberToName(noteNumber) {
+            const names = {
+                62: 'D4', 64: 'E4', 67: 'G4', 69: 'A4', 71: 'B4',
+                74: 'D5', 76: 'E5', 79: 'G5', 81: 'A5', 83: 'B5'
+            };
+            return names[noteNumber] || 'A4';
+        }
+
+        // 显示 MIDI 音符
+        function displayMidiNotes(notes) {
+            const display = document.getElementById('notesDisplay');
+            display.innerHTML = notes.map((n, i) => {
+                const mapped = mapToPentatonic(n.note);
+                const name = noteNumberToName(mapped);
+                return `<span class="note-item" id="note-${i}" title="原音符: ${n.note} → ${name}">${name}</span>`;
+            }).join('');
+        }
+
+        // 高亮 MIDI 音符
+        function highlightMidiNote(index) {
+            document.querySelectorAll('.note-item').forEach((el, i) => {
+                el.style.background = i === index ? 
+                    'rgba(78, 205, 196, 0.5)' : 'rgba(255, 107, 107, 0.2)';
+                el.style.color = i === index ? '#fff' : 'var(--primary)';
+            });
         }
 
         // 更新频谱
