@@ -404,7 +404,7 @@
         .note-keyboard {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            gap: 10px;
             margin-top: 10px;
             padding: 15px;
             background: rgba(0, 0, 0, 0.3);
@@ -412,8 +412,16 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .note-key-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
         .note-key {
             aspect-ratio: 1;
+            width: 100%;
             background: linear-gradient(145deg, rgba(255, 107, 107, 0.15), rgba(78, 205, 196, 0.15));
             border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
@@ -454,6 +462,50 @@
         .note-key.active .note-name,
         .note-key.active .note-freq {
             color: #fff;
+        }
+
+        /* 音符音量滑块 */
+        .note-volume-control {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .note-volume-slider {
+            width: 90%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .note-volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid var(--bg-dark);
+        }
+
+        .note-volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid var(--bg-dark);
+        }
+
+        .note-volume-label {
+            font-size: 0.6rem;
+            color: var(--text-dim);
         }
 
         .note-keyboard-title {
@@ -633,7 +685,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.3 · 音量均衡</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.4 · 独立音量控制</p>
         </header>
 
         <div class="main-panel">
@@ -862,6 +914,12 @@
         const audioBuffers = {};
         let samplesLoaded = false;
 
+        // 每个音符的独立音量设置 (默认1.0)
+        const noteVolumes = {
+            'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0,
+            'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0
+        };
+
         // 音符频率表
         const noteFrequencies = {
             'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13,
@@ -974,6 +1032,11 @@
             const notes = getCurrentInstrumentNotes();
             
             notes.forEach((noteInfo, index) => {
+                // 创建包装容器
+                const wrapper = document.createElement('div');
+                wrapper.className = 'note-key-wrapper';
+                
+                // 创建音符按钮
                 const key = document.createElement('div');
                 key.className = 'note-key';
                 key.dataset.note = noteInfo.note;
@@ -1000,7 +1063,36 @@
                     releaseNoteKey(key);
                 });
                 
-                keyboard.appendChild(key);
+                // 创建音量控制
+                const volumeControl = document.createElement('div');
+                volumeControl.className = 'note-volume-control';
+                
+                const volumeSlider = document.createElement('input');
+                volumeSlider.type = 'range';
+                volumeSlider.className = 'note-volume-slider';
+                volumeSlider.min = '0';
+                volumeSlider.max = '200';
+                volumeSlider.value = Math.round(noteVolumes[noteInfo.note] * 100);
+                volumeSlider.dataset.note = noteInfo.note;
+                
+                const volumeLabel = document.createElement('span');
+                volumeLabel.className = 'note-volume-label';
+                volumeLabel.textContent = `${Math.round(noteVolumes[noteInfo.note] * 100)}%`;
+                
+                // 音量调节事件
+                volumeSlider.addEventListener('input', (e) => {
+                    const volume = parseInt(e.target.value) / 100;
+                    noteVolumes[noteInfo.note] = volume;
+                    volumeLabel.textContent = `${e.target.value}%`;
+                });
+                
+                volumeControl.appendChild(volumeSlider);
+                volumeControl.appendChild(volumeLabel);
+                
+                // 组装
+                wrapper.appendChild(key);
+                wrapper.appendChild(volumeControl);
+                keyboard.appendChild(wrapper);
             });
         }
 
@@ -1027,14 +1119,17 @@
         function playNoteKey(noteInfo, keyElement) {
             keyElement.classList.add('active');
             
+            // 获取用户调节的音量 (默认0.7 * noteVolumes)
+            const userVolume = 0.7 * (noteVolumes[noteInfo.note] || 1.0);
+            
             if (currentInstrument === 'piano' && samplesLoaded) {
-                playSampleTone(noteInfo.freq, 0.5, 0.7);
+                playSampleTone(noteInfo.freq, 0.5, userVolume);
             } else {
-                playSynthTone(noteInfo.freq, 0.5, 0.7);
+                playSynthTone(noteInfo.freq, 0.5, userVolume);
             }
             
             // 添加到历史
-            addToHistory(`♪ ${noteInfo.note}`);
+            addToHistory(`♪ ${noteInfo.note} (${Math.round((noteVolumes[noteInfo.note] || 1.0) * 100)}%)`);
         }
 
         // 释放音符按钮
