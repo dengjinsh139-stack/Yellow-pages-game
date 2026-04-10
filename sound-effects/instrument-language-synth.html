@@ -722,6 +722,16 @@
 
                 <div class="panel-title">演奏参数</div>
                 
+                <!-- 全局音量控制 -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>🎚️ 全局音量</span>
+                        <span class="control-value" id="masterVolumeValue">100%</span>
+                    </div>
+                    <input type="range" id="masterVolume" min="0" max="200" value="100" oninput="updateParams()">
+                </div>
+
+                <!-- 基础音高 -->
                 <div class="control-group">
                     <div class="control-label">
                         <span>基础音高</span>
@@ -730,12 +740,21 @@
                     <input type="range" id="baseFreq" min="130" max="523" value="262" oninput="updateParams()">
                 </div>
 
+                <!-- 播放间隔区间 -->
                 <div class="control-group">
                     <div class="control-label">
-                        <span>演奏速度</span>
-                        <span class="control-value" id="tempoValue">中速</span>
+                        <span>⏱️ 播放间隔</span>
+                        <span class="control-value" id="tempoRangeValue">200-400ms</span>
                     </div>
-                    <input type="range" id="tempo" min="100" max="800" value="300" oninput="updateParams()">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="range" id="tempoMin" min="50" max="1000" value="200" oninput="updateParams()" style="flex: 1;">
+                        <span style="color: var(--text-dim);">-</span>
+                        <input type="range" id="tempoMax" min="50" max="1000" value="400" oninput="updateParams()" style="flex: 1;">
+                    </div>
+                    <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="tempoRandom" checked onchange="updateParams()" style="width: auto;">
+                        <label for="tempoRandom" style="font-size: 0.8rem; color: var(--text-dim); cursor: pointer;">启用随机波动</label>
+                    </div>
                 </div>
 
                 <div class="control-group">
@@ -881,8 +900,12 @@
 
         // 参数
         const params = {
-            baseFreq: 262,  // C4
-            tempo: 300,     // ms per note
+            baseFreq: 262,      // C4
+            tempo: 300,         // ms per note (基准值)
+            tempoMin: 200,      // 最小间隔 (ms)
+            tempoMax: 400,      // 最大间隔 (ms)
+            tempoRandom: true,  // 是否启用随机间隔
+            masterVolume: 1.0,  // 全局音量 (0-2)
             noteDuration: 300,
             reverb: 0.3
         };
@@ -1121,11 +1144,10 @@
         function playNoteKey(noteInfo, keyElement) {
             keyElement.classList.add('active');
             
-            // 基础演奏力度
+            // 基础演奏力度 * 全局音量 * 用户调节
             const baseVelocity = 0.7;
-            // 应用用户调节的音量
             const userVolume = noteVolumes[noteInfo.note] || 1.0;
-            const finalVelocity = baseVelocity * userVolume;
+            const finalVelocity = baseVelocity * params.masterVolume * userVolume;
             
             if (currentInstrument === 'piano' && samplesLoaded) {
                 playSampleTone(noteInfo.freq, noteInfo.note, 0.5, finalVelocity);
@@ -1145,21 +1167,32 @@
         // 更新参数
         function updateParams() {
             params.baseFreq = parseInt(document.getElementById('baseFreq').value);
-            params.tempo = parseInt(document.getElementById('tempo').value);
+            params.tempoMin = parseInt(document.getElementById('tempoMin').value);
+            params.tempoMax = parseInt(document.getElementById('tempoMax').value);
+            params.tempoRandom = document.getElementById('tempoRandom').checked;
+            params.masterVolume = parseInt(document.getElementById('masterVolume').value) / 100;
             params.noteDuration = parseInt(document.getElementById('noteDuration').value);
             params.reverb = parseInt(document.getElementById('reverb').value) / 100;
+
+            // 确保 tempoMin <= tempoMax
+            if (params.tempoMin > params.tempoMax) {
+                const temp = params.tempoMin;
+                params.tempoMin = params.tempoMax;
+                params.tempoMax = temp;
+            }
 
             const freqNote = freqToNote(params.baseFreq);
             document.getElementById('baseFreqValue').textContent = 
                 `${freqNote} (${params.baseFreq}Hz)`;
             
-            const tempoLabels = { 100: '慢速', 300: '中速', 500: '快速', 800: '极速' };
-            let tempoLabel = '中速';
-            if (params.tempo <= 150) tempoLabel = '慢速';
-            else if (params.tempo <= 400) tempoLabel = '中速';
-            else if (params.tempo <= 600) tempoLabel = '快速';
-            else tempoLabel = '极速';
-            document.getElementById('tempoValue').textContent = tempoLabel;
+            // 更新播放间隔显示
+            const randomText = params.tempoRandom ? ' (随机)' : '';
+            document.getElementById('tempoRangeValue').textContent = 
+                `${params.tempoMin}-${params.tempoMax}ms${randomText}`;
+            
+            // 更新全局音量显示
+            document.getElementById('masterVolumeValue').textContent = 
+                Math.round(params.masterVolume * 100) + '%';
             
             const durLabels = { 100: '短', 300: '中', 600: '长', 1000: '悠长' };
             let durLabel = '中';
@@ -1499,13 +1532,23 @@
                 if (!isPlaying) break;
                 
                 const note = notes[i];
-                playTone(note.frequency, note.note, note.duration, note.velocity);
+                // 应用全局音量
+                const velocityWithMaster = note.velocity * params.masterVolume;
+                playTone(note.frequency, note.note, note.duration, velocityWithMaster);
                 
                 // 高亮当前音符
                 highlightNote(i);
                 
-                // 等待
-                await sleep(params.tempo + (note.pause ? 200 : 0));
+                // 计算等待时间（支持随机区间）
+                let waitTime;
+                if (params.tempoRandom) {
+                    // 在 min-max 之间随机
+                    waitTime = Math.floor(Math.random() * (params.tempoMax - params.tempoMin + 1)) + params.tempoMin;
+                } else {
+                    // 使用固定基准值
+                    waitTime = params.tempo;
+                }
+                await sleep(waitTime + (note.pause ? 200 : 0));
             }
             
             isPlaying = false;
