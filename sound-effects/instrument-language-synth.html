@@ -1954,18 +1954,43 @@
 
         // 演奏文本
         async function playText() {
-            if (isPlaying) return;
+            console.log('=== playText 开始 ===');
+            
+            if (isPlaying) {
+                console.log('已经在播放中，返回');
+                return;
+            }
             
             const text = document.getElementById('textInput').value.trim();
+            console.log('输入文本:', text);
+            
             if (!text) {
                 document.getElementById('statusText').textContent = '请先输入文字';
+                console.log('文本为空，返回');
                 return;
             }
             
             if (currentInstrument === 'piano' && !samplesLoaded) {
                 document.getElementById('statusText').textContent = '采样加载中，请稍候...';
+                console.log('采样未加载完成，返回');
                 return;
             }
+            
+            if (!audioContext) {
+                document.getElementById('statusText').textContent = '音频引擎未启动';
+                console.log('audioContext 不存在，返回');
+                return;
+            }
+            
+            // 检查音频上下文状态
+            if (audioContext.state === 'suspended') {
+                console.log('音频上下文被暂停，尝试恢复...');
+                await audioContext.resume();
+            }
+            
+            console.log('音频上下文状态:', audioContext.state);
+            console.log('samplesLoaded:', samplesLoaded);
+            console.log('currentInstrument:', currentInstrument);
             
             isPlaying = true;
             document.getElementById('statusText').textContent = currentInstrument === 'piano' ? '演奏中 (真实钢琴)...' : '演奏中...';
@@ -2011,18 +2036,32 @@
             
             // 转换为音符
             const notes = textToNotes(text);
+            console.log('转换后的音符:', notes);
             
             // 显示音符序列
             displayNotes(notes);
             
+            if (notes.length === 0) {
+                console.log('没有可播放的音符');
+                isPlaying = false;
+                document.getElementById('statusText').textContent = '没有可播放的音符';
+                return;
+            }
+            
             // 依次演奏
+            console.log('开始演奏，音符数量:', notes.length);
             for (let i = 0; i < notes.length; i++) {
-                if (!isPlaying) break;
+                if (!isPlaying) {
+                    console.log('演奏被中断');
+                    break;
+                }
                 
                 const note = notes[i];
+                console.log(`演奏第 ${i + 1}/${notes.length} 个音符:`, note);
                 
                 // 休止符处理
                 if (note.isRest) {
+                    console.log('休止符，等待', note.duration, 'ms');
                     await sleep(note.duration);
                     continue;
                 }
@@ -2030,6 +2069,8 @@
                 // 应用全局音量 + 音符独立音量
                 const userVolume = noteVolumes[note.note] || 1.0;
                 const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
+                
+                console.log(`播放音符: ${note.note}, 频率: ${note.frequency}, 音量: ${velocityWithMaster}`);
                 
                 // 播放单音
                 playTone(note.frequency, note.note, note.duration, velocityWithMaster);
