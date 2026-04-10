@@ -829,6 +829,8 @@
             <div class="panel">
                 <div class="panel-title">快速预设</div>
                 
+                <div class="panel-title">快速预设</div>
+                
                 <div class="preset-grid">
                     <div class="preset-btn" onclick="playPreset('hello')">👋 你好</div>
                     <div class="preset-btn" onclick="playPreset('goodmorning')">🌅 早上好</div>
@@ -838,15 +840,29 @@
                     <div class="preset-btn" onclick="playPreset('thankyou')">🙏 谢谢</div>
                     <div class="preset-btn" onclick="playPreset('congrats')">🎉 恭喜</div>
                     <div class="preset-btn" onclick="playPreset('goodluck')">🍀 祝好运</div>
-                    <div class="preset-btn" onclick="playPreset('happy')" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
+                    <div class="preset-btn" onclick="selectEmotion('happy')" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
                 </div>
 
-                <div class="panel-title">🎹 MIDI 导入</div>
-                <div style="padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 10px;">
-                    <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">上传 MIDI 文件，用五声音阶演奏</p>
-                    <input type="file" id="midiFileInput" accept=".mid,.midi" style="display: none;" onchange="handleMidiFile(event)">
-                    <button class="btn btn-secondary" onclick="document.getElementById('midiFileInput').click()" style="width: 100%;">📁 选择 MIDI 文件</button>
-                    <div id="midiStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 5px; text-align: center;"></div>
+                <!-- 情绪专属文件上传区域 -->
+                <div id="emotionFilePanel" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span id="emotionPanelTitle" style="font-weight: 600; color: var(--primary);">😊 开心 - 专属文件</span>
+                        <button onclick="closeEmotionPanel()" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.2rem;">✕</button>
+                    </div>
+                    
+                    <div id="emotionFileList" style="margin-bottom: 12px; font-size: 0.8rem; color: var(--text-dim);">
+                        <p>暂无专属文件</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <input type="file" id="emotionMidiInput" accept=".mid,.midi" style="display: none;" onchange="handleEmotionMidi(event)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('emotionMidiInput').click()" style="flex: 1; font-size: 0.8rem;">📁 上传 MIDI</button>
+                        
+                        <input type="file" id="emotionAudioInput" accept="audio/*" style="display: none;" onchange="handleEmotionAudio(event)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('emotionAudioInput').click()" style="flex: 1; font-size: 0.8rem;">🎵 上传音频</button>
+                    </div>
+                    
+                    <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
                 </div>
 
                 <div class="panel-title">演奏历史</div>
@@ -959,6 +975,187 @@
             'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
             'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
         };
+
+        // ==================== 情绪专属文件系统 ====================
+        
+        // 情绪配置 - 每个情绪可以有专属的 MIDI 或音频文件
+        const emotionFiles = {
+            happy: {
+                name: '开心',
+                emoji: '😊',
+                color: 'linear-gradient(135deg, #ff6b9d, #feca57)',
+                midi: null,      // { name: '文件名', data: ArrayBuffer }
+                audio: null,     // { name: '文件名', buffer: AudioBuffer }
+                parsedMidi: null // 解析后的 MIDI 数据
+            }
+            // 可以在这里添加更多情绪：sad, excited, calm, mysterious...
+        };
+        
+        let currentEmotion = null;  // 当前选中的情绪
+        
+        // 选择情绪（显示上传面板）
+        function selectEmotion(emotionKey) {
+            currentEmotion = emotionKey;
+            const emotion = emotionFiles[emotionKey];
+            
+            if (!emotion) return;
+            
+            // 更新面板标题
+            document.getElementById('emotionPanelTitle').textContent = `${emotion.emoji} ${emotion.name} - 专属文件`;
+            document.getElementById('emotionPanelTitle').style.background = emotion.color;
+            document.getElementById('emotionPanelTitle').style.webkitBackgroundClip = 'text';
+            document.getElementById('emotionPanelTitle').style.webkitTextFillColor = 'transparent';
+            
+            // 显示面板
+            document.getElementById('emotionFilePanel').style.display = 'block';
+            
+            // 更新文件列表显示
+            updateEmotionFileList(emotionKey);
+            
+            // 播放该情绪
+            playPreset(emotionKey);
+        }
+        
+        // 关闭情绪面板
+        function closeEmotionPanel() {
+            document.getElementById('emotionFilePanel').style.display = 'none';
+            currentEmotion = null;
+        }
+        
+        // 更新情绪文件列表显示
+        function updateEmotionFileList(emotionKey) {
+            const emotion = emotionFiles[emotionKey];
+            const listDiv = document.getElementById('emotionFileList');
+            
+            let html = '';
+            if (emotion.midi) {
+                html += `<p>🎹 MIDI: ${emotion.midi.name} <button onclick="clearEmotionFile('${emotionKey}', 'midi')" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
+            }
+            if (emotion.audio) {
+                html += `<p>🎵 音频: ${emotion.audio.name} <button onclick="clearEmotionFile('${emotionKey}', 'audio')" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
+            }
+            if (!emotion.midi && !emotion.audio) {
+                html = '<p>暂无专属文件，请上传 MIDI 或音频</p>';
+            }
+            
+            listDiv.innerHTML = html;
+        }
+        
+        // 清除情绪文件
+        function clearEmotionFile(emotionKey, type) {
+            if (emotionFiles[emotionKey]) {
+                emotionFiles[emotionKey][type] = null;
+                if (type === 'midi') {
+                    emotionFiles[emotionKey].parsedMidi = null;
+                }
+                updateEmotionFileList(emotionKey);
+                document.getElementById('emotionFileStatus').textContent = `已删除 ${type === 'midi' ? 'MIDI' : '音频'} 文件`;
+            }
+        }
+        
+        // 处理情绪专属 MIDI 上传
+        async function handleEmotionMidi(event) {
+            if (!currentEmotion) return;
+            
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('emotionFileStatus');
+            statusDiv.textContent = '正在解析 MIDI...';
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const midiData = parseMidi(arrayBuffer);
+                
+                emotionFiles[currentEmotion].midi = {
+                    name: file.name,
+                    data: arrayBuffer
+                };
+                emotionFiles[currentEmotion].parsedMidi = midiData;
+                
+                updateEmotionFileList(currentEmotion);
+                statusDiv.textContent = `✅ MIDI 文件已保存到 ${emotionFiles[currentEmotion].name}`;
+                
+                // 清空 input 以便可以重新上传同名文件
+                event.target.value = '';
+            } catch (err) {
+                console.error('MIDI 解析错误:', err);
+                statusDiv.textContent = '❌ 解析失败: ' + err.message;
+            }
+        }
+        
+        // 处理情绪专属音频上传
+        async function handleEmotionAudio(event) {
+            if (!currentEmotion || !audioContext) return;
+            
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('emotionFileStatus');
+            statusDiv.textContent = '正在解码音频...';
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                emotionFiles[currentEmotion].audio = {
+                    name: file.name,
+                    buffer: audioBuffer
+                };
+                
+                updateEmotionFileList(currentEmotion);
+                statusDiv.textContent = `✅ 音频文件已保存到 ${emotionFiles[currentEmotion].name}`;
+                
+                // 清空 input
+                event.target.value = '';
+            } catch (err) {
+                console.error('音频解码错误:', err);
+                statusDiv.textContent = '❌ 解码失败: ' + err.message;
+            }
+        }
+        
+        // 播放情绪专属内容
+        async function playEmotionContent(emotionKey) {
+            const emotion = emotionFiles[emotionKey];
+            if (!emotion) return false;
+            
+            // 优先播放音频（如果有）
+            if (emotion.audio && emotion.audio.buffer) {
+                playEmotionAudio(emotion.audio.buffer);
+                return true;
+            }
+            
+            // 其次播放 MIDI（如果有）
+            if (emotion.parsedMidi) {
+                playMidi(emotion.parsedMidi);
+                return true;
+            }
+            
+            return false;  // 没有专属文件
+        }
+        
+        // 播放音频文件
+        function playEmotionAudio(audioBuffer) {
+            if (!audioContext) return;
+            
+            const source = audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = params.masterVolume;
+            
+            source.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            source.start();
+            updateSpectrum();
+            
+            // 播放完成后更新状态
+            source.onended = () => {
+                document.getElementById('statusText').textContent = '情绪音频播放完成';
+            };
+        }
 
         // 情感关键词
         const emotionKeywords = {
@@ -1807,6 +2004,32 @@
 
         // 预设
         function playPreset(type) {
+            // 检查是否是情绪类型且有专属文件
+            if (emotionFiles[type]) {
+                // 先尝试播放情绪专属内容
+                const hasCustomFile = playEmotionContent(type);
+                if (hasCustomFile) {
+                    // 如果有专属文件，设置文本但不播放文字转音乐
+                    const presets = {
+                        hello: '你好，很高兴认识你',
+                        goodmorning: '早上好，愿你有个美好的一天',
+                        iloveyou: '我爱你，永远永远',
+                        happybirthday: '生日快乐，祝你心想事成',
+                        goodnight: '晚安，愿你有个甜美的梦',
+                        thankyou: '谢谢你的帮助和关心',
+                        congrats: '恭喜你，真是太棒了',
+                        goodluck: '祝你好运，相信自己',
+                        happy: '今天真开心！世界真美好！加油！耶！'
+                    };
+                    document.getElementById('textInput').value = presets[type] || '';
+                    if (type === 'happy') {
+                        adjustParamsByEmotion('happy');
+                    }
+                    return;  // 已经播放了专属内容，不需要再播放文字
+                }
+            }
+            
+            // 默认播放文字转音乐
             const presets = {
                 hello: '你好，很高兴认识你',
                 goodmorning: '早上好，愿你有个美好的一天',
