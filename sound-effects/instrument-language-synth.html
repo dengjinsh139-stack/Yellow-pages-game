@@ -1119,13 +1119,13 @@
         function playNoteKey(noteInfo, keyElement) {
             keyElement.classList.add('active');
             
-            // 获取用户调节的音量 (默认0.7 * noteVolumes)
-            const userVolume = 0.7 * (noteVolumes[noteInfo.note] || 1.0);
+            // 基础演奏力度，用户调节在 playSampleTone 中应用
+            const baseVelocity = 0.7;
             
             if (currentInstrument === 'piano' && samplesLoaded) {
-                playSampleTone(noteInfo.freq, 0.5, userVolume);
+                playSampleTone(noteInfo.freq, 0.5, baseVelocity);
             } else {
-                playSynthTone(noteInfo.freq, 0.5, userVolume);
+                playSynthTone(noteInfo.freq, 0.5, baseVelocity * (noteVolumes[noteInfo.note] || 1.0));
             }
             
             // 添加到历史
@@ -1368,18 +1368,22 @@
             const playbackRate = targetFrequency / nearestFreq;
             source.playbackRate.value = playbackRate;
             
-            // 音量计算：只使用用户调节的音量，不再叠加预设补偿
-            // velocity 已经包含了用户调节 (0.7 * noteVolumes[noteName])
-            const compensatedVelocity = velocity;
+            // 音量计算：基础补偿 * 用户调节 * 演奏力度
+            // 1. baseGain: 基于RMS测量让各采样响度一致
+            // 2. noteVolumes: 用户独立调节 (默认1.0)
+            // 3. velocity: 演奏力度参数
+            const baseGain = sampleConfig.piano.samples[sampleNote].gain || 1.0;
+            const userGain = noteVolumes[sampleNote] || 1.0;
+            const finalVelocity = velocity * baseGain * userGain;
             
             // 增益节点
             const gainNode = audioContext.createGain();
-            gainNode.gain.value = compensatedVelocity;
+            gainNode.gain.value = finalVelocity;
             
             // 包络
             const now = audioContext.currentTime;
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(compensatedVelocity, now + 0.01);
+            gainNode.gain.linearRampToValueAtTime(finalVelocity, now + 0.01);
             gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
             
             // 混响
