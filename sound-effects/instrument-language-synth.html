@@ -1114,49 +1114,104 @@
             }
         }
         
-        // 播放情绪专属内容
-        async function playEmotionContent(emotionKey) {
+        // 播放情绪专属内容（异步版本，等待完成）
+        async function playEmotionContentAsync(emotionKey) {
             const emotion = emotionFiles[emotionKey];
             if (!emotion) return false;
             
-            // 优先播放音频（如果有）
+            // 优先播放音频（如果有）- 等待播放完成
             if (emotion.audio && emotion.audio.buffer) {
-                playEmotionAudio(emotion.audio.buffer);
+                await playEmotionAudioAsync(emotion.audio.buffer);
                 return true;
             }
             
-            // 其次播放 MIDI（如果有）
+            // 其次播放 MIDI（如果有）- 等待播放完成
             if (emotion.parsedMidi) {
-                playMidi(emotion.parsedMidi);
+                await playMidiAsync(emotion.parsedMidi);
                 return true;
             }
             
             return false;  // 没有专属文件
         }
         
-        // 播放音频文件
-        function playEmotionAudio(audioBuffer) {
-            if (!audioContext) return;
-            
-            const source = audioContext.createBufferSource();
-            source.buffer = audioBuffer;
-            
-            const gainNode = audioContext.createGain();
-            gainNode.gain.value = params.masterVolume;
-            
-            source.connect(gainNode);
-            gainNode.connect(analyser);
-            analyser.connect(audioContext.destination);
-            
-            source.start();
-            updateSpectrum();
-            
-            // 播放完成后更新状态
-            source.onended = () => {
-                document.getElementById('statusText').textContent = '情绪音频播放完成';
-            };
+        // 播放音频文件（异步，等待完成）
+        function playEmotionAudioAsync(audioBuffer) {
+            return new Promise((resolve) => {
+                if (!audioContext) {
+                    resolve();
+                    return;
+                }
+                
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = params.masterVolume;
+                
+                source.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioContext.destination);
+                
+                source.start();
+                updateSpectrum();
+                
+                // 播放完成后 resolve
+                source.onended = () => {
+                    resolve();
+                };
+            });
         }
-
+        
+        // 播放 MIDI（异步，等待完成）
+        function playMidiAsync(midiData) {
+            return new Promise(async (resolve) => {
+                if (currentInstrument === 'piano' && !samplesLoaded) {
+                    resolve();
+                    return;
+                }
+                
+                // 合并所有音轨的音符开事件
+                const allNotes = [];
+                for (const track of midiData.tracks) {
+                    for (const event of track) {
+                        if (event.type === 'noteOn') {
+                            allNotes.push(event);
+                        }
+                    }
+                }
+                
+                // 按时间排序
+                allNotes.sort((a, b) => a.time - b.time);
+                
+                // 计算时间比例（将 MIDI tick 转换为毫秒）
+                const msPerTick = 60000 / (120 * midiData.timeDivision);
+                
+                // 依次演奏
+                let lastTime = 0;
+                for (let i = 0; i < allNotes.length; i++) {
+                    const note = allNotes[i];
+                    const waitMs = (note.time - lastTime) * msPerTick;
+                    
+                    if (waitMs > 0) {
+                        await sleep(waitMs);
+                    }
+                    lastTime = note.time;
+                    
+                    // 映射到五声音阶
+                    const pentatonicNote = mapToPentatonic(note.note);
+                    const freq = midiToFreq[pentatonicNote];
+                    const noteName = noteNumberToName(pentatonicNote);
+                    
+                    if (freq) {
+                        const velocity = (note.velocity / 127) * params.masterVolume;
+                        playTone(freq, noteName, params.noteDuration, velocity);
+                    }
+                }
+                
+                resolve();
+            });
+        }
+        
         // 情感关键词
         const emotionKeywords = {
             happy: ['好', '棒', '喜', '乐', '爱', 'happy', 'good', 'great', 'love', 'wonderful'],
@@ -1878,6 +1933,24 @@
             
             // 根据情感调整参数
             adjustParamsByEmotion(emotion);
+            
+            // ===== 智能情绪预设 =====
+            // 如果检测到有情绪专属文件，播放情绪专属内容
+            if (emotionFiles[emotion]) {
+                // 选中该情绪（显示面板）
+                selectEmotion(emotion);
+                
+                // 尝试播放情绪专属内容
+                const hasCustomFile = await playEmotionContentAsync(emotion);
+                if (hasCustomFile) {
+                    // 如果有专属文件，播放完成后结束
+                    document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
+                    addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
+                    isPlaying = false;
+                    return;
+                }
+                // 如果没有专属文件，继续播放文字转音乐
+            }
             
             // 转换为音符
             const notes = textToNotes(text);
