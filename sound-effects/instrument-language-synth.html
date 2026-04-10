@@ -1339,16 +1339,16 @@
             if (!audioContext || !samplesLoaded) return;
             
             // 找到最近的采样
-            const freqToNote = {};
+            const freqToSampleNote = {};
             for (const [note, info] of Object.entries(sampleConfig.piano.samples)) {
-                freqToNote[info.freq] = note;
+                freqToSampleNote[info.freq] = note;
             }
             
             // 找到最接近目标频率的采样
             let nearestFreq = 440;
             let minDiff = Infinity;
             
-            for (const freq of Object.keys(freqToNote).map(f => parseFloat(f))) {
+            for (const freq of Object.keys(freqToSampleNote).map(f => parseFloat(f))) {
                 const diff = Math.abs(freq - targetFrequency);
                 if (diff < minDiff) {
                     minDiff = diff;
@@ -1356,7 +1356,7 @@
                 }
             }
             
-            const sampleNote = freqToNote[nearestFreq];
+            const sampleNote = freqToSampleNote[nearestFreq];
             const buffer = audioBuffers[sampleNote];
             
             if (!buffer) {
