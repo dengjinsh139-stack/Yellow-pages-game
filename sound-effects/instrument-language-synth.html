@@ -1684,8 +1684,9 @@
                     continue;
                 }
                 
-                // 应用全局音量
-                const velocityWithMaster = note.velocity * params.masterVolume;
+                // 应用全局音量 + 音符独立音量
+                const userVolume = noteVolumes[note.note] || 1.0;
+                const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
                 
                 // 播放单音
                 playTone(note.frequency, note.note, note.duration, velocityWithMaster);
