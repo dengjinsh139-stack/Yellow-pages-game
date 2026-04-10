@@ -902,12 +902,12 @@
         const params = {
             baseFreq: 262,      // C4
             tempo: 300,         // ms per note (基准值)
-            tempoMin: 200,      // 最小间隔 (ms)
-            tempoMax: 400,      // 最大间隔 (ms)
+            tempoMin: 300,      // 最小间隔 (ms) - 增加让音符更清晰
+            tempoMax: 500,      // 最大间隔 (ms)
             tempoRandom: true,  // 是否启用随机间隔
             masterVolume: 1.0,  // 全局音量 (0-2)
-            noteDuration: 300,
-            reverb: 0.3
+            noteDuration: 400,  // 音符时长增加
+            reverb: 0.2         // 减少混响避免浑浊
         };
 
         // 采样配置 - 五声音阶 D E G A B
@@ -916,19 +916,18 @@
                 name: '钢琴',
                 emoji: '🎹',
                 basePath: '../assets/audio/samples/piano/',
-                outputGain: 2.0,  // 整体输出增益
                 samples: {
-                    // 基于RMS测量的精确增益补偿 + 心理声学额外补偿 + 输出增益2x
-                    'D4': { file: 'D4.wav', freq: 293.66, gain: 2.16 },  // 1.08 * 2
-                    'E4': { file: 'E4.wav', freq: 329.63, gain: 2.06 },  // 1.03 * 2
-                    'F4': { file: 'F4.wav', freq: 349.23, gain: 2.06 },  // 1.03 * 2
-                    'A4': { file: 'A4.wav', freq: 440.00, gain: 2.02 },  // 1.01 * 2
-                    'B4': { file: 'B4.wav', freq: 493.88, gain: 3.64 },  // 1.82 * 2
-                    'D5': { file: 'D5.wav', freq: 587.33, gain: 3.82 },  // 1.91 * 2
-                    'E5': { file: 'E5.wav', freq: 659.25, gain: 6.32 },  // 3.16 * 2
-                    'F5': { file: 'F5.wav', freq: 698.46, gain: 2.82 },  // 1.41 * 2
-                    'A5': { file: 'A5.wav', freq: 880.00, gain: 4.56 },  // 2.28 * 2
-                    'B5': { file: 'B5.wav', freq: 987.77, gain: 3.50 }   // 1.75 * 2
+                    // 优化后的增益值，避免削波同时保持音量平衡
+                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.5 },
+                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.5 },
+                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.5 },
+                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.5 },
+                    'B4': { file: 'B4.wav', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.wav', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.wav', freq: 659.25, gain: 2.5 },
+                    'F5': { file: 'F5.wav', freq: 698.46, gain: 1.8 },
+                    'A5': { file: 'A5.wav', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.wav', freq: 987.77, gain: 2.0 }
                 },
                 attack: 0.01,
                 release: 0.3
@@ -1509,13 +1508,21 @@
             
             // 增益节点
             const gainNode = audioContext.createGain();
-            gainNode.gain.value = finalVelocity;
+            // 限制最大增益防止削波，但保持相对音量差异
+            const maxGain = 3.0;  // 最大3倍增益
+            const clampedVelocity = Math.min(finalVelocity, maxGain);
+            gainNode.gain.value = clampedVelocity;
             
-            // 包络
+            // 包络 - 使用更长的衰减让音符更清晰
             const now = audioContext.currentTime;
+            const attackTime = 0.005;  // 5ms快速起音
+            const holdTime = Math.min(duration * 0.3, 0.1);  // 保持阶段
+            const decayTime = duration * 0.7;  // 衰减阶段
+            
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(finalVelocity, now + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            gainNode.gain.linearRampToValueAtTime(clampedVelocity, now + attackTime);
+            gainNode.gain.setValueAtTime(clampedVelocity, now + attackTime + holdTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + attackTime + holdTime + decayTime);
             
             // 混响
             let reverbGain = null;
