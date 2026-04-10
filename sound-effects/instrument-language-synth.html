@@ -1114,6 +1114,46 @@
             }
         }
         
+        // 同步版本的情绪内容播放检查（用于playPreset）
+        function playEmotionContent(emotionKey) {
+            const emotion = emotionFiles[emotionKey];
+            if (!emotion) return false;
+            
+            // 检查是否有可用的音频/MIDI
+            const hasAudio = emotion.audio && emotion.audio.buffer;
+            const hasMidi = emotion.parsedMidi;
+            
+            if (hasAudio) {
+                // 异步播放但不等待
+                playEmotionContentAsync(emotionKey);
+                return true;
+            }
+            if (hasMidi) {
+                // 异步播放但不等待
+                playEmotionContentAsync(emotionKey);
+                return true;
+            }
+            
+            return false;  // 没有专属文件
+        }
+            const emotion = emotionFiles[emotionKey];
+            if (!emotion) return false;
+            
+            // 优先播放音频（如果有）- 等待播放完成
+            if (emotion.audio && emotion.audio.buffer) {
+                await playEmotionAudioAsync(emotion.audio.buffer);
+                return true;
+            }
+            
+            // 其次播放 MIDI（如果有）- 等待播放完成
+            if (emotion.parsedMidi) {
+                await playMidiAsync(emotion.parsedMidi);
+                return true;
+            }
+            
+            return false;  // 没有专属文件
+        }
+        
         // 播放情绪专属内容（异步版本，等待完成）
         async function playEmotionContentAsync(emotionKey) {
             const emotion = emotionFiles[emotionKey];
@@ -2032,48 +2072,52 @@
             
             // 依次演奏
             console.log('开始演奏，音符数量:', notes.length);
-            for (let i = 0; i < notes.length; i++) {
-                if (!isPlaying) {
-                    console.log('演奏被中断');
-                    break;
+            try {
+                for (let i = 0; i < notes.length; i++) {
+                    if (!isPlaying) {
+                        console.log('演奏被中断');
+                        break;
+                    }
+                    
+                    const note = notes[i];
+                    
+                    // 休止符处理
+                    if (note.isRest) {
+                        console.log(`第 ${i+1} 个是休止符，等待 ${note.duration}ms`);
+                        await sleep(note.duration);
+                        continue;
+                    }
+                    
+                    // 应用全局音量 + 音符独立音量
+                    const userVolume = noteVolumes[note.note] || 1.0;
+                    const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
+                    
+                    console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 频率=${note.frequency.toFixed(2)}, 音量=${velocityWithMaster.toFixed(2)}`);
+                    
+                    // 播放单音
+                    playTone(note.frequency, note.note, note.duration, velocityWithMaster);
+                    
+                    // 高亮当前音符
+                    highlightNote(i);
+                    
+                    // 计算等待时间（支持随机区间）
+                    let waitTime;
+                    if (params.tempoRandom) {
+                        // 在 min-max 之间随机
+                        waitTime = Math.floor(Math.random() * (params.tempoMax - params.tempoMin + 1)) + params.tempoMin;
+                    } else {
+                        // 使用固定基准值
+                        waitTime = params.tempo;
+                    }
+                    await sleep(waitTime + (note.pause ? 200 : 0));
                 }
-                
-                const note = notes[i];
-                
-                // 休止符处理
-                if (note.isRest) {
-                    console.log(`第 ${i+1} 个是休止符，等待 ${note.duration}ms`);
-                    await sleep(note.duration);
-                    continue;
-                }
-                
-                // 应用全局音量 + 音符独立音量
-                const userVolume = noteVolumes[note.note] || 1.0;
-                const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
-                
-                console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 频率=${note.frequency.toFixed(2)}, 音量=${velocityWithMaster.toFixed(2)}`);
-                
-                // 播放单音
-                playTone(note.frequency, note.note, note.duration, velocityWithMaster);
-                
-                // 高亮当前音符
-                highlightNote(i);
-                
-                // 计算等待时间（支持随机区间）
-                let waitTime;
-                if (params.tempoRandom) {
-                    // 在 min-max 之间随机
-                    waitTime = Math.floor(Math.random() * (params.tempoMax - params.tempoMin + 1)) + params.tempoMin;
-                } else {
-                    // 使用固定基准值
-                    waitTime = params.tempo;
-                }
-                await sleep(waitTime + (note.pause ? 200 : 0));
+            } catch (err) {
+                console.error('演奏过程中出错:', err);
+            } finally {
+                isPlaying = false;
+                document.getElementById('statusText').textContent = '演奏完成';
+                addToHistory(text.substring(0, 20) + (text.length > 20 ? '...' : ''));
             }
-            
-            isPlaying = false;
-            document.getElementById('statusText').textContent = '演奏完成';
-            addToHistory(text.substring(0, 20) + (text.length > 20 ? '...' : ''));
         }
 
         // 根据情感调整参数
