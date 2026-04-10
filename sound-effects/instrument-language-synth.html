@@ -1225,31 +1225,40 @@
 
         // 初始化
         async function initAudio() {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 2048;
-            
-            canvas = document.getElementById('visualizer');
-            canvasCtx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                
+                canvas = document.getElementById('visualizer');
+                canvasCtx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
 
-            createSpectrumBars();
-            visualize();
-            
-            // 加载采样
-            document.getElementById('statusText').textContent = '加载采样中...';
-            await loadSamples();
-            
-            // 加载默认情绪音频
-            await loadDefaultEmotionAudio();
-            
-            // 生成音符键盘
-            generateNoteKeyboard();
-            
-            document.getElementById('startOverlay').classList.add('hidden');
-            document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
-            addToHistory('真实钢琴音色已加载');
+                createSpectrumBars();
+                visualize();
+                
+                // 加载采样
+                document.getElementById('statusText').textContent = '加载采样中...';
+                await loadSamples();
+                
+                // 加载默认情绪音频（不阻塞，失败也没关系）
+                document.getElementById('statusText').textContent = '加载情绪音频...';
+                loadDefaultEmotionAudio().catch(err => {
+                    console.error('情绪音频加载失败（非致命）:', err);
+                });
+                
+                // 生成音符键盘
+                generateNoteKeyboard();
+                
+                document.getElementById('startOverlay').classList.add('hidden');
+                document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
+                addToHistory('真实钢琴音色已加载');
+            } catch (err) {
+                console.error('音频引擎启动失败:', err);
+                document.getElementById('statusText').textContent = '音频引擎启动失败: ' + err.message;
+                alert('无法启动音频引擎，请检查浏览器是否支持Web Audio API');
+            }
         }
 
         // 加载采样文件
@@ -1276,25 +1285,30 @@
 
         // 加载默认情绪音频
         async function loadDefaultEmotionAudio() {
+            console.log('开始加载默认情绪音频...');
             for (const [emotionKey, emotion] of Object.entries(emotionFiles)) {
                 if (emotion.defaultAudio && !emotion.audio) {
                     try {
+                        console.log(`尝试加载 ${emotionKey}: ${emotion.defaultAudio}`);
                         const response = await fetch(emotion.defaultAudio);
-                        if (response.ok) {
-                            const arrayBuffer = await response.arrayBuffer();
-                            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                            emotion.audio = {
-                                name: '默认音频',
-                                buffer: audioBuffer
-                            };
-                            console.log(`Loaded default audio for ${emotionKey}`);
+                        if (!response.ok) {
+                            console.warn(`无法加载 ${emotionKey}: HTTP ${response.status}`);
+                            continue;
                         }
+                        const arrayBuffer = await response.arrayBuffer();
+                        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                        emotion.audio = {
+                            name: '默认音频',
+                            buffer: audioBuffer
+                        };
+                        console.log(`✅ 已加载默认音频 for ${emotionKey}`);
                     } catch (err) {
-                        console.error(`Failed to load default audio for ${emotionKey}:`, err);
+                        console.error(`❌ 加载 ${emotionKey} 失败:`, err.message);
                     }
                 }
             }
             emotionAudioLoaded = true;
+            console.log('默认情绪音频加载完成');
         }
 
         // 创建频谱条
