@@ -1242,11 +1242,13 @@
                 document.getElementById('statusText').textContent = '加载采样中...';
                 await loadSamples();
                 
-                // 加载默认情绪音频（不阻塞，失败也没关系）
+                // 加载默认情绪音频（等待完成）
                 document.getElementById('statusText').textContent = '加载情绪音频...';
-                loadDefaultEmotionAudio().catch(err => {
+                try {
+                    await loadDefaultEmotionAudio();
+                } catch (err) {
                     console.error('情绪音频加载失败（非致命）:', err);
-                });
+                }
                 
                 // 生成音符键盘
                 generateNoteKeyboard();
@@ -1981,19 +1983,30 @@
             // ===== 智能情绪预设 =====
             // 如果检测到有情绪专属文件，播放情绪专属内容
             if (emotionFiles[emotion]) {
-                // 选中该情绪（显示面板）
-                selectEmotion(emotion);
+                console.log(`检测到情绪: ${emotion}，检查专属文件...`);
                 
-                // 尝试播放情绪专属内容
-                const hasCustomFile = await playEmotionContentAsync(emotion);
-                if (hasCustomFile) {
-                    // 如果有专属文件，播放完成后结束
-                    document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
-                    addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
-                    isPlaying = false;
-                    return;
+                // 检查该情绪是否有可用的音频/MIDI
+                const emotionData = emotionFiles[emotion];
+                const hasAudio = emotionData.audio && emotionData.audio.buffer;
+                const hasMidi = emotionData.parsedMidi;
+                
+                if (hasAudio || hasMidi) {
+                    console.log(`发现 ${emotion} 的专属文件，准备播放...`);
+                    // 选中该情绪（显示面板）
+                    selectEmotion(emotion);
+                    
+                    // 尝试播放情绪专属内容
+                    const played = await playEmotionContentAsync(emotion);
+                    if (played) {
+                        // 如果有专属文件，播放完成后结束
+                        document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
+                        addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
+                        isPlaying = false;
+                        return;
+                    }
+                } else {
+                    console.log(`${emotion} 暂无专属文件，使用文字转音乐`);
                 }
-                // 如果没有专属文件，继续播放文字转音乐
             }
             
             // 转换为音符
