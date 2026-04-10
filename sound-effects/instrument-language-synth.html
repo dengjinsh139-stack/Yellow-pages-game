@@ -916,19 +916,19 @@
                 name: '钢琴',
                 emoji: '🎹',
                 basePath: '../assets/audio/samples/piano/',
+                outputGain: 2.0,  // 整体输出增益
                 samples: {
-                    // 基于RMS测量的精确增益补偿 + 心理声学额外补偿
-                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.08 },
-                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.03 },
-                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.03 },
-                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.01 },
-                    // B4-B5 额外 +3dB (1.414倍) 补偿感知音量不足
-                    'B4': { file: 'B4.wav', freq: 493.88, gain: 1.82 },  // 1.29 * 1.414
-                    'D5': { file: 'D5.wav', freq: 587.33, gain: 1.91 },  // 1.35 * 1.414
-                    'E5': { file: 'E5.wav', freq: 659.25, gain: 3.16 },  // +10dB
-                    'F5': { file: 'F5.wav', freq: 698.46, gain: 1.41 },  // 1.00 * 1.414
-                    'A5': { file: 'A5.wav', freq: 880.00, gain: 2.28 },  // 1.61 * 1.414
-                    'B5': { file: 'B5.wav', freq: 987.77, gain: 1.75 }   // 1.24 * 1.414
+                    // 基于RMS测量的精确增益补偿 + 心理声学额外补偿 + 输出增益2x
+                    'D4': { file: 'D4.wav', freq: 293.66, gain: 2.16 },  // 1.08 * 2
+                    'E4': { file: 'E4.wav', freq: 329.63, gain: 2.06 },  // 1.03 * 2
+                    'F4': { file: 'F4.wav', freq: 349.23, gain: 2.06 },  // 1.03 * 2
+                    'A4': { file: 'A4.wav', freq: 440.00, gain: 2.02 },  // 1.01 * 2
+                    'B4': { file: 'B4.wav', freq: 493.88, gain: 3.64 },  // 1.82 * 2
+                    'D5': { file: 'D5.wav', freq: 587.33, gain: 3.82 },  // 1.91 * 2
+                    'E5': { file: 'E5.wav', freq: 659.25, gain: 6.32 },  // 3.16 * 2
+                    'F5': { file: 'F5.wav', freq: 698.46, gain: 2.82 },  // 1.41 * 2
+                    'A5': { file: 'A5.wav', freq: 880.00, gain: 4.56 },  // 2.28 * 2
+                    'B5': { file: 'B5.wav', freq: 987.77, gain: 3.50 }   // 1.75 * 2
                 },
                 attack: 0.01,
                 release: 0.3
