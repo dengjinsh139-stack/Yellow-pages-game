@@ -1274,8 +1274,8 @@
             source.playbackRate.value = playbackRate;
             
             // 音量补偿：高频需要更大的增益
-            // 基准是A4(440Hz)，每高一个八度增益增加40%
-            const volumeCompensation = Math.pow(1.4, Math.log2(targetFrequency / 440));
+            // 基准是A4(440Hz)，每高一个八度增益增加60%（原来是40%，不够）
+            const volumeCompensation = Math.pow(1.6, Math.log2(targetFrequency / 440));
             const compensatedVelocity = Math.min(velocity * volumeCompensation, 1.0);
             
             // 增益节点
