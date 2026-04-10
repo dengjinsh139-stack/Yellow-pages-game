@@ -807,7 +807,7 @@
                 </div>
 
                 <div class="btn-grid">
-                    <button class="btn" onclick="playText()">▶ 演奏文字</button>
+                    <button class="btn" onclick="testPlayText()">▶ 演奏文字</button>
                     <button class="btn btn-secondary" onclick="playRandomText()">🎲 随机示例</button>
                     <button class="btn btn-secondary" onclick="clearText()">🗑️ 清空</button>
                     <button class="btn btn-secondary" onclick="stopPlaying()">⏹ 停止</button>
@@ -1921,6 +1921,22 @@
             osc.stop(now + duration + 0.1);
             
             updateSpectrum();
+        }
+
+        // 测试演奏按钮
+        function testPlayText() {
+            console.log('=== 测试按钮点击 ===');
+            console.log('audioContext:', audioContext);
+            console.log('audioContext state:', audioContext ? audioContext.state : 'null');
+            console.log('samplesLoaded:', samplesLoaded);
+            console.log('isPlaying:', isPlaying);
+            console.log('currentInstrument:', currentInstrument);
+            
+            const text = document.getElementById('textInput').value.trim();
+            console.log('输入文本:', text);
+            
+            // 直接调用 playText
+            playText();
         }
 
         // 演奏文本
