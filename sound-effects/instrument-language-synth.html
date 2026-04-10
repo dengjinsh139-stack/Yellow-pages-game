@@ -894,17 +894,18 @@
                 emoji: '🎹',
                 basePath: '../assets/audio/samples/piano/',
                 samples: {
-                    // 基于RMS测量的精确增益补偿
+                    // 基于RMS测量的精确增益补偿 + 心理声学额外补偿
                     'D4': { file: 'D4.wav', freq: 293.66, gain: 1.08 },
                     'E4': { file: 'E4.wav', freq: 329.63, gain: 1.03 },
                     'F4': { file: 'F4.wav', freq: 349.23, gain: 1.03 },
                     'A4': { file: 'A4.wav', freq: 440.00, gain: 1.01 },
-                    'B4': { file: 'B4.wav', freq: 493.88, gain: 1.29 },
-                    'D5': { file: 'D5.wav', freq: 587.33, gain: 1.35 },
-                    'E5': { file: 'E5.wav', freq: 659.25, gain: 1.04 },
-                    'F5': { file: 'F5.wav', freq: 698.46, gain: 1.00 },
-                    'A5': { file: 'A5.wav', freq: 880.00, gain: 1.61 },
-                    'B5': { file: 'B5.wav', freq: 987.77, gain: 1.24 }
+                    // B4-B5 额外 +3dB (1.414倍) 补偿感知音量不足
+                    'B4': { file: 'B4.wav', freq: 493.88, gain: 1.82 },  // 1.29 * 1.414
+                    'D5': { file: 'D5.wav', freq: 587.33, gain: 1.91 },  // 1.35 * 1.414
+                    'E5': { file: 'E5.wav', freq: 659.25, gain: 1.47 },  // 1.04 * 1.414
+                    'F5': { file: 'F5.wav', freq: 698.46, gain: 1.41 },  // 1.00 * 1.414
+                    'A5': { file: 'A5.wav', freq: 880.00, gain: 2.28 },  // 1.61 * 1.414
+                    'B5': { file: 'B5.wav', freq: 987.77, gain: 1.75 }   // 1.24 * 1.414
                 },
                 attack: 0.01,
                 release: 0.3
