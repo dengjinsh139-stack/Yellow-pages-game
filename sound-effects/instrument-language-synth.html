@@ -1314,18 +1314,18 @@
         // 声调映射到音高区域
         // 0=轻声, 1=阴平, 2=阳平, 3=上声, 4=去声
         function getToneRegion(tone) {
-            // 音高区域映射
-            // 一声（阴平）：高平 D4(293.66) → F4(349.23)
-            // 二声（阳平）：上行 F4(349.23) → B4(493.88)  
-            // 三声（上声）：下行-上行 D5(587.33) → F5(698.46)
-            // 四声（去声）：下行 F5(698.46) → B5(987.77)
+            // 音高区域映射 - 区间内随机选择
+            // 一声（阴平）：D4→F4 范围（D4, E4, F4）
+            // 二声（阳平）：F4→B4 范围（F4, G4, A4, B4）
+            // 三声（上声）：D5→F5 范围（D5, E5, F5）
+            // 四声（去声）：F5→B5 范围（F5, G5, A5, B5）
             // 轻声：延续前音或休止
             const regions = {
-                0: { base: 'D4', range: 0, glide: false, rest: true },      // 轻声 - 休止或延续
-                1: { base: 'D4', range: 2, glide: true, rest: false },     // 阴平 - 高平 D4→F4
-                2: { base: 'F4', range: 3, glide: true, rest: false },     // 阳平 - 上行 F4→B4
-                3: { base: 'D5', range: 2, glide: true, rest: false },     // 上声 - 下行-上行 D5→F5
-                4: { base: 'F5', range: 3, glide: true, rest: false }      // 去声 - 下行 F5→B5
+                0: { notes: ['rest'], rest: true },                    // 轻声 - 休止
+                1: { notes: ['D4', 'E4', 'F4'], rest: false },         // 阴平 - D4到F4随机
+                2: { notes: ['F4', 'G4', 'A4', 'B4'], rest: false },   // 阳平 - F4到B4随机
+                3: { notes: ['D5', 'E5', 'F5'], rest: false },         // 上声 - D5到F5随机
+                4: { notes: ['F5', 'G5', 'A5', 'B5'], rest: false }    // 去声 - F5到B5随机
             };
             return regions[tone] || regions[1];
         }
@@ -1341,7 +1341,7 @@
             return (code % 4) + 1;
         }
 
-        // 字符转音符（五声音阶 + 声调映射版）
+        // 字符转音符（五声音阶 + 声调映射版 - 区间内随机）
         function charToNote(char, index) {
             // 五声音阶频率表
             const pentatonicFreqs = {
@@ -1358,7 +1358,7 @@
             const tone = getCharTone(char);
             const region = getToneRegion(tone);
             
-            // 轻声处理
+            // 轻声处理（休止）
             if (region.rest) {
                 return {
                     char: char,
@@ -1367,56 +1367,27 @@
                     duration: params.noteDuration * 0.5,
                     velocity: 0,
                     sampleNote: null,
-                    isRest: true
-                };
-            }
-            
-            // 根据音高区域选择音符
-            const pentatonicNotes = ['D', 'E', 'F', 'G', 'A', 'B'];
-            const baseIndex = pentatonicNotes.indexOf(region.base[0]);
-            const octave = region.base[1];
-            
-            let noteName, frequency, fullNote;
-            
-            if (region.glide) {
-                // 滑音效果 - 返回起始和结束频率
-                const startNote = region.base;
-                const endIndex = Math.min(baseIndex + region.range, pentatonicNotes.length - 1);
-                const endNote = pentatonicNotes[endIndex] + octave;
-                
-                noteName = startNote;
-                frequency = pentatonicFreqs[startNote];
-                fullNote = startNote;
-                
-                // 添加滑音信息
-                return {
-                    char: char,
-                    note: fullNote,
-                    frequency: frequency,
-                    endFrequency: pentatonicFreqs[endNote],
-                    duration: params.noteDuration,
-                    velocity: 0.5 + Math.random() * 0.5,
-                    sampleNote: findNearestSample(fullNote),
-                    hasGlide: true,
-                    tone: tone
-                };
-            } else {
-                // 平音
-                noteName = region.base;
-                frequency = pentatonicFreqs[noteName];
-                fullNote = noteName;
-                
-                return {
-                    char: char,
-                    note: fullNote,
-                    frequency: frequency,
-                    duration: params.noteDuration,
-                    velocity: 0.5 + Math.random() * 0.5,
-                    sampleNote: findNearestSample(fullNote),
-                    hasGlide: false,
+                    isRest: true,
                     tone: tone
                 };
             }
+            
+            // 从区间内随机选择一个音符（洗牌效果）
+            const availableNotes = region.notes;
+            const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+            const frequency = pentatonicFreqs[randomNote];
+            
+            return {
+                char: char,
+                note: randomNote,
+                frequency: frequency,
+                duration: params.noteDuration,
+                velocity: 0.5 + Math.random() * 0.5,
+                sampleNote: findNearestSample(randomNote),
+                hasGlide: false,
+                tone: tone,
+                region: availableNotes  // 记录可用区间，用于显示
+            };
         }
 
         // 原有字符映射（非中文用）
@@ -1716,12 +1687,8 @@
                 // 应用全局音量
                 const velocityWithMaster = note.velocity * params.masterVolume;
                 
-                // 滑音效果
-                if (note.hasGlide && note.endFrequency) {
-                    playToneWithGlide(note.frequency, note.endFrequency, note.note, note.duration, velocityWithMaster);
-                } else {
-                    playTone(note.frequency, note.note, note.duration, velocityWithMaster);
-                }
+                // 播放单音
+                playTone(note.frequency, note.note, note.duration, velocityWithMaster);
                 
                 // 高亮当前音符
                 highlightNote(i);
@@ -1769,12 +1736,13 @@
         function displayNotes(notes) {
             const display = document.getElementById('notesDisplay');
             const toneMarks = { 0: '•', 1: '̄', 2: '́', 3: '̌', 4: '̀' };
+            const toneNames = { 0: '轻声', 1: '阴平', 2: '阳平', 3: '上声', 4: '去声' };
             
             display.innerHTML = notes.map((n, i) => {
-                const toneMark = n.tone ? toneMarks[n.tone] : '';
+                const toneMark = n.tone !== undefined ? toneMarks[n.tone] : '';
                 const isRest = n.isRest ? '休' : n.note;
-                const glideMark = n.hasGlide ? '↗' : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${n.tone || ''}声">${isRest}${toneMark}${glideMark}</span>`;
+                const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
+                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} 区间${regionInfo}">${isRest}${toneMark}</span>`;
             }).join('');
         }
 
