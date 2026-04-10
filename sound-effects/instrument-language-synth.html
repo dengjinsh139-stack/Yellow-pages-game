@@ -1120,17 +1120,20 @@
         function playNoteKey(noteInfo, keyElement) {
             keyElement.classList.add('active');
             
-            // 基础演奏力度，用户调节在 playSampleTone 中应用
+            // 基础演奏力度
             const baseVelocity = 0.7;
+            // 应用用户调节的音量
+            const userVolume = noteVolumes[noteInfo.note] || 1.0;
+            const finalVelocity = baseVelocity * userVolume;
             
             if (currentInstrument === 'piano' && samplesLoaded) {
-                playSampleTone(noteInfo.freq, 0.5, baseVelocity);
+                playSampleTone(noteInfo.freq, noteInfo.note, 0.5, finalVelocity);
             } else {
-                playSynthTone(noteInfo.freq, 0.5, baseVelocity * (noteVolumes[noteInfo.note] || 1.0));
+                playSynthTone(noteInfo.freq, 0.5, finalVelocity);
             }
             
             // 添加到历史
-            addToHistory(`♪ ${noteInfo.note} (${Math.round((noteVolumes[noteInfo.note] || 1.0) * 100)}%)`);
+            addToHistory(`♪ ${noteInfo.note} (${Math.round(userVolume * 100)}%)`);
         }
 
         // 释放音符按钮
@@ -1332,7 +1335,7 @@
         }
 
         // 使用真实采样播放音符
-        function playSampleTone(targetFrequency, duration, velocity = 0.5) {
+        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5) {
             if (!audioContext || !samplesLoaded) return;
             
             // 找到最近的采样
@@ -1369,16 +1372,10 @@
             const playbackRate = targetFrequency / nearestFreq;
             source.playbackRate.value = playbackRate;
             
-            // 关键修复：根据目标频率找到目标音符名称，而不是用采样名称
-            const targetNoteName = freqToNote(targetFrequency);
-            
-            // 音量计算：基础补偿 * 用户调节 * 演奏力度
-            // 1. baseGain: 使用目标音符的增益（如果采样和目标不同，用采样的补偿）
-            // 2. noteVolumes: 使用目标音符的用户调节
-            // 3. velocity: 演奏力度参数
+            // 音量计算：基础补偿 * 演奏力度
+            // velocity 已经包含了用户调节
             const baseGain = sampleConfig.piano.samples[sampleNote].gain || 1.0;
-            const userGain = noteVolumes[targetNoteName] || 1.0;
-            const finalVelocity = velocity * baseGain * userGain;
+            const finalVelocity = velocity * baseGain;
             
             // 增益节点
             const gainNode = audioContext.createGain();
@@ -1454,9 +1451,9 @@
         }
 
         // 演奏单个音符（根据当前乐器选择播放方式）
-        function playTone(frequency, duration, velocity = 0.5) {
+        function playTone(frequency, noteName, duration, velocity = 0.5) {
             if (currentInstrument === 'piano' && samplesLoaded) {
-                return playSampleTone(frequency, duration / 1000, velocity);
+                return playSampleTone(frequency, noteName, duration / 1000, velocity);
             } else {
                 return playSynthTone(frequency, duration / 1000, velocity);
             }
@@ -1501,7 +1498,7 @@
                 if (!isPlaying) break;
                 
                 const note = notes[i];
-                playTone(note.frequency, note.duration, note.velocity);
+                playTone(note.frequency, note.note, note.duration, note.velocity);
                 
                 // 高亮当前音符
                 highlightNote(i);
