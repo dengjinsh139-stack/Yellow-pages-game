@@ -1368,10 +1368,11 @@
             const playbackRate = targetFrequency / nearestFreq;
             source.playbackRate.value = playbackRate;
             
-            // 音量补偿：使用预计算的增益值 + 高频额外补偿
+            // 音量补偿：使用预计算的增益值 + 高频额外补偿 + 用户调节
             const baseGain = sampleConfig.piano.samples[sampleNote].gain || 1.0;
             const highFreqCompensation = Math.pow(1.3, Math.log2(targetFrequency / 440));
-            const compensatedVelocity = Math.min(velocity * baseGain * highFreqCompensation, 1.0);
+            // 用户音量可以超过100%，不做限制
+            const compensatedVelocity = velocity * baseGain * highFreqCompensation;
             
             // 增益节点
             const gainNode = audioContext.createGain();
