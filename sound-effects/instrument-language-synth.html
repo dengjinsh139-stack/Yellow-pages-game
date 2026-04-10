@@ -633,7 +633,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.2 · 10键实时演奏</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.3 · 音量均衡</p>
         </header>
 
         <div class="main-panel">
@@ -1273,14 +1273,19 @@
             const playbackRate = targetFrequency / nearestFreq;
             source.playbackRate.value = playbackRate;
             
+            // 音量补偿：高频需要更大的增益
+            // 基准是A4(440Hz)，每高一个八度增益增加40%
+            const volumeCompensation = Math.pow(1.4, Math.log2(targetFrequency / 440));
+            const compensatedVelocity = Math.min(velocity * volumeCompensation, 1.0);
+            
             // 增益节点
             const gainNode = audioContext.createGain();
-            gainNode.gain.value = velocity;
+            gainNode.gain.value = compensatedVelocity;
             
             // 包络
             const now = audioContext.currentTime;
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(velocity, now + 0.01);
+            gainNode.gain.linearRampToValueAtTime(compensatedVelocity, now + 0.01);
             gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
             
             // 混响
