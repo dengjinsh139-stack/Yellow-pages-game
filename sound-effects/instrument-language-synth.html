@@ -1910,16 +1910,25 @@
 
         // 演奏文本
         async function playText() {
-            if (isPlaying) return;
+            console.log('=== playText 开始 ===');
+            
+            if (isPlaying) {
+                console.log('已经在播放中，返回');
+                return;
+            }
             
             const text = document.getElementById('textInput').value.trim();
+            console.log('输入文本:', text);
+            
             if (!text) {
                 document.getElementById('statusText').textContent = '请先输入文字';
+                console.log('文本为空，返回');
                 return;
             }
             
             if (currentInstrument === 'piano' && !samplesLoaded) {
                 document.getElementById('statusText').textContent = '采样加载中，请稍候...';
+                console.log('采样未加载完成，返回. samplesLoaded:', samplesLoaded);
                 return;
             }
             
@@ -1928,6 +1937,8 @@
             
             // 分析情感
             const emotion = analyzeEmotion(text);
+            console.log('检测到的情绪:', emotion);
+            
             const emotionStyle = getEmotionStyle(emotion);
             const badge = document.getElementById('emotionBadge');
             badge.className = 'emotion-badge ' + emotionStyle.class;
@@ -1939,11 +1950,16 @@
             // ===== 智能情绪预设 =====
             // 如果检测到有情绪专属文件，播放情绪专属内容
             if (emotionFiles[emotion]) {
+                console.log(`检测到情绪 ${emotion}，检查专属文件...`);
+                console.log('情绪数据:', emotionFiles[emotion]);
+                
                 // 选中该情绪（显示面板）
                 selectEmotion(emotion);
                 
                 // 尝试播放情绪专属内容
                 const hasCustomFile = await playEmotionContentAsync(emotion);
+                console.log('是否有专属文件:', hasCustomFile);
+                
                 if (hasCustomFile) {
                     // 如果有专属文件，播放完成后结束
                     document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
@@ -1951,23 +1967,37 @@
                     isPlaying = false;
                     return;
                 }
-                // 如果没有专属文件，继续播放文字转音乐
+                console.log('没有专属文件，继续播放文字转音乐');
             }
             
             // 转换为音符
             const notes = textToNotes(text);
+            console.log('转换后的音符数量:', notes.length);
+            console.log('音符数据:', notes);
             
             // 显示音符序列
             displayNotes(notes);
             
+            if (notes.length === 0) {
+                console.log('没有可播放的音符');
+                isPlaying = false;
+                document.getElementById('statusText').textContent = '没有可播放的音符';
+                return;
+            }
+            
             // 依次演奏
+            console.log('开始演奏，音符数量:', notes.length);
             for (let i = 0; i < notes.length; i++) {
-                if (!isPlaying) break;
+                if (!isPlaying) {
+                    console.log('演奏被中断');
+                    break;
+                }
                 
                 const note = notes[i];
                 
                 // 休止符处理
                 if (note.isRest) {
+                    console.log(`第 ${i+1} 个是休止符，等待 ${note.duration}ms`);
                     await sleep(note.duration);
                     continue;
                 }
@@ -1975,6 +2005,8 @@
                 // 应用全局音量 + 音符独立音量
                 const userVolume = noteVolumes[note.note] || 1.0;
                 const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
+                
+                console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 频率=${note.frequency.toFixed(2)}, 音量=${velocityWithMaster.toFixed(2)}`);
                 
                 // 播放单音
                 playTone(note.frequency, note.note, note.duration, velocityWithMaster);
