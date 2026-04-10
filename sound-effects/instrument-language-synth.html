@@ -1411,6 +1411,8 @@
             const baseGain = sampleConfig.piano.samples[sampleNote].gain || 1.0;
             const finalVelocity = velocity * baseGain;
             
+            console.log(`Playing ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
+            
             // 增益节点
             const gainNode = audioContext.createGain();
             gainNode.gain.value = finalVelocity;
