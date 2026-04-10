@@ -1482,6 +1482,7 @@
                 for (const keyword of keywords) {
                     if (text.toLowerCase().includes(keyword)) {
                         scores[emotion]++;
+                        console.log(`Emotion match: ${emotion} - '${keyword}' found in text`);
                     }
                 }
             }
@@ -1496,6 +1497,7 @@
                 }
             }
             
+            console.log('Emotion analysis:', { text, scores, result: maxEmotion });
             return maxEmotion;
         }
 
