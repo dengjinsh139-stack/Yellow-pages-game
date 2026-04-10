@@ -1223,28 +1223,43 @@
 
         // 初始化
         async function initAudio() {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 2048;
-            
-            canvas = document.getElementById('visualizer');
-            canvasCtx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            try {
+                // Safari 兼容性：使用 webkitAudioContext
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Mac/Safari 兼容性：音频上下文可能被暂停，需要手动恢复
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                
+                canvas = document.getElementById('visualizer');
+                canvasCtx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
 
-            createSpectrumBars();
-            visualize();
-            
-            // 加载采样
-            document.getElementById('statusText').textContent = '加载采样中...';
-            await loadSamples();
-            
-            // 生成音符键盘
-            generateNoteKeyboard();
-            
-            document.getElementById('startOverlay').classList.add('hidden');
-            document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
-            addToHistory('真实钢琴音色已加载');
+                createSpectrumBars();
+                visualize();
+                
+                // 加载采样
+                document.getElementById('statusText').textContent = '加载采样中...';
+                await loadSamples();
+                
+                // 生成音符键盘
+                generateNoteKeyboard();
+                
+                document.getElementById('startOverlay').classList.add('hidden');
+                document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
+                addToHistory('真实钢琴音色已加载');
+                
+                console.log('音频引擎启动成功，状态:', audioContext.state);
+            } catch (err) {
+                console.error('音频引擎启动失败:', err);
+                document.getElementById('statusText').textContent = '启动失败: ' + err.message;
+                alert('无法启动音频引擎，请检查浏览器设置或使用Chrome浏览器');
+            }
         }
 
         // 加载采样文件
@@ -1924,6 +1939,20 @@
                 document.getElementById('statusText').textContent = '请先输入文字';
                 console.log('文本为空，返回');
                 return;
+            }
+            
+            // Safari/Mac 兼容性：确保音频上下文已启动
+            if (!audioContext) {
+                document.getElementById('statusText').textContent = '请先点击"启动音频引擎"';
+                console.log('audioContext 不存在');
+                return;
+            }
+            
+            // Safari 兼容性：检查并恢复音频上下文
+            if (audioContext.state === 'suspended') {
+                console.log('音频上下文被暂停，尝试恢复...');
+                await audioContext.resume();
+                console.log('音频上下文已恢复，状态:', audioContext.state);
             }
             
             if (currentInstrument === 'piano' && !samplesLoaded) {
