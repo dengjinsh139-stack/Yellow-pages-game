@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目能力 | ⚡ 我的工作站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(180deg, #0a0a0f 0%, #12121a 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+
+        /* 头部 */
+        header {
+            text-align: center;
+            padding: 50px 20px 30px;
+            background: linear-gradient(180deg, rgba(0,212,170,0.1) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 212, 170, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before, header::after {
+            content: '⚡';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            opacity: 0.15;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        header::before { left: 8%; }
+        header::after { right: 8%; animation-delay: 1.5s; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.15; transform: translateY(-50%) scale(1); }
+            50% { opacity: 0.3; transform: translateY(-50%) scale(1.1); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.95em;
+            letter-spacing: 3px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 分类标题样式 */
+        .category-section {
+            margin-bottom: 50px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 18px 22px;
+            background: linear-gradient(90deg, rgba(0,212,170,0.1), transparent);
+            border-left: 3px solid #00d4aa;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .category-icon {
+            font-size: 2em;
+        }
+
+        .category-title-group {
+            flex: 1;
+        }
+
+        .category-title {
+            font-size: 1.3em;
+            color: #00d4aa;
+            margin-bottom: 4px;
+        }
+
+        .category-desc {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .category-count {
+            background: linear-gradient(135deg, #00d4aa, #00a8e8);
+            color: #0a0a0f;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1em;
+        }
+
+        /* 能力卡片网格 */
+        .abilities-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .ability-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 0;
+            transition: all 0.3s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ability-card:hover {
+            border-color: rgba(0, 212, 170, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.1);
+        }
+
+        /* 卡片头部 */
+        .card-header {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,168,232,0.05));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #00d4aa, #00a8e8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 8px 20px rgba(0, 212, 170, 0.25);
+        }
+
+        .card-title-group {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 1.15em;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .card-tag {
+            padding: 3px 10px;
+            background: rgba(0, 212, 170, 0.15);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 4px;
+            color: #00d4aa;
+            font-size: 0.75em;
+        }
+
+        .card-tag.core { background: rgba(0, 212, 170, 0.25); color: #00d4aa; }
+        .card-tag.tool { background: rgba(0, 168, 232, 0.15); color: #00a8e8; border-color: rgba(0, 168, 232, 0.2); }
+        .card-tag.analysis { background: rgba(100, 200, 150, 0.15); color: #64c896; border-color: rgba(100, 200, 150, 0.2); }
+
+        /* 卡片内容 */
+        .card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .card-desc {
+            color: #999;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        /* 流程步骤 */
+        .process-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid #00d4aa;
+            border-radius: 0 8px 8px 0;
+            padding: 15px;
+            margin-top: auto;
+        }
+
+        .process-title {
+            color: #00d4aa;
+            font-size: 0.8em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85em;
+            color: #777;
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #00d4aa, #00a8e8);
+            border-radius: 50%;
+            color: #0a0a0f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8em;
+            flex-shrink: 0;
+        }
+
+        .step-arrow {
+            color: #444;
+            font-size: 0.8em;
+        }
+
+        /* 唤醒词区域 */
+        .wake-section {
+            background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,168,232,0.05));
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 16px;
+            padding: 35px;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .wake-title {
+            font-size: 1.1em;
+            color: #00d4aa;
+            margin-bottom: 20px;
+        }
+
+        .wake-words {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .wake-word {
+            background: linear-gradient(135deg, #00d4aa, #00a8e8);
+            color: #0a0a0f;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .wake-word:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 212, 170, 0.3);
+        }
+
+        /* 知识库区域 */
+        .knowledge-section {
+            margin-top: 50px;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+        }
+
+        .knowledge-title {
+            font-size: 1.3em;
+            color: #00d4aa;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .knowledge-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 3px solid #00d4aa;
+        }
+
+        .knowledge-card h4 {
+            color: #00d4aa;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+
+        .knowledge-card ul {
+            list-style: none;
+            color: #888;
+        }
+
+        .knowledge-card li {
+            padding: 6px 0;
+            padding-left: 16px;
+            position: relative;
+            font-size: 0.85em;
+        }
+
+        .knowledge-card li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #00d4aa;
+        }
+
+        /* 限制说明 */
+        .limits-section {
+            margin-top: 50px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .limits-title {
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .limits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .limit-item {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.8em;
+        }
+
+        .limit-item strong {
+            color: #00d4aa;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .limit-item p {
+            color: #666;
+        }
+
+        /* 底部 */
+        footer {
+            text-align: center;
+            padding: 35px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 40px;
+        }
+
+        footer p {
+            color: #444;
+            font-size: 0.9em;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .nav-links { display: none; }
+            .abilities-row { grid-template-columns: 1fr; }
+            .wake-words { flex-direction: column; align-items: center; }
+            .category-header { flex-wrap: wrap; }
+        }
+    
+        /* 悬浮音乐控制按钮 */
+        .music-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            border: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-float-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+        }
+
+        .music-float-btn.playing {
+            animation: floatPulse 2s infinite;
+        }
+
+        @keyframes floatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3); transform: scale(1); }
+            50% { box-shadow: 0 4px 30px rgba(0, 212, 170, 0.5); transform: scale(1.02); }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站</span>
+            </a>
+            <div class="nav-links" id="nav-links">
+                <a href="index.html" class="nav-link">🏠 首页</a>
+                <a href="index.html#games" class="nav-link">🎮 游戏中心</a>
+                <a href="sound-effects/sound-effects-hub.html" class="nav-link">🔊 音效相关</a>
+                <a href="music/music-genres.html" class="nav-link">🎵 音乐百科</a>
+                <a href="projects-login.html" class="nav-link">📁 项目</a>
+                <a href="wwise/wwise.html" class="nav-link">🔊 Wwise</a>
+                <a href="task-manager.html" class="nav-link">📈 任务管理器</a>
+                <a href="capabilities.html" class="nav-link active">📊 项目能力</a>
+                <a href="finance-login.html" class="nav-link">💰 理财相关</a>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <h1>项目能力</h1>
+        <p class="subtitle">CORE CAPABILITIES & KNOWLEDGE SYSTEM</p>
+    </header>
+
+    <div class="container">
+
+        <!-- 唤醒词 -->
+        <div class="wake-section">
+            <div class="wake-title">🔑 记忆唤醒词</div>
+            <div class="wake-words">
+                <div class="wake-word">🎵 音频模块</div>
+                <div class="wake-word">📈 股票模块</div>
+                <div class="wake-word">⚡ 我的工作站</div>
+            </div>
+            <p style="color: #555; margin-top: 20px; font-size: 0.85em;">💡 说出唤醒词可立即激活相关记忆上下文</p>
+        </div>
+
+
+        <!-- 第一类：技术开发能力 -->
+        <div id="development" class="category-section">
+            <div class="category-header">
+                <div class="category-icon">💻</div>
+                <div class="category-title-group">
+                    <div class="category-title">技术开发能力</div>
+                    <div class="category-desc">代码生成、系统架构与自动化部署的核心技术栈</div>
+                </div>
+                <div class="category-count">03</div>
+            </div>
+
+            <div class="abilities-row">
+                <!-- 代码生成 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">💻</div>
+                        <div class="card-title-group">
+                            <div class="card-title">代码生成引擎</div>
+                            <div class="card-tags">
+                                <span class="card-tag core">核心</span>
+                                <span class="card-tag">游戏开发</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">生成完整可运行的HTML5游戏和应用程序，支持Web Audio API、Canvas动画、响应式设计、游戏循环架构。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>解析需求 <span class="step-arrow">→</span> 设计架构</div>
+                                <div class="step"><span class="step-num">2</span>编写代码 <span class="step-arrow">→</span> 集成音频</div>
+                                <div class="step"><span class="step-num">3</span>测试验证 <span class="step-arrow">→</span> 部署上线</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 文件操作 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">📁</div>
+                        <div class="card-title-group">
+                            <div class="card-title">文件系统管理</div>
+                            <div class="card-tags">
+                                <span class="card-tag tool">工具</span>
+                                <span class="card-tag">自动化</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">完整的文件读写、编辑、创建、部署能力。支持批量处理、版本控制集成、GitHub自动化部署。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>文件操作 <span class="step-arrow">→</span> 精准编辑</div>
+                                <div class="step"><span class="step-num">2</span>批量生成 <span class="step-arrow">→</span> Git提交</div>
+                                <div class="step"><span class="step-num">3</span>版本控制 <span class="step-arrow">→</span> 自动部署</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 音频处理 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">🎵</div>
+                        <div class="card-title-group">
+                            <div class="card-title">音频生成系统</div>
+                            <div class="card-tags">
+                                <span class="card-tag core">核心</span>
+                                <span class="card-tag">创意</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">Web Audio API音频合成、游戏背景音乐生成、音效设计。纯代码生成动态音乐，无需外部音频文件。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>创建上下文 <span class="step-arrow">→</span> 合成器设计</div>
+                                <div class="step"><span class="step-num">2</span>包络配置 <span class="step-arrow">→</span> 节奏编排</div>
+                                <div class="step"><span class="step-num">3</span>节拍同步 <span class="step-arrow">→</span> 实时渲染</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 第二类：数据分析能力 -->
+        <div id="analysis" class="category-section">
+            <div class="category-header">
+                <div class="category-icon">📊</div>
+                <div class="category-title-group">
+                    <div class="category-title">数据分析能力</div>
+                    <div class="category-desc">信息检索、市场研究与投资决策支持系统</div>
+                </div>
+                <div class="category-count">02</div>
+            </div>
+
+            <div class="abilities-row">
+                <!-- 网络搜索 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">🔍</div>
+                        <div class="card-title-group">
+                            <div class="card-title">智能信息检索</div>
+                            <div class="card-tags">
+                                <span class="card-tag analysis">分析</span>
+                                <span class="card-tag">数据</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">实时搜索网络最新信息，支持网页内容提取、多源数据整合、新闻资讯获取。用于市场研究、技术调研、动态信息追踪。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>构建查询 <span class="step-arrow">→</span> 多引擎检索</div>
+                                <div class="step"><span class="step-num">2</span>内容提取 <span class="step-arrow">→</span> 信息去重</div>
+                                <div class="step"><span class="step-num">3</span>整合分析 <span class="step-arrow">→</span> 结构输出</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 股票分析 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">📈</div>
+                        <div class="card-title-group">
+                            <div class="card-title">金融数据分析</div>
+                            <div class="card-tags">
+                                <span class="card-tag analysis">分析</span>
+                                <span class="card-tag">投资</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">股票市场分析、资金流向追踪、基本面研究、行业轮动判断。整合研报观点与实时数据，提供投资决策支持。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>搜索研报 <span class="step-arrow">→</span> 资金流向</div>
+                                <div class="step"><span class="step-num">2</span>基本面筛选 <span class="step-arrow">→</span> 机构观点</div>
+                                <div class="step"><span class="step-num">3</span>综合排名 <span class="step-arrow">→</span> 投资建议</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 第三类：创意与认知能力 -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🎨</div>
+                <div class="category-title-group">
+                    <div class="category-title">创意与认知能力</div>
+                    <div class="category-desc">视觉设计、知识管理、项目协调与QA测试的综合能力</div>
+                </div>
+                <div class="category-count">05</div>
+            </div>
+
+            <div class="abilities-row">
+                <!-- UI设计 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">🎨</div>
+                        <div class="card-title-group">
+                            <div class="card-title">视觉设计系统</div>
+                            <div class="card-tags">
+                                <span class="card-tag">设计</span>
+                                <span class="card-tag">前端</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">科技风格界面设计、响应式布局、动画效果、色彩系统构建。擅长深色主题、青绿蓝配色、现代简约风格。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>设计系统 <span class="step-arrow">→</span> CSS动画</div>
+                                <div class="step"><span class="step-num">2</span>响应布局 <span class="step-arrow">→</span> 交互反馈</div>
+                                <div class="step"><span class="step-num">3</span>性能优化 <span class="step-arrow">→</span> 兼容适配</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 记忆管理 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">🧠</div>
+                        <div class="card-title-group">
+                            <div class="card-title">记忆管理系统</div>
+                            <div class="card-tags">
+                                <span class="card-tag core">核心</span>
+                                <span class="card-tag">认知</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">长期记忆存储、模块化知识管理、上下文唤醒。支持跨会话记忆保持、项目状态追踪、个性化配置存储。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>信息结构化 <span class="step-arrow">→</span> 持久存储</div>
+                                <div class="step"><span class="step-num">2</span>设定唤醒词 <span class="step-arrow">→</span> 自动加载</div>
+                                <div class="step"><span class="step-num">3</span>按需召回 <span class="step-arrow">→</span> 上下文恢复</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目协调 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">📋</div>
+                        <div class="card-title-group">
+                            <div class="card-title">项目协调管理</div>
+                            <div class="card-tags">
+                                <span class="card-tag">管理</span>
+                                <span class="card-tag">协作</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">多任务并行处理、子代理调度、进度追踪、质量把控。支持复杂项目分解、批量文件生成、自动化工作流。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>任务拆解 <span class="step-arrow">→</span> 并行调度</div>
+                                <div class="step"><span class="step-num">2</span>进度监控 <span class="step-arrow">→</span> 质量检查</div>
+                                <div class="step"><span class="step-num">3</span>结果整合 <span class="step-arrow">→</span> 交付验收</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QA测试 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">✅</div>
+                        <div class="card-title-group">
+                            <div class="card-title">QA质量保障</div>
+                            <div class="card-tags">
+                                <span class="card-tag core">核心</span>
+                                <span class="card-tag">测试</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">主动QA检查、全站一致性验证、回归测试、Bug修复。支持自动化测试脚本、多维度质量检查、问题主动发现。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>影响评估 <span class="step-arrow">→</span> 制定计划</div>
+                                <div class="step"><span class="step-num">2</span>整体跑测 <span class="step-arrow">→</span> 问题发现</div>
+                                <div class="step"><span class="step-num">3</span>修复验证 <span class="step-arrow">→</span> 回归测试</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 文档管理 -->
+                <div class="ability-card">
+                    <div class="card-header">
+                        <div class="card-icon">📝</div>
+                        <div class="card-title-group">
+                            <div class="card-title">文档工程化</div>
+                            <div class="card-tags">
+                                <span class="card-tag">文档</span>
+                                <span class="card-tag">协作</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-desc">飞书文档操作、Markdown生成、版本历史管理、知识库构建。支持API集成、批量文档处理、结构化内容输出。</p>
+                        <div class="process-box">
+                            <div class="process-title">执行流程</div>
+                            <div class="process-steps">
+                                <div class="step"><span class="step-num">1</span>内容规划 <span class="step-arrow">→</span> 结构设计</div>
+                                <div class="step"><span class="step-num">2</span>文档生成 <span class="step-arrow">→</span> 格式优化</div>
+                                <div class="step"><span class="step-num">3</span>版本管理 <span class="step-arrow">→</span> 知识沉淀</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 知识库 -->
+        <div id="knowledge" class="knowledge-section">
+            <div class="knowledge-title">📚 已学习知识库</div>
+
+            <div class="knowledge-grid">
+                <div class="knowledge-card">
+                    <h4>🎵 音频技术</h4>
+                    <ul>
+                        <li>Web Audio API 完整规范</li>
+                        <li>Oscillator 波形合成</li>
+                        <li>Envelope 包络控制</li>
+                        <li>节拍同步算法</li>
+                        <li>游戏音频架构设计</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h4>📈 金融分析</h4>
+                    <ul>
+                        <li>A股资金流向分析方法</li>
+                        <li>北向资金与主力分层</li>
+                        <li>基本面指标（ROE/PE/PB）</li>
+                        <li>行业轮动规律</li>
+                        <li>机构研报观点整合</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h4>💻 技术栈</h4>
+                    <ul>
+                        <li>HTML5 Canvas 游戏开发</li>
+                        <li>CSS3 动画与响应式</li>
+                        <li>JavaScript ES6+ 特性</li>
+                        <li>Git/GitHub 工作流</li>
+                        <li>青绿蓝科技风 UI 设计</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 技术限制 -->
+        <div class="limits-section">
+            <div class="limits-title">⚠️ 技术边界与使用建议</div>
+
+            <div class="limits-grid">
+                <div class="limit-item">
+                    <strong>⏰ 实时数据限制</strong>
+                    <p>股票数据存在延迟（非Level-2），搜索结果基于爬虫快照</p>
+                </div>
+                <div class="limit-item">
+                    <strong>🔒 系统限制</strong>
+                    <p>单次执行时间有限制，无法访问外部API密钥，文件系统沙箱隔离</p>
+                </div>
+                <div class="limit-item">
+                    <strong>💡 建议用法</strong>
+                    <p>代码生成与原型开发、信息整合与研报分析、批量文件处理与部署</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>⚡ 我的工作站 · 项目能力中心</p>
+        <p style="margin-top: 10px; font-size: 0.85em; color: #444;" data-version>最后更新: 2026年3月24日 | 版本: v2.9.0</p>
+    </footer>
+    
+    <script src="nav-config.js"></script>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" src="assets/audio/bg-music.mp3" loop preload="auto"></audio>
+    
+    <!-- 悬浮音乐控制按钮 -->
+    <div id="musicFloatBtn" class="music-float-btn" onclick="toggleGlobalMusic()">
+        <span id="musicFloatIcon">🔇</span>
+        <span id="musicFloatText">开启音乐</span>
+    </div>
+
+    <script src="assets/js/music-system.js"></script>
+
+  <script src="assets/js/music-global.js?v=2.8.9"></script>
+</body>
+</html>

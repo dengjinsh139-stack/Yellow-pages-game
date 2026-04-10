@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👾 音游原型 #4 - 复古像素风</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0f0f0f;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Press Start 2P', cursive;
+            color: #fff;
+            overflow: hidden;
+            image-rendering: pixelated;
+        }
+        h1 { 
+            margin: 15px 0; 
+            font-size: 1rem; 
+            color: #ff0066;
+            text-shadow: 3px 3px 0 #660033;
+            letter-spacing: 2px;
+        }
+        #gameCanvas {
+            border: 4px solid #ff0066;
+            box-shadow: 
+                0 0 0 4px #660033,
+                0 0 20px #ff0066,
+                inset 0 0 20px rgba(255,0,102,0.2);
+            image-rendering: pixelated;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .retro-btn {
+            padding: 15px 25px;
+            background: #ff0066;
+            border: none;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            box-shadow: 
+                0 4px 0 #990044,
+                0 6px 10px rgba(0,0,0,0.5);
+            transition: all 0.1s;
+        }
+        .retro-btn:active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 0 0 #990044,
+                0 2px 5px rgba(0,0,0,0.5);
+        }
+        .score {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #00ff99;
+            text-shadow: 2px 2px 0 #006633;
+        }
+        .keys {
+            margin-top: 15px;
+            font-size: 10px;
+            color: #666;
+        }
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.1) 0px,
+                rgba(0,0,0,0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <h1>👾 RETRO BEAT</h1>
+    <canvas id="gameCanvas" width="320" height="480"></canvas>
+    <div class="score">SCORE: <span id="score">00000</span> | COMBO: <span id="combo">0</span></div>
+    <div class="controls">
+        <button class="retro-btn" onclick="startGame()">START</button>
+        <button class="retro-btn" onclick="resetGame()">RESET</button>
+    </div>
+    <div class="keys">[Z][X][N][M] OR [←][↑][↓][→]</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// 禁用抗锯齿，保持像素感
+ctx.imageSmoothingEnabled = false;
+
+const LANE_COUNT = 4;
+const LANE_WIDTH = canvas.width / LANE_COUNT;
+const HIT_LINE_Y = 400;
+const NOTE_SPEED = 2.5;
+const PIXEL_SIZE = 4;
+
+let notes = [];
+let score = 0;
+let combo = 0;
+let gameRunning = false;
+let animationId;
+let frameCount = 0;
+
+const keyMap = { 'KeyZ': 0, 'KeyX': 1, 'KeyN': 2, 'KeyM': 3 };
+const arrowMap = { 'ArrowLeft': 0, 'ArrowUp': 1, 'ArrowDown': 2, 'ArrowRight': 3 };
+
+// 复古配色
+const PALETTE = ['#ff0066', '#00ff99', '#ffff00', '#00ccff'];
+const DARK_PALETTE = ['#990044', '#006633', '#999900', '#006699'];
+
+class PixelNote {
+    constructor(lane) {
+        this.lane = lane;
+        this.x = lane * LANE_WIDTH + 8;
+        this.y = -40;
+        this.width = LANE_WIDTH - 16;
+        this.height = 32;
+        this.hit = false;
+        this.missed = false;
+        this.color = PALETTE[lane];
+        this.darkColor = DARK_PALETTE[lane];
+        this.pixelPattern = this.generatePixelPattern();
+    }
+
+    generatePixelPattern() {
+        // 生成随机像素图案
+        const pattern = [];
+        for (let i = 0; i < 8; i++) {
+            pattern.push(Math.random() > 0.3 ? 1 : 0);
+        }
+        return pattern;
+    }
+
+    update() {
+        this.y += NOTE_SPEED;
+        if (this.y > canvas.height) {
+            this.missed = true;
+            combo = 0;
+        }
+    }
+
+    drawPixelRect(x, y, w, h, color) {
+        // 绘制像素化矩形（带边框效果）
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, w, h);
+        
+        // 高光
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillRect(x, y, w, PIXEL_SIZE);
+        ctx.fillRect(x, y, PIXEL_SIZE, h);
+        
+        // 阴影
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(x, y + h - PIXEL_SIZE, w, PIXEL_SIZE);
+        ctx.fillRect(x + w - PIXEL_SIZE, y, PIXEL_SIZE, h);
+    }
+
+    draw() {
+        if (this.hit || this.missed) return;
+        
+        // 像素化音符
+        this.drawPixelRect(this.x, this.y, this.width, this.height, this.color);
+        
+        // 内部装饰像素
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        for (let i = 0; i < this.pixelPattern.length; i++) {
+            if (this.pixelPattern[i]) {
+                const px = this.x + 8 + (i % 4) * 8;
+                const py = this.y + 8 + Math.floor(i / 4) * 8;
+                ctx.fillRect(px, py, 4, 4);
+            }
+        }
+    }
+}
+
+function drawBackground() {
+    // 深色背景
+    ctx.fillStyle = '#0a0a0f';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 像素网格
+    ctx.fillStyle = 'rgba(255,0,102,0.05)';
+    for (let x = 0; x < canvas.width; x += PIXEL_SIZE * 2) {
+        for (let y = 0; y < canvas.height; y += PIXEL_SIZE * 2) {
+            if ((x / (PIXEL_SIZE * 2) + y / (PIXEL_SIZE * 2)) % 2 === 0) {
+                ctx.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
+            }
+        }
+    }
+    
+    // 轨道
+    for (let i = 1; i < LANE_COUNT; i++) {
+        ctx.fillStyle = 'rgba(255,0,102,0.2)';
+        ctx.fillRect(i * LANE_WIDTH - 1, 0, 2, canvas.height);
+    }
+    
+    // 判定线
+    ctx.fillStyle = '#ff0066';
+    ctx.fillRect(0, HIT_LINE_Y - 2, canvas.width, 4);
+    
+    // 判定区域
+    ctx.fillStyle = 'rgba(255,0,102,0.1)';
+    ctx.fillRect(0, HIT_LINE_Y - 20, canvas.width, 40);
+}
+
+function drawLaneBase() {
+    // 底部按键区域
+    for (let i = 0; i < LANE_COUNT; i++) {
+        const x = i * LANE_WIDTH + 4;
+        
+        // 按键底色
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(x, HIT_LINE_Y + 10, LANE_WIDTH - 8, 60);
+        
+        // 按键边框
+        ctx.strokeStyle = PALETTE[i];
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, HIT_LINE_Y + 10, LANE_WIDTH - 8, 60);
+        
+        // 按键字母
+        ctx.fillStyle = PALETTE[i];
+        ctx.font = '10px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        const keyName = ['Z', 'X', 'N', 'M'][i];
+        ctx.fillText(keyName, x + (LANE_WIDTH - 8) / 2, HIT_LINE_Y + 45);
+    }
+}
+
+function highlightLane(lane) {
+    const x = lane * LANE_WIDTH + 4;
+    
+    // 闪光效果
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillRect(x, HIT_LINE_Y + 10, LANE_WIDTH - 8, 60);
+    
+    // 粒子爆炸
+    for (let i = 0; i < 8; i++) {
+        const px = x + Math.random() * (LANE_WIDTH - 8);
+        const py = HIT_LINE_Y + 10 + Math.random() * 60;
+        ctx.fillStyle = PALETTE[lane];
+        ctx.fillRect(px, py, 4, 4);
+    }
+}
+
+function spawnNote() {
+    if (frameCount % 40 === 0 && Math.random() < 0.7) {
+        const lane = Math.floor(Math.random() * LANE_COUNT);
+        notes.push(new PixelNote(lane));
+    }
+}
+
+function checkHit(lane) {
+    const hitNotes = notes.filter(n => n.lane === lane && !n.hit && !n.missed);
+    if (hitNotes.length === 0) return;
+    
+    const note = hitNotes[0];
+    const dist = Math.abs(note.y + note.height - HIT_LINE_Y);
+    
+    if (dist <= 15) {
+        note.hit = true;
+        score += 100;
+        combo++;
+        showPixelText(lane, 'PERFECT', PALETTE[lane]);
+    } else if (dist <= 30) {
+        note.hit = true;
+        score += 50;
+        combo++;
+        showPixelText(lane, 'GOOD', '#ffff00');
+    } else if (dist <= 45) {
+        note.hit = true;
+        score += 20;
+        combo = 0;
+        showPixelText(lane, 'BAD', '#888');
+    }
+    
+    highlightLane(lane);
+    updateScore();
+}
+
+let texts = [];
+function showPixelText(lane, text, color) {
+    texts.push({
+        x: lane * LANE_WIDTH + LANE_WIDTH / 2,
+        y: HIT_LINE_Y - 30,
+        text, color, life: 30
+    });
+}
+
+function drawTexts() {
+    texts = texts.filter(t => {
+        ctx.fillStyle = t.color;
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.text, t.x, t.y);
+        t.y -= 1;
+        t.life--;
+        return t.life > 0;
+    });
+}
+
+function updateScore() {
+    document.getElementById('score').textContent = score.toString().padStart(5, '0');
+    document.getElementById('combo').textContent = combo;
+}
+
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    frameCount++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    drawBackground();
+    
+    spawnNote();
+    
+    notes = notes.filter(n => !n.hit && !n.missed);
+    notes.forEach(note => {
+        note.update();
+        note.draw();
+    });
+    
+    drawLaneBase();
+    drawTexts();
+    
+    animationId = requestAnimationFrame(gameLoop);
+}
+
+document.addEventListener('keydown', (e) => {
+    if (!gameRunning) return;
+    
+    let lane = keyMap[e.code] ?? arrowMap[e.code];
+    if (lane !== undefined) {
+        e.preventDefault();
+        checkHit(lane);
+    }
+});
+
+function startGame() {
+    if (gameRunning) return;
+    gameRunning = true;
+    notes = [];
+    score = 0;
+    combo = 0;
+    frameCount = 0;
+    updateScore();
+    gameLoop();
+}
+
+function resetGame() {
+    gameRunning = false;
+    cancelAnimationFrame(animationId);
+    notes = [];
+    score = 0;
+    combo = 0;
+    texts = [];
+    updateScore();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground();
+    drawLaneBase();
+}
+
+drawBackground();
+drawLaneBase();
+</script>
+</body>
+</html>

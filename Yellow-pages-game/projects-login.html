@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 项目 - 访问验证 | 我的工作站</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #0f0f23 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: rgba(30, 30, 45, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+        }
+        .logo h1 { color: #fff; font-size: 1.5rem; margin-bottom: 8px; }
+        .logo p { color: #888; font-size: 0.9rem; }
+        .section-badge {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 25px;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        .password-input-wrap { position: relative; }
+        .password-input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .password-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.2);
+        }
+        .password-input.error {
+            border-color: #e74c3c;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.1rem;
+        }
+        .toggle-password:hover { color: #fff; }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.4);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
+        .error-message.show { display: block; }
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .back-link a {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+        .back-link a:hover { color: #00d4aa; }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .success-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .success-overlay.show { opacity: 1; visibility: visible; }
+        .success-content { text-align: center; color: #fff; }
+        .success-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            animation: scaleIn 0.5s ease;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">📁</div>
+            <h1>项目中心</h1>
+            <p>Project Management</p>
+        </div>
+
+        <div style="text-align: center;">
+            <span class="section-badge">🔒 受保护内容</span>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="password">访问密码</label>
+                <div class="password-input-wrap">
+                    <input type="password" id="password" class="password-input" placeholder="请输入密码" autocomplete="off">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">进入项目中心</button>
+
+            <div class="error-message" id="errorMessage">❌ 密码错误，请重试</div>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← 返回工作站首页</a>
+        </div>
+    </div>
+
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>验证成功</h2>
+            <p>正在进入项目中心...</p>
+        </div>
+    </div>
+
+    <script>
+        // 密码配置
+        var CORRECT_PASSWORD = '85661139';
+        var REDIRECT_URL = 'projects.html';
+        var SESSION_KEY = 'projects_access_granted';
+        var SESSION_DURATION = 24 * 60 * 60 * 1000; // 24小时
+
+        // 检查现有会话
+        function checkExistingSession() {
+            var session = localStorage.getItem(SESSION_KEY);
+            if (session) {
+                var data = JSON.parse(session);
+                if (Date.now() - data.timestamp < SESSION_DURATION) {
+                    window.location.href = REDIRECT_URL;
+                    return true;
+                } else {
+                    localStorage.removeItem(SESSION_KEY);
+                }
+            }
+            return false;
+        }
+
+        // 页面加载时检查
+        if (checkExistingSession()) {
+            // 已登录，会跳转
+        }
+
+        // 切换密码显示
+        function togglePassword() {
+            var input = document.getElementById('password');
+            var btn = document.querySelector('.toggle-password');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
+        // 表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var input = document.getElementById('password');
+            var submitBtn = document.getElementById('submitBtn');
+            var errorMsg = document.getElementById('errorMessage');
+            var password = input.value.trim();
+
+            // 显示加载状态
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span>验证中...';
+            errorMsg.classList.remove('show');
+            input.classList.remove('error');
+
+            // 延迟验证
+            setTimeout(function() {
+                if (password === CORRECT_PASSWORD) {
+                    // 创建会话
+                    localStorage.setItem(SESSION_KEY, JSON.stringify({
+                        timestamp: Date.now(),
+                        authenticated: true
+                    }));
+
+                    // 显示成功
+                    document.getElementById('successOverlay').classList.add('show');
+
+                    // 跳转
+                    setTimeout(function() {
+                        window.location.href = REDIRECT_URL;
+                    }, 1500);
+                } else {
+                    // 验证失败
+                    input.classList.add('error');
+                    errorMsg.classList.add('show');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '进入项目中心';
+                    input.value = '';
+                    input.focus();
+                }
+            }, 600);
+        });
+    </script>
+  <script src="assets/js/music-global.js?v=2.8.9"></script>
+</body>
+</html>

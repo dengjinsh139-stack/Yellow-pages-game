@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎹 钢琴瀑布流</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(180deg, #1a1a2e, #16213e);
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #gameCanvas {
+            border-radius: 10px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+        }
+        .ui {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            text-align: center;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui">得分: <span id="score">0</span> | 连击: <span id="combo">0</span></div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div class="controls">A S D F 或点击黑块</div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        let score = 0;
+        let combo = 0;
+        let notes = [];
+        const lanes = 4;
+        const laneWidth = canvas.width / lanes;
+        const keys = ['a', 's', 'd', 'f'];
+        const keyMap = { 'a': 0, 's': 1, 'd': 2, 'f': 3 };
+        
+        // 音阶
+        const scale = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+        
+        // 背景音乐琶音
+        let bgmNote = 0;
+        function playBGM() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'triangle';
+            osc.frequency.value = scale[bgmNote % scale.length];
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+            bgmNote++;
+        }
+        
+        // 击中音效
+        function playHit(freq) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        // 生成音符
+        function spawnNote() {
+            const lane = Math.floor(Math.random() * lanes);
+            const noteFreq = scale[Math.floor(Math.random() * scale.length)];
+            notes.push({
+                lane,
+                y: -100,
+                speed: 3 + score / 1000,
+                freq: noteFreq,
+                hit: false,
+                color: `hsl(${180 + lane * 30}, 100%, 50%)`
+            });
+        }
+        
+        // 绘制
+        function draw() {
+            // 背景
+            ctx.fillStyle = 'rgba(26, 26, 46, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 分隔线
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 2;
+            for (let i = 1; i < lanes; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * laneWidth, 0);
+                ctx.lineTo(i * laneWidth, canvas.height);
+                ctx.stroke();
+            }
+            
+            // 判定线
+            ctx.strokeStyle = '#0ff';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#0ff';
+            ctx.beginPath();
+            ctx.moveTo(0, 500);
+            ctx.lineTo(canvas.width, 500);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            
+            // 按键提示
+            ctx.font = 'bold 30px Arial';
+            ctx.textAlign = 'center';
+            keys.forEach((key, i) => {
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.fillText(key.toUpperCase(), i * laneWidth + laneWidth/2, 540);
+            });
+            
+            // 音符
+            notes = notes.filter(n => {
+                n.y += n.speed;
+                
+                if (!n.hit) {
+                    ctx.fillStyle = n.color;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = n.color;
+                    ctx.fillRect(n.lane * laneWidth + 5, n.y, laneWidth - 10, 80);
+                    ctx.shadowBlur = 0;
+                }
+                
+                // 错过
+                if (n.y > canvas.height && !n.hit) {
+                    combo = 0;
+                    document.getElementById('combo').textContent = combo;
+                    return false;
+                }
+                
+                return n.y < canvas.height + 100;
+            });
+            
+            requestAnimationFrame(draw);
+        }
+        
+        // 按键处理
+        document.addEventListener('keydown', e => {
+            const lane = keyMap[e.key.toLowerCase()];
+            if (lane === undefined) return;
+            
+            // 找到最近的音符
+            const target = notes.find(n => 
+                n.lane === lane && !n.hit && n.y > 420 && n.y < 580
+            );
+            
+            if (target) {
+                target.hit = true;
+                score += 100 + combo * 10;
+                combo++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('combo').textContent = combo;
+                playHit(target.freq);
+            }
+        });
+        
+        // 点击处理
+        canvas.addEventListener('click', e => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const lane = Math.floor(x / laneWidth);
+            
+            const target = notes.find(n => 
+                n.lane === lane && !n.hit && n.y > 420 && n.y < 580
+            );
+            
+            if (target) {
+                target.hit = true;
+                score += 100 + combo * 10;
+                combo++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('combo').textContent = combo;
+                playHit(target.freq);
+            }
+        });
+        
+        // 启动
+        setInterval(spawnNote, 800);
+        setInterval(playBGM, 400);
+        
+        if (audioCtx.state === 'suspended') {
+            document.addEventListener('click', () => audioCtx.resume(), { once: true });
+        }
+        
+        draw();
+    </script>
+</body>
+</html>

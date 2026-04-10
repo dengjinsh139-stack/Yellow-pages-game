@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🫧 泡泡龙</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(180deg, #1a1a3e, #16213e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #gameCanvas { border: 3px solid #ff6b6b; border-radius: 10px; }
+        .ui {
+            margin-bottom: 15px;
+            font-size: 24px;
+            color: #4ecdc4;
+        }
+        .instructions {
+            margin-top: 15px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui">得分: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    <p class="instructions">鼠标瞄准，点击发射！3个相同颜色消除</p>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
+        const rows = 10, cols = 8;
+        const bubbleSize = 40;
+        let grid = [];
+        let currentBubble = null;
+        let nextBubble = null;
+        let score = 0;
+        let angle = -Math.PI / 2;
+        let projectile = null;
+        
+        function playBGM() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 200 + Math.random() * 200;
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        function playShoot() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 600;
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+        
+        function playPop() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+        
+        function init() {
+            for(let r = 0; r < rows; r++) {
+                grid[r] = [];
+                for(let c = 0; c < cols; c++) {
+                    if(r < 4) {
+                        grid[r][c] = Math.floor(Math.random() * colors.length);
+                    } else {
+                        grid[r][c] = -1;
+                    }
+                }
+            }
+            currentBubble = Math.floor(Math.random() * colors.length);
+            nextBubble = Math.floor(Math.random() * colors.length);
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#1a1a3e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制网格
+            for(let r = 0; r < rows; r++) {
+                for(let c = 0; c < cols; c++) {
+                    if(grid[r][c] >= 0) {
+                        const x = c * bubbleSize + bubbleSize/2 + (r % 2) * bubbleSize/2;
+                        const y = r * bubbleSize * 0.866 + bubbleSize/2;
+                        ctx.fillStyle = colors[grid[r][c]];
+                        ctx.beginPath();
+                        ctx.arc(x, y, bubbleSize/2 - 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // 发射器
+            const shooterX = canvas.width / 2;
+            const shooterY = canvas.height - 50;
+            
+            // 瞄准线
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(shooterX, shooterY);
+            ctx.lineTo(shooterX + Math.cos(angle) * 100, shooterY + Math.sin(angle) * 100);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 当前泡泡
+            ctx.fillStyle = colors[currentBubble];
+            ctx.beginPath();
+            ctx.arc(shooterX, shooterY, bubbleSize/2 - 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 下一个泡泡
+            ctx.fillStyle = colors[nextBubble];
+            ctx.beginPath();
+            ctx.arc(shooterX + 80, shooterY, 15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#888';
+            ctx.font = '12px Arial';
+            ctx.fillText('下一个', shooterX + 55, shooterY - 25);
+            
+            // 发射的泡泡
+            if(projectile) {
+                ctx.fillStyle = colors[projectile.color];
+                ctx.beginPath();
+                ctx.arc(projectile.x, projectile.y, bubbleSize/2 - 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function update() {
+            if(projectile) {
+                projectile.x += Math.cos(projectile.angle) * 8;
+                projectile.y += Math.sin(projectile.angle) * 8;
+                
+                // 墙壁反弹
+                if(projectile.x <= bubbleSize/2 || projectile.x >= canvas.width - bubbleSize/2) {
+                    projectile.angle = Math.PI - projectile.angle;
+                }
+                
+                // 碰撞检测
+                let hit = false;
+                for(let r = 0; r < rows && !hit; r++) {
+                    for(let c = 0; c < cols && !hit; c++) {
+                        if(grid[r][c] >= 0) {
+                            const bx = c * bubbleSize + bubbleSize/2 + (r % 2) * bubbleSize/2;
+                            const by = r * bubbleSize * 0.866 + bubbleSize/2;
+                            const dist = Math.hypot(projectile.x - bx, projectile.y - by);
+                            if(dist < bubbleSize) {
+                                hit = true;
+                                // 找到最近的空位
+                                const nr = Math.floor(projectile.y / (bubbleSize * 0.866));
+                                const nc = Math.floor((projectile.x - (nr % 2) * bubbleSize/2) / bubbleSize);
+                                if(nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                                    grid[nr][nc] = projectile.color;
+                                    checkMatches(nr, nc);
+                                }
+                                projectile = null;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // 到达顶部
+                if(!hit && projectile.y <= bubbleSize/2) {
+                    const nr = 0;
+                    const nc = Math.floor(projectile.x / bubbleSize);
+                    if(nc >= 0 && nc < cols) {
+                        grid[nr][nc] = projectile.color;
+                        checkMatches(nr, nc);
+                    }
+                    projectile = null;
+                }
+                
+                if(!projectile) {
+                    currentBubble = nextBubble;
+                    nextBubble = Math.floor(Math.random() * colors.length);
+                }
+            }
+        }
+        
+        function checkMatches(r, c) {
+            const color = grid[r][c];
+            const visited = new Set();
+            const matches = [];
+            const queue = [[r, c]];
+            
+            while(queue.length > 0) {
+                const [cr, cc] = queue.shift();
+                const key = `${cr},${cc}`;
+                if(visited.has(key)) continue;
+                visited.add(key);
+                matches.push([cr, cc]);
+                
+                // 检查邻居
+                const neighbors = [
+                    [cr-1, cc], [cr+1, cc], [cr, cc-1], [cr, cc+1],
+                    [cr-1, cc + (cr % 2 === 0 ? -1 : 0)],
+                    [cr-1, cc + (cr % 2 === 0 ? 0 : 1)],
+                    [cr+1, cc + (cr % 2 === 0 ? -1 : 0)],
+                    [cr+1, cc + (cr % 2 === 0 ? 0 : 1)]
+                ];
+                
+                for(const [nr, nc] of neighbors) {
+                    if(nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                        if(grid[nr][nc] === color && !visited.has(`${nr},${nc}`)) {
+                            queue.push([nr, nc]);
+                        }
+                    }
+                }
+            }
+            
+            if(matches.length >= 3) {
+                matches.forEach(([mr, mc]) => grid[mr][mc] = -1);
+                score += matches.length * 10;
+                document.getElementById('score').textContent = score;
+                playPop();
+            }
+        }
+        
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            angle = Math.atan2(y - (canvas.height - 50), x - canvas.width/2);
+            angle = Math.max(-Math.PI + 0.2, Math.min(-0.2, angle));
+        });
+        
+        canvas.addEventListener('click', () => {
+            if(!projectile) {
+                projectile = {
+                    x: canvas.width / 2,
+                    y: canvas.height - 50,
+                    angle: angle,
+                    color: currentBubble
+                };
+                playShoot();
+            }
+        });
+        
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        
+        init();
+        loop();
+        setInterval(playBGM, 600);
+        
+        if(audioCtx.state === 'suspended') {
+            document.addEventListener('click', ()=>audioCtx.resume(),{once:true});
+        }
+    </script>
+</body>
+</html>

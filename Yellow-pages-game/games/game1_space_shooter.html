@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 太空节奏射击</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #gameCanvas {
+            border: 2px solid #0ff;
+            box-shadow: 0 0 20px #0ff;
+        }
+        .ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 20px;
+            text-shadow: 0 0 10px #0ff;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui">得分: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="controls">⬅️ ➡️ 移动飞船 | 空格射击 | 击中节奏点得分</div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        let score = 0;
+        let shipX = 400;
+        const shipY = 520;
+        let bullets = [];
+        let targets = [];
+        let particles = [];
+        
+        // 背景音乐 - 太空电子风格
+        function playBGM() {
+            const now = audioCtx.currentTime;
+            // 低音鼓点
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(60, now);
+            osc.frequency.exponentialRampToValueAtTime(30, now + 0.2);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+        
+        // 射击音效
+        function playShoot() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+        
+        // 击中音效
+        function playHit() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+        
+        // 生成目标
+        function spawnTarget() {
+            targets.push({
+                x: Math.random() * 750 + 25,
+                y: 0,
+                radius: 20,
+                color: `hsl(${Math.random() * 60 + 180}, 100%, 50%)`,
+                speed: 2 + Math.random() * 2
+            });
+        }
+        
+        // 绘制星空背景
+        function drawStars() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 137.5 + Date.now() * 0.01) % canvas.width;
+                const y = (i * 73.3 + Date.now() * 0.05) % canvas.height;
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5})`;
+                ctx.fillRect(x, y, 2, 2);
+            }
+        }
+        
+        // 绘制飞船
+        function drawShip() {
+            ctx.save();
+            ctx.translate(shipX, shipY);
+            ctx.fillStyle = '#0ff';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#0ff';
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(-15, 20);
+            ctx.lineTo(0, 10);
+            ctx.lineTo(15, 20);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        // 游戏循环
+        function gameLoop() {
+            drawStars();
+            
+            // 更新和绘制子弹
+            bullets = bullets.filter(b => {
+                b.y -= 8;
+                ctx.fillStyle = '#ff0';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff0';
+                ctx.fillRect(b.x - 2, b.y, 4, 10);
+                ctx.shadowBlur = 0;
+                return b.y > 0;
+            });
+            
+            // 更新和绘制目标
+            targets = targets.filter(t => {
+                t.y += t.speed;
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fillStyle = t.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = t.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                // 检测碰撞
+                bullets.forEach((b, bi) => {
+                    const dx = b.x - t.x;
+                    const dy = b.y - t.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < t.radius) {
+                        score += 100;
+                        document.getElementById('score').textContent = score;
+                        playHit();
+                        bullets.splice(bi, 1);
+                        t.hit = true;
+                    }
+                });
+                
+                return t.y < canvas.height && !t.hit;
+            });
+            
+            drawShip();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 控制
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') shipX = Math.max(30, shipX - 30);
+            if (e.key === 'ArrowRight') shipX = Math.min(770, shipX + 30);
+            if (e.key === ' ') {
+                bullets.push({ x: shipX, y: shipY - 20 });
+                playShoot();
+            }
+        });
+        
+        // 背景音乐循环
+        setInterval(playBGM, 500);
+        
+        // 生成目标
+        setInterval(spawnTarget, 1000);
+        
+        // 启动
+        if (audioCtx.state === 'suspended') {
+            document.addEventListener('click', () => audioCtx.resume(), { once: true });
+        }
+        
+        gameLoop();
+    </script>
+</body>
+</html>

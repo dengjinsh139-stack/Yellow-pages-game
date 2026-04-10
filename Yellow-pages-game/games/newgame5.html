@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>节奏点击 - Rhythm Tap</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(180deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+        #gameCanvas {
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(233, 69, 96, 0.5);
+        }
+        .ui {
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .score-display {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #e94560;
+            color: #e94560;
+        }
+        .combo-display {
+            font-size: 24px;
+            color: #ffd700;
+            margin-top: 5px;
+            height: 30px;
+        }
+        .accuracy {
+            font-size: 18px;
+            color: #aaa;
+            margin-top: 10px;
+        }
+        #startBtn {
+            background: linear-gradient(45deg, #e94560, #ff6b6b);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 30px;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.6);
+            transition: transform 0.2s;
+        }
+        #startBtn:hover {
+            transform: scale(1.05);
+        }
+        .controls {
+            color: #888;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .hit-feedback {
+            position: absolute;
+            font-size: 36px;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="ui">
+        <div class="score-display" id="score">0</div>
+        <div class="combo-display" id="combo"></div>
+        <div class="accuracy" id="accuracy">准备开始</div>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <button id="startBtn">开始游戏</button>
+    <div class="controls">点击圆圈得分 | 在圆圈发光时点击获得更高分数</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const comboEl = document.getElementById('combo');
+const accuracyEl = document.getElementById('accuracy');
+const startBtn = document.getElementById('startBtn');
+
+// 游戏状态
+let score = 0;
+let combo = 0;
+let maxCombo = 0;
+let gameRunning = false;
+let circles = [];
+let particles = [];
+let gameTime = 0;
+let lastSpawn = 0;
+let spawnInterval = 1000;
+
+// 命中判定
+const JUDGMENTS = {
+    PERFECT: { threshold: 50, score: 300, color: '#ff00ff', text: 'PERFECT!' },
+    GREAT: { threshold: 100, score: 200, color: '#00ff00', text: 'GREAT!' },
+    GOOD: { threshold: 150, score: 100, color: '#ffff00', text: 'GOOD' },
+    MISS: { threshold: 200, score: 0, color: '#888888', text: 'MISS' }
+};
+
+// ============ Web Audio API - 节奏音乐 ============
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let bgmInterval;
+let nextNote = 0;
+
+function playTone(frequency, duration, type = 'sine', volume = 0.3) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = type;
+    osc.frequency.value = frequency;
+    filter.type = 'lowpass';
+    filter.frequency.value = frequency * 3;
+    
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+function playKick() {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playSnare() {
+    const bufferSize = audioCtx.sampleRate * 0.1;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+    }
+    const noise = audioCtx.createBufferSource();
+    const filter = audioCtx.createBiquadFilter();
+    const gain = audioCtx.createGain();
+    noise.buffer = buffer;
+    filter.type = 'highpass';
+    filter.frequency.value = 1000;
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    noise.start();
+}
+
+function playHiHat() {
+    playTone(10000, 0.05, 'square', 0.1);
+}
+
+function playHitSound() {
+    playTone(880, 0.1, 'sine', 0.2);
+    setTimeout(() => playTone(1100, 0.1, 'sine', 0.15), 50);
+}
+
+function playPerfectSound() {
+    playTone(523.25, 0.1, 'sine', 0.25); // C5
+    setTimeout(() => playTone(659.25, 0.1, 'sine', 0.2), 50);  // E5
+    setTimeout(() => playTone(783.99, 0.15, 'sine', 0.25), 100); // G5
+}
+
+// BGM序列
+const melodyPattern = [
+    { note: 261.63, dur: 0.25 }, // C4
+    { note: 329.63, dur: 0.25 }, // E4
+    { note: 392.00, dur: 0.25 }, // G4
+    { note: 523.25, dur: 0.25 }, // C5
+    { note: 392.00, dur: 0.25 },
+    { note: 329.63, dur: 0.25 },
+    { note: 293.66, dur: 0.25 }, // D4
+    { note: 349.23, dur: 0.25 }, // F4
+    { note: 440.00, dur: 0.25 }, // A4
+    { note: 587.33, dur: 0.25 }, // D5
+    { note: 440.00, dur: 0.25 },
+    { note: 349.23, dur: 0.25 },
+];
+
+let beatIndex = 0;
+function startBGM() {
+    const bpm = 120;
+    const beatTime = 60000 / bpm / 4; // 十六分音符
+    
+    bgmInterval = setInterval(() => {
+        if (!gameRunning) return;
+        
+        const step = beatIndex % 16;
+        
+        // 鼓组
+        if (step % 4 === 0) playKick();
+        if (step % 4 === 2) playSnare();
+        if (step % 2 === 1) playHiHat();
+        
+        // 旋律
+        if (step % 2 === 0 && Math.random() > 0.3) {
+            const noteIdx = Math.floor(beatIndex / 4) % melodyPattern.length;
+            playTone(melodyPattern[noteIdx].note, 0.15, 'triangle', 0.15);
+        }
+        
+        beatIndex++;
+    }, beatTime);
+}
+
+function stopBGM() {
+    clearInterval(bgmInterval);
+    beatIndex = 0;
+}
+
+// ============ 游戏对象 ============
+class Circle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 60;
+        this.targetRadius = 30;
+        this.shrinkSpeed = 0.5 + (gameTime / 60000) * 0.3;
+        this.createdAt = Date.now();
+        this.hit = false;
+        this.missed = false;
+        this.lifeTime = 2000;
+    }
+    
+    update() {
+        if (this.hit || this.missed) return;
+        
+        this.radius -= this.shrinkSpeed;
+        
+        if (this.radius <= 0) {
+            this.missed = true;
+            combo = 0;
+            updateCombo();
+            showFeedback(this.x, this.y, JUDGMENTS.MISS);
+        }
+    }
+    
+    getJudgment() {
+        const diff = Math.abs(this.radius - this.targetRadius);
+        if (diff < JUDGMENTS.PERFECT.threshold) return JUDGMENTS.PERFECT;
+        if (diff < JUDGMENTS.GREAT.threshold) return JUDGMENTS.GREAT;
+        if (diff < JUDGMENTS.GOOD.threshold) return JUDGMENTS.GOOD;
+        return null;
+    }
+    
+    click() {
+        if (this.hit || this.missed) return null;
+        
+        const judgment = this.getJudgment();
+        if (judgment) {
+            this.hit = true;
+            createExplosion(this.x, this.y, judgment.color);
+            
+            if (judgment === JUDGMENTS.MISS) {
+                combo = 0;
+            } else {
+                combo++;
+                if (combo > maxCombo) maxCombo = combo;
+            }
+            
+            score += judgment.score + (combo > 10 ? combo * 10 : 0);
+            updateCombo();
+            
+            if (judgment === JUDGMENTS.PERFECT) {
+                playPerfectSound();
+            } else {
+                playHitSound();
+            }
+            
+            showFeedback(this.x, this.y - 50, judgment);
+            return judgment;
+        }
+        return null;
+    }
+    
+    draw() {
+        if (this.hit) return;
+        
+        const judgment = this.getJudgment();
+        const ringColor = judgment ? judgment.color : '#555';
+        const alpha = this.missed ? 0.3 : 1;
+        
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        
+        // 外圈
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = ringColor;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        
+        // 内圈（目标）
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.targetRadius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // 发光效果
+        if (judgment && judgment !== JUDGMENTS.MISS) {
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = ringColor;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+        
+        ctx.restore();
+    }
+}
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 8;
+        this.vy = (Math.random() - 0.5) * 8;
+        this.life = 1;
+        this.color = color;
+        this.size = Math.random() * 5 + 3;
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.2; // 重力
+        this.life -= 0.02;
+        this.size *= 0.98;
+    }
+    
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+// ============ 游戏逻辑 ============
+function spawnCircle() {
+    const margin = 100;
+    const x = margin + Math.random() * (canvas.width - margin * 2);
+    const y = margin + Math.random() * (canvas.height - margin * 2);
+    circles.push(new Circle(x, y));
+}
+
+function createExplosion(x, y, color) {
+    for (let i = 0; i < 15; i++) {
+        particles.push(new Particle(x, y, color));
+    }
+}
+
+function showFeedback(x, y, judgment) {
+    const el = document.createElement('div');
+    el.className = 'hit-feedback';
+    el.textContent = judgment.text;
+    el.style.color = judgment.color;
+    el.style.left = (canvas.offsetLeft + x) + 'px';
+    el.style.top = (canvas.offsetTop + y) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+}
+
+function updateCombo() {
+    comboEl.textContent = combo > 1 ? `${combo} COMBO!` : '';
+    if (combo > 10) {
+        comboEl.style.textShadow = `0 0 ${Math.min(combo, 30)}px #ffd700`;
+    } else {
+        comboEl.style.textShadow = 'none';
+    }
+}
+
+function initGame() {
+    score = 0;
+    combo = 0;
+    maxCombo = 0;
+    circles = [];
+    particles = [];
+    gameTime = 0;
+    lastSpawn = 0;
+    spawnInterval = 1200;
+    scoreEl.textContent = '0';
+    comboEl.textContent = '';
+    accuracyEl.textContent = '跟随节奏点击!';
+}
+
+function update(deltaTime) {
+    gameTime += deltaTime;
+    lastSpawn += deltaTime;
+    
+    // 随时间增加难度
+    spawnInterval = Math.max(600, 1200 - (gameTime / 10000) * 100);
+    
+    if (lastSpawn > spawnInterval) {
+        spawnCircle();
+        lastSpawn = 0;
+    }
+    
+    circles = circles.filter(c => !c.hit && !c.missed);
+    circles.forEach(c => c.update());
+    
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => p.update());
+    
+    scoreEl.textContent = score;
+}
+
+function draw() {
+    // 清空背景
+    ctx.fillStyle = 'rgba(26, 10, 46, 0.3)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 绘制网格背景
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 50) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+    
+    circles.forEach(c => c.draw());
+    particles.forEach(p => p.draw());
+}
+
+let lastTime = 0;
+function gameLoop(timestamp) {
+    if (gameRunning) {
+        const deltaTime = timestamp - lastTime;
+        update(deltaTime);
+        draw();
+    }
+    lastTime = timestamp;
+    requestAnimationFrame(gameLoop);
+}
+
+// 点击检测
+canvas.addEventListener('mousedown', (e) => {
+    if (!gameRunning) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // 找到点击的圆圈（按半径从小到大排序）
+    const clickable = circles
+        .filter(c => !c.hit && !c.missed)
+        .sort((a, b) => a.radius - b.radius);
+    
+    for (let circle of clickable) {
+        const dx = x - circle.x;
+        const dy = y - circle.y;
+        if (dx * dx + dy * dy < circle.radius * circle.radius) {
+            circle.click();
+            break;
+        }
+    }
+});
+
+function startGame() {
+    gameRunning = true;
+    initGame();
+    startBGM();
+    startBtn.textContent = '重新开始';
+}
+
+startBtn.addEventListener('click', () => {
+    stopBGM();
+    startGame();
+});
+
+// 初始化
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

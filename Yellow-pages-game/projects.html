@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 项目 - 我的工作站</title>
+    <script>
+        // 访问权限检查
+        (function() {
+            var SESSION_KEY = 'projects_access_granted';
+            var SESSION_DURATION = 24 * 60 * 60 * 1000;
+            
+            var session = localStorage.getItem(SESSION_KEY);
+            if (!session) {
+                window.location.href = 'projects-login.html';
+                return;
+            }
+            
+            var data = JSON.parse(session);
+            if (Date.now() - data.timestamp >= SESSION_DURATION) {
+                localStorage.removeItem(SESSION_KEY);
+                window.location.href = 'projects-login.html';
+            }
+        })();
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #00d4aa;
+            --primary-blue: #00a8e8;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.05);
+            --text: #e0e0e0;
+            --text-muted: #888;
+        }
+        
+        body {
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-version {
+            font-size: 0.7rem;
+            color: var(--primary);
+            background: rgba(0, 212, 170, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            font-weight: 500;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 10px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--primary);
+        }
+        
+        /* 页面头部 */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background: linear-gradient(180deg, rgba(0, 212, 170, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .main-title {
+            font-family: 'Black Ops One', 'Noto Sans SC', sans-serif;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            letter-spacing: 3px;
+        }
+        
+        /* 子导航 */
+        .sub-nav {
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 0;
+            position: sticky;
+            top: 61px;
+            z-index: 999;
+        }
+        
+        .sub-nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .sub-nav-link {
+            padding: 10px 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        
+        .sub-nav-link:hover, .sub-nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--primary);
+            border-color: rgba(0, 212, 170, 0.3);
+        }
+        
+        /* 内容区域 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+        
+        /* 项目卡片 */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+        
+        .project-card:hover {
+            border-color: rgba(0, 212, 170, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .project-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .project-title {
+            font-size: 1.3rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        
+        .project-status {
+            padding: 4px 12px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-left: auto;
+        }
+        
+        .project-desc {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .meta-item span {
+            color: var(--primary);
+        }
+        
+        /* 占位内容 */
+        .placeholder-box {
+            background: var(--bg-card);
+            border: 2px dashed rgba(0, 212, 170, 0.3);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .placeholder-text {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        /* G42 录音管理表格样式 */
+        .g42-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .g42-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .g42-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .g42-header p {
+            color: var(--text-muted);
+        }
+        
+        /* G42 子导航 */
+        .g42-sub-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding: 15px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        
+        .g42-sub-nav a {
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .g42-sub-nav a:hover {
+            color: #fff;
+            background: rgba(0, 212, 170, 0.1);
+        }
+        
+        .g42-sub-nav a.active {
+            color: var(--primary);
+            background: rgba(0, 212, 170, 0.15);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+        
+        .g42-tab {
+            display: none;
+        }
+        
+        .g42-tab.active {
+            display: block;
+        }
+        
+        /* G42 概览页 */
+        .g42-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .g42-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+        }
+        
+        .g42-card h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .g42-card p {
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        
+        .g42-card ul {
+            list-style: none;
+            color: var(--text-muted);
+        }
+        
+        .g42-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .g42-card li:last-child {
+            border-bottom: none;
+        }
+        
+        .g42-card li strong {
+            color: var(--text);
+        }
+        
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-box .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        /* 筛选栏 */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+        
+        /* 下拉框选项样式 */
+        .filter-group select option {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 8px;
+        }
+        
+        .filter-group select option:hover {
+            background: #00d4aa;
+            color: #000;
+        }
+        
+        .filter-group input {
+            min-width: 200px;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* 表格样式 */
+        .data-table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: rgba(0, 212, 170, 0.1);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        
+        .data-table tbody tr:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+        
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 角色列 */
+        .char-name {
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .char-actor {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        
+        /* 批次标签 */
+        .batch-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .batch-1 { background: rgba(0, 212, 170, 0.15); color: var(--primary); }
+        .batch-2 { background: rgba(0, 168, 232, 0.15); color: var(--primary-blue); }
+        .batch-3 { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+        .batch-2-5 { background: rgba(156, 39, 176, 0.15); color: #9c27b0; }
+        
+        /* 类型标签 */
+        .type-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+        
+        /* 状态标签 */
+        .status-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-done { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
+        .status-pending { background: rgba(255, 152, 0, 0.15); color: #ff9800; }
+        .status-recording { background: rgba(0, 212, 170, 0.15); color: var(--primary); }
+        
+        /* 台词内容 */
+        .line-text {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .pagination button {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: rgba(0, 212, 170, 0.2);
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination .page-info {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* 角色点击样式 */
+        .char-name-clickable {
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .char-name-clickable:hover {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-header h3 {
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: #fff;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        /* 角色概览 */
+        .char-summary {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        .char-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-blue) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .char-info {
+            flex: 1;
+        }
+        
+        .char-info h4 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin: 0 0 5px 0;
+        }
+        
+        .char-info p {
+            color: var(--text-muted);
+            margin: 0 0 15px 0;
+        }
+        
+        .char-progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-blue) 100%);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        /* 角色台词明细表 */
+        .char-lines-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        
+        .char-lines-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .char-lines-table th {
+            background: rgba(0, 212, 170, 0.1);
+            padding: 12px;
+            text-align: left;
+            font-size: 0.85rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+        
+        .char-lines-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        
+        .char-lines-table tbody tr:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+        
+        .char-lines-table .line-text {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-title { font-size: 2rem; }
+            .sub-nav-link { padding: 8px 15px; font-size: 0.85rem; }
+            .project-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <div class="nav-logo-text">
+                    <span>我的工作站</span>
+                </div>
+            </a>
+            <div class="nav-links" id="nav-links"></div>
+        </div>
+    </nav>
+    
+    <!-- 页面头部 -->
+    <header>
+        <h1 class="main-title">📁 项目中心</h1>
+        <p class="subtitle">项目管理与进度追踪</p>
+    </header>
+    
+    <!-- 子导航 -->
+    <nav class="sub-nav">
+        <div class="sub-nav-content">
+            <a href="#overview" class="sub-nav-link active" onclick="showSection('overview', this)">📊 概览</a>
+            <a href="#g42" class="sub-nav-link" onclick="showSection('g42', this)">🎮 G42</a>
+        </div>
+    </nav>
+    
+    <!-- 内容区域 -->
+    <div class="container">
+        <!-- 概览页 -->
+        <div id="overview" class="section active">
+            <div class="section-title">
+                <h2>📊 项目概览</h2>
+            </div>
+            <div class="project-grid">
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">🎮</div>
+                        <h3 class="project-title">G42</h3>
+                        <span class="project-status">进行中</span>
+                    </div>
+                    <p class="project-desc">游戏开发项目，待更新详细内容...</p>
+                    <div class="project-meta">
+                        <div class="meta-item">📅 <span>更新时间：</span>待更新</div>
+                        <div class="meta-item">👤 <span>负责人：</span>待更新</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- G42 项目页 -->
+        <div id="g42" class="section">
+            <div class="g42-container">
+                <div class="g42-header">
+                    <h2>🎮 G42 项目</h2>
+                    <p>火凤燎原游戏开发项目</p>
+                </div>
+                
+                <!-- G42 子导航 -->
+                <nav class="g42-sub-nav">
+                    <a class="active" onclick="showG42Tab('g42-overview', this)">📊 概览</a>
+                    <a onclick="showG42Tab('g42-voice', this)">🎙️ 语音</a>
+                </nav>
+                
+                <!-- G42 概览页 -->
+                <div id="g42-overview" class="g42-tab active">
+                    <div class="g42-overview-grid">
+                        <div class="g42-card">
+                            <h3>📋 项目简介</h3>
+                            <p>《火凤燎原》是一款以三国为背景的剧情向游戏，讲述了燎原火、司马懿、小孟等角色在乱世中的故事。</p>
+                        </div>
+                        <div class="g42-card">
+                            <h3>🎯 项目状态</h3>
+                            <ul>
+                                <li><strong>第一批录音：</strong>已完成 ✅</li>
+                                <li><strong>第二批录音：</strong>进行中 🔄</li>
+                                <li><strong>第三批录音：</strong>待开始 ⏳</li>
+                            </ul>
+                        </div>
+                        <div class="g42-card">
+                            <h3>👥 主要角色</h3>
+                            <ul>
+                                <li>🔥 燎原火 - WeiF</li>
+                                <li>👹 董卓 - ZhangD</li>
+                                <li>🦅 司马懿 - 待定</li>
+                                <li>🦋 小孟 - 待定</li>
+                                <li>🌙 袁方 - 待定</li>
+                                <li>🦊 郭嘉 - 待定</li>
+                                <li>👑 刘备 - 待定</li>
+                                <li>🐉 关羽 - 待定</li>
+                            </ul>
+                        </div>
+                        <div class="g42-card">
+                            <h3>📊 快速统计</h3>
+                            <ul>
+                                <li><strong>角色总数：</strong>25+</li>
+                                <li><strong>台词总数：</strong>3000+</li>
+                                <li><strong>已录制：</strong>~70%</li>
+                                <li><strong>配音演员：</strong>10+</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- G42 语音页 - 配音管理 -->
+                <div id="g42-voice" class="g42-tab">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <p style="color: var(--text-muted);">火凤燎原配音台本明细 - 快速追溯与查询</p>
+                    </div>
+                    
+                    <!-- 统计卡片 -->
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="number" id="stat-characters">0</div>
+                        <div class="label">角色总数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="stat-lines">0</div>
+                        <div class="label">台词总数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="stat-recorded">0</div>
+                        <div class="label">已录制</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="stat-progress">0%</div>
+                        <div class="label">总进度</div>
+                    </div>
+                </div>
+                
+                <!-- 筛选栏 -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>批次:</label>
+                        <select id="filter-batch" onchange="updateCharacterSelect(); updateBatchInfo(); filterTable()">
+                            <option value="">全部</option>
+                            <option value="第一批">第一批</option>
+                            <option value="第二批">第二批</option>
+                            <option value="第2.5批">第2.5批</option>
+                            <option value="第三批">第三批</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>角色:</label>
+                        <select id="filter-character" onchange="filterTable()">
+                            <option value="">全部角色</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>状态:</label>
+                        <select id="filter-status" onchange="filterTable()">
+                            <option value="">全部</option>
+                            <option value="已录完">已录完</option>
+                            <option value="待录制">待录制</option>
+                            <option value="重录">重录</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>搜索台词:</label>
+                        <input type="text" id="filter-search" placeholder="输入台词关键词..." onkeyup="filterTable()">
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button onclick="clearFilters()" style="padding: 8px 16px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; color: var(--text); cursor: pointer;">清空筛选</button>
+                    </div>
+                </div>
+                
+                <!-- 批次信息显示 -->
+                <div id="batch-info" style="display: none; margin: 15px 0; padding: 15px; background: rgba(0,212,170,0.05); border: 1px solid rgba(0,212,170,0.2); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="color: var(--primary); font-weight: bold; font-size: 1.1rem;" id="batch-name"></span>
+                            <span style="color: var(--text-muted); margin-left: 10px;">角色数: <strong id="batch-characters" style="color: var(--text);">0</strong> | 
+                            台词数: <strong id="batch-lines" style="color: var(--text);">0</strong> | 
+                            已录制: <strong id="batch-recorded" style="color: #4caf50;">0</strong> | 
+                            进度: <strong id="batch-progress" style="color: var(--primary);">0%</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快捷筛选 -->
+                <div style="margin-bottom: 20px; padding: 15px; background: var(--bg-card); border-radius: 8px;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem; margin-right: 10px;">⚡ 快捷筛选:</span>
+                    <button onclick="quickFilter('batch', '第一批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); border-radius: 4px; color: #4caf50; font-size: 0.85rem; cursor: pointer;">第一批</button>
+                    <button onclick="quickFilter('batch', '第二批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(33,150,243,0.1); border: 1px solid rgba(33,150,243,0.3); border-radius: 4px; color: #2196f3; font-size: 0.85rem; cursor: pointer;">第二批</button>
+                    <button onclick="quickFilter('batch', '第2.5批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(156,39,176,0.1); border: 1px solid rgba(156,39,176,0.3); border-radius: 4px; color: #9c27b0; font-size: 0.85rem; cursor: pointer;">第2.5批</button>
+                    <button onclick="quickFilter('batch', '第三批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3); border-radius: 4px; color: var(--primary); font-size: 0.85rem; cursor: pointer;">第三批</button>
+                    <button onclick="quickFilter('status', '待录制')" style="margin-right: 8px; padding: 6px 12px; background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); border-radius: 4px; color: #ff9800; font-size: 0.85rem; cursor: pointer;">待录制</button>
+                    <button onclick="quickFilter('status', '已录完')" style="padding: 6px 12px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); border-radius: 4px; color: #00c853; font-size: 0.85rem; cursor: pointer;">已录完</button>
+                </div>
+                
+                <!-- 角色明细弹窗 -->
+                <div id="character-modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modal-title">角色台词明细</h3>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="char-summary">
+                                <div class="char-avatar" id="modal-avatar">🔥</div>
+                                <div class="char-info">
+                                    <h4 id="modal-char-name">燎原火</h4>
+                                    <p id="modal-char-actor">配音: WeiF</p>
+                                    <div class="char-progress-bar">
+                                        <div class="progress-fill" id="modal-progress"></div>
+                                    </div>
+                                    <p id="modal-char-stats">已录 180 / 总 200</p>
+                                </div>
+                            </div>
+                            <div class="char-lines-table-container">
+                                <table class="char-lines-table">
+                                    <thead>
+                                        <tr>
+                                            <th>批次</th>
+                                            <th>类型</th>
+                                            <th>场景</th>
+                                            <th>台词内容</th>
+                                            <th>状态</th>
+                                            <th>文件命名</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modal-lines-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据表格 -->
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>角色</th>
+                                <th>批次</th>
+                                <th>类型</th>
+                                <th>场景</th>
+                                <th>台词内容</th>
+                                <th>状态</th>
+                                <th>文件命名</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- 数据由 JS 填充 -->
+                        </tbody>
+                    </table>
+                    
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <button id="prev-btn" onclick="changePage(-1)" disabled>上一页</button>
+                        <span class="page-info">第 <span id="current-page">1</span> 页，共 <span id="total-pages">1</span> 页</span>
+                        <button id="next-btn" onclick="changePage(1)">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 配音数据从 data/g42-voice-data.js 加载
+        
+        let filteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        
+        // 初始化数据
+        function initData() {
+            if (typeof voiceData !== 'undefined' && voiceData.length > 0) {
+                filteredData = [...voiceData];
+                updateStats();
+                initCharacterSelect();
+                updateBatchInfo();
+                renderTable();
+            } else {
+                // 数据未加载完成，稍后重试
+                setTimeout(initData, 100);
+            }
+        }
+
+        // 计算统计数据
+        function updateStats() {
+            const uniqueChars = new Set(voiceData.map(d => d.character)).size;
+            const totalLines = voiceData.length;
+            const recordedLines = voiceData.filter(d => d.status === '已录完').length;
+            const progress = Math.round((recordedLines / totalLines) * 100);
+
+            document.getElementById('stat-characters').textContent = uniqueChars;
+            document.getElementById('stat-lines').textContent = totalLines;
+            document.getElementById('stat-recorded').textContent = recordedLines;
+            document.getElementById('stat-progress').textContent = progress + '%';
+        }
+        
+        // 更新批次信息显示
+        function updateBatchInfo() {
+            const batch = document.getElementById('filter-batch').value;
+            const batchInfoDiv = document.getElementById('batch-info');
+            
+            if (!batch) {
+                batchInfoDiv.style.display = 'none';
+                return;
+            }
+            
+            const batchData = voiceData.filter(d => d.batch === batch);
+            const uniqueChars = new Set(batchData.map(d => d.character)).size;
+            const totalLines = batchData.length;
+            const recordedLines = batchData.filter(d => d.status === '已录完').length;
+            const progress = totalLines > 0 ? Math.round((recordedLines / totalLines) * 100) : 0;
+            
+            document.getElementById('batch-name').textContent = batch;
+            document.getElementById('batch-characters').textContent = uniqueChars;
+            document.getElementById('batch-lines').textContent = totalLines;
+            document.getElementById('batch-recorded').textContent = recordedLines;
+            document.getElementById('batch-progress').textContent = progress + '%';
+            batchInfoDiv.style.display = 'block';
+        }
+
+        // 获取批次样式类
+        function getBatchClass(batch) {
+            const map = { '第一批': 'batch-1', '第二批': 'batch-2', '第三批': 'batch-3', '第2.5批': 'batch-2-5' };
+            return map[batch] || 'batch-1';
+        }
+
+        // 获取状态样式类
+        function getStatusClass(status) {
+            const map = { '已录完': 'status-done', '待录制': 'status-pending', '重录': 'status-recording' };
+            return map[status] || 'status-pending';
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            // 更新分页信息
+            document.getElementById('current-page').textContent = currentPage;
+            document.getElementById('total-pages').textContent = totalPages || 1;
+            document.getElementById('prev-btn').disabled = currentPage <= 1;
+            document.getElementById('next-btn').disabled = currentPage >= totalPages;
+
+            // 空状态
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div class="icon">🔍</div>
+                            <div>没有找到匹配的数据</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // 分页数据
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = filteredData.slice(start, start + itemsPerPage);
+
+            tbody.innerHTML = pageData.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>
+                        <div class="char-name-clickable" onclick="showCharacterDetail('${item.character}')">${item.character}</div>
+                        <div class="char-actor">${item.actor}</div>
+                    </td>
+                    <td><span class="batch-tag ${getBatchClass(item.batch)}">${item.batch}</span></td>
+                    <td><span class="type-tag">${item.type}</span></td>
+                    <td>${item.scene || '-'}</td>
+                    <td><div class="line-text" title="${item.text}">${item.text}</div></td>
+                    <td><span class="status-tag ${getStatusClass(item.status)}">${item.status}</span></td>
+                    <td>${item.fileName || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 显示角色明细弹窗
+        function showCharacterDetail(charName) {
+            const charLines = voiceData.filter(d => d.character === charName);
+            if (charLines.length === 0) return;
+            
+            const charInfo = charLines[0];
+            const totalLines = charLines.length;
+            const recordedLines = charLines.filter(d => d.status === '已录完').length;
+            const progress = Math.round((recordedLines / totalLines) * 100);
+            
+            // 更新弹窗内容
+            document.getElementById('modal-char-name').textContent = charName;
+            document.getElementById('modal-char-actor').textContent = `配音: ${charInfo.actor}`;
+            document.getElementById('modal-char-stats').textContent = `已录 ${recordedLines} / 总 ${totalLines}`;
+            document.getElementById('modal-progress').style.width = progress + '%';
+            
+            // 设置角色头像emoji
+            const avatarMap = {
+                '燎原火': '🔥', '董卓': '👹', '司马懿': '🦅', '小孟': '🦋',
+                '袁方': '🌙', '郭嘉': '🦊', '刘备': '👑', '关羽': '🐉',
+                '张飞': '🐻', '吕布': '⚔️', '黄盖': '⚓', '颜良': '🔱',
+                '文丑': '🎭', '张辽': '🏹', '孙淑': '🌸'
+            };
+            document.getElementById('modal-avatar').textContent = avatarMap[charName] || '👤';
+            
+            // 渲染台词明细表
+            const modalBody = document.getElementById('modal-lines-body');
+            modalBody.innerHTML = charLines.map(line => `
+                <tr>
+                    <td><span class="batch-tag ${getBatchClass(line.batch)}">${line.batch}</span></td>
+                    <td><span class="type-tag">${line.type}</span></td>
+                    <td>${line.scene || '-'}</td>
+                    <td><div class="line-text" title="${line.text}">${line.text}</div></td>
+                    <td><span class="status-tag ${getStatusClass(line.status)}">${line.status}</span></td>
+                    <td>${line.fileName || '-'}</td>
+                </tr>
+            `).join('');
+            
+            // 显示弹窗
+            document.getElementById('character-modal').style.display = 'flex';
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('character-modal').style.display = 'none';
+        }
+        
+        // 点击弹窗外部关闭
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('character-modal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // 筛选功能
+        function filterTable() {
+            const batch = document.getElementById('filter-batch').value;
+            const character = document.getElementById('filter-character').value;
+            const status = document.getElementById('filter-status').value;
+            const search = document.getElementById('filter-search').value.toLowerCase();
+
+            filteredData = voiceData.filter(item => {
+                const matchBatch = !batch || item.batch === batch;
+                const matchCharacter = !character || item.character === character;
+                const matchStatus = !status || item.status === status;
+                const matchSearch = !search || 
+                    item.character.toLowerCase().includes(search) ||
+                    item.text.toLowerCase().includes(search) ||
+                    item.fileName.toLowerCase().includes(search);
+                
+                return matchBatch && matchCharacter && matchStatus && matchSearch;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+        
+        // 初始化角色选择器
+        function initCharacterSelect() {
+            const characters = [...new Set(voiceData.map(d => d.character))].sort();
+            const select = document.getElementById('filter-character');
+            
+            // 保留第一个"全部角色"选项
+            select.innerHTML = '<option value="">全部角色</option>';
+            
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+        }
+        
+        // 根据批次动态更新角色下拉框
+        function updateCharacterSelect() {
+            const batch = document.getElementById('filter-batch').value;
+            const characterSelect = document.getElementById('filter-character');
+            const currentCharacter = characterSelect.value;
+            
+            // 根据批次筛选角色
+            let characters;
+            if (batch) {
+                characters = [...new Set(voiceData.filter(d => d.batch === batch).map(d => d.character))].sort();
+            } else {
+                characters = [...new Set(voiceData.map(d => d.character))].sort();
+            }
+            
+            // 重新生成选项
+            characterSelect.innerHTML = '<option value="">全部角色</option>';
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                if (char === currentCharacter) {
+                    option.selected = true;
+                }
+                characterSelect.appendChild(option);
+            });
+        }
+        
+        // 清空筛选
+        function clearFilters() {
+            document.getElementById('filter-batch').value = '';
+            document.getElementById('filter-character').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-search').value = '';
+            filterTable();
+        }
+        
+        // 快捷筛选
+        function quickFilter(field, value) {
+            if (field === 'batch') {
+                document.getElementById('filter-batch').value = value;
+                updateCharacterSelect();
+                updateBatchInfo();
+            } else if (field === 'status') {
+                document.getElementById('filter-status').value = value;
+            }
+            filterTable();
+        }
+
+        // 分页功能
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            currentPage += delta;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            renderTable();
+        }
+
+        // 初始化
+        function showSection(sectionId, linkElement) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.sub-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (linkElement) {
+                linkElement.classList.add('active');
+            }
+
+            // 如果是 G42 页面，初始化数据
+            if (sectionId === 'g42') {
+                updateStats();
+                renderTable();
+            }
+        }
+        
+        // G42 子页签切换
+        function showG42Tab(tabId, linkElement) {
+            // 隐藏所有 G42 tab
+            document.querySelectorAll('.g42-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示目标 tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // 更新子导航状态
+            document.querySelectorAll('.g42-sub-nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (linkElement) {
+                linkElement.classList.add('active');
+            }
+            
+            // 如果是语音页，初始化表格
+            if (tabId === 'g42-voice') {
+                initData();
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initData();
+        });
+    </script>
+    <script src="nav-config.js"></script>
+    <script src="data/g42-voice-data.js"></script>
+  <script src="assets/js/music-global.js?v=2.8.9"></script>
+</body>
+</html>
+/* Cache bust: 1774344700 */

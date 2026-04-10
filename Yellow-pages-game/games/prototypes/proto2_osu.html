@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 音游原型 #2 - 点击式 OSU!风</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(ellipse at center, #2d1b69 0%, #0f0f23 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+        h1 { margin: 10px 0; font-size: 1.5rem; text-shadow: 0 0 20px #ff00ff; }
+        #gameCanvas {
+            border: 3px solid #ff00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.4);
+            cursor: crosshair;
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+        }
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255,0,255,0.6); }
+        .score {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        .instruction {
+            margin-top: 10px;
+            color: #aaa;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 原型 #2 - 点击式 OSU!风</h1>
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <div class="score">得分: <span id="score">0</span> | 连击: <span id="combo">0</span> | 准确率: <span id="acc">100%</span></div>
+    <div class="controls">
+        <button onclick="startGame()">▶ 开始</button>
+        <button onclick="resetGame()">↺ 重置</button>
+    </div>
+    <div class="instruction">鼠标点击圆圈，圆圈缩小到中心时点击得分最高</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const CENTER_X = canvas.width / 2;
+const CENTER_Y = canvas.height / 2;
+const SPAWN_RADIUS = 250;
+
+let circles = [];
+let score = 0;
+let combo = 0;
+let maxCombo = 0;
+let totalHits = 0;
+let perfectHits = 0;
+let gameRunning = false;
+let animationId;
+
+class Circle {
+    constructor() {
+        const angle = Math.random() * Math.PI * 2;
+        this.x = CENTER_X + Math.cos(angle) * SPAWN_RADIUS;
+        this.y = CENTER_Y + Math.sin(angle) * SPAWN_RADIUS;
+        this.maxRadius = 60;
+        this.minRadius = 20;
+        this.currentRadius = this.maxRadius;
+        this.shrinkSpeed = 0.8;
+        this.hit = false;
+        this.missed = false;
+        this.life = 120; // 帧数
+        this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+        this.approachScale = 3;
+    }
+
+    update() {
+        this.currentRadius -= this.shrinkSpeed;
+        this.approachScale -= 0.025;
+        this.life--;
+        
+        if (this.currentRadius <= 0 || this.life <= 0) {
+            this.missed = true;
+            combo = 0;
+        }
+    }
+
+    draw() {
+        if (this.hit || this.missed) return;
+        
+        // 外圈approach circle
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 3;
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.maxRadius * this.approachScale, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // 主圆圈
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.currentRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // 内部小圈
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.currentRadius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 数字显示
+        ctx.fillStyle = 'black';
+        ctx.font = `bold ${this.currentRadius * 0.5}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(Math.ceil(this.life / 60), this.x, this.y);
+    }
+
+    checkClick(mx, my) {
+        const dist = Math.hypot(mx - this.x, my - this.y);
+        if (dist <= this.maxRadius) {
+            const accuracy = 1 - Math.abs(this.currentRadius - this.minRadius) / (this.maxRadius - this.minRadius);
+            return { hit: true, accuracy };
+        }
+        return { hit: false };
+    }
+}
+
+let particles = [];
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 8;
+        this.vy = (Math.random() - 0.5) * 8;
+        this.life = 30;
+        this.color = color;
+        this.size = Math.random() * 5 + 2;
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.2;
+        this.life--;
+    }
+    
+    draw() {
+        ctx.globalAlpha = this.life / 30;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+let hitTexts = [];
+function showHitText(x, y, text, color) {
+    hitTexts.push({ x, y, text, color, alpha: 1, scale: 1 });
+}
+
+function drawBackground() {
+    // 径向渐变背景
+    const grad = ctx.createRadialGradient(CENTER_X, CENTER_Y, 0, CENTER_X, CENTER_Y, 300);
+    grad.addColorStop(0, 'rgba(45, 27, 105, 0.3)');
+    grad.addColorStop(1, 'rgba(15, 15, 35, 0.8)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 网格线
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += 40) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+    }
+    for (let i = 0; i < canvas.height; i += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+    }
+}
+
+function spawnCircle() {
+    if (Math.random() < 0.02) {
+        circles.push(new Circle());
+    }
+}
+
+function updateDisplay() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('combo').textContent = combo;
+    const acc = totalHits > 0 ? (perfectHits / totalHits * 100).toFixed(1) : 100;
+    document.getElementById('acc').textContent = acc + '%';
+}
+
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground();
+    
+    spawnCircle();
+    
+    circles = circles.filter(c => !c.hit && !c.missed);
+    circles.forEach(c => {
+        c.update();
+        c.draw();
+    });
+    
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+    
+    hitTexts = hitTexts.filter(t => {
+        ctx.save();
+        ctx.globalAlpha = t.alpha;
+        ctx.fillStyle = t.color;
+        ctx.font = `bold ${30 * t.scale}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText(t.text, t.x, t.y);
+        ctx.restore();
+        t.alpha -= 0.02;
+        t.y -= 2;
+        t.scale += 0.01;
+        return t.alpha > 0;
+    });
+    
+    updateDisplay();
+    animationId = requestAnimationFrame(gameLoop);
+}
+
+function handleClick(e) {
+    if (!gameRunning) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    
+    for (let c of circles) {
+        const result = c.checkClick(mx, my);
+        if (result.hit) {
+            c.hit = true;
+            totalHits++;
+            
+            let points, text, color;
+            if (result.accuracy > 0.9) {
+                points = 300;
+                text = 'PERFECT!!';
+                color = '#ffd700';
+                perfectHits++;
+            } else if (result.accuracy > 0.7) {
+                points = 100;
+                text = 'GREAT!';
+                color = '#00ff00';
+            } else if (result.accuracy > 0.5) {
+                points = 50;
+                text = 'GOOD';
+                color = '#00ffff';
+            } else {
+                points = 10;
+                text = 'BAD';
+                color = '#ff8800';
+            }
+            
+            score += points * (1 + combo * 0.1);
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+            
+            showHitText(c.x, c.y, text, color);
+            
+            // 爆炸粒子
+            for (let i = 0; i < 15; i++) {
+                particles.push(new Particle(c.x, c.y, c.color));
+            }
+            
+            updateDisplay();
+            break;
+        }
+    }
+}
+
+function startGame() {
+    if (gameRunning) return;
+    gameRunning = true;
+    circles = [];
+    particles = [];
+    hitTexts = [];
+    score = 0;
+    combo = 0;
+    totalHits = 0;
+    perfectHits = 0;
+    updateDisplay();
+    gameLoop();
+}
+
+function resetGame() {
+    gameRunning = false;
+    cancelAnimationFrame(animationId);
+    circles = [];
+    particles = [];
+    hitTexts = [];
+    score = 0;
+    combo = 0;
+    totalHits = 0;
+    perfectHits = 0;
+    updateDisplay();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground();
+}
+
+canvas.addEventListener('mousedown', handleClick);
+drawBackground();
+</script>
+</body>
+</html>

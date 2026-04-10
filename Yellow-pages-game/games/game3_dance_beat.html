@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💃 炫舞节拍</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #2d1b69, #11998e);
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .stage {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        #gameCanvas {
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .ui {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            text-align: right;
+        }
+        .dancer {
+            animation: dance 0.5s infinite alternate;
+        }
+        @keyframes dance {
+            from { transform: scale(1) rotate(-5deg); }
+            to { transform: scale(1.1) rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stage"><div class="dancer">💃</div></div>
+    <div class="ui">得分: <span id="score">0</span><br>连击: <span id="combo">0</span></div>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        let score = 0;
+        let combo = 0;
+        let arrows = [];
+        const arrowTypes = ['↑', '↓', '←', '→'];
+        const keyMap = { 'ArrowUp': 0, 'ArrowDown': 1, 'ArrowLeft': 2, 'ArrowRight': 3 };
+        
+        // 舞曲风格背景音乐
+        let beatCount = 0;
+        function playDanceBGM() {
+            const t = audioCtx.currentTime;
+            
+            // 低音鼓
+            const kick = audioCtx.createOscillator();
+            const kickGain = audioCtx.createGain();
+            kick.connect(kickGain);
+            kickGain.connect(audioCtx.destination);
+            kick.frequency.setValueAtTime(150, t);
+            kick.frequency.exponentialRampToValueAtTime(50, t + 0.1);
+            kickGain.gain.setValueAtTime(0.5, t);
+            kickGain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+            kick.start(t);
+            kick.stop(t + 0.2);
+            
+            // 每两拍加军鼓
+            if (beatCount % 2 === 1) {
+                const snare = audioCtx.createBufferSource();
+                const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < buffer.length; i++) data[i] = Math.random() * 2 - 1;
+                snare.buffer = buffer;
+                const snareGain = audioCtx.createGain();
+                snare.connect(snareGain);
+                snareGain.connect(audioCtx.destination);
+                snareGain.gain.setValueAtTime(0.3, t);
+                snareGain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+                snare.start(t);
+            }
+            
+            // Hi-hat
+            const hihat = audioCtx.createOscillator();
+            const hihatGain = audioCtx.createGain();
+            hihat.connect(hihatGain);
+            hihatGain.connect(audioCtx.destination);
+            hihat.type = 'square';
+            hihat.frequency.value = 8000;
+            hihatGain.gain.setValueAtTime(0.1, t);
+            hihatGain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+            hihat.start(t);
+            hihat.stop(t + 0.05);
+            
+            beatCount++;
+        }
+        
+        // 击中音效
+        function playDanceHit() {
+            const t = audioCtx.currentTime;
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            const note = notes[Math.floor(Math.random() * notes.length)];
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.value = note;
+            gain.gain.setValueAtTime(0.3, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+            osc.start(t);
+            osc.stop(t + 0.2);
+        }
+        
+        // 生成箭头
+        function spawnArrow() {
+            arrows.push({
+                type: Math.floor(Math.random() * 4),
+                y: 0,
+                speed: 2 + score / 2000,
+                hit: false
+            });
+        }
+        
+        // 绘制
+        function draw() {
+            ctx.fillStyle = 'rgba(45, 27, 105, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 判定区
+            const targetY = 320;
+            ctx.strokeStyle = '#ff0';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(0, targetY);
+            ctx.lineTo(canvas.width, targetY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 箭头槽位
+            for (let i = 0; i < 4; i++) {
+                const x = 75 + i * 150;
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                ctx.fillRect(x - 50, targetY - 40, 100, 80);
+                ctx.fillStyle = '#fff';
+                ctx.font = '40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(arrowTypes[i], x, targetY + 15);
+            }
+            
+            // 下落箭头
+            arrows = arrows.filter(a => {
+                a.y += a.speed;
+                
+                if (!a.hit) {
+                    const x = 75 + a.type * 150;
+                    ctx.fillStyle = `hsl(${a.type * 90}, 100%, 60%)`;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = ctx.fillStyle;
+                    ctx.font = 'bold 60px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(arrowTypes[a.type], x, a.y);
+                    ctx.shadowBlur = 0;
+                }
+                
+                // 错过
+                if (a.y > canvas.height && !a.hit) {
+                    combo = 0;
+                    document.getElementById('combo').textContent = combo;
+                    return false;
+                }
+                
+                return a.y < canvas.height + 50;
+            });
+            
+            requestAnimationFrame(draw);
+        }
+        
+        // 按键
+        document.addEventListener('keydown', e => {
+            const type = keyMap[e.key];
+            if (type === undefined) return;
+            
+            const target = arrows.find(a => 
+                a.type === type && !a.hit && a.y > 260 && a.y < 380
+            );
+            
+            if (target) {
+                target.hit = true;
+                score += 100 + combo * 10;
+                combo++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('combo').textContent = combo;
+                playDanceHit();
+            }
+        });
+        
+        // 启动
+        setInterval(spawnArrow, 700);
+        setInterval(playDanceBGM, 300);
+        
+        if (audioCtx.state === 'suspended') {
+            document.addEventListener('click', () => audioCtx.resume(), { once: true });
+        }
+        
+        draw();
+    </script>
+</body>
+</html>

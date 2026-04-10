@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✈️ 弹幕躲避</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #gameCanvas { border: 2px solid #ff00ff; box-shadow: 0 0 20px #ff00ff; }
+        .ui { margin-bottom: 15px; font-size: 24px; color: #00ffff; }
+    </style>
+</head>
+<body>
+    <div class="ui">存活时间: <span id="time">0</span> 秒</div>
+    <canvas id="gameCanvas" width="500" height="600"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        let player = {x: 250, y: 520, size: 8};
+        let bullets = [];
+        let startTime = Date.now();
+        let gameOver = false;
+        let particles = [];
+        
+        function playBGM() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 100 + Math.sin(Date.now()/1000) * 50;
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+        
+        function playExplosion() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        function spawnBullet() {
+            const angle = Math.random() * Math.PI + Math.PI;
+            bullets.push({
+                x: Math.random() * canvas.width,
+                y: -10,
+                vx: Math.cos(angle) * 3,
+                vy: Math.sin(angle) * 3 + 2,
+                size: 5
+            });
+        }
+        
+        function createParticles(x, y) {
+            for(let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    life: 30,
+                    color: `hsl(${Math.random() * 60 + 300}, 100%, 50%)`
+                });
+            }
+        }
+        
+        function draw() {
+            // 渐变背景
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#0a0a1a');
+            grad.addColorStop(1, '#1a0a2e');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 网格
+            ctx.strokeStyle = 'rgba(255, 0, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < canvas.width; i += 50) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+            for(let i = 0; i < canvas.height; i += 50) {
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+            
+            // 玩家
+            ctx.fillStyle = '#00ffff';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#00ffff';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // 弹幕
+            bullets.forEach(b => {
+                ctx.fillStyle = '#ff00ff';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff00ff';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+            
+            // 粒子
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 30;
+                ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+                ctx.globalAlpha = 1;
+            });
+            
+            if(gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ff00ff';
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 30);
+                ctx.fillStyle = '#00ffff';
+                ctx.font = '24px Arial';
+                ctx.fillText(`存活: ${((Date.now() - startTime)/1000).toFixed(1)}秒`, canvas.width/2, canvas.height/2 + 20);
+                ctx.font = '18px Arial';
+                ctx.fillText('点击重新开始', canvas.width/2, canvas.height/2 + 60);
+            }
+        }
+        
+        function update() {
+            if(gameOver) return;
+            
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            document.getElementById('time').textContent = elapsed;
+            
+            // 更新弹幕
+            bullets.forEach(b => {
+                b.x += b.vx;
+                b.y += b.vy;
+                
+                // 碰撞检测
+                const dist = Math.hypot(b.x - player.x, b.y - player.y);
+                if(dist < b.size + player.size) {
+                    gameOver = true;
+                    playExplosion();
+                    createParticles(player.x, player.y);
+                }
+            });
+            
+            bullets = bullets.filter(b => b.y < canvas.height + 20 && b.x > -20 && b.x < canvas.width + 20);
+            
+            // 更新粒子
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+            });
+            particles = particles.filter(p => p.life > 0);
+        }
+        
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            player.x = e.clientX - rect.left;
+            player.y = e.clientY - rect.top;
+            player.x = Math.max(player.size, Math.min(canvas.width - player.size, player.x));
+            player.y = Math.max(player.size, Math.min(canvas.height - player.size, player.y));
+        });
+        
+        canvas.addEventListener('click', () => {
+            if(gameOver) {
+                gameOver = false;
+                bullets = [];
+                particles = [];
+                startTime = Date.now();
+                player.x = 250;
+                player.y = 520;
+            }
+        });
+        
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        
+        setInterval(spawnBullet, 200);
+        setInterval(playBGM, 300);
+        loop();
+        
+        if(audioCtx.state === 'suspended') {
+            document.addEventListener('click', ()=>audioCtx.resume(),{once:true});
+        }
+    </script>
+</body>
+</html>
