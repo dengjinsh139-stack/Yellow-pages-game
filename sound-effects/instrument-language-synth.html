@@ -984,7 +984,6 @@
                 name: '开心',
                 emoji: '😊',
                 color: 'linear-gradient(135deg, #ff6b9d, #feca57)',
-                defaultAudio: '../assets/audio/emotions/happy.wav',  // 默认音频文件路径
                 midi: null,      // { name: '文件名', data: ArrayBuffer }
                 audio: null,     // { name: '文件名', buffer: AudioBuffer }
                 parsedMidi: null // 解析后的 MIDI 数据
@@ -993,7 +992,6 @@
         };
         
         let currentEmotion = null;  // 当前选中的情绪
-        let emotionAudioLoaded = false;  // 情绪音频是否已加载
         
         // 选择情绪（显示上传面板）
         function selectEmotion(emotionKey) {
@@ -1225,42 +1223,28 @@
 
         // 初始化
         async function initAudio() {
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 2048;
-                
-                canvas = document.getElementById('visualizer');
-                canvasCtx = canvas.getContext('2d');
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+            
+            canvas = document.getElementById('visualizer');
+            canvasCtx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
 
-                createSpectrumBars();
-                visualize();
-                
-                // 加载采样
-                document.getElementById('statusText').textContent = '加载采样中...';
-                await loadSamples();
-                
-                // 加载默认情绪音频（等待完成）
-                document.getElementById('statusText').textContent = '加载情绪音频...';
-                try {
-                    await loadDefaultEmotionAudio();
-                } catch (err) {
-                    console.error('情绪音频加载失败（非致命）:', err);
-                }
-                
-                // 生成音符键盘
-                generateNoteKeyboard();
-                
-                document.getElementById('startOverlay').classList.add('hidden');
-                document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
-                addToHistory('真实钢琴音色已加载');
-            } catch (err) {
-                console.error('音频引擎启动失败:', err);
-                document.getElementById('statusText').textContent = '音频引擎启动失败: ' + err.message;
-                alert('无法启动音频引擎，请检查浏览器是否支持Web Audio API');
-            }
+            createSpectrumBars();
+            visualize();
+            
+            // 加载采样
+            document.getElementById('statusText').textContent = '加载采样中...';
+            await loadSamples();
+            
+            // 生成音符键盘
+            generateNoteKeyboard();
+            
+            document.getElementById('startOverlay').classList.add('hidden');
+            document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
+            addToHistory('真实钢琴音色已加载');
         }
 
         // 加载采样文件
@@ -1283,34 +1267,6 @@
             
             await Promise.all(loadPromises);
             samplesLoaded = true;
-        }
-
-        // 加载默认情绪音频
-        async function loadDefaultEmotionAudio() {
-            console.log('开始加载默认情绪音频...');
-            for (const [emotionKey, emotion] of Object.entries(emotionFiles)) {
-                if (emotion.defaultAudio && !emotion.audio) {
-                    try {
-                        console.log(`尝试加载 ${emotionKey}: ${emotion.defaultAudio}`);
-                        const response = await fetch(emotion.defaultAudio);
-                        if (!response.ok) {
-                            console.warn(`无法加载 ${emotionKey}: HTTP ${response.status}`);
-                            continue;
-                        }
-                        const arrayBuffer = await response.arrayBuffer();
-                        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                        emotion.audio = {
-                            name: '默认音频',
-                            buffer: audioBuffer
-                        };
-                        console.log(`✅ 已加载默认音频 for ${emotionKey}`);
-                    } catch (err) {
-                        console.error(`❌ 加载 ${emotionKey} 失败:`, err.message);
-                    }
-                }
-            }
-            emotionAudioLoaded = true;
-            console.log('默认情绪音频加载完成');
         }
 
         // 创建频谱条
@@ -1954,43 +1910,18 @@
 
         // 演奏文本
         async function playText() {
-            console.log('=== playText 开始 ===');
-            
-            if (isPlaying) {
-                console.log('已经在播放中，返回');
-                return;
-            }
+            if (isPlaying) return;
             
             const text = document.getElementById('textInput').value.trim();
-            console.log('输入文本:', text);
-            
             if (!text) {
                 document.getElementById('statusText').textContent = '请先输入文字';
-                console.log('文本为空，返回');
                 return;
             }
             
             if (currentInstrument === 'piano' && !samplesLoaded) {
                 document.getElementById('statusText').textContent = '采样加载中，请稍候...';
-                console.log('采样未加载完成，返回');
                 return;
             }
-            
-            if (!audioContext) {
-                document.getElementById('statusText').textContent = '音频引擎未启动';
-                console.log('audioContext 不存在，返回');
-                return;
-            }
-            
-            // 检查音频上下文状态
-            if (audioContext.state === 'suspended') {
-                console.log('音频上下文被暂停，尝试恢复...');
-                await audioContext.resume();
-            }
-            
-            console.log('音频上下文状态:', audioContext.state);
-            console.log('samplesLoaded:', samplesLoaded);
-            console.log('currentInstrument:', currentInstrument);
             
             isPlaying = true;
             document.getElementById('statusText').textContent = currentInstrument === 'piano' ? '演奏中 (真实钢琴)...' : '演奏中...';
@@ -2008,60 +1939,35 @@
             // ===== 智能情绪预设 =====
             // 如果检测到有情绪专属文件，播放情绪专属内容
             if (emotionFiles[emotion]) {
-                console.log(`检测到情绪: ${emotion}，检查专属文件...`);
+                // 选中该情绪（显示面板）
+                selectEmotion(emotion);
                 
-                // 检查该情绪是否有可用的音频/MIDI
-                const emotionData = emotionFiles[emotion];
-                const hasAudio = emotionData.audio && emotionData.audio.buffer;
-                const hasMidi = emotionData.parsedMidi;
-                
-                if (hasAudio || hasMidi) {
-                    console.log(`发现 ${emotion} 的专属文件，准备播放...`);
-                    // 选中该情绪（显示面板）
-                    selectEmotion(emotion);
-                    
-                    // 尝试播放情绪专属内容
-                    const played = await playEmotionContentAsync(emotion);
-                    if (played) {
-                        // 如果有专属文件，播放完成后结束
-                        document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
-                        addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
-                        isPlaying = false;
-                        return;
-                    }
-                } else {
-                    console.log(`${emotion} 暂无专属文件，使用文字转音乐`);
+                // 尝试播放情绪专属内容
+                const hasCustomFile = await playEmotionContentAsync(emotion);
+                if (hasCustomFile) {
+                    // 如果有专属文件，播放完成后结束
+                    document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
+                    addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
+                    isPlaying = false;
+                    return;
                 }
+                // 如果没有专属文件，继续播放文字转音乐
             }
             
             // 转换为音符
             const notes = textToNotes(text);
-            console.log('转换后的音符:', notes);
             
             // 显示音符序列
             displayNotes(notes);
             
-            if (notes.length === 0) {
-                console.log('没有可播放的音符');
-                isPlaying = false;
-                document.getElementById('statusText').textContent = '没有可播放的音符';
-                return;
-            }
-            
             // 依次演奏
-            console.log('开始演奏，音符数量:', notes.length);
             for (let i = 0; i < notes.length; i++) {
-                if (!isPlaying) {
-                    console.log('演奏被中断');
-                    break;
-                }
+                if (!isPlaying) break;
                 
                 const note = notes[i];
-                console.log(`演奏第 ${i + 1}/${notes.length} 个音符:`, note);
                 
                 // 休止符处理
                 if (note.isRest) {
-                    console.log('休止符，等待', note.duration, 'ms');
                     await sleep(note.duration);
                     continue;
                 }
@@ -2069,8 +1975,6 @@
                 // 应用全局音量 + 音符独立音量
                 const userVolume = noteVolumes[note.note] || 1.0;
                 const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
-                
-                console.log(`播放音符: ${note.note}, 频率: ${note.frequency}, 音量: ${velocityWithMaster}`);
                 
                 // 播放单音
                 playTone(note.frequency, note.note, note.duration, velocityWithMaster);
