@@ -984,6 +984,7 @@
                 name: '开心',
                 emoji: '😊',
                 color: 'linear-gradient(135deg, #ff6b9d, #feca57)',
+                defaultAudio: '../assets/audio/emotions/happy.wav',  // 默认音频文件路径
                 midi: null,      // { name: '文件名', data: ArrayBuffer }
                 audio: null,     // { name: '文件名', buffer: AudioBuffer }
                 parsedMidi: null // 解析后的 MIDI 数据
@@ -992,6 +993,7 @@
         };
         
         let currentEmotion = null;  // 当前选中的情绪
+        let emotionAudioLoaded = false;  // 情绪音频是否已加载
         
         // 选择情绪（显示上传面板）
         function selectEmotion(emotionKey) {
@@ -1239,6 +1241,9 @@
             document.getElementById('statusText').textContent = '加载采样中...';
             await loadSamples();
             
+            // 加载默认情绪音频
+            await loadDefaultEmotionAudio();
+            
             // 生成音符键盘
             generateNoteKeyboard();
             
@@ -1267,6 +1272,29 @@
             
             await Promise.all(loadPromises);
             samplesLoaded = true;
+        }
+
+        // 加载默认情绪音频
+        async function loadDefaultEmotionAudio() {
+            for (const [emotionKey, emotion] of Object.entries(emotionFiles)) {
+                if (emotion.defaultAudio && !emotion.audio) {
+                    try {
+                        const response = await fetch(emotion.defaultAudio);
+                        if (response.ok) {
+                            const arrayBuffer = await response.arrayBuffer();
+                            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                            emotion.audio = {
+                                name: '默认音频',
+                                buffer: audioBuffer
+                            };
+                            console.log(`Loaded default audio for ${emotionKey}`);
+                        }
+                    } catch (err) {
+                        console.error(`Failed to load default audio for ${emotionKey}:`, err);
+                    }
+                }
+            }
+            emotionAudioLoaded = true;
         }
 
         // 创建频谱条
