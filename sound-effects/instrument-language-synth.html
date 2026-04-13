@@ -2223,7 +2223,10 @@
 
         // 演奏单个音符（根据当前乐器选择播放方式）
         function playTone(frequency, noteName, duration, velocity = 0.5) {
-            if (currentInstrument === 'piano' && samplesLoaded) {
+            // 检查当前乐器是否有采样可用
+            const hasSamples = hasInstrumentSamples(currentInstrument);
+            
+            if (hasSamples) {
                 return playSampleTone(frequency, noteName, duration / 1000, velocity);
             } else {
                 return playSynthTone(frequency, duration / 1000, velocity);
@@ -2232,8 +2235,11 @@
 
         // 演奏带滑音的音符（声调效果）
         function playToneWithGlide(startFreq, endFreq, noteName, duration, velocity = 0.5) {
-            if (currentInstrument === 'piano' && samplesLoaded) {
-                // 钢琴采样版滑音 - 连续播放两个采样
+            // 检查当前乐器是否有采样可用
+            const hasSamples = hasInstrumentSamples(currentInstrument);
+            
+            if (hasSamples) {
+                // 采样版滑音 - 连续播放两个采样
                 const durationSec = duration / 1000;
                 const halfDuration = durationSec / 2;
                 
@@ -2388,14 +2394,29 @@
                 console.log('音频上下文已恢复，状态:', audioContext.state);
             }
             
-            if (currentInstrument === 'piano' && !samplesLoaded) {
-                document.getElementById('statusText').textContent = '采样加载中，请稍候...';
-                console.log('采样未加载完成，返回. samplesLoaded:', samplesLoaded);
-                return;
+            // 检查采样是否加载完成
+            const hasSamples = hasInstrumentSamples(currentInstrument);
+            if (!hasSamples) {
+                // 如果是采样乐器但采样未加载，提示加载中
+                if (currentInstrument === 'piano' || currentInstrument === 'saxophone') {
+                    document.getElementById('statusText').textContent = '采样加载中，请稍候...';
+                    console.log('采样未加载完成，返回. currentInstrument:', currentInstrument);
+                    return;
+                }
             }
             
             isPlaying = true;
-            document.getElementById('statusText').textContent = currentInstrument === 'piano' ? '演奏中 (真实钢琴)...' : '演奏中...';
+            const instrumentDisplayNames = {
+                'piano': '真实钢琴',
+                'saxophone': '真实沙克斯',
+                'guitar': '吉他',
+                'flute': '长笛',
+                'violin': '小提琴',
+                'trumpet': '小号',
+                'synth': '合成器'
+            };
+            const instrumentName = instrumentDisplayNames[currentInstrument] || currentInstrument;
+            document.getElementById('statusText').textContent = hasSamples ? `演奏中 (${instrumentName})...` : '演奏中...';
             
             // 分析情感
             const emotion = analyzeEmotion(text);
