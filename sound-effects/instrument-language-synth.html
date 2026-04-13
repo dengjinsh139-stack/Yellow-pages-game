@@ -714,6 +714,10 @@
                         <span class="icon">🎺</span>
                         <span class="name">小号</span>
                     </div>
+                    <div class="instrument-btn" data-instrument="saxophone" onclick="selectInstrument('saxophone')">
+                        <span class="icon">🎷</span>
+                        <span class="name">沙克斯</span>
+                    </div>
                     <div class="instrument-btn" data-instrument="synth" onclick="selectInstrument('synth')">
                         <span class="icon">🎛️</span>
                         <span class="name">合成器</span>
@@ -1085,6 +1089,26 @@
                 },
                 attack: 0.01,
                 release: 0.3
+            },
+            saxophone: {
+                name: '沙克斯',
+                emoji: '🎷',
+                basePath: '../assets/audio/samples/saxophone/',
+                samples: {
+                    // 沙克斯五声音阶采样
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                },
+                attack: 0.05,
+                release: 0.5
             }
         };
 
@@ -1476,31 +1500,67 @@
             }
         }
 
-        // 选择乐器（暂时只有钢琴）
-        function selectInstrument(instrument) {
+        // 选择乐器（钢琴和萨克斯有真实采样）
+        async function selectInstrument(instrument) {
             currentInstrument = instrument;
             document.querySelectorAll('.instrument-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.querySelector(`[data-instrument="${instrument}"]`).classList.add('active');
             
-            if (instrument === 'piano') {
-                document.getElementById('waveInfo').textContent = 
-                    'Instrument: 真实钢琴采样 🎹 | 五声音阶';
-            } else {
-                document.getElementById('waveInfo').textContent = 
-                    `Instrument: ${instrument} (合成音色)`;
+            const instrumentNames = {
+                'piano': '真实钢琴采样 🎹',
+                'saxophone': '真实沙克斯采样 🎷',
+                'guitar': '吉他 (合成音色)',
+                'flute': '长笛 (合成音色)',
+                'violin': '小提琴 (合成音色)',
+                'trumpet': '小号 (合成音色)',
+                'synth': '合成器 (合成音色)'
+            };
+            
+            document.getElementById('waveInfo').textContent = 
+                `Instrument: ${instrumentNames[instrument] || instrument} | 五声音阶`;
+            
+            // 如果是萨克斯，需要加载采样
+            if (instrument === 'saxophone' && !audioBuffers['saxophone_D4']) {
+                document.getElementById('statusText').textContent = '加载萨克斯采样中...';
+                await loadSaxophoneSamples();
+                document.getElementById('statusText').textContent = '萨克斯采样已加载';
             }
             
             // 重新生成音符键盘
             generateNoteKeyboard();
             
             // 播放试听音
-            if (instrument === 'piano' && samplesLoaded) {
+            if ((instrument === 'piano' && samplesLoaded) || 
+                (instrument === 'saxophone' && audioBuffers['saxophone_D4'])) {
                 playSampleTone(440, 0.3);
             } else {
                 playSynthTone(440, 0.2);
             }
+        }
+
+        // 加载萨克斯采样
+        async function loadSaxophoneSamples() {
+            if (audioBuffers['saxophone_D4']) return; // 已加载
+            
+            const config = sampleConfig.saxophone;
+            const loadPromises = [];
+            
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['saxophone_' + note] = audioBuffer;
+                        console.log(`Loaded saxophone: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load saxophone ${note}:`, err));
+                
+                loadPromises.push(promise);
+            }
+            
+            await Promise.all(loadPromises);
         }
 
         // 生成10键音符键盘 + Chord按钮
@@ -1663,7 +1723,10 @@
             const userVolume = noteVolumes[noteInfo.note] || 1.0;
             const finalVelocity = baseVelocity * params.masterVolume * userVolume;
             
-            if (currentInstrument === 'piano' && samplesLoaded) {
+            // 检查当前乐器是否有采样可用
+            const hasSamples = hasInstrumentSamples(currentInstrument);
+            
+            if (hasSamples) {
                 playSampleTone(noteInfo.freq, noteInfo.note, 0.5, finalVelocity);
             } else {
                 playSynthTone(noteInfo.freq, 0.5, finalVelocity);
@@ -1671,6 +1734,17 @@
             
             // 添加到历史
             addToHistory(`♪ ${noteInfo.note} (${Math.round(userVolume * 100)}%)`);
+        }
+
+        // 检查乐器是否有采样可用
+        function hasInstrumentSamples(instrument) {
+            if (instrument === 'piano' && samplesLoaded) {
+                return true;
+            }
+            if (instrument === 'saxophone' && audioBuffers['saxophone_D4']) {
+                return true;
+            }
+            return false;
         }
 
         // 释放音符按钮
@@ -2016,11 +2090,18 @@
 
         // 使用真实采样播放音符
         function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5) {
-            if (!audioContext || !samplesLoaded) return;
+            if (!audioContext) return;
+            
+            // 根据当前乐器选择配置
+            const config = sampleConfig[currentInstrument];
+            if (!config) {
+                console.warn('No sample config for instrument:', currentInstrument);
+                return;
+            }
             
             // 找到最近的采样
             const freqToSampleNote = {};
-            for (const [note, info] of Object.entries(sampleConfig.piano.samples)) {
+            for (const [note, info] of Object.entries(config.samples)) {
                 freqToSampleNote[info.freq] = note;
             }
             
@@ -2037,10 +2118,11 @@
             }
             
             const sampleNote = freqToSampleNote[nearestFreq];
-            const buffer = audioBuffers[sampleNote];
+            const bufferKey = currentInstrument === 'piano' ? sampleNote : currentInstrument + '_' + sampleNote;
+            const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
-                console.warn('Sample not found for', sampleNote);
+                console.warn('Sample not found for', bufferKey);
                 return;
             }
             
@@ -2053,11 +2135,10 @@
             source.playbackRate.value = playbackRate;
             
             // 音量计算：基础补偿 * 演奏力度
-            // velocity 已经包含了用户调节
-            const baseGain = sampleConfig.piano.samples[sampleNote].gain || 1.0;
+            const baseGain = config.samples[sampleNote].gain || 1.0;
             const finalVelocity = velocity * baseGain;
             
-            console.log(`Playing ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
+            console.log(`Playing ${currentInstrument} ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
             
             // 增益节点
             const gainNode = audioContext.createGain();
@@ -2068,9 +2149,9 @@
             
             // 包络 - 使用更长的衰减让音符更清晰
             const now = audioContext.currentTime;
-            const attackTime = 0.005;  // 5ms快速起音
-            const holdTime = Math.min(duration * 0.3, 0.1);  // 保持阶段
-            const decayTime = duration * 0.7;  // 衰减阶段
+            const attackTime = config.attack || 0.005;
+            const holdTime = Math.min(duration * 0.3, 0.1);
+            const decayTime = duration * 0.7;
             
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, now + attackTime);
