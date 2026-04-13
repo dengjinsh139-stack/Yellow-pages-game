@@ -1136,24 +1136,7 @@
             
             return false;  // 没有专属文件
         }
-            const emotion = emotionFiles[emotionKey];
-            if (!emotion) return false;
-            
-            // 优先播放音频（如果有）- 等待播放完成
-            if (emotion.audio && emotion.audio.buffer) {
-                await playEmotionAudioAsync(emotion.audio.buffer);
-                return true;
-            }
-            
-            // 其次播放 MIDI（如果有）- 等待播放完成
-            if (emotion.parsedMidi) {
-                await playMidiAsync(emotion.parsedMidi);
-                return true;
-            }
-            
-            return false;  // 没有专属文件
-        }
-        
+
         // 播放情绪专属内容（异步版本，等待完成）
         async function playEmotionContentAsync(emotionKey) {
             const emotion = emotionFiles[emotionKey];
