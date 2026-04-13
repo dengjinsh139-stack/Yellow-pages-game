@@ -2192,21 +2192,30 @@
                 source.buffer = randomChord;
                 
                 const gainNode = audioContext.createGain();
-                gainNode.gain.value = velocity * params.masterVolume;
+                const now = audioContext.currentTime;
+                const actualDuration = randomChord.duration * params.chordDuration;
+                const fadeOutTime = 0.1; // 淡出时间 100ms
+                
+                // 设置增益包络 - 带淡出的平滑停止
+                gainNode.gain.setValueAtTime(velocity * params.masterVolume, now);
+                
+                // 如果不是完整播放，在结束前淡出
+                if (params.chordDuration < 1.0) {
+                    // 在结束前 fadeOutTime 秒开始淡出
+                    const fadeStart = Math.max(0, actualDuration - fadeOutTime);
+                    gainNode.gain.setValueAtTime(velocity * params.masterVolume, now + fadeStart);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + actualDuration);
+                }
                 
                 source.connect(gainNode);
                 gainNode.connect(analyser);
                 analyser.connect(audioContext.destination);
                 
-                // 根据和弦长度设置播放
-                const now = audioContext.currentTime;
-                const actualDuration = randomChord.duration * params.chordDuration;
-                
                 source.start(now);
                 
-                // 如果不是完整播放，则在指定时间停止
+                // 如果不是完整播放，则在指定时间停止（加上淡出时间）
                 if (params.chordDuration < 1.0) {
-                    source.stop(now + actualDuration);
+                    source.stop(now + actualDuration + fadeOutTime);
                 }
                 
                 updateSpectrum();
