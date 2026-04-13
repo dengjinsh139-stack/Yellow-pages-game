@@ -785,6 +785,103 @@
                     </div>
                 </div>
 
+                <!-- 节奏引擎控制 -->
+                <div class="panel-title" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">🥁 节奏引擎</div>
+                
+                <!-- BPM 控制 -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>🎼 BPM 速度</span>
+                        <span class="control-value" id="bpmValue">120</span>
+                    </div>
+                    <input type="range" id="bpm" min="60" max="200" value="120" oninput="updateParams()">
+                </div>
+
+                <!-- 每拍音符数 -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>🎶 每拍音符数</span>
+                        <span class="control-value" id="notesPerBeatValue">1个</span>
+                    </div>
+                    <input type="range" id="notesPerBeat" min="1" max="4" value="1" oninput="updateParams()">
+                </div>
+
+                <!-- 节奏随机模式 -->
+                <div class="control-group">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="rhythmRandom" onchange="updateParams()" style="width: auto;">
+                        <label for="rhythmRandom" style="font-size: 0.85rem; color: var(--text); cursor: pointer;">🎲 启用节奏随机</label>
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--text-dim);">
+                        随机变化每拍音符数和时值
+                    </div>
+                </div>
+
+                <!-- 声调时值设置 -->
+                <div style="margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px;">声调时值映射</div>
+                    
+                    <!-- 一声 -->
+                    <div class="control-group" style="margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.75rem; color: var(--primary);">一声 阴平</span>
+                            <span class="control-value" id="tone1Value" style="font-size: 0.7rem;">8分音符 ♪</span>
+                        </div>
+                        <select id="tone1NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.75rem;">
+                            <option value="4">4分音符 ♩</option>
+                            <option value="8" selected>8分音符 ♪</option>
+                            <option value="16">16分音符 ♫</option>
+                            <option value="32">32分音符 ♬</option>
+                            <option value="triplet">三连音 ♪♪♪</option>
+                        </select>
+                    </div>
+
+                    <!-- 二声 -->
+                    <div class="control-group" style="margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.75rem; color: var(--primary);">二声 阳平</span>
+                            <span class="control-value" id="tone2Value" style="font-size: 0.7rem;">16分音符 ♫</span>
+                        </div>
+                        <select id="tone2NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.75rem;">
+                            <option value="4">4分音符 ♩</option>
+                            <option value="8">8分音符 ♪</option>
+                            <option value="16" selected>16分音符 ♫</option>
+                            <option value="32">32分音符 ♬</option>
+                            <option value="triplet">三连音 ♪♪♪</option>
+                        </select>
+                    </div>
+
+                    <!-- 三声 -->
+                    <div class="control-group" style="margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.75rem; color: var(--primary);">三声 上声</span>
+                            <span class="control-value" id="tone3Value" style="font-size: 0.7rem;">三连音 ♪♪♪</span>
+                        </div>
+                        <select id="tone3NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.75rem;">
+                            <option value="4">4分音符 ♩</option>
+                            <option value="8">8分音符 ♪</option>
+                            <option value="16">16分音符 ♫</option>
+                            <option value="32">32分音符 ♬</option>
+                            <option value="triplet" selected>三连音 ♪♪♪</option>
+                        </select>
+                    </div>
+
+                    <!-- 四声 -->
+                    <div class="control-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.75rem; color: var(--primary);">四声 去声</span>
+                            <span class="control-value" id="tone4Value" style="font-size: 0.7rem;">32分音符 ♬</span>
+                        </div>
+                        <select id="tone4NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.75rem;">
+                            <option value="4">4分音符 ♩</option>
+                            <option value="8">8分音符 ♪</option>
+                            <option value="16">16分音符 ♫</option>
+                            <option value="32" selected>32分音符 ♬</option>
+                            <option value="triplet">三连音 ♪♪♪</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="spectrum-display" id="spectrum">
                     <!-- 动态生成频谱条 -->
                 </div>
@@ -939,13 +1036,32 @@
         const params = {
             baseFreq: 262,      // C4
             tempo: 300,         // ms per note (基准值)
-            tempoMin: 300,      // 最小间隔 (ms) - 增加让音符更清晰
+            tempoMin: 300,      // 最小间隔 (ms)
             tempoMax: 500,      // 最大间隔 (ms)
             tempoRandom: true,  // 是否启用随机间隔
             masterVolume: 1.0,  // 全局音量 (0-2)
-            noteDuration: 400,  // 音符时长增加
-            reverb: 0.2,        // 减少混响避免浑浊
-            chordDuration: 1.0  // 和弦播放长度比例 (0-1)
+            noteDuration: 400,  // 音符时长
+            reverb: 0.2,        // 混响
+            chordDuration: 1.0, // 和弦播放长度比例
+            // 节奏引擎参数
+            bpm: 120,           // BPM速度
+            notesPerBeat: 1,    // 每拍音符数
+            rhythmRandom: false,// 节奏随机模式
+            toneNoteValues: {   // 声调时值映射
+                1: '8',         // 一声 = 8分音符
+                2: '16',        // 二声 = 16分音符
+                3: 'triplet',   // 三声 = 三连音
+                4: '32'         // 四声 = 32分音符
+            }
+        };
+
+        // 时值配置 (相对于四分音符的倍数)
+        const noteValueConfig = {
+            '4': { name: '4分音符', symbol: '♩', duration: 1.0 },
+            '8': { name: '8分音符', symbol: '♪', duration: 0.5 },
+            '16': { name: '16分音符', symbol: '♫', duration: 0.25 },
+            '32': { name: '32分音符', symbol: '♬', duration: 0.125 },
+            'triplet': { name: '三连音', symbol: '♪♪♪', duration: 0.333, isTriplet: true }
         };
 
         // 采样配置 - 五声音阶 D E G A B
@@ -1611,6 +1727,32 @@
             else if (params.chordDuration <= 0.8) chordLabel = '大半';
             else chordLabel = '完整';
             document.getElementById('chordDurationValue').textContent = chordLabel;
+            
+            // ===== 节奏引擎参数 =====
+            params.bpm = parseInt(document.getElementById('bpm').value);
+            params.notesPerBeat = parseInt(document.getElementById('notesPerBeat').value);
+            params.rhythmRandom = document.getElementById('rhythmRandom').checked;
+            
+            // 读取声调时值设置
+            params.toneNoteValues[1] = document.getElementById('tone1NoteValue').value;
+            params.toneNoteValues[2] = document.getElementById('tone2NoteValue').value;
+            params.toneNoteValues[3] = document.getElementById('tone3NoteValue').value;
+            params.toneNoteValues[4] = document.getElementById('tone4NoteValue').value;
+            
+            // 更新显示
+            document.getElementById('bpmValue').textContent = params.bpm;
+            document.getElementById('notesPerBeatValue').textContent = params.notesPerBeat + '个';
+            
+            // 更新声调时值显示
+            const toneSymbols = { '4': '♩', '8': '♪', '16': '♫', '32': '♬', 'triplet': '♪♪♪' };
+            document.getElementById('tone1Value').textContent = 
+                noteValueConfig[params.toneNoteValues[1]].name + ' ' + toneSymbols[params.toneNoteValues[1]];
+            document.getElementById('tone2Value').textContent = 
+                noteValueConfig[params.toneNoteValues[2]].name + ' ' + toneSymbols[params.toneNoteValues[2]];
+            document.getElementById('tone3Value').textContent = 
+                noteValueConfig[params.toneNoteValues[3]].name + ' ' + toneSymbols[params.toneNoteValues[3]];
+            document.getElementById('tone4Value').textContent = 
+                noteValueConfig[params.toneNoteValues[4]].name + ' ' + toneSymbols[params.toneNoteValues[4]];
         }
 
         // 频率转音符
@@ -2215,8 +2357,18 @@
                 return;
             }
             
-            // 依次演奏
+            // 依次演奏 - 使用节奏引擎
             console.log('开始演奏，音符数量:', notes.length);
+            console.log('节奏引擎设置:', {
+                bpm: params.bpm,
+                notesPerBeat: params.notesPerBeat,
+                rhythmRandom: params.rhythmRandom,
+                toneValues: params.toneNoteValues
+            });
+            
+            // 计算一拍的时间 (ms)
+            const beatDuration = 60000 / params.bpm;
+            
             try {
                 for (let i = 0; i < notes.length; i++) {
                     if (!isPlaying) {
@@ -2240,28 +2392,46 @@
                         continue;
                     }
                     
+                    // ===== 节奏引擎计算 =====
+                    let currentNoteValue = params.toneNoteValues[note.tone] || '8';
+                    let currentNotesPerBeat = params.notesPerBeat;
+                    
+                    // 随机模式：随机变化时值和每拍音符数
+                    if (params.rhythmRandom) {
+                        const values = Object.keys(noteValueConfig);
+                        currentNoteValue = values[Math.floor(Math.random() * values.length)];
+                        currentNotesPerBeat = Math.floor(Math.random() * 3) + 1; // 1-3个
+                    }
+                    
+                    // 获取时值配置
+                    const noteValue = noteValueConfig[currentNoteValue];
+                    
+                    // 计算音符实际时长
+                    // 基础：一拍时间 × 时值比例 ÷ 每拍音符数
+                    let noteDuration = beatDuration * noteValue.duration / currentNotesPerBeat;
+                    
+                    // 三连音特殊处理：一个三连音组占一拍
+                    if (noteValue.isTriplet) {
+                        noteDuration = beatDuration / 3;
+                    }
+                    
                     // 应用全局音量 + 音符独立音量
                     const userVolume = noteVolumes[note.note] || 1.0;
                     const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
                     
-                    console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 频率=${note.frequency.toFixed(2)}, 音量=${velocityWithMaster.toFixed(2)}`);
+                    console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 声调=${note.tone}, 时值=${noteValue.name}, 时长=${noteDuration.toFixed(0)}ms`);
                     
-                    // 播放单音
-                    playTone(note.frequency, note.note, note.duration, velocityWithMaster);
+                    // 播放单音（使用节奏引擎计算的时长）
+                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
                     
                     // 高亮当前音符
                     highlightNote(i);
                     
-                    // 计算等待时间（支持随机区间）
-                    let waitTime;
-                    if (params.tempoRandom) {
-                        // 在 min-max 之间随机
-                        waitTime = Math.floor(Math.random() * (params.tempoMax - params.tempoMin + 1)) + params.tempoMin;
-                    } else {
-                        // 使用固定基准值
-                        waitTime = params.tempo;
-                    }
-                    await sleep(waitTime + (note.pause ? 200 : 0));
+                    // 等待计算好的时长
+                    await sleep(noteDuration);
+                    
+                    // 添加微小间隔避免音符粘连
+                    await sleep(20);
                 }
             } catch (err) {
                 console.error('演奏过程中出错:', err);
@@ -2299,19 +2469,30 @@
             const display = document.getElementById('notesDisplay');
             const toneMarks = { 0: '•', 1: '̄', 2: '́', 3: '̌', 4: '̀' };
             const toneNames = { 0: '轻声', 1: '阴平', 2: '阳平', 3: '上声', 4: '去声' };
+            const noteValueSymbols = { '4': '♩', '8': '♪', '16': '♫', '32': '♬', 'triplet': '♪♪♪' };
             
             display.innerHTML = notes.map((n, i) => {
                 const toneMark = n.tone !== undefined ? toneMarks[n.tone] : '';
                 let displayText;
+                let rhythmInfo = '';
+                
                 if (n.isChord) {
-                    displayText = '🎵Chord';  // 和弦显示
+                    displayText = '🎵Chord';
                 } else if (n.isRest) {
-                    displayText = '休';  // 兼容旧数据
+                    displayText = '休';
                 } else {
                     displayText = n.note;
+                    // 显示节奏时值
+                    const noteValue = params.toneNoteValues[n.tone] || '8';
+                    rhythmInfo = noteValueSymbols[noteValue] || '';
                 }
+                
                 const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}">${displayText}${toneMark}</span>`;
+                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}"
+                    style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px;">
+                    <span style="font-size: 0.9rem;">${displayText}</span>
+                    <span style="font-size: 0.6rem; opacity: 0.7;">${rhythmInfo}</span>
+                </span>`;
             }).join('');
         }
 
