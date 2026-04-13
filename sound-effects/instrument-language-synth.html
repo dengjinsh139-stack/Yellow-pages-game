@@ -1531,8 +1531,8 @@
             const instrumentNames = {
                 'piano': '真实钢琴采样 🎹',
                 'saxophone': '真实沙克斯采样 🎷',
+                'flute': '真实长笛采样 🪈',
                 'guitar': '吉他 (合成音色)',
-                'flute': '长笛 (合成音色)',
                 'violin': '小提琴 (合成音色)',
                 'trumpet': '小号 (合成音色)',
                 'synth': '合成器 (合成音色)'
@@ -1548,12 +1548,20 @@
                 document.getElementById('statusText').textContent = '萨克斯采样已加载';
             }
             
+            // 如果是长笛，需要加载采样
+            if (instrument === 'flute' && !audioBuffers['flute_D4']) {
+                document.getElementById('statusText').textContent = '加载长笛采样中...';
+                await loadFluteSamples();
+                document.getElementById('statusText').textContent = '长笛采样已加载';
+            }
+            
             // 重新生成音符键盘
             generateNoteKeyboard();
             
             // 播放试听音
             if ((instrument === 'piano' && samplesLoaded) || 
-                (instrument === 'saxophone' && audioBuffers['saxophone_D4'])) {
+                (instrument === 'saxophone' && audioBuffers['saxophone_D4']) ||
+                (instrument === 'flute' && audioBuffers['flute_D4'])) {
                 playSampleTone(440, 0.3);
             } else {
                 playSynthTone(440, 0.2);
@@ -1576,6 +1584,29 @@
                         console.log(`Loaded saxophone: ${note}`);
                     })
                     .catch(err => console.error(`Failed to load saxophone ${note}:`, err));
+                
+                loadPromises.push(promise);
+            }
+            
+            await Promise.all(loadPromises);
+        }
+
+        // 加载长笛采样
+        async function loadFluteSamples() {
+            if (audioBuffers['flute_D4']) return; // 已加载
+            
+            const config = sampleConfig.flute;
+            const loadPromises = [];
+            
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['flute_' + note] = audioBuffer;
+                        console.log(`Loaded flute: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load flute ${note}:`, err));
                 
                 loadPromises.push(promise);
             }
