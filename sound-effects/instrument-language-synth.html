@@ -1235,7 +1235,15 @@
             });
         }
         
-        // 情感关键词
+        // 轻声和弦配置 - 遇到轻声字时随机播放
+        const lightToneChords = [
+            { name: 'C', frequencies: [261.63, 329.63, 392.00], emoji: '🎵' },      // C-E-G
+            { name: 'Am', frequencies: [220.00, 261.63, 329.63], emoji: '🎶' },     // A-C-E  
+            { name: 'F', frequencies: [349.23, 440.00, 523.25], emoji: '💫' },      // F-A-C
+            { name: 'G', frequencies: [196.00, 246.94, 293.66], emoji: '✨' },      // G-B-D (低八度)
+            { name: 'Dm', frequencies: [293.66, 349.23, 440.00], emoji: '🌙' },     // D-F-A
+            { name: 'Em', frequencies: [329.63, 392.00, 493.88], emoji: '☁️' }      // E-G-B
+        ];
         const emotionKeywords = {
             happy: ['好', '棒', '喜', '乐', '爱', '开心', '快乐', '高兴', '愉快', '幸福', 'happy', 'good', 'great', 'love', 'wonderful', 'joy'],
             sad: ['伤', '悲', '泪', '痛', '难过', '伤心', 'sad', 'cry', 'tear', 'sorry', 'miss'],
@@ -1619,9 +1627,9 @@
             // 二声（阳平）：F4→B4 范围（F4, G4, A4, B4）
             // 三声（上声）：D5→F5 范围（D5, E5, F5）
             // 四声（去声）：F5→B5 范围（F5, G5, A5, B5）
-            // 轻声：延续前音或休止
+            // 轻声：播放柔和和弦（随机选择）
             const regions = {
-                0: { notes: ['rest'], rest: true },                    // 轻声 - 休止
+                0: { notes: ['chord'], isChord: true },                 // 轻声 - 和弦
                 1: { notes: ['D4', 'E4', 'F4'], rest: false },         // 阴平 - D4到F4随机
                 2: { notes: ['F4', 'G4', 'A4', 'B4'], rest: false },   // 阳平 - F4到B4随机
                 3: { notes: ['D5', 'E5', 'F5'], rest: false },         // 上声 - D5到F5随机
@@ -1658,16 +1666,17 @@
             const tone = getCharTone(char);
             const region = getToneRegion(tone);
             
-            // 轻声处理（休止）
-            if (region.rest) {
+            // 轻声处理（播放和弦）
+            if (region.isChord) {
+                const randomChord = lightToneChords[Math.floor(Math.random() * lightToneChords.length)];
                 return {
                     char: char,
-                    note: 'rest',
-                    frequency: 0,
-                    duration: params.noteDuration * 0.5,
-                    velocity: 0,
-                    sampleNote: null,
-                    isRest: true,
+                    note: randomChord.name,
+                    frequencies: randomChord.frequencies,
+                    emoji: randomChord.emoji,
+                    duration: params.noteDuration * 0.6,  // 和弦稍微短一点
+                    velocity: 0.3 + Math.random() * 0.2,  // 和弦音量较小，更柔和
+                    isChord: true,
                     tone: tone
                 };
             }
@@ -1888,6 +1897,43 @@
             updateSpectrum();
         }
 
+        // 演奏和弦（轻声用）
+        function playChord(frequencies, duration, velocity = 0.3) {
+            if (!audioContext) return;
+            
+            const now = audioContext.currentTime;
+            const durationSec = duration / 1000;
+            
+            // 为每个频率创建一个振荡器
+            frequencies.forEach((freq, index) => {
+                const osc = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                // 使用正弦波或三角波，更柔和
+                osc.type = index === 0 ? 'triangle' : 'sine';  // 根音用三角波，其他用正弦波
+                osc.frequency.setValueAtTime(freq, now);
+                
+                // 和弦包络 - 更柔和的淡入淡出
+                const attackTime = 0.05;
+                const releaseTime = durationSec * 0.8;
+                const individualVelocity = velocity * (index === 0 ? 1.0 : 0.6);  // 根音稍大
+                
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(individualVelocity * 0.2, now + attackTime);
+                gainNode.gain.setValueAtTime(individualVelocity * 0.2, now + attackTime + durationSec * 0.3);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + attackTime + releaseTime);
+                
+                osc.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioContext.destination);
+                
+                osc.start(now);
+                osc.stop(now + durationSec + 0.2);
+            });
+            
+            updateSpectrum();
+        }
+
         // 演奏单个音符（根据当前乐器选择播放方式）
         function playTone(frequency, noteName, duration, velocity = 0.5) {
             if (currentInstrument === 'piano' && samplesLoaded) {
@@ -2064,7 +2110,14 @@
                     
                     const note = notes[i];
                     
-                    // 休止符处理
+                    // 和弦处理（轻声字）
+                    if (note.isChord) {
+                        console.log(`第 ${i+1} 个是和弦: ${note.note} ${note.emoji}`);
+                        playChord(note.frequencies, note.duration, note.velocity * params.masterVolume);
+                        continue;
+                    }
+                    
+                    // 休止符处理（已废弃，保留兼容）
                     if (note.isRest) {
                         console.log(`第 ${i+1} 个是休止符，等待 ${note.duration}ms`);
                         await sleep(note.duration);
@@ -2133,9 +2186,17 @@
             
             display.innerHTML = notes.map((n, i) => {
                 const toneMark = n.tone !== undefined ? toneMarks[n.tone] : '';
-                const isRest = n.isRest ? '休' : n.note;
+                // 轻声显示和弦名+emoji，其他显示音符
+                let displayText;
+                if (n.isChord) {
+                    displayText = `${n.emoji}${n.note}`;
+                } else if (n.isRest) {
+                    displayText = '休';  // 兼容旧数据
+                } else {
+                    displayText = n.note;
+                }
                 const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} 区间${regionInfo}">${isRest}${toneMark}</span>`;
+                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}">${displayText}${toneMark}</span>`;
             }).join('');
         }
 
