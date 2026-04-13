@@ -773,6 +773,18 @@
                     <input type="range" id="reverb" min="0" max="100" value="30" oninput="updateParams()">
                 </div>
 
+                <!-- 和弦播放长度设置 -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>🎵 和弦长度</span>
+                        <span class="control-value" id="chordDurationValue">完整</span>
+                    </div>
+                    <input type="range" id="chordDuration" min="0" max="100" value="100" oninput="updateParams()">
+                    <div style="margin-top: 4px; font-size: 0.7rem; color: var(--text-dim);">
+                        0%=静音 50%=半长 100%=完整
+                    </div>
+                </div>
+
                 <div class="spectrum-display" id="spectrum">
                     <!-- 动态生成频谱条 -->
                 </div>
@@ -932,7 +944,8 @@
             tempoRandom: true,  // 是否启用随机间隔
             masterVolume: 1.0,  // 全局音量 (0-2)
             noteDuration: 400,  // 音符时长增加
-            reverb: 0.2         // 减少混响避免浑浊
+            reverb: 0.2,        // 减少混响避免浑浊
+            chordDuration: 1.0  // 和弦播放长度比例 (0-1)
         };
 
         // 采样配置 - 五声音阶 D E G A B
@@ -1558,6 +1571,7 @@
             params.masterVolume = parseInt(document.getElementById('masterVolume').value) / 100;
             params.noteDuration = parseInt(document.getElementById('noteDuration').value);
             params.reverb = parseInt(document.getElementById('reverb').value) / 100;
+            params.chordDuration = parseInt(document.getElementById('chordDuration').value) / 100;
 
             // 确保 tempoMin <= tempoMax
             if (params.tempoMin > params.tempoMax) {
@@ -1584,6 +1598,20 @@
             if (params.noteDuration <= 150) durLabel = '短';
             else if (params.noteDuration <= 400) durLabel = '中';
             else if (params.noteDuration <= 700) durLabel = '长';
+            else durLabel = '悠长';
+            document.getElementById('durationValue').textContent = durLabel;
+            
+            document.getElementById('reverbValue').textContent = Math.round(params.reverb * 100) + '%';
+            
+            // 更新和弦长度显示
+            let chordLabel = '完整';
+            if (params.chordDuration === 0) chordLabel = '静音';
+            else if (params.chordDuration <= 0.3) chordLabel = '很短';
+            else if (params.chordDuration <= 0.5) chordLabel = '半长';
+            else if (params.chordDuration <= 0.8) chordLabel = '大半';
+            else chordLabel = '完整';
+            document.getElementById('chordDurationValue').textContent = chordLabel;
+        }
             else durLabel = '悠长';
             document.getElementById('durationValue').textContent = durLabel;
             
@@ -2013,6 +2041,13 @@
                     return;
                 }
                 
+                // 如果和弦长度为0，跳过播放
+                if (params.chordDuration <= 0) {
+                    console.log('Chord duration is 0, skipping');
+                    resolve();
+                    return;
+                }
+                
                 // 随机选择一个和弦
                 const randomChord = chordBuffers[Math.floor(Math.random() * chordBuffers.length)];
                 
@@ -2026,7 +2061,17 @@
                 gainNode.connect(analyser);
                 analyser.connect(audioContext.destination);
                 
-                source.start();
+                // 根据和弦长度设置播放
+                const now = audioContext.currentTime;
+                const actualDuration = randomChord.duration * params.chordDuration;
+                
+                source.start(now);
+                
+                // 如果不是完整播放，则在指定时间停止
+                if (params.chordDuration < 1.0) {
+                    source.stop(now + actualDuration);
+                }
+                
                 updateSpectrum();
                 
                 // 播放完成后 resolve
@@ -2035,7 +2080,7 @@
                     resolve();
                 };
                 
-                console.log('Playing chord, waiting for completion...');
+                console.log(`Playing chord (${Math.round(params.chordDuration * 100)}% length), waiting for completion...`);
             });
         }
 
