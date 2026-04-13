@@ -2224,9 +2224,11 @@
             
             // 包络 - 使用更长的衰减让音符更清晰
             const now = audioContext.currentTime;
-            const attackTime = config.attack || 0.005;
-            const holdTime = Math.min(duration * 0.3, 0.1);
-            const decayTime = duration * 0.7;
+            const attackTime = Math.min(config.attack || 0.005, duration * 0.2);
+            // 短音符需要更长的保持时间，确保音量饱满
+            const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
+            // 衰减时间至少保证100ms，避免声音过快消失
+            const decayTime = Math.max(duration * 0.6, 0.1);
             
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, now + attackTime);
