@@ -1635,6 +1635,27 @@
                 key.dataset.freq = noteInfo.freq;
                 key.dataset.index = index;
                 
+                // 根据乐器设置不同的颜色主题
+                const instrumentColors = {
+                    'piano': 'rgba(255, 107, 107, 0.15)',  // 红色
+                    'guitar': 'rgba(244, 162, 97, 0.15)',  // 橙色
+                    'flute': 'rgba(42, 157, 143, 0.15)',   // 青绿色
+                    'violin': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
+                    'trumpet': 'rgba(233, 196, 106, 0.15)', // 金色
+                    'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
+                    'synth': 'rgba(155, 93, 229, 0.15)'    // 紫色
+                };
+                const activeColors = {
+                    'piano': 'rgba(255, 107, 107, 0.4)',
+                    'guitar': 'rgba(244, 162, 97, 0.4)',
+                    'flute': 'rgba(42, 157, 143, 0.4)',
+                    'violin': 'rgba(231, 111, 81, 0.4)',
+                    'trumpet': 'rgba(233, 196, 106, 0.4)',
+                    'saxophone': 'rgba(255, 107, 107, 0.4)',
+                    'synth': 'rgba(155, 93, 229, 0.4)'
+                };
+                key.style.background = `linear-gradient(145deg, ${instrumentColors[currentInstrument] || 'rgba(255, 107, 107, 0.15)'}, rgba(0, 0, 0, 0.2))`;
+                key.style.borderColor = activeColors[currentInstrument] || 'rgba(255, 107, 107, 0.4)';
                 key.innerHTML = `
                     <span class="note-name">${noteInfo.note}</span>
                     <span class="note-freq">${Math.round(noteInfo.freq)}Hz</span>
