@@ -963,6 +963,11 @@
         const audioBuffers = {};
         let samplesLoaded = false;
 
+        // 和弦音频
+        const chordBuffers = [];
+        let chordsLoaded = false;
+        const chordFiles = ['../assets/audio/chords/chord1.mp3']; // 和弦文件列表
+
         // 每个音符的独立音量设置 (默认1.0)
         const noteVolumes = {
             'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0,
@@ -1303,8 +1308,24 @@
                 loadPromises.push(promise);
             }
             
+            // 加载和弦音频
+            for (const chordFile of chordFiles) {
+                const promise = fetch(chordFile)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        chordBuffers.push(audioBuffer);
+                        console.log(`Loaded chord: ${chordFile}`);
+                    })
+                    .catch(err => console.error(`Failed to load chord ${chordFile}:`, err));
+                
+                loadPromises.push(promise);
+            }
+            
             await Promise.all(loadPromises);
             samplesLoaded = true;
+            chordsLoaded = chordBuffers.length > 0;
+            console.log(`Chords loaded: ${chordBuffers.length}`);
         }
 
         // 创建频谱条
@@ -1346,7 +1367,7 @@
             }
         }
 
-        // 生成10键音符键盘
+        // 生成10键音符键盘 + Chord按钮
         function generateNoteKeyboard() {
             const keyboard = document.getElementById('noteKeyboard');
             keyboard.innerHTML = '';
@@ -1354,6 +1375,7 @@
             // 获取当前乐器的10个音符配置
             const notes = getCurrentInstrumentNotes();
             
+            // 添加普通音符按钮
             notes.forEach((noteInfo, index) => {
                 // 创建包装容器
                 const wrapper = document.createElement('div');
@@ -1417,6 +1439,64 @@
                 wrapper.appendChild(volumeControl);
                 keyboard.appendChild(wrapper);
             });
+            
+            // 添加 Chord 按钮（用于试听和弦）
+            const chordWrapper = document.createElement('div');
+            chordWrapper.className = 'note-key-wrapper';
+            
+            const chordKey = document.createElement('div');
+            chordKey.className = 'note-key';
+            chordKey.style.background = 'linear-gradient(145deg, rgba(255, 215, 0, 0.3), rgba(255, 140, 0, 0.3))';
+            chordKey.style.borderColor = 'rgba(255, 215, 0, 0.5)';
+            chordKey.innerHTML = `
+                <span class="note-name" style="font-size: 1rem;">🎵</span>
+                <span class="note-freq">Chord</span>
+            `;
+            
+            // Chord 按钮点击事件
+            chordKey.addEventListener('mousedown', () => {
+                chordKey.classList.add('active');
+                playChordAsync(1000, 0.6);
+            });
+            chordKey.addEventListener('mouseup', () => releaseNoteKey(chordKey));
+            chordKey.addEventListener('mouseleave', () => releaseNoteKey(chordKey));
+            
+            // 触摸支持
+            chordKey.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                chordKey.classList.add('active');
+                playChordAsync(1000, 0.6);
+            });
+            chordKey.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                releaseNoteKey(chordKey);
+            });
+            
+            // Chord 音量控制
+            const chordVolumeControl = document.createElement('div');
+            chordVolumeControl.className = 'note-volume-control';
+            
+            const chordVolumeSlider = document.createElement('input');
+            chordVolumeSlider.type = 'range';
+            chordVolumeSlider.className = 'note-volume-slider';
+            chordVolumeSlider.min = '0';
+            chordVolumeSlider.max = '200';
+            chordVolumeSlider.value = '100';
+            
+            const chordVolumeLabel = document.createElement('span');
+            chordVolumeLabel.className = 'note-volume-label';
+            chordVolumeLabel.textContent = '100%';
+            
+            chordVolumeSlider.addEventListener('input', (e) => {
+                chordVolumeLabel.textContent = `${e.target.value}%`;
+            });
+            
+            chordVolumeControl.appendChild(chordVolumeSlider);
+            chordVolumeControl.appendChild(chordVolumeLabel);
+            
+            chordWrapper.appendChild(chordKey);
+            chordWrapper.appendChild(chordVolumeControl);
+            keyboard.appendChild(chordWrapper);
         }
 
         // 获取当前乐器的10个音符
@@ -1658,16 +1738,16 @@
             const tone = getCharTone(char);
             const region = getToneRegion(tone);
             
-            // 轻声处理（休止）
+            // 轻声处理（播放和弦）
             if (region.rest) {
                 return {
                     char: char,
-                    note: 'rest',
+                    note: 'Chord',
                     frequency: 0,
-                    duration: params.noteDuration * 0.5,
-                    velocity: 0,
+                    duration: params.noteDuration * 1.2,  // 和弦稍长
+                    velocity: 0.6,  // 和弦音量
                     sampleNote: null,
-                    isRest: true,
+                    isChord: true,  // 标记为和弦
                     tone: tone
                 };
             }
@@ -1917,6 +1997,41 @@
             }
         }
 
+        // 播放和弦（随机选择一个，等待完成）
+        function playChordAsync(duration, velocity = 0.6) {
+            return new Promise((resolve) => {
+                if (!audioContext || chordBuffers.length === 0) {
+                    console.log('No chord buffers available');
+                    resolve();
+                    return;
+                }
+                
+                // 随机选择一个和弦
+                const randomChord = chordBuffers[Math.floor(Math.random() * chordBuffers.length)];
+                
+                const source = audioContext.createBufferSource();
+                source.buffer = randomChord;
+                
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = velocity * params.masterVolume;
+                
+                source.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioContext.destination);
+                
+                source.start();
+                updateSpectrum();
+                
+                // 播放完成后 resolve
+                source.onended = () => {
+                    console.log('Chord finished playing');
+                    resolve();
+                };
+                
+                console.log('Playing chord, waiting for completion...');
+            });
+        }
+
         // 合成器滑音
         function playSynthToneWithGlide(startFreq, endFreq, duration, velocity = 0.5) {
             if (!audioContext) return;
@@ -2064,7 +2179,14 @@
                     
                     const note = notes[i];
                     
-                    // 休止符处理
+                    // 和弦处理（轻声字）- 等待和弦播完
+                    if (note.isChord) {
+                        console.log(`第 ${i+1} 个是和弦，播放并等待完成`);
+                        await playChordAsync(note.duration, note.velocity);
+                        continue;
+                    }
+                    
+                    // 休止符处理（兼容旧数据）
                     if (note.isRest) {
                         console.log(`第 ${i+1} 个是休止符，等待 ${note.duration}ms`);
                         await sleep(note.duration);
@@ -2133,9 +2255,16 @@
             
             display.innerHTML = notes.map((n, i) => {
                 const toneMark = n.tone !== undefined ? toneMarks[n.tone] : '';
-                const isRest = n.isRest ? '休' : n.note;
+                let displayText;
+                if (n.isChord) {
+                    displayText = '🎵Chord';  // 和弦显示
+                } else if (n.isRest) {
+                    displayText = '休';  // 兼容旧数据
+                } else {
+                    displayText = n.note;
+                }
                 const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} 区间${regionInfo}">${isRest}${toneMark}</span>`;
+                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}">${displayText}${toneMark}</span>`;
             }).join('');
         }
 
