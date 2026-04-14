@@ -735,13 +735,16 @@
                     <input type="range" id="masterVolume" min="0" max="200" value="100" oninput="updateParams()">
                 </div>
 
-                <!-- 基础音高 -->
+                <!-- 音频偏移 -->
                 <div class="control-group">
                     <div class="control-label">
-                        <span>基础音高</span>
-                        <span class="control-value" id="baseFreqValue">C4 (262Hz)</span>
+                        <span>⏱️ 音频偏移</span>
+                        <span class="control-value" id="offsetValue">0ms</span>
                     </div>
-                    <input type="range" id="baseFreq" min="130" max="523" value="262" oninput="updateParams()">
+                    <input type="range" id="audioOffset" min="0" max="1000" value="0" step="10" oninput="updateParams()">
+                    <div style="margin-top: 4px; font-size: 0.7rem; color: var(--text-dim);">
+                        当前乐器: <span id="currentInstrumentForOffset">钢琴</span> 从 <span id="currentOffsetMs">0</span>ms 开始播放
+                    </div>
                 </div>
 
                 <!-- 播放间隔区间 -->
@@ -1038,7 +1041,6 @@
 
         // 参数
         const params = {
-            baseFreq: 262,      // C4
             tempo: 300,         // ms per note (基准值)
             tempoMin: 300,      // 最小间隔 (ms)
             tempoMax: 500,      // 最大间隔 (ms)
@@ -1047,6 +1049,16 @@
             noteDuration: 400,  // 音符时长
             reverb: 0.2,        // 混响
             chordDuration: 1.0, // 和弦播放长度比例
+            // 乐器音频偏移 (毫秒)
+            instrumentOffsets: {
+                piano: 0,
+                guitar: 0,
+                flute: 0,
+                violin: 0,
+                trumpet: 0,
+                saxophone: 0,
+                synth: 0
+            },
             // 节奏引擎参数
             bpm: 120,           // BPM速度
             notesPerBeat: 1,    // 每拍音符数
@@ -1128,8 +1140,7 @@
                     'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
                 },
                 attack: 0.03,
-                release: 0.4,
-                startOffset: 0.1
+                release: 0.4
             }
         };
 
@@ -1556,6 +1567,11 @@
                 document.getElementById('statusText').textContent = '长笛采样已加载';
             }
             
+            // 切换乐器时，更新音频偏移滑块为当前乐器的设置
+            const currentOffset = params.instrumentOffsets[instrument] || 0;
+            document.getElementById('audioOffset').value = currentOffset;
+            updateParams();
+            
             // 重新生成音符键盘
             generateNoteKeyboard();
             
@@ -1830,7 +1846,10 @@
 
         // 更新参数
         function updateParams() {
-            params.baseFreq = parseInt(document.getElementById('baseFreq').value);
+            // 更新当前乐器的音频偏移
+            const offsetValue = parseInt(document.getElementById('audioOffset').value);
+            params.instrumentOffsets[currentInstrument] = offsetValue;
+            
             params.tempoMin = parseInt(document.getElementById('tempoMin').value);
             params.tempoMax = parseInt(document.getElementById('tempoMax').value);
             params.tempoRandom = document.getElementById('tempoRandom').checked;
@@ -1846,9 +1865,19 @@
                 params.tempoMax = temp;
             }
 
-            const freqNote = freqToNote(params.baseFreq);
-            document.getElementById('baseFreqValue').textContent = 
-                `${freqNote} (${params.baseFreq}Hz)`;
+            // 更新音频偏移显示
+            const instrumentNames = {
+                piano: '钢琴',
+                guitar: '吉他',
+                flute: '长笛',
+                violin: '小提琴',
+                trumpet: '小号',
+                saxophone: '萨克斯',
+                synth: '合成器'
+            };
+            document.getElementById('offsetValue').textContent = offsetValue + 'ms';
+            document.getElementById('currentInstrumentForOffset').textContent = instrumentNames[currentInstrument] || currentInstrument;
+            document.getElementById('currentOffsetMs').textContent = offsetValue;
             
             // 更新播放间隔显示
             const randomText = params.tempoRandom ? ' (随机)' : '';
@@ -2264,9 +2293,10 @@
                 reverbGain.connect(audioContext.destination);
             }
             
-            // 播放
-            const startOffset = config.startOffset || 0;
-            source.start(now, startOffset);
+            // 播放 - 使用当前乐器的音频偏移设置（毫秒转秒）
+            const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
+            const startOffsetSec = offsetMs / 1000;
+            source.start(now, startOffsetSec);
             source.stop(now + duration + 0.5);
             
             // 更新频谱
