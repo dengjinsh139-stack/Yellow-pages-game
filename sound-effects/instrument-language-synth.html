@@ -956,7 +956,7 @@
                     <div class="preset-btn" onclick="playPreset('thankyou')">🙏 谢谢</div>
                     <div class="preset-btn" onclick="playPreset('congrats')">🎉 恭喜</div>
                     <div class="preset-btn" onclick="playPreset('goodluck')">🍀 祝好运</div>
-                    <div class="preset-btn" onclick="selectEmotion('happy')" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
+                    <div class="preset-btn" onclick="selectEmotion('happy'); playPreset('happy');" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
                 </div>
 
                 <!-- 情绪专属文件上传区域 -->
@@ -1210,7 +1210,7 @@
             updateEmotionFileList(emotionKey);
             
             // 播放该情绪
-            playPreset(emotionKey);
+            // playPreset(emotionKey); // 移除此处调用，避免在自动情感分析时覆盖用户输入文本
         }
         
         // 关闭情绪面板
