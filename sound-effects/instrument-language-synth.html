@@ -722,6 +722,10 @@
                         <span class="icon">🎛️</span>
                         <span class="name">合成器</span>
                     </div>
+                    <div class="instrument-btn" data-instrument="train" onclick="selectInstrument('train')">
+                        <span class="icon">🚂</span>
+                        <span class="name">火车</span>
+                    </div>
                 </div>
 
                 <div class="panel-title">演奏参数</div>
@@ -1057,7 +1061,8 @@
                 violin: 0,
                 trumpet: 0,
                 saxophone: 0,
-                synth: 0
+                synth: 0,
+                train: 0
             },
             // 节奏引擎参数
             bpm: 120,           // BPM速度
@@ -1148,6 +1153,26 @@
                 basePath: '../assets/audio/samples/synth/',
                 samples: {
                     // 合成器五声音阶采样
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                },
+                attack: 0.02,
+                release: 0.3
+            },
+            train: {
+                name: '火车',
+                emoji: '🚂',
+                basePath: '../assets/audio/samples/train/',
+                samples: {
+                    // 火车五声音阶采样
                     'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
                     'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
                     'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
@@ -1565,6 +1590,7 @@
                 'saxophone': '真实沙克斯采样 🎷',
                 'flute': '真实长笛采样 🪈',
                 'synth': '真实合成器采样 🎛️',
+                'train': '真实火车采样 🚂',
                 'guitar': '吉他 (合成音色)',
                 'violin': '小提琴 (合成音色)',
                 'trumpet': '小号 (合成音色)'
@@ -1594,6 +1620,13 @@
                 document.getElementById('statusText').textContent = '合成器采样已加载';
             }
             
+            // 如果是火车，需要加载采样
+            if (instrument === 'train' && !audioBuffers['train_D4']) {
+                document.getElementById('statusText').textContent = '加载火车采样中...';
+                await loadTrainSamples();
+                document.getElementById('statusText').textContent = '火车采样已加载';
+            }
+            
             // 切换乐器时，更新音频偏移滑块为当前乐器的设置
             const currentOffset = params.instrumentOffsets[instrument] || 0;
             document.getElementById('audioOffset').value = currentOffset;
@@ -1606,7 +1639,8 @@
             if ((instrument === 'piano' && samplesLoaded) || 
                 (instrument === 'saxophone' && audioBuffers['saxophone_D4']) ||
                 (instrument === 'flute' && audioBuffers['flute_D4']) ||
-                (instrument === 'synth' && audioBuffers['synth_D4'])) {
+                (instrument === 'synth' && audioBuffers['synth_D4']) ||
+                (instrument === 'train' && audioBuffers['train_D4'])) {
                 playSampleTone(440, 0.3);
             } else {
                 playSynthTone(440, 0.2);
@@ -1682,6 +1716,29 @@
             await Promise.all(loadPromises);
         }
 
+        // 加载火车采样
+        async function loadTrainSamples() {
+            if (audioBuffers['train_D4']) return; // 已加载
+            
+            const config = sampleConfig.train;
+            const loadPromises = [];
+            
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['train_' + note] = audioBuffer;
+                        console.log(`Loaded train: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load train ${note}:`, err));
+                
+                loadPromises.push(promise);
+            }
+            
+            await Promise.all(loadPromises);
+        }
+
         // 生成10键音符键盘 + Chord按钮
         function generateNoteKeyboard() {
             const keyboard = document.getElementById('noteKeyboard');
@@ -1711,7 +1768,8 @@
                     'violin': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
                     'trumpet': 'rgba(233, 196, 106, 0.15)', // 金色
                     'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
-                    'synth': 'rgba(155, 93, 229, 0.15)'    // 紫色
+                    'synth': 'rgba(155, 93, 229, 0.15)',    // 紫色
+                    'train': 'rgba(100, 149, 237, 0.15)'    // 钢蓝色
                 };
                 const activeColors = {
                     'piano': 'rgba(255, 107, 107, 0.4)',
@@ -1720,7 +1778,8 @@
                     'violin': 'rgba(231, 111, 81, 0.4)',
                     'trumpet': 'rgba(233, 196, 106, 0.4)',
                     'saxophone': 'rgba(255, 107, 107, 0.4)',
-                    'synth': 'rgba(155, 93, 229, 0.4)'
+                    'synth': 'rgba(155, 93, 229, 0.4)',
+                    'train': 'rgba(100, 149, 237, 0.4)'     // 钢蓝色
                 };
                 key.style.background = `linear-gradient(145deg, ${instrumentColors[currentInstrument] || 'rgba(255, 107, 107, 0.15)'}, rgba(0, 0, 0, 0.2))`;
                 key.style.borderColor = activeColors[currentInstrument] || 'rgba(255, 107, 107, 0.4)';
@@ -1890,6 +1949,9 @@
             if (instrument === 'synth' && audioBuffers['synth_D4']) {
                 return true;
             }
+            if (instrument === 'train' && audioBuffers['train_D4']) {
+                return true;
+            }
             return false;
         }
 
@@ -1927,7 +1989,8 @@
                 violin: '小提琴',
                 trumpet: '小号',
                 saxophone: '萨克斯',
-                synth: '合成器'
+                synth: '合成器',
+                train: '火车'
             };
             document.getElementById('offsetValue').textContent = offsetValue + 'ms';
             document.getElementById('currentInstrumentForOffset').textContent = instrumentNames[currentInstrument] || currentInstrument;
@@ -2561,7 +2624,7 @@
             const hasSamples = hasInstrumentSamples(currentInstrument);
             if (!hasSamples) {
                 // 如果是采样乐器但采样未加载，提示加载中
-                if (currentInstrument === 'piano' || currentInstrument === 'saxophone' || currentInstrument === 'flute' || currentInstrument === 'synth') {
+                if (currentInstrument === 'piano' || currentInstrument === 'saxophone' || currentInstrument === 'flute' || currentInstrument === 'synth' || currentInstrument === 'train') {
                     document.getElementById('statusText').textContent = '采样加载中，请稍候...';
                     console.log('采样未加载完成，返回. currentInstrument:', currentInstrument);
                     return;
@@ -2576,7 +2639,8 @@
                 'flute': '长笛',
                 'violin': '小提琴',
                 'trumpet': '小号',
-                'synth': '合成器'
+                'synth': '合成器',
+                'train': '火车'
             };
             const instrumentName = instrumentDisplayNames[currentInstrument] || currentInstrument;
             document.getElementById('statusText').textContent = hasSamples ? `演奏中 (${instrumentName})...` : '演奏中...';
