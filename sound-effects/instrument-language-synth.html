@@ -1128,7 +1128,8 @@
                     'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
                 },
                 attack: 0.03,
-                release: 0.4
+                release: 0.4,
+                startOffset: 0.1
             }
         };
 
@@ -2264,7 +2265,8 @@
             }
             
             // 播放
-            source.start(now);
+            const startOffset = config.startOffset || 0;
+            source.start(now, startOffset);
             source.stop(now + duration + 0.5);
             
             // 更新频谱
