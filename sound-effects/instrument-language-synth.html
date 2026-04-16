@@ -933,6 +933,20 @@
                     <button class="btn btn-secondary" onclick="stopPlaying()">⏹ 停止</button>
                 </div>
 
+                <!-- 音频导出区域 -->
+                <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px;">📥 音频导出</div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn" onclick="exportToWAV()" id="exportBtn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
+                        <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
+                            <option value="44100">44.1kHz</option>
+                            <option value="48000" selected>48kHz</option>
+                            <option value="96000">96kHz</option>
+                        </select>
+                    </div>
+                    <div id="exportStatus" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-dim);"></div>
+                </div>
+
                 <!-- 10键音符面板 -->
                 <div class="panel-title" style="margin-top: 15px;">音符键盘 <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: normal;">点击演奏</span></div>
                 <div class="note-keyboard" id="noteKeyboard">
@@ -1073,6 +1087,75 @@
                 2: '16',        // 二声 = 16分音符
                 3: 'triplet',   // 三声 = 三连音
                 4: '32'         // 四声 = 32分音符
+            }
+        };
+
+        // 乐器默认参数配置
+        const instrumentDefaults = {
+            piano: {
+                masterVolume: 100,      // 全局音量: 100%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 119,          // 播放间隔最小: 119ms
+                tempoMax: 218,          // 播放间隔最大: 218ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 900,      // 音符时长: 悠长
+                reverb: 12,             // 混响效果: 12%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 120,               // BPM速度: 120
+                notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            flute: {
+                masterVolume: 120,      // 全局音量: 120%
+                audioOffset: 90,        // 音频偏移: 90ms
+                tempoMin: 81,           // 播放间隔最小: 81ms
+                tempoMax: 218,          // 播放间隔最大: 218ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 900,      // 音符时长: 悠长
+                reverb: 10,             // 混响效果: 10%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 117,               // BPM速度: 117
+                notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            saxophone: {
+                masterVolume: 100,      // 全局音量: 100%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 200,          // 播放间隔最小: 200ms
+                tempoMax: 375,          // 播放间隔最大: 375ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 700,      // 音符时长: 长音
+                reverb: 19,             // 混响效果: 19%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 102,               // BPM速度: 102
+                notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            synth: {
+                masterVolume: 88,       // 全局音量: 88%
+                audioOffset: 80,        // 音频偏移: 80ms
+                tempoMin: 14,           // 播放间隔最小: 14ms
+                tempoMax: 135,          // 播放间隔最大: 135ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 150,      // 音符时长: 极短
+                reverb: 12,             // 混响效果: 12%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 140,               // BPM速度: 140
+                notesPerBeat: 8,        // 每拍音符数: 8个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            train: {
+                masterVolume: 88,       // 全局音量: 88%
+                audioOffset: 140,       // 音频偏移: 140ms
+                tempoMin: 81,           // 播放间隔最小: 81ms
+                tempoMax: 218,          // 播放间隔最大: 218ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 900,      // 音符时长: 悠长
+                reverb: 5,              // 混响效果: 5%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 120,               // BPM速度: 120
+                notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
             }
         };
 
@@ -1627,6 +1710,9 @@
                 document.getElementById('statusText').textContent = '火车采样已加载';
             }
             
+            // 应用该乐器的默认参数
+            applyInstrumentDefaults(instrument);
+            
             // 切换乐器时，更新音频偏移滑块为当前乐器的设置
             const currentOffset = params.instrumentOffsets[instrument] || 0;
             document.getElementById('audioOffset').value = currentOffset;
@@ -1645,6 +1731,46 @@
             } else {
                 playSynthTone(440, 0.2);
             }
+        }
+
+        // 应用乐器默认参数
+        function applyInstrumentDefaults(instrument) {
+            const defaults = instrumentDefaults[instrument];
+            if (!defaults) {
+                console.log(`No defaults found for instrument: ${instrument}`);
+                return;
+            }
+            
+            // 应用参数到 params 对象
+            params.masterVolume = defaults.masterVolume / 100; // 转换为 0-2 范围
+            params.instrumentOffsets[instrument] = defaults.audioOffset;
+            params.tempoMin = defaults.tempoMin;
+            params.tempoMax = defaults.tempoMax;
+            params.tempoRandom = defaults.tempoRandom;
+            params.noteDuration = defaults.noteDuration;
+            params.reverb = defaults.reverb / 100; // 转换为 0-1 范围
+            params.chordDuration = defaults.chordDuration / 100; // 转换为 0-1 范围
+            params.bpm = defaults.bpm;
+            params.notesPerBeat = defaults.notesPerBeat;
+            params.rhythmRandom = defaults.rhythmRandom;
+            
+            // 更新UI控件
+            document.getElementById('masterVolume').value = defaults.masterVolume;
+            document.getElementById('audioOffset').value = defaults.audioOffset;
+            document.getElementById('tempoMin').value = defaults.tempoMin;
+            document.getElementById('tempoMax').value = defaults.tempoMax;
+            document.getElementById('tempoRandom').checked = defaults.tempoRandom;
+            document.getElementById('noteDuration').value = defaults.noteDuration;
+            document.getElementById('reverb').value = defaults.reverb;
+            document.getElementById('chordDuration').value = defaults.chordDuration;
+            document.getElementById('bpm').value = defaults.bpm;
+            document.getElementById('notesPerBeat').value = defaults.notesPerBeat;
+            document.getElementById('rhythmRandom').checked = defaults.rhythmRandom;
+            
+            // 更新显示标签
+            updateParams();
+            
+            console.log(`Applied default params for ${instrument}:`, defaults);
         }
 
         // 加载萨克斯采样
@@ -3271,6 +3397,282 @@
         // 工具函数
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ==================== WAV 导出功能 ====================
+        
+        // 导出当前文本演奏为 WAV 文件
+        async function exportToWAV() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                alert('请先输入要演奏的文字');
+                return;
+            }
+            
+            const exportBtn = document.getElementById('exportBtn');
+            const exportStatus = document.getElementById('exportStatus');
+            const sampleRate = parseInt(document.getElementById('exportSampleRate').value);
+            
+            exportBtn.disabled = true;
+            exportBtn.textContent = '🎵 渲染中...';
+            exportStatus.textContent = '正在准备音频渲染...';
+            
+            try {
+                // 使用 OfflineAudioContext 渲染音频
+                const duration = await calculateAudioDuration(text);
+                const offlineContext = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
+                    2, // 立体声
+                    Math.ceil(duration * sampleRate),
+                    sampleRate
+                );
+                
+                exportStatus.textContent = `正在渲染音频 (${Math.ceil(duration)}秒)...`;
+                
+                // 渲染音频
+                const renderedBuffer = await renderAudioToBuffer(text, offlineContext);
+                
+                exportStatus.textContent = '正在生成 WAV 文件...';
+                
+                // 转换为 WAV 并下载
+                const wavBlob = audioBufferToWAV(renderedBuffer);
+                const url = URL.createObjectURL(wavBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `乐器语言_${currentInstrument}_${new Date().getTime()}.wav`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                exportStatus.textContent = `✅ 导出成功! (${Math.ceil(duration)}秒, ${sampleRate/1000}kHz)`;
+                setTimeout(() => {
+                    exportStatus.textContent = '';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('导出失败:', error);
+                exportStatus.textContent = '❌ 导出失败: ' + error.message;
+            } finally {
+                exportBtn.disabled = false;
+                exportBtn.textContent = '💾 导出 WAV';
+            }
+        }
+        
+        // 计算音频总时长
+        async function calculateAudioDuration(text) {
+            const notes = textToNotes(text);
+            let totalTime = 0.5; // 起始偏移
+            
+            for (let i = 0; i < notes.length; i++) {
+                const note = notes[i];
+                const tempo = params.tempoRandom 
+                    ? params.tempoMin + Math.random() * (params.tempoMax - params.tempoMin)
+                    : params.tempo;
+                
+                // 根据声调时值计算实际持续时间
+                const noteDuration = getNoteDurationByTone(note.tone || 1);
+                totalTime += (tempo / 1000) * noteDuration;
+            }
+            
+            return totalTime + 1.0; // 添加尾部余量
+        }
+        
+        // 根据声调获取音符时值
+        function getNoteDurationByTone(tone) {
+            const noteValue = params.toneNoteValues[tone] || '8';
+            const config = noteValueConfig[noteValue];
+            return config ? config.duration : 0.5;
+        }
+        
+        // 将文本转换为音符序列
+        function textToNotes(text) {
+            const notes = [];
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char.trim()) {
+                    notes.push(charToNote(char, i));
+                }
+            }
+            return notes;
+        }
+        
+        // 渲染音频到 AudioBuffer
+        async function renderAudioToBuffer(text, offlineContext) {
+            const notes = textToNotes(text);
+            const destination = offlineContext.destination;
+            
+            let currentTime = 0.5; // 起始偏移
+            
+            for (let i = 0; i < notes.length; i++) {
+                const note = notes[i];
+                const tempo = params.tempoRandom 
+                    ? params.tempoMin + Math.random() * (params.tempoMax - params.tempoMin)
+                    : params.tempo;
+                
+                const noteDurationMs = getNoteDurationByTone(note.tone || 1) * tempo;
+                const noteDuration = noteDurationMs / 1000;
+                
+                // 创建音源
+                if (note.isChord && chordsLoaded) {
+                    // 播放和弦
+                    await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, note.velocity || 0.6);
+                } else if (currentInstrument === 'piano' && samplesLoaded && note.sampleNote) {
+                    // 使用钢琴采样
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration);
+                } else if (['saxophone', 'flute', 'synth', 'train'].includes(currentInstrument) && note.sampleNote) {
+                    // 使用其他乐器采样
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration);
+                } else {
+                    // 使用合成音色
+                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration);
+                }
+                
+                currentTime += noteDuration;
+            }
+            
+            // 完成渲染
+            return await offlineContext.startRendering();
+        }
+        
+        // 渲染采样到 buffer
+        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration) {
+            const bufferKey = `${currentInstrument}_${note.sampleNote}`;
+            const buffer = audioBuffers[bufferKey];
+            
+            if (!buffer) return;
+            
+            const source = offlineContext.createBufferSource();
+            source.buffer = buffer;
+            
+            // 计算播放速率以匹配目标频率
+            const sampleConfig_obj = sampleConfig[currentInstrument];
+            const sampleInfo = sampleConfig_obj ? sampleConfig_obj.samples[note.sampleNote] : null;
+            if (sampleInfo && note.frequency !== sampleInfo.freq) {
+                source.playbackRate.value = note.frequency / sampleInfo.freq;
+            }
+            
+            // 创建增益节点
+            const gainNode = offlineContext.createGain();
+            const velocity = (note.velocity || 0.5) * params.masterVolume;
+            gainNode.gain.setValueAtTime(velocity, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            // 连接节点
+            source.connect(gainNode);
+            gainNode.connect(destination);
+            
+            // 播放
+            source.start(startTime);
+            source.stop(startTime + duration);
+        }
+        
+        // 渲染合成音色到 buffer
+        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration) {
+            const oscillator = offlineContext.createOscillator();
+            const gainNode = offlineContext.createGain();
+            
+            // 根据乐器选择波形
+            const waveforms = {
+                'guitar': 'sawtooth',
+                'violin': 'sawtooth',
+                'trumpet': 'square',
+                'synth': 'sawtooth'
+            };
+            oscillator.type = waveforms[currentInstrument] || 'sine';
+            oscillator.frequency.value = note.frequency;
+            
+            // 包络
+            const velocity = (note.velocity || 0.5) * params.masterVolume;
+            const attack = 0.02;
+            const release = Math.min(duration * 0.3, 0.1);
+            
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(velocity, startTime + attack);
+            gainNode.gain.setValueAtTime(velocity, startTime + duration - release);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(destination);
+            
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
+        }
+        
+        // 渲染和弦到 buffer
+        async function renderChordToBuffer(offlineContext, destination, startTime, duration, velocity) {
+            if (chordBuffers.length === 0) return;
+            
+            const randomChord = chordBuffers[Math.floor(Math.random() * chordBuffers.length)];
+            const source = offlineContext.createBufferSource();
+            source.buffer = randomChord;
+            
+            const gainNode = offlineContext.createGain();
+            const vol = velocity * params.masterVolume;
+            gainNode.gain.setValueAtTime(vol, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            source.connect(gainNode);
+            gainNode.connect(destination);
+            
+            source.start(startTime);
+            source.stop(startTime + duration);
+        }
+        
+        // 将 AudioBuffer 转换为 WAV Blob
+        function audioBufferToWAV(buffer) {
+            const numberOfChannels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+            const format = 1; // PCM
+            const bitDepth = 16;
+            
+            const bytesPerSample = bitDepth / 8;
+            const blockAlign = numberOfChannels * bytesPerSample;
+            
+            const dataLength = buffer.length * numberOfChannels * bytesPerSample;
+            const bufferLength = 44 + dataLength;
+            
+            const arrayBuffer = new ArrayBuffer(bufferLength);
+            const view = new DataView(arrayBuffer);
+            
+            // 写入 WAV 头
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataLength, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, format, true);
+            view.setUint16(22, numberOfChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * blockAlign, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitDepth, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataLength, true);
+            
+            // 写入音频数据
+            const offset = 44;
+            const channels = [];
+            for (let i = 0; i < numberOfChannels; i++) {
+                channels.push(buffer.getChannelData(i));
+            }
+            
+            let index = offset;
+            for (let i = 0; i < buffer.length; i++) {
+                for (let channel = 0; channel < numberOfChannels; channel++) {
+                    const sample = Math.max(-1, Math.min(1, channels[channel][i]));
+                    const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                    view.setInt16(index, intSample, true);
+                    index += 2;
+                }
+            }
+            
+            return new Blob([arrayBuffer], { type: 'audio/wav' });
+        }
+        
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
         }
 
         // 键盘事件
