@@ -16,7 +16,7 @@
             --piano: #ff6b6b;
             --guitar: #f4a261;
             --flute: #2a9d8f;
-            --violin: #e76f51;
+            --xylophone: #e76f51;
             --trumpet: #e9c46a;
             --synth: #9b5de5;
         }
@@ -706,9 +706,9 @@
                         <span class="icon">🪈</span>
                         <span class="name">长笛</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="violin" onclick="selectInstrument('violin')">
-                        <span class="icon">🎻</span>
-                        <span class="name">小提琴</span>
+                    <div class="instrument-btn" data-instrument="xylophone" onclick="selectInstrument('xylophone')">
+                        <span class="icon">🎹</span>
+                        <span class="name">木琴</span>
                     </div>
                     <div class="instrument-btn" data-instrument="trumpet" onclick="selectInstrument('trumpet')">
                         <span class="icon">🎺</span>
@@ -1072,7 +1072,7 @@
                 piano: 0,
                 guitar: 0,
                 flute: 0,
-                violin: 0,
+                xylophone: 0,
                 trumpet: 0,
                 saxophone: 0,
                 synth: 0,
@@ -1103,6 +1103,19 @@
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 120,               // BPM速度: 120
                 notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            xylophone: {
+                masterVolume: 110,      // 全局音量: 110%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 100,          // 播放间隔最小: 100ms
+                tempoMax: 200,          // 播放间隔最大: 200ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 300,      // 音符时长: 短促
+                reverb: 8,              // 混响效果: 8%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 130,               // BPM速度: 130
+                notesPerBeat: 2,        // 每拍音符数: 2个
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             },
             flute: {
@@ -1675,7 +1688,7 @@
                 'synth': '真实合成器采样 🎛️',
                 'train': '真实火车采样 🚂',
                 'guitar': '吉他 (合成音色)',
-                'violin': '小提琴 (合成音色)',
+                'xylophone': '木琴 (合成音色)',
                 'trumpet': '小号 (合成音色)'
             };
             
@@ -1891,7 +1904,7 @@
                     'piano': 'rgba(255, 107, 107, 0.15)',  // 红色
                     'guitar': 'rgba(244, 162, 97, 0.15)',  // 橙色
                     'flute': 'rgba(42, 157, 143, 0.15)',   // 青绿色
-                    'violin': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
+                    'xylophone': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
                     'trumpet': 'rgba(233, 196, 106, 0.15)', // 金色
                     'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
                     'synth': 'rgba(155, 93, 229, 0.15)',    // 紫色
@@ -1901,7 +1914,7 @@
                     'piano': 'rgba(255, 107, 107, 0.4)',
                     'guitar': 'rgba(244, 162, 97, 0.4)',
                     'flute': 'rgba(42, 157, 143, 0.4)',
-                    'violin': 'rgba(231, 111, 81, 0.4)',
+                    'xylophone': 'rgba(231, 111, 81, 0.4)',
                     'trumpet': 'rgba(233, 196, 106, 0.4)',
                     'saxophone': 'rgba(255, 107, 107, 0.4)',
                     'synth': 'rgba(155, 93, 229, 0.4)',
@@ -2112,7 +2125,7 @@
                 piano: '钢琴',
                 guitar: '吉他',
                 flute: '长笛',
-                violin: '小提琴',
+                xylophone: '木琴',
                 trumpet: '小号',
                 saxophone: '萨克斯',
                 synth: '合成器',
@@ -2763,7 +2776,7 @@
                 'saxophone': '真实沙克斯',
                 'guitar': '吉他',
                 'flute': '长笛',
-                'violin': '小提琴',
+                'xylophone': '木琴',
                 'trumpet': '小号',
                 'synth': '合成器',
                 'train': '火车'
@@ -3574,7 +3587,7 @@
             // 根据乐器选择波形
             const waveforms = {
                 'guitar': 'sawtooth',
-                'violin': 'sawtooth',
+                'xylophone': 'triangle',
                 'trumpet': 'square',
                 'synth': 'sawtooth'
             };
