@@ -16,7 +16,7 @@
             --piano: #ff6b6b;
             --guitar: #f4a261;
             --flute: #2a9d8f;
-            --violin: #e76f51;
+            --xylophone: #e76f51;
             --trumpet: #e9c46a;
             --synth: #9b5de5;
         }
@@ -706,9 +706,9 @@
                         <span class="icon">🪈</span>
                         <span class="name">长笛</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="violin" onclick="selectInstrument('violin')">
-                        <span class="icon">🎻</span>
-                        <span class="name">小提琴</span>
+                    <div class="instrument-btn" data-instrument="xylophone" onclick="selectInstrument('xylophone')">
+                        <span class="icon">🎹</span>
+                        <span class="name">木琴</span>
                     </div>
                     <div class="instrument-btn" data-instrument="trumpet" onclick="selectInstrument('trumpet')">
                         <span class="icon">🎺</span>
@@ -1072,7 +1072,7 @@
                 piano: 0,
                 guitar: 0,
                 flute: 0,
-                violin: 0,
+                xylophone: 0,
                 trumpet: 0,
                 saxophone: 0,
                 synth: 0,
@@ -1103,6 +1103,19 @@
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 120,               // BPM速度: 120
                 notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            xylophone: {
+                masterVolume: 110,      // 全局音量: 110%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 100,          // 播放间隔最小: 100ms
+                tempoMax: 200,          // 播放间隔最大: 200ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 300,      // 音符时长: 短促
+                reverb: 8,              // 混响效果: 8%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 130,               // BPM速度: 130
+                notesPerBeat: 2,        // 每拍音符数: 2个
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             },
             flute: {
@@ -1170,6 +1183,27 @@
 
         // 采样配置 - 五声音阶 D E G A B
         const sampleConfig = {
+            xylophone: {
+                name: '木琴',
+                emoji: '🎹',
+                basePath: '../assets/audio/samples/xylophone/',
+                samples: {
+                    // 木琴五声音阶采样 - 全部10个音符都有真实采样！
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                },
+                attack: 0.01,
+                release: 0.2,
+                isHybrid: false  // 全部真实采样，不再是混合模式
+            },
             piano: {
                 name: '钢琴',
                 emoji: '🎹',
@@ -1675,7 +1709,7 @@
                 'synth': '真实合成器采样 🎛️',
                 'train': '真实火车采样 🚂',
                 'guitar': '吉他 (合成音色)',
-                'violin': '小提琴 (合成音色)',
+                'xylophone': '真实木琴采样 🎹',
                 'trumpet': '小号 (合成音色)'
             };
             
@@ -1710,6 +1744,13 @@
                 document.getElementById('statusText').textContent = '火车采样已加载';
             }
             
+            // 如果是木琴，需要加载采样
+            if (instrument === 'xylophone' && !audioBuffers['xylophone_F4']) {
+                document.getElementById('statusText').textContent = '加载木琴采样中...';
+                await loadXylophoneSamples();
+                document.getElementById('statusText').textContent = '木琴采样已加载';
+            }
+            
             // 应用该乐器的默认参数
             applyInstrumentDefaults(instrument);
             
@@ -1726,7 +1767,8 @@
                 (instrument === 'saxophone' && audioBuffers['saxophone_D4']) ||
                 (instrument === 'flute' && audioBuffers['flute_D4']) ||
                 (instrument === 'synth' && audioBuffers['synth_D4']) ||
-                (instrument === 'train' && audioBuffers['train_D4'])) {
+                (instrument === 'train' && audioBuffers['train_D4']) ||
+                (instrument === 'xylophone' && audioBuffers['xylophone_F4'])) {
                 playSampleTone(440, 0.3);
             } else {
                 playSynthTone(440, 0.2);
@@ -1865,6 +1907,32 @@
             await Promise.all(loadPromises);
         }
 
+        // 加载木琴采样（只加载真实采样文件，其他音符用合成）
+        async function loadXylophoneSamples() {
+            if (audioBuffers['xylophone_A5']) return; // 已加载
+            
+            const config = sampleConfig.xylophone;
+            
+            // 只加载有真实文件的采样
+            const loadPromises = [];
+            for (const [note, info] of Object.entries(config.samples)) {
+                if (!info.file) continue; // 跳过没有真实采样的音符
+                
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['xylophone_' + note] = audioBuffer;
+                        console.log(`Loaded xylophone: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load xylophone ${note}:`, err));
+                
+                loadPromises.push(promise);
+            }
+            
+            await Promise.all(loadPromises);
+        }
+
         // 生成10键音符键盘 + Chord按钮
         function generateNoteKeyboard() {
             const keyboard = document.getElementById('noteKeyboard');
@@ -1891,7 +1959,7 @@
                     'piano': 'rgba(255, 107, 107, 0.15)',  // 红色
                     'guitar': 'rgba(244, 162, 97, 0.15)',  // 橙色
                     'flute': 'rgba(42, 157, 143, 0.15)',   // 青绿色
-                    'violin': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
+                    'xylophone': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
                     'trumpet': 'rgba(233, 196, 106, 0.15)', // 金色
                     'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
                     'synth': 'rgba(155, 93, 229, 0.15)',    // 紫色
@@ -1901,7 +1969,7 @@
                     'piano': 'rgba(255, 107, 107, 0.4)',
                     'guitar': 'rgba(244, 162, 97, 0.4)',
                     'flute': 'rgba(42, 157, 143, 0.4)',
-                    'violin': 'rgba(231, 111, 81, 0.4)',
+                    'xylophone': 'rgba(231, 111, 81, 0.4)',
                     'trumpet': 'rgba(233, 196, 106, 0.4)',
                     'saxophone': 'rgba(255, 107, 107, 0.4)',
                     'synth': 'rgba(155, 93, 229, 0.4)',
@@ -2048,13 +2116,26 @@
             const userVolume = noteVolumes[noteInfo.note] || 1.0;
             const finalVelocity = baseVelocity * params.masterVolume * userVolume;
             
-            // 检查当前乐器是否有采样可用
-            const hasSamples = hasInstrumentSamples(currentInstrument);
-            
-            if (hasSamples) {
-                playSampleTone(noteInfo.freq, noteInfo.note, 0.5, finalVelocity);
+            // 木琴是混合模式：检查是否有该具体音符的采样
+            if (currentInstrument === 'xylophone') {
+                const config = sampleConfig.xylophone;
+                const sampleInfo = config.samples[noteInfo.note];
+                // 如果有真实采样文件且已加载，使用采样
+                if (sampleInfo && sampleInfo.file && audioBuffers['xylophone_' + noteInfo.note]) {
+                    playSampleTone(noteInfo.freq, noteInfo.note, 0.5, finalVelocity);
+                } else {
+                    // 否则使用合成
+                    playSynthTone(noteInfo.freq, 0.5, finalVelocity);
+                }
             } else {
-                playSynthTone(noteInfo.freq, 0.5, finalVelocity);
+                // 检查当前乐器是否有采样可用
+                const hasSamples = hasInstrumentSamples(currentInstrument);
+                
+                if (hasSamples) {
+                    playSampleTone(noteInfo.freq, noteInfo.note, 0.5, finalVelocity);
+                } else {
+                    playSynthTone(noteInfo.freq, 0.5, finalVelocity);
+                }
             }
             
             // 添加到历史
@@ -2076,6 +2157,9 @@
                 return true;
             }
             if (instrument === 'train' && audioBuffers['train_D4']) {
+                return true;
+            }
+            if (instrument === 'xylophone' && audioBuffers['xylophone_F4']) {
                 return true;
             }
             return false;
@@ -2112,7 +2196,7 @@
                 piano: '钢琴',
                 guitar: '吉他',
                 flute: '长笛',
-                violin: '小提琴',
+                xylophone: '木琴',
                 trumpet: '小号',
                 saxophone: '萨克斯',
                 synth: '合成器',
@@ -2403,12 +2487,15 @@
 
         // 找到最近的采样
         function findNearestSample(targetNote) {
-            const sampleNotes = Object.keys(audioBuffers);
-            if (sampleNotes.length === 0) return 'A4';
+            // 获取当前乐器的采样键名列表
+            const instrumentPrefix = currentInstrument + '_';
+            const sampleKeys = Object.keys(audioBuffers).filter(key => key.startsWith(instrumentPrefix));
+            
+            if (sampleKeys.length === 0) return targetNote; // 如果没有该乐器的采样，返回原音符
             
             // 提取音名和八度
             const targetMatch = targetNote.match(/^([A-G]#?)(\d)$/);
-            if (!targetMatch) return 'A4';
+            if (!targetMatch) return targetNote;
             
             const targetName = targetMatch[1];
             const targetOct = parseInt(targetMatch[2]);
@@ -2417,11 +2504,13 @@
             const noteValues = { 'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11 };
             const targetVal = noteValues[targetName] + targetOct * 12;
             
-            let nearest = sampleNotes[0];
+            let nearest = sampleKeys[0];
             let minDiff = Infinity;
             
-            for (const sample of sampleNotes) {
-                const match = sample.match(/^([A-G]#?)(\d)$/);
+            for (const sampleKey of sampleKeys) {
+                // 从键名中提取音符（如 xylophone_D4 -> D4）
+                const sampleNote = sampleKey.replace(instrumentPrefix, '');
+                const match = sampleNote.match(/^([A-G]#?)(\d)$/);
                 if (!match) continue;
                 
                 const sampleVal = noteValues[match[1]] + parseInt(match[2]) * 12;
@@ -2429,7 +2518,7 @@
                 
                 if (diff < minDiff) {
                     minDiff = diff;
-                    nearest = sample;
+                    nearest = sampleNote; // 返回纯音符名，不是完整键名
                 }
             }
             
@@ -2577,6 +2666,18 @@
         function playTone(frequency, noteName, duration, velocity = 0.5) {
             // 检查当前乐器是否有采样可用
             const hasSamples = hasInstrumentSamples(currentInstrument);
+            
+            // 木琴是混合模式：检查是否有该具体音符的采样
+            if (currentInstrument === 'xylophone') {
+                const config = sampleConfig.xylophone;
+                const sampleInfo = config.samples[noteName];
+                // 如果有真实采样文件且已加载，使用采样
+                if (sampleInfo && sampleInfo.file && audioBuffers['xylophone_' + noteName]) {
+                    return playSampleTone(frequency, noteName, duration / 1000, velocity);
+                }
+                // 否则使用合成
+                return playSynthTone(frequency, duration / 1000, velocity);
+            }
             
             if (hasSamples) {
                 return playSampleTone(frequency, noteName, duration / 1000, velocity);
@@ -2750,7 +2851,7 @@
             const hasSamples = hasInstrumentSamples(currentInstrument);
             if (!hasSamples) {
                 // 如果是采样乐器但采样未加载，提示加载中
-                if (currentInstrument === 'piano' || currentInstrument === 'saxophone' || currentInstrument === 'flute' || currentInstrument === 'synth' || currentInstrument === 'train') {
+                if (currentInstrument === 'piano' || currentInstrument === 'saxophone' || currentInstrument === 'flute' || currentInstrument === 'synth' || currentInstrument === 'train' || currentInstrument === 'xylophone') {
                     document.getElementById('statusText').textContent = '采样加载中，请稍候...';
                     console.log('采样未加载完成，返回. currentInstrument:', currentInstrument);
                     return;
@@ -2763,7 +2864,7 @@
                 'saxophone': '真实沙克斯',
                 'guitar': '吉他',
                 'flute': '长笛',
-                'violin': '小提琴',
+                'xylophone': '真实木琴',
                 'trumpet': '小号',
                 'synth': '合成器',
                 'train': '火车'
@@ -3574,7 +3675,7 @@
             // 根据乐器选择波形
             const waveforms = {
                 'guitar': 'sawtooth',
-                'violin': 'sawtooth',
+                'xylophone': 'triangle',
                 'trumpet': 'square',
                 'synth': 'sawtooth'
             };
