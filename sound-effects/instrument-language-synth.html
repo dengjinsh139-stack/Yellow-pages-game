@@ -1188,21 +1188,21 @@
                 emoji: '🎹',
                 basePath: '../assets/audio/samples/xylophone/',
                 samples: {
-                    // 木琴五声音阶采样 - 目前有 D4, E4, A4, B4, D5, E5, A5, B5 真实采样 (8/10)
+                    // 木琴五声音阶采样 - 全部10个音符都有真实采样！
                     'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
                     'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'G4': { file: null, freq: 392.00, gain: 1.8 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
                     'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
                     'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
                     'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
                     'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'G5': { file: null, freq: 783.99, gain: 2.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
                     'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
                     'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
                 },
                 attack: 0.01,
                 release: 0.2,
-                isHybrid: true  // 混合模式：部分真实采样，部分合成
+                isHybrid: false  // 全部真实采样，不再是混合模式
             },
             piano: {
                 name: '钢琴',
@@ -1709,7 +1709,7 @@
                 'synth': '真实合成器采样 🎛️',
                 'train': '真实火车采样 🚂',
                 'guitar': '吉他 (合成音色)',
-                'xylophone': '木琴 (混合采样)',
+                'xylophone': '真实木琴采样 🎹',
                 'trumpet': '小号 (合成音色)'
             };
             
@@ -1745,7 +1745,7 @@
             }
             
             // 如果是木琴，需要加载采样
-            if (instrument === 'xylophone' && !audioBuffers['xylophone_A5']) {
+            if (instrument === 'xylophone' && !audioBuffers['xylophone_F4']) {
                 document.getElementById('statusText').textContent = '加载木琴采样中...';
                 await loadXylophoneSamples();
                 document.getElementById('statusText').textContent = '木琴采样已加载';
@@ -1768,7 +1768,7 @@
                 (instrument === 'flute' && audioBuffers['flute_D4']) ||
                 (instrument === 'synth' && audioBuffers['synth_D4']) ||
                 (instrument === 'train' && audioBuffers['train_D4']) ||
-                (instrument === 'xylophone' && audioBuffers['xylophone_A5'])) {
+                (instrument === 'xylophone' && audioBuffers['xylophone_F4'])) {
                 playSampleTone(440, 0.3);
             } else {
                 playSynthTone(440, 0.2);
@@ -2159,7 +2159,7 @@
             if (instrument === 'train' && audioBuffers['train_D4']) {
                 return true;
             }
-            if (instrument === 'xylophone' && audioBuffers['xylophone_A5']) {
+            if (instrument === 'xylophone' && audioBuffers['xylophone_F4']) {
                 return true;
             }
             return false;
@@ -2859,7 +2859,7 @@
                 'saxophone': '真实沙克斯',
                 'guitar': '吉他',
                 'flute': '长笛',
-                'xylophone': '木琴',
+                'xylophone': '真实木琴',
                 'trumpet': '小号',
                 'synth': '合成器',
                 'train': '火车'
