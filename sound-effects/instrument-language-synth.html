@@ -2487,12 +2487,15 @@
 
         // 找到最近的采样
         function findNearestSample(targetNote) {
-            const sampleNotes = Object.keys(audioBuffers);
-            if (sampleNotes.length === 0) return 'A4';
+            // 获取当前乐器的采样键名列表
+            const instrumentPrefix = currentInstrument + '_';
+            const sampleKeys = Object.keys(audioBuffers).filter(key => key.startsWith(instrumentPrefix));
+            
+            if (sampleKeys.length === 0) return targetNote; // 如果没有该乐器的采样，返回原音符
             
             // 提取音名和八度
             const targetMatch = targetNote.match(/^([A-G]#?)(\d)$/);
-            if (!targetMatch) return 'A4';
+            if (!targetMatch) return targetNote;
             
             const targetName = targetMatch[1];
             const targetOct = parseInt(targetMatch[2]);
@@ -2501,11 +2504,13 @@
             const noteValues = { 'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11 };
             const targetVal = noteValues[targetName] + targetOct * 12;
             
-            let nearest = sampleNotes[0];
+            let nearest = sampleKeys[0];
             let minDiff = Infinity;
             
-            for (const sample of sampleNotes) {
-                const match = sample.match(/^([A-G]#?)(\d)$/);
+            for (const sampleKey of sampleKeys) {
+                // 从键名中提取音符（如 xylophone_D4 -> D4）
+                const sampleNote = sampleKey.replace(instrumentPrefix, '');
+                const match = sampleNote.match(/^([A-G]#?)(\d)$/);
                 if (!match) continue;
                 
                 const sampleVal = noteValues[match[1]] + parseInt(match[2]) * 12;
@@ -2513,7 +2518,7 @@
                 
                 if (diff < minDiff) {
                     minDiff = diff;
-                    nearest = sample;
+                    nearest = sampleNote; // 返回纯音符名，不是完整键名
                 }
             }
             
