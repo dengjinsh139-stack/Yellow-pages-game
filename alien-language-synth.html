@@ -1094,11 +1094,24 @@
 
         // 播放合成音
         async function playSynthesizedSound(frequency, duration = null, stopPrevious = true) {
-            if (!audioContext) return;
+            if (!audioContext) {
+                console.warn('AudioContext not initialized');
+                return Promise.resolve();
+            }
             
             // 如果音频上下文被暂停（浏览器自动挂起），尝试恢复
             if (audioContext.state === 'suspended') {
-                await audioContext.resume();
+                try {
+                    await audioContext.resume();
+                    console.log('AudioContext resumed, state:', audioContext.state);
+                } catch (e) {
+                    console.error('Failed to resume AudioContext:', e);
+                }
+            }
+            
+            // 再次检查状态
+            if (audioContext.state !== 'running') {
+                console.warn('AudioContext is not running, state:', audioContext.state);
             }
             
             // 可选：停止之前的音（文本播放时不需要）
@@ -1141,11 +1154,11 @@
 
                     // 滤波器（共鸣效果）
                     filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(200 + params.resonance * 3000, audioContext.currentTime);
+                    filter.frequency.setValueAtTime(400 + params.resonance * 6000, audioContext.currentTime);
                     filter.Q.setValueAtTime(5 + params.resonance * 15, audioContext.currentTime);
 
                     // 音量包络
-                    const vol = 0.3 / (i + 1); // 谐波音量递减
+                    const vol = 0.5 / (i + 1); // 谐波音量递减
                     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
                     gainNode.gain.linearRampToValueAtTime(vol, audioContext.currentTime + 0.05);
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + dur);
@@ -1154,7 +1167,7 @@
                     osc.connect(filter);
                     filter.connect(gainNode);
                     gainNode.connect(analyser);
-                    analyser.connect(audioContext.destination);
+                    gainNode.connect(audioContext.destination);
 
                     osc.start();
                     osc.stop(audioContext.currentTime + dur);

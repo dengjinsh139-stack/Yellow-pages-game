@@ -2340,7 +2340,9 @@
                 }
             }
             
-            return notes;
+            // 过滤掉任何 null 或 undefined 值
+            const validNotes = notes.filter(n => n !== null && n !== undefined && typeof n === 'object');
+            return validNotes;
         }
 
         // 常用汉字声调映射表（简化版 - 高频字）
@@ -2573,7 +2575,9 @@
             
             // 音量计算：基础补偿 * 演奏力度
             const baseGain = config.samples[sampleNote].gain || 1.0;
-            const finalVelocity = velocity * baseGain;
+            // 确保 velocity 是有效数字
+            const safeVelocity = (typeof velocity === 'number' && isFinite(velocity)) ? velocity : 0.5;
+            const finalVelocity = safeVelocity * baseGain;
             
             console.log(`Playing ${currentInstrument} ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
             
@@ -2586,16 +2590,19 @@
             
             // 包络 - 使用更长的衰减让音符更清晰
             const now = audioContext.currentTime;
-            const attackTime = Math.min(config.attack || 0.005, duration * 0.2);
+            const attackTime = Math.min(config.attack || 0.005, Math.max(0.001, duration * 0.2));
             // 短音符需要更长的保持时间，确保音量饱满
             const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
             // 衰减时间至少保证100ms，避免声音过快消失
-            const decayTime = Math.max(duration * 0.6, 0.1);
+            const decayTime = Math.max(duration * 0.6, 0.05);
             
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, now + attackTime);
             gainNode.gain.setValueAtTime(clampedVelocity, now + attackTime + holdTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + attackTime + holdTime + decayTime);
+            const totalTime = now + attackTime + holdTime + decayTime;
+            if (isFinite(totalTime) && totalTime > now) {
+                gainNode.gain.exponentialRampToValueAtTime(0.001, totalTime);
+            }
             
             // 混响
             let reverbGain = null;
@@ -2819,9 +2826,11 @@
         async function playText() {
             console.log('=== playText 开始 ===');
             
+            // 强制重置异常状态
             if (isPlaying) {
-                console.log('已经在播放中，返回');
-                return;
+                console.log('检测到 isPlaying=true，强制重置');
+                stopPlaying();
+                await new Promise(r => setTimeout(r, 50));
             }
             
             const text = document.getElementById('textInput').value.trim();
@@ -2854,6 +2863,8 @@
                 if (currentInstrument === 'piano' || currentInstrument === 'saxophone' || currentInstrument === 'flute' || currentInstrument === 'synth' || currentInstrument === 'train' || currentInstrument === 'xylophone') {
                     document.getElementById('statusText').textContent = '采样加载中，请稍候...';
                     console.log('采样未加载完成，返回. currentInstrument:', currentInstrument);
+                    // 重置播放状态，避免死锁
+                    isPlaying = false;
                     return;
                 }
             }
@@ -2908,7 +2919,9 @@
             }
             
             // 转换为音符
-            const notes = textToNotes(text);
+            let notes = textToNotes(text);
+            // 过滤掉 null 值
+            notes = notes.filter(n => n !== null && n !== undefined);
             console.log('转换后的音符数量:', notes.length);
             console.log('音符数据:', notes);
             
@@ -3037,6 +3050,8 @@
             const noteValueSymbols = { '4': '♩', '8': '♪', '16': '♫', '32': '♬', 'triplet': '♪♪♪' };
             
             display.innerHTML = notes.map((n, i) => {
+                // 跳过 null 值
+                if (!n) return '';
                 const toneMark = n.tone !== undefined ? toneMarks[n.tone] : '';
                 let displayText;
                 let rhythmInfo = '';
@@ -3064,6 +3079,7 @@
         // 高亮音符
         function highlightNote(index) {
             document.querySelectorAll('.note-item').forEach((el, i) => {
+                if (!el) return;
                 el.style.background = i === index ? 
                     'rgba(78, 205, 196, 0.5)' : 'rgba(255, 107, 107, 0.2)';
                 el.style.color = i === index ? '#fff' : 'var(--primary)';
@@ -3073,7 +3089,25 @@
         // 停止演奏
         function stopPlaying() {
             isPlaying = false;
+            // 强制重置所有音频相关状态
+            currentPlayingOscillators.forEach(osc => {
+                try {
+                    if (osc && typeof osc.stop === 'function') {
+                        osc.stop();
+                        osc.disconnect();
+                    }
+                } catch (e) {}
+            });
+            currentPlayingOscillators = [];
+            currentPlayingOscillators.forEach(osc => {
+                try {
+                    osc.stop();
+                    osc.disconnect();
+                } catch (e) {}
+            });
+            currentPlayingOscillators = [];
             document.getElementById('statusText').textContent = '已停止';
+            console.log('演奏已停止，状态已重置');
         }
 
         // 清空文本
