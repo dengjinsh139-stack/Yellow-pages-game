@@ -3833,6 +3833,11 @@
                 }
             }
             
+            // 混响尾巴时长
+            if (params.reverb > 0) {
+                totalTime += 1.5; // 1.5秒混响尾音
+            }
+            
             return totalTime + 1.0; // 添加尾部余量
         }
         
@@ -4004,7 +4009,25 @@
             // ===== stop 尾部余量：与实时播放一致 =====
             source.start(startTime, startOffsetSec);
             source.stop(startTime + duration + 0.5);
-        }
+            
+            // ===== 混响链（与实时播放一致）=====
+            if (params.reverb > 0) {
+                const reverbGain = offlineContext.createGain();
+                reverbGain.gain.value = params.reverb * 0.3;
+                
+                const delay = offlineContext.createDelay();
+                delay.delayTime.value = 0.3;
+                
+                const feedback = offlineContext.createGain();
+                feedback.gain.value = 0.3;
+                
+                gainNode.connect(delay);
+                delay.connect(feedback);
+                feedback.connect(delay);
+                delay.connect(reverbGain);
+                reverbGain.connect(destination);
+            }
+        }        }
         
         // 渲染合成音色到 buffer
         async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
@@ -4035,6 +4058,24 @@
             oscillator.connect(gainNode);
             gainNode.connect(destination);
             
+            // ===== 混响链 =====
+            if (params.reverb > 0) {
+                const reverbGain = offlineContext.createGain();
+                reverbGain.gain.value = params.reverb * 0.3;
+                
+                const delay = offlineContext.createDelay();
+                delay.delayTime.value = 0.3;
+                
+                const feedback = offlineContext.createGain();
+                feedback.gain.value = 0.3;
+                
+                gainNode.connect(delay);
+                delay.connect(feedback);
+                feedback.connect(delay);
+                delay.connect(reverbGain);
+                reverbGain.connect(destination);
+            }
+            
             // 给足尾部余量
             oscillator.start(startTime);
             oscillator.stop(startTime + duration + 0.5);
@@ -4056,8 +4097,26 @@
             source.connect(gainNode);
             gainNode.connect(destination);
             
+            // ===== 混响链 =====
+            if (params.reverb > 0) {
+                const reverbGain = offlineContext.createGain();
+                reverbGain.gain.value = params.reverb * 0.3;
+                
+                const delay = offlineContext.createDelay();
+                delay.delayTime.value = 0.3;
+                
+                const feedback = offlineContext.createGain();
+                feedback.gain.value = 0.3;
+                
+                gainNode.connect(delay);
+                delay.connect(feedback);
+                feedback.connect(delay);
+                delay.connect(reverbGain);
+                reverbGain.connect(destination);
+            }
+            
             source.start(startTime);
-            source.stop(startTime + duration);
+            source.stop(startTime + duration + 0.5);
         }
         
         // 将 AudioBuffer 转换为 WAV Blob
