@@ -666,7 +666,7 @@
         }
     </style>
 </head>
-<body>
+<body data-build="ILS_BUILD_2026_04_20_B">
     <!-- 背景动画 -->
     <div class="bg-animation"></div>
     <div class="staff-overlay"></div>
@@ -1048,6 +1048,9 @@
     </div>
 
     <script>
+        // ===== BUILD MARKER =====
+        console.log('ILS_BUILD_MARKER_2026_04_20_B');
+        console.log('SCRIPT_START');
         // 全局变量
         let audioContext;
         let analyser;
@@ -1699,7 +1702,11 @@
         };
 
         // 初始化
+        // SCRIPT_MIDDLE - initAudio 定义点
+        console.log('SCRIPT_MIDDLE');
+
         async function initAudio() {
+            console.log('INIT_AUDIO_CALLED');
             try {
                 // Safari 兼容性：使用 webkitAudioContext
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -4202,7 +4209,12 @@
 
             // 启动按钮
             const btnStart = document.getElementById('btn-start-audio');
-            if (btnStart) btnStart.addEventListener('click', initAudio);
+            if (btnStart) {
+                btnStart.addEventListener('click', initAudio);
+                console.log('✅ 启动按钮已绑定');
+            } else {
+                console.warn('⚠️ 启动按钮未找到 (#btn-start-audio)');
+            }
 
             // 乐器按钮（事件委托）
             const instrumentGrid = document.querySelector('.instrument-grid');
@@ -4318,6 +4330,17 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 页面初始化开始');
+            
+            // 关键函数可用性检查
+            console.log('关键函数检查:', {
+                initAudio: typeof initAudio,
+                windowInitAudio: typeof window.initAudio,
+                bindUIEvents: typeof bindUIEvents,
+                textToNotes: typeof textToNotes,
+                selectInstrument: typeof selectInstrument,
+                playTone: typeof playTone
+            });
+            
             bindUIEvents();
             verifyCriticalBindings();
             console.log('🚀 页面初始化完成');
@@ -4335,6 +4358,9 @@
         window.selectEmotion = selectEmotion;
         window.closeEmotionPanel = closeEmotionPanel;
         window.clearEmotionFile = clearEmotionFile;
+        
+        // SCRIPT_END
+        console.log('SCRIPT_END');
     </script>
 </body>
 </html>
