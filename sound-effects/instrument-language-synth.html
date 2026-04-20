@@ -3151,9 +3151,9 @@
                         noteDuration *= note.durationMultiplier;
                     }
                     
-                    // ===== 最短可听下限保护 =====
-                    const MIN_AUDIBLE_NOTE_MS = 110;
-                    noteDuration = Math.max(noteDuration, MIN_AUDIBLE_NOTE_MS);
+                    // ===== 最短可听下限保护（BPM 动态计算）=====
+                    const minAudibleMs = (60000 / params.bpm) * 0.23; // 约 0.23 拍
+                    noteDuration = Math.max(noteDuration, minAudibleMs);
                     
                     // 应用全局音量 + 音符独立音量
                     let userVolume = noteVolumes[note.note] || 1.0;
