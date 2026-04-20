@@ -967,14 +967,14 @@
                 <div class="panel-title">快速预设</div>
                 
                 <div class="preset-grid">
-                    <div class="preset-btn" onclick="playPreset('hello')">👋 你好</div>
-                    <div class="preset-btn" onclick="playPreset('goodmorning')">🌅 早上好</div>
-                    <div class="preset-btn" onclick="playPreset('iloveyou')">❤️ 我爱你</div>
-                    <div class="preset-btn" onclick="playPreset('happybirthday')">🎂 生日快乐</div>
-                    <div class="preset-btn" onclick="playPreset('goodnight')">🌙 晚安</div>
-                    <div class="preset-btn" onclick="playPreset('thankyou')">🙏 谢谢</div>
-                    <div class="preset-btn" onclick="playPreset('congrats')">🎉 恭喜</div>
-                    <div class="preset-btn" onclick="playPreset('goodluck')">🍀 祝好运</div>
+                    <div class="preset-btn" data-preset="hello">👋 你好</div>
+                    <div class="preset-btn" data-preset="goodmorning">🌅 早上好</div>
+                    <div class="preset-btn" data-preset="iloveyou">❤️ 我爱你</div>
+                    <div class="preset-btn" data-preset="happybirthday">🎂 生日快乐</div>
+                    <div class="preset-btn" data-preset="goodnight">🌙 晚安</div>
+                    <div class="preset-btn" data-preset="thankyou">🙏 谢谢</div>
+                    <div class="preset-btn" data-preset="congrats">🎉 恭喜</div>
+                    <div class="preset-btn" data-preset="goodluck">🍀 祝好运</div>
                     <div class="preset-btn" data-emotion="happy" data-preset="happy" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
                 </div>
 
@@ -990,11 +990,11 @@
                     </div>
                     
                     <div style="display: flex; gap: 8px;">
-                        <input type="file" id="emotionMidiInput" accept=".mid,.midi" style="display: none;" onchange="handleEmotionMidi(event)">
-                        <button class="btn btn-secondary" onclick="document.getElementById('emotionMidiInput').click()" style="flex: 1; font-size: 0.8rem;">📁 上传 MIDI</button>
+                        <input type="file" id="emotionMidiInput" accept=".mid,.midi" style="display: none;">
+                        <button id="btn-upload-midi" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">📁 上传 MIDI</button>
                         
-                        <input type="file" id="emotionAudioInput" accept="audio/*" style="display: none;" onchange="handleEmotionAudio(event)">
-                        <button class="btn btn-secondary" onclick="document.getElementById('emotionAudioInput').click()" style="flex: 1; font-size: 0.8rem;">🎵 上传音频</button>
+                        <input type="file" id="emotionAudioInput" accept="audio/*" style="display: none;">
+                        <button id="btn-upload-audio" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">🎵 上传音频</button>
                     </div>
                     
                     <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
@@ -1483,10 +1483,10 @@
             
             let html = '';
             if (emotion.midi) {
-                html += `<p>🎹 MIDI: ${emotion.midi.name} <button onclick="clearEmotionFile('${emotionKey}', 'midi')" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
+                html += `<p>🎹 MIDI: ${emotion.midi.name} <button class="btn-delete-emotion-file" data-emotion="${emotionKey}" data-type="midi" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
             }
             if (emotion.audio) {
-                html += `<p>🎵 音频: ${emotion.audio.name} <button onclick="clearEmotionFile('${emotionKey}', 'audio')" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
+                html += `<p>🎵 音频: ${emotion.audio.name} <button class="btn-delete-emotion-file" data-emotion="${emotionKey}" data-type="audio" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
             }
             if (!emotion.midi && !emotion.audio) {
                 html = '<p>暂无专属文件，请上传 MIDI 或音频</p>';
@@ -4195,7 +4195,135 @@
             }
         });
 
-        // ===== 暴露函数到全局 window（供 inline onclick 调用）=====
+        // ==================== 统一事件绑定 ====================
+
+        function bindUIEvents() {
+            console.log('🔧 绑定 UI 事件...');
+
+            // 启动按钮
+            const btnStart = document.getElementById('btn-start-audio');
+            if (btnStart) btnStart.addEventListener('click', initAudio);
+
+            // 乐器按钮（事件委托）
+            const instrumentGrid = document.querySelector('.instrument-grid');
+            if (instrumentGrid) {
+                instrumentGrid.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.instrument-btn');
+                    if (btn) {
+                        const instrument = btn.dataset.instrument;
+                        if (instrument) selectInstrument(instrument);
+                    }
+                });
+            }
+
+            // 主控制按钮
+            const btnPlay = document.getElementById('btn-play-text');
+            if (btnPlay) btnPlay.addEventListener('click', testPlayText);
+
+            const btnRandom = document.getElementById('btn-random-text');
+            if (btnRandom) btnRandom.addEventListener('click', playRandomText);
+
+            const btnClear = document.getElementById('btn-clear-text');
+            if (btnClear) btnClear.addEventListener('click', clearText);
+
+            const btnStop = document.getElementById('btn-stop');
+            if (btnStop) btnStop.addEventListener('click', stopPlaying);
+
+            const btnExport = document.getElementById('btn-export-wav');
+            if (btnExport) btnExport.addEventListener('click', exportToWAV);
+
+            // 预设按钮（事件委托）
+            const presetGrid = document.querySelector('.preset-grid');
+            if (presetGrid) {
+                presetGrid.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.preset-btn');
+                    if (btn) {
+                        const preset = btn.dataset.preset;
+                        const emotion = btn.dataset.emotion;
+                        if (emotion) selectEmotion(emotion);
+                        if (preset) playPreset(preset);
+                    }
+                });
+            }
+
+            // 情绪面板
+            const btnCloseEmotion = document.getElementById('btn-close-emotion');
+            if (btnCloseEmotion) btnCloseEmotion.addEventListener('click', closeEmotionPanel);
+
+            // 上传按钮
+            const btnUploadMidi = document.getElementById('btn-upload-midi');
+            const inputMidi = document.getElementById('emotionMidiInput');
+            if (btnUploadMidi && inputMidi) {
+                btnUploadMidi.addEventListener('click', () => inputMidi.click());
+                inputMidi.addEventListener('change', handleEmotionMidi);
+            }
+
+            const btnUploadAudio = document.getElementById('btn-upload-audio');
+            const inputAudio = document.getElementById('emotionAudioInput');
+            if (btnUploadAudio && inputAudio) {
+                btnUploadAudio.addEventListener('click', () => inputAudio.click());
+                inputAudio.addEventListener('change', handleEmotionAudio);
+            }
+
+            // 情绪文件删除按钮（事件委托）
+            const emotionFileList = document.getElementById('emotionFileList');
+            if (emotionFileList) {
+                emotionFileList.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.btn-delete-emotion-file');
+                    if (btn) {
+                        const emotionKey = btn.dataset.emotion;
+                        const fileType = btn.dataset.type;
+                        if (emotionKey && fileType) {
+                            clearEmotionFile(emotionKey, fileType);
+                        }
+                    }
+                });
+            }
+
+            console.log('✅ UI 事件绑定完成');
+        }
+
+        // ==================== 初始化自检 ====================
+
+        function verifyCriticalBindings() {
+            console.log('🔍 验证关键控件绑定...');
+            const checks = [
+                { name: '启动按钮', id: 'btn-start-audio' },
+                { name: '播放按钮', id: 'btn-play-text' },
+                { name: '导出按钮', id: 'btn-export-wav' },
+                { name: '文本输入框', id: 'textInput' },
+                { name: '主状态栏', id: 'status' }
+            ];
+
+            let allOk = true;
+            checks.forEach(check => {
+                const el = document.getElementById(check.id);
+                if (el) {
+                    console.log(`  ✅ ${check.name}: 已找到`);
+                } else {
+                    console.warn(`  ⚠️ ${check.name}: 未找到 (#${check.id})`);
+                    allOk = false;
+                }
+            });
+
+            if (allOk) {
+                console.log('✅ 所有关键控件检查通过');
+            } else {
+                console.warn('⚠️ 部分控件缺失，可能影响功能');
+            }
+            return allOk;
+        }
+
+        // ==================== 页面初始化 ====================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 页面初始化开始');
+            bindUIEvents();
+            verifyCriticalBindings();
+            console.log('🚀 页面初始化完成');
+        });
+
+        // ===== 暴露函数到全局 window（兼容旧代码）=====
         window.initAudio = initAudio;
         window.selectInstrument = selectInstrument;
         window.testPlayText = testPlayText;
