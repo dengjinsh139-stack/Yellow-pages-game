@@ -4194,6 +4194,19 @@
                 canvas.height = canvas.offsetHeight;
             }
         });
+
+        // ===== 暴露函数到全局 window（供 inline onclick 调用）=====
+        window.initAudio = initAudio;
+        window.selectInstrument = selectInstrument;
+        window.testPlayText = testPlayText;
+        window.playRandomText = playRandomText;
+        window.clearText = clearText;
+        window.stopPlaying = stopPlaying;
+        window.exportToWAV = exportToWAV;
+        window.playPreset = playPreset;
+        window.selectEmotion = selectEmotion;
+        window.closeEmotionPanel = closeEmotionPanel;
+        window.clearEmotionFile = clearEmotionFile;
     </script>
 </body>
 </html>
