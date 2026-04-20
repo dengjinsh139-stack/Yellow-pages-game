@@ -3004,15 +3004,20 @@
             
             // 检查采样是否加载完成
             const hasSamples = hasInstrumentSamples(currentInstrument);
-            if (!hasSamples) {
-                // 如果是采样乐器但采样未加载，提示加载中
-                if (currentInstrument === 'piano' || currentInstrument === 'saxophone' || currentInstrument === 'flute' || currentInstrument === 'synth' || currentInstrument === 'train' || currentInstrument === 'xylophone') {
-                    document.getElementById('statusText').textContent = '采样加载中，请稍候...';
-                    console.log('采样未加载完成，返回. currentInstrument:', currentInstrument);
-                    // 重置播放状态，避免死锁
-                    isPlaying = false;
-                    return;
-                }
+            const canPlayNormalNotes = hasSamples || currentInstrument === 'guitar' || currentInstrument === 'trumpet';
+            const canPlayChords = chordBuffers.length > 0 && chordsLoaded;
+            
+            // 如果既不能播放普通音符也不能播放和弦，才提前返回
+            if (!canPlayNormalNotes && !canPlayChords) {
+                document.getElementById('statusText').textContent = '音频资源加载中，请稍候...';
+                console.log('音频资源未加载完成，返回. currentInstrument:', currentInstrument);
+                isPlaying = false;
+                return;
+            }
+            
+            // 如果采样未加载但和弦可用，提示降级模式
+            if (!canPlayNormalNotes && canPlayChords) {
+                console.log('乐器采样未加载，仅播放和弦模式. currentInstrument:', currentInstrument);
             }
             
             isPlaying = true;
@@ -3119,6 +3124,12 @@
                         console.log(`第 ${i+1} 个是和弦，播放并等待完成`);
                         highlightNote(i);
                         await playChordAsync(note.duration, note.velocity);
+                        continue;
+                    }
+                    
+                    // 如果普通音符无法播放（采样未加载），跳过
+                    if (!canPlayNormalNotes) {
+                        console.log(`第 ${i+1} 个是普通音符，但采样未加载，跳过`);
                         continue;
                     }
                     
