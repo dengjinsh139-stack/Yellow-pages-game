@@ -675,7 +675,7 @@
     <div class="start-overlay" id="startOverlay">
         <h2>🎵 乐器语言合成器</h2>
         <p>将文字转换为乐器演奏 · 选择音色 · 体验音乐语言</p>
-        <button class="btn" onclick="initAudio()" style="font-size: 1rem; padding: 15px 40px; width: auto;">
+        <button id="btn-start-audio" class="btn" style="font-size: 1rem; padding: 15px 40px; width: auto;">
             启动音频引擎
         </button>
     </div>
@@ -694,35 +694,35 @@
                 <div class="panel-title">选择乐器</div>
                 
                 <div class="instrument-grid">
-                    <div class="instrument-btn active" data-instrument="piano" onclick="selectInstrument('piano')">
+                    <div class="instrument-btn active" data-instrument="piano">
                         <span class="icon">🎹</span>
                         <span class="name">钢琴 <small style="color:var(--accent);font-size:0.7em;">真实采样</small></span>
                     </div>
-                    <div class="instrument-btn" data-instrument="guitar" onclick="selectInstrument('guitar')">
+                    <div class="instrument-btn" data-instrument="guitar">
                         <span class="icon">🎸</span>
                         <span class="name">吉他</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="flute" onclick="selectInstrument('flute')">
+                    <div class="instrument-btn" data-instrument="flute">
                         <span class="icon">🪈</span>
                         <span class="name">长笛</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="xylophone" onclick="selectInstrument('xylophone')">
+                    <div class="instrument-btn" data-instrument="xylophone">
                         <span class="icon">🎹</span>
                         <span class="name">木琴</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="trumpet" onclick="selectInstrument('trumpet')">
+                    <div class="instrument-btn" data-instrument="trumpet">
                         <span class="icon">🎺</span>
                         <span class="name">小号</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="saxophone" onclick="selectInstrument('saxophone')">
+                    <div class="instrument-btn" data-instrument="saxophone">
                         <span class="icon">🎷</span>
                         <span class="name">沙克斯</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="synth" onclick="selectInstrument('synth')">
+                    <div class="instrument-btn" data-instrument="synth">
                         <span class="icon">🎛️</span>
                         <span class="name">合成器</span>
                     </div>
-                    <div class="instrument-btn" data-instrument="train" onclick="selectInstrument('train')">
+                    <div class="instrument-btn" data-instrument="train">
                         <span class="icon">🚂</span>
                         <span class="name">火车</span>
                     </div>
@@ -928,17 +928,17 @@
                 </div>
 
                 <div class="btn-grid">
-                    <button class="btn" onclick="testPlayText()">▶ 演奏文字</button>
-                    <button class="btn btn-secondary" onclick="playRandomText()">🎲 随机示例</button>
-                    <button class="btn btn-secondary" onclick="clearText()">🗑️ 清空</button>
-                    <button class="btn btn-secondary" onclick="stopPlaying()">⏹ 停止</button>
+                    <button id="btn-play-text" class="btn">▶ 演奏文字</button>
+                    <button id="btn-random-text" class="btn btn-secondary">🎲 随机示例</button>
+                    <button id="btn-clear-text" class="btn btn-secondary">🗑️ 清空</button>
+                    <button id="btn-stop" class="btn btn-secondary">⏹ 停止</button>
                 </div>
 
                 <!-- 音频导出区域 -->
                 <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
                     <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px;">📥 音频导出</div>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <button class="btn" onclick="exportToWAV()" id="exportBtn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
+                        <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
                         <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
                             <option value="44100">44.1kHz</option>
                             <option value="48000" selected>48kHz</option>
@@ -975,7 +975,7 @@
                     <div class="preset-btn" onclick="playPreset('thankyou')">🙏 谢谢</div>
                     <div class="preset-btn" onclick="playPreset('congrats')">🎉 恭喜</div>
                     <div class="preset-btn" onclick="playPreset('goodluck')">🍀 祝好运</div>
-                    <div class="preset-btn" onclick="selectEmotion('happy'); playPreset('happy');" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
+                    <div class="preset-btn" data-emotion="happy" data-preset="happy" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
                 </div>
 
                 <!-- 情绪专属文件上传区域 -->
