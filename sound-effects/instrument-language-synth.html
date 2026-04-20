@@ -2863,6 +2863,7 @@
         }
 
         // 播放和弦（随机选择一个，等待完成）
+        // 实时播放和弦
         function playChordAsync(duration, velocity = 0.6) {
             return new Promise((resolve) => {
                 if (!audioContext || chordBuffers.length === 0) {
@@ -2871,12 +2872,14 @@
                     return;
                 }
                 
-                // 如果和弦长度为0，跳过播放
-                if (params.chordDuration <= 0) {
+                const timing = computeChordTiming(duration);
+                if (!timing) {
                     console.log('Chord duration is 0, skipping');
                     resolve();
                     return;
                 }
+                
+                const { actualDuration, fadeOutTime, fadeStart } = timing;
                 
                 // 随机选择一个和弦
                 const randomChord = chordBuffers[Math.floor(Math.random() * chordBuffers.length)];
@@ -2886,16 +2889,12 @@
                 
                 const gainNode = audioContext.createGain();
                 const now = audioContext.currentTime;
-                const actualDuration = randomChord.duration * params.chordDuration;
-                const fadeOutTime = 0.1; // 淡出时间 100ms
                 
                 // 设置增益包络 - 带淡出的平滑停止
                 gainNode.gain.setValueAtTime(velocity * params.masterVolume, now);
                 
                 // 如果不是完整播放，在结束前淡出
                 if (params.chordDuration < 1.0) {
-                    // 在结束前 fadeOutTime 秒开始淡出
-                    const fadeStart = Math.max(0, actualDuration - fadeOutTime);
                     gainNode.gain.setValueAtTime(velocity * params.masterVolume, now + fadeStart);
                     gainNode.gain.exponentialRampToValueAtTime(0.001, now + actualDuration);
                 }
@@ -2919,7 +2918,7 @@
                     resolve();
                 };
                 
-                console.log(`Playing chord (${Math.round(params.chordDuration * 100)}% length), waiting for completion...`);
+                console.log(`Playing chord (${Math.round(params.chordDuration * 100)}% length), actualDuration=${actualDuration.toFixed(3)}s, waiting for completion...`);
             });
         }
 
@@ -3763,7 +3762,21 @@
             return { silent, weak, peak: maxPeak, rms };
         }
 
-        // ==================== WAV 导出功能 ====================
+        // ==================== 和弦公共函数 ====================
+        
+        // 计算和弦实际时长和淡出参数（实时播放和导出共用）
+        function computeChordTiming(baseDuration) {
+            if (params.chordDuration <= 0) {
+                return null; // 静音
+            }
+            const actualDuration = baseDuration * params.chordDuration;
+            if (actualDuration <= 0) {
+                return null; // 静音
+            }
+            const fadeOutTime = 0.1;
+            const fadeStart = Math.max(0, actualDuration - fadeOutTime);
+            return { actualDuration, fadeOutTime, fadeStart };
+        }
         
         // 导出当前文本演奏为 WAV 文件
         async function exportToWAV() {
@@ -4151,6 +4164,14 @@
         async function renderChordToBuffer(offlineContext, destination, startTime, duration, velocity) {
             if (chordBuffers.length === 0) return;
             
+            // 统一和弦时长计算
+            const timing = computeChordTiming(duration);
+            if (!timing) {
+                console.log('[RENDER] Chord duration is 0, skipping');
+                return;
+            }
+            const { actualDuration, fadeOutTime, fadeStart } = timing;
+            
             const randomChord = chordBuffers[Math.floor(Math.random() * chordBuffers.length)];
             const source = offlineContext.createBufferSource();
             source.buffer = randomChord;
@@ -4158,7 +4179,12 @@
             const gainNode = offlineContext.createGain();
             const vol = velocity * params.masterVolume;
             gainNode.gain.setValueAtTime(vol, startTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            // 如果不是完整播放，应用淡出
+            if (params.chordDuration < 1.0) {
+                gainNode.gain.setValueAtTime(vol, startTime + fadeStart);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + actualDuration);
+            }
             
             source.connect(gainNode);
             gainNode.connect(destination);
@@ -4182,7 +4208,9 @@
             }
             
             source.start(startTime);
-            source.stop(startTime + duration + 0.5);
+            source.stop(startTime + actualDuration + fadeOutTime);
+            
+            console.log(`[RENDER] Chord: actualDuration=${actualDuration.toFixed(3)}s, fadeOut=${fadeOutTime}s`);
         }
         
         // 将 AudioBuffer 转换为 WAV Blob
