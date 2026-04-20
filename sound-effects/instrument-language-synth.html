@@ -770,10 +770,11 @@
 
                 <div class="control-group">
                     <div class="control-label">
-                        <span>音符时长</span>
+                        <span>音色衰减/包络长度</span>
                         <span class="control-value" id="durationValue">中</span>
                     </div>
                     <input type="range" id="noteDuration" min="100" max="1000" value="300" oninput="updateParams()">
+                    <small style="color: var(--text-dim); font-size: 0.7rem; display: block; margin-top: 4px;">影响合成器采样衰减，不决定主播放节奏</small>
                 </div>
 
                 <div class="control-group">
@@ -881,13 +882,13 @@
                     <div class="control-group">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-size: 0.75rem; color: var(--primary);">四声 去声</span>
-                            <span class="control-value" id="tone4Value" style="font-size: 0.7rem;">32分音符 ♬</span>
+                            <span class="control-value" id="tone4Value" style="font-size: 0.7rem;">16分音符 ♫</span>
                         </div>
                         <select id="tone4NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.75rem;">
                             <option value="4">4分音符 ♩</option>
                             <option value="8">8分音符 ♪</option>
-                            <option value="16">16分音符 ♫</option>
-                            <option value="32" selected>32分音符 ♬</option>
+                            <option value="16" selected>16分音符 ♫</option>
+                            <option value="32">32分音符 ♬</option>
                             <option value="triplet">三连音 ♪♪♪</option>
                         </select>
                     </div>
@@ -1086,7 +1087,7 @@
                 1: '8',         // 一声 = 8分音符
                 2: '16',        // 二声 = 16分音符
                 3: 'triplet',   // 三声 = 三连音
-                4: '32'         // 四声 = 32分音符
+                4: '16'         // 四声 = 16分音符（默认值，避免过短）
             }
         };
 
@@ -3084,7 +3085,6 @@
             
             // 计算一拍的时间 (ms)
             const beatDuration = 60000 / params.bpm;
-            let noteIndex = 0; // 用于高亮显示的音符计数
             
             try {
                 for (let i = 0; i < notes.length; i++) {
@@ -3098,6 +3098,8 @@
                     // ===== 停顿事件处理 =====
                     if (event.type === 'pause') {
                         console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms, reset=${event.resetPhrase}`);
+                        // 高亮显示停顿
+                        highlightNote(i);
                         await sleep(event.pauseMs);
                         continue;
                     }
@@ -3108,6 +3110,7 @@
                     // 和弦处理（轻声字）- 等待和弦播完
                     if (note.isChord) {
                         console.log(`第 ${i+1} 个是和弦，播放并等待完成`);
+                        highlightNote(i);
                         await playChordAsync(note.duration, note.velocity);
                         continue;
                     }
@@ -3115,6 +3118,7 @@
                     // 休止符处理（兼容旧数据）
                     if (note.isRest) {
                         console.log(`第 ${i+1} 个是休止符，等待 ${note.duration}ms`);
+                        highlightNote(i);
                         await sleep(note.duration);
                         continue;
                     }
@@ -3147,12 +3151,16 @@
                         noteDuration *= note.durationMultiplier;
                     }
                     
+                    // ===== 最短可听下限保护 =====
+                    const MIN_AUDIBLE_NOTE_MS = 110;
+                    noteDuration = Math.max(noteDuration, MIN_AUDIBLE_NOTE_MS);
+                    
                     // 应用全局音量 + 音符独立音量
                     let userVolume = noteVolumes[note.note] || 1.0;
                     let velocityWithMaster = note.velocity * params.masterVolume * userVolume;
                     
-                    // 应用后音轻起修饰（标点气口系统）
-                    if (note.velocityMultiplier) {
+                    // 应用后音轻起修饰（仅对足够长的音生效，避免过短音被吞）
+                    if (note.velocityMultiplier && noteDuration >= 160) {
                         velocityWithMaster *= note.velocityMultiplier;
                     }
                     
@@ -3161,9 +3169,8 @@
                     // 播放单音（使用节奏引擎计算的时长）
                     playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
                     
-                    // 高亮当前音符
-                    highlightNote(noteIndex);
-                    noteIndex++;
+                    // 高亮当前事件（使用真实事件索引 i）
+                    highlightNote(i);
                     
                     // 等待计算好的时长
                     await sleep(noteDuration);
