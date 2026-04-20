@@ -3931,7 +3931,7 @@
                     await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, velocity);
                 } else if (currentInstrument === 'piano' && samplesLoaded && note.sampleNote) {
                     await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
-                } else if (['saxophone', 'flute', 'synth', 'train'].includes(currentInstrument) && note.sampleNote) {
+                } else if (['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument) && note.sampleNote) {
                     await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
                 } else {
                     await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
