@@ -1181,6 +1181,100 @@
             'triplet': { name: '三连音', symbol: '♪♪♪', duration: 0.333, isTriplet: true }
         };
 
+        // ============================================
+        // 标点符号气口系统 - Punctuation Phrasing
+        // ============================================
+
+        // 标点规则配置
+        const punctuationRules = {
+            ' ':   { beats: 0.25, preNoteMultiplier: 1.00, nextNoteVelocityMultiplier: 0.95, resetPhrase: false },
+            '、':  { beats: 0.50, preNoteMultiplier: 1.05, nextNoteVelocityMultiplier: 0.92, resetPhrase: false },
+            '，':  { beats: 0.75, preNoteMultiplier: 1.10, nextNoteVelocityMultiplier: 0.90, resetPhrase: false },
+            ',':   { beats: 0.75, preNoteMultiplier: 1.10, nextNoteVelocityMultiplier: 0.90, resetPhrase: false },
+            '：':  { beats: 0.75, preNoteMultiplier: 1.10, nextNoteVelocityMultiplier: 0.90, resetPhrase: false },
+            ':':   { beats: 0.75, preNoteMultiplier: 1.10, nextNoteVelocityMultiplier: 0.90, resetPhrase: false },
+            '；':  { beats: 1.00, preNoteMultiplier: 1.15, nextNoteVelocityMultiplier: 0.90, resetPhrase: false },
+            ';':   { beats: 1.00, preNoteMultiplier: 1.15, nextNoteVelocityMultiplier: 0.90, resetPhrase: false },
+            '。':  { beats: 1.25, preNoteMultiplier: 1.20, nextNoteVelocityMultiplier: 0.90, resetPhrase: true  },
+            '.':   { beats: 1.25, preNoteMultiplier: 1.20, nextNoteVelocityMultiplier: 0.90, resetPhrase: true  },
+            '？':  { beats: 1.25, preNoteMultiplier: 1.15, nextNoteVelocityMultiplier: 0.90, resetPhrase: true  },
+            '?':   { beats: 1.25, preNoteMultiplier: 1.15, nextNoteVelocityMultiplier: 0.90, resetPhrase: true  },
+            '！':  { beats: 1.00, preNoteMultiplier: 1.10, nextNoteVelocityMultiplier: 0.92, resetPhrase: true  },
+            '!':   { beats: 1.00, preNoteMultiplier: 1.10, nextNoteVelocityMultiplier: 0.92, resetPhrase: true  },
+            '…':   { beats: 0.875, preNoteMultiplier: 1.10, nextNoteVelocityMultiplier: 0.90, resetPhrase: false },
+            '……': { beats: 1.75, preNoteMultiplier: 1.25, nextNoteVelocityMultiplier: 0.88, resetPhrase: true  },
+            '...': { beats: 1.75, preNoteMultiplier: 1.25, nextNoteVelocityMultiplier: 0.88, resetPhrase: true  }
+        };
+
+        // 气口可调参数
+        const phrasingConfig = {
+            punctuationPauseScale: 1.0,        // 全局停顿倍率
+            preNoteLengthScale: 1.0,           // 前音延长倍率总开关
+            nextNoteVelocityScale: 1.0,        // 后音轻起倍率总开关
+            sentenceResetEnabled: true,        // 句尾是否 reset phrase
+            maxPauseBeats: 2.0                 // 最大停顿保护
+        };
+
+        // 文本分词：将文本拆分为 tokens（字符/标点/空格）
+        function tokenizeText(text) {
+            const tokens = [];
+            let i = 0;
+            while (i < text.length) {
+                const char = text[i];
+                // 合并省略号
+                if (char === '…' || char === '.') {
+                    let dots = char;
+                    let j = i + 1;
+                    while (j < text.length && text[j] === char) {
+                        dots += char;
+                        j++;
+                    }
+                    // 标准化省略号
+                    if (dots === '……' || dots === '...' || dots.length >= 3 && char === '.') {
+                        tokens.push({ type: 'punctuation', symbol: dots.length >= 3 ? '……' : dots, isEllipsis: true });
+                    } else if (dots === '…') {
+                        tokens.push({ type: 'punctuation', symbol: '…', isEllipsis: false });
+                    } else {
+                        // 普通句号
+                        for (let k = 0; k < dots.length; k++) {
+                            tokens.push({ type: 'punctuation', symbol: char });
+                        }
+                    }
+                    i = j;
+                } else if (punctuationRules[char]) {
+                    tokens.push({ type: 'punctuation', symbol: char });
+                    i++;
+                } else if (char === ' ') {
+                    tokens.push({ type: 'space', symbol: ' ' });
+                    i++;
+                } else {
+                    tokens.push({ type: 'char', char: char });
+                    i++;
+                }
+            }
+            return tokens;
+        }
+
+        // 获取标点规则（处理连续标点的上限保护）
+        function getPunctuationRule(symbol) {
+            const rule = punctuationRules[symbol];
+            if (!rule) return null;
+            // 应用全局倍率和上限保护
+            const beats = Math.min(rule.beats * phrasingConfig.punctuationPauseScale, phrasingConfig.maxPauseBeats);
+            return {
+                ...rule,
+                beats: beats,
+                preNoteMultiplier: 1.0 + (rule.preNoteMultiplier - 1.0) * phrasingConfig.preNoteLengthScale,
+                nextNoteVelocityMultiplier: 1.0 - (1.0 - rule.nextNoteVelocityMultiplier) * phrasingConfig.nextNoteVelocityScale
+            };
+        }
+
+        // 计算停顿毫秒数（基于BPM）
+        function getPauseMs(beats, bpm) {
+            const quarterNoteMs = 60000 / bpm;
+            return quarterNoteMs * beats;
+        }
+
         // 采样配置 - 五声音阶 D E G A B
         const sampleConfig = {
             xylophone: {
@@ -2309,40 +2403,84 @@
             return styles[emotion] || styles.calm;
         }
 
-        // 文本转音符序列
+        // 文本转音符序列（统一事件模型：note + pause）
         function textToNotes(text) {
-            const notes = [];
-            const chars = text.split('');
+            const tokens = tokenizeText(text);
+            const events = [];
+            const bpm = params.bpm || 120;
             
-            for (let i = 0; i < chars.length; i++) {
-                const char = chars[i];
+            // 第一遍：生成基础 note 和 pause 事件
+            for (let i = 0; i < tokens.length; i++) {
+                const token = tokens[i];
                 
-                // 跳过空格，但增加停顿
-                if (char === ' ') {
-                    if (notes.length > 0) {
-                        notes[notes.length - 1].pause = true;
+                if (token.type === 'char') {
+                    const note = charToNote(token.char, i);
+                    if (note) {
+                        events.push({ type: 'note', ...note });
                     }
-                    continue;
+                } else if (token.type === 'punctuation' || token.type === 'space') {
+                    const symbol = token.symbol;
+                    const rule = getPunctuationRule(symbol);
+                    if (rule) {
+                        events.push({
+                            type: 'pause',
+                            symbol: symbol,
+                            beats: rule.beats,
+                            pauseMs: getPauseMs(rule.beats, bpm),
+                            preNoteMultiplier: rule.preNoteMultiplier,
+                            nextNoteVelocityMultiplier: rule.nextNoteVelocityMultiplier,
+                            resetPhrase: phrasingConfig.sentenceResetEnabled && rule.resetPhrase
+                        });
+                    }
+                }
+            }
+            
+            // 第二遍：应用前后音修饰
+            // 找到所有有效音符的索引
+            const noteIndices = [];
+            for (let i = 0; i < events.length; i++) {
+                if (events[i].type === 'note') {
+                    noteIndices.push(i);
+                }
+            }
+            
+            // 处理每个 pause 事件的前后修饰
+            for (let i = 0; i < events.length; i++) {
+                const evt = events[i];
+                if (evt.type !== 'pause') continue;
+                
+                // 找到前一个有效音符
+                let prevNoteIdx = -1;
+                for (let j = i - 1; j >= 0; j--) {
+                    if (events[j].type === 'note') {
+                        prevNoteIdx = j;
+                        break;
+                    }
                 }
                 
-                // 标点符号处理
-                if ('，。！？；'.includes(char) || '.,!?;'.includes(char)) {
-                    if (notes.length > 0) {
-                        notes[notes.length - 1].duration *= 1.5;
+                // 找到后一个有效音符
+                let nextNoteIdx = -1;
+                for (let j = i + 1; j < events.length; j++) {
+                    if (events[j].type === 'note') {
+                        nextNoteIdx = j;
+                        break;
                     }
-                    continue;
                 }
                 
-                // 获取字符对应的音符
-                const note = charToNote(char, i);
-                if (note) {
-                    notes.push(note);
+                // 前一个音延长（如果存在）
+                if (prevNoteIdx >= 0) {
+                    events[prevNoteIdx].durationMultiplier = evt.preNoteMultiplier;
+                }
+                
+                // 后一个音轻起（如果存在）
+                if (nextNoteIdx >= 0) {
+                    events[nextNoteIdx].velocityMultiplier = evt.nextNoteVelocityMultiplier;
                 }
             }
             
             // 过滤掉任何 null 或 undefined 值
-            const validNotes = notes.filter(n => n !== null && n !== undefined && typeof n === 'object');
-            return validNotes;
+            const validEvents = events.filter(e => e !== null && e !== undefined && typeof e === 'object');
+            return validEvents;
         }
 
         // 常用汉字声调映射表（简化版 - 高频字）
@@ -2935,8 +3073,8 @@
                 return;
             }
             
-            // 依次演奏 - 使用节奏引擎
-            console.log('开始演奏，音符数量:', notes.length);
+            // 依次演奏 - 使用节奏引擎 + 标点气口系统
+            console.log('开始演奏，事件数量:', notes.length);
             console.log('节奏引擎设置:', {
                 bpm: params.bpm,
                 notesPerBeat: params.notesPerBeat,
@@ -2946,6 +3084,7 @@
             
             // 计算一拍的时间 (ms)
             const beatDuration = 60000 / params.bpm;
+            let noteIndex = 0; // 用于高亮显示的音符计数
             
             try {
                 for (let i = 0; i < notes.length; i++) {
@@ -2954,7 +3093,17 @@
                         break;
                     }
                     
-                    const note = notes[i];
+                    const event = notes[i];
+                    
+                    // ===== 停顿事件处理 =====
+                    if (event.type === 'pause') {
+                        console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms, reset=${event.resetPhrase}`);
+                        await sleep(event.pauseMs);
+                        continue;
+                    }
+                    
+                    // 下面的都是 note 事件
+                    const note = event;
                     
                     // 和弦处理（轻声字）- 等待和弦播完
                     if (note.isChord) {
@@ -2993,9 +3142,19 @@
                         noteDuration = beatDuration / 3;
                     }
                     
+                    // 应用前音延长修饰（标点气口系统）
+                    if (note.durationMultiplier) {
+                        noteDuration *= note.durationMultiplier;
+                    }
+                    
                     // 应用全局音量 + 音符独立音量
-                    const userVolume = noteVolumes[note.note] || 1.0;
-                    const velocityWithMaster = note.velocity * params.masterVolume * userVolume;
+                    let userVolume = noteVolumes[note.note] || 1.0;
+                    let velocityWithMaster = note.velocity * params.masterVolume * userVolume;
+                    
+                    // 应用后音轻起修饰（标点气口系统）
+                    if (note.velocityMultiplier) {
+                        velocityWithMaster *= note.velocityMultiplier;
+                    }
                     
                     console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 声调=${note.tone}, 时值=${noteValue.name}, 时长=${noteDuration.toFixed(0)}ms`);
                     
@@ -3003,7 +3162,8 @@
                     playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
                     
                     // 高亮当前音符
-                    highlightNote(i);
+                    highlightNote(noteIndex);
+                    noteIndex++;
                     
                     // 等待计算好的时长
                     await sleep(noteDuration);
@@ -3043,15 +3203,29 @@
         }
 
         // 显示音符
-        function displayNotes(notes) {
+        function displayNotes(events) {
             const display = document.getElementById('notesDisplay');
             const toneMarks = { 0: '•', 1: '̄', 2: '́', 3: '̌', 4: '̀' };
             const toneNames = { 0: '轻声', 1: '阴平', 2: '阳平', 3: '上声', 4: '去声' };
             const noteValueSymbols = { '4': '♩', '8': '♪', '16': '♫', '32': '♬', 'triplet': '♪♪♪' };
             
-            display.innerHTML = notes.map((n, i) => {
+            display.innerHTML = events.map((evt, i) => {
                 // 跳过 null 值
-                if (!n) return '';
+                if (!evt) return '';
+                
+                // 停顿事件显示
+                if (evt.type === 'pause') {
+                    const pauseSymbols = { ' ': '·', '、': '、', '，': '，', ',': ',', '：': '：', ':': ':', '；': '；', ';': ';', '。': '。', '.': '.', '？': '？', '?': '?', '！': '！', '!': '!', '…': '…', '……': '…', '...': '…' };
+                    const symbol = pauseSymbols[evt.symbol] || evt.symbol;
+                    return `<span class="note-item" id="note-${i}" title="停顿 ${evt.pauseMs.toFixed(0)}ms"
+                        style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; opacity: 0.6; color: var(--text-dim);">
+                        <span style="font-size: 0.9rem;">⏸</span>
+                        <span style="font-size: 0.6rem; opacity: 0.7;">${symbol}</span>
+                    </span>`;
+                }
+                
+                // note 事件显示
+                const n = evt;
                 const toneMark = n.tone !== undefined ? toneMarks[n.tone] : '';
                 let displayText;
                 let rhythmInfo = '';
@@ -3595,17 +3769,30 @@
         
         // 计算音频总时长
         async function calculateAudioDuration(text) {
-            const notes = textToNotes(text);
+            const events = textToNotes(text);
             let totalTime = 0.5; // 起始偏移
             
-            for (let i = 0; i < notes.length; i++) {
-                const note = notes[i];
+            for (let i = 0; i < events.length; i++) {
+                const evt = events[i];
+                
+                if (evt.type === 'pause') {
+                    totalTime += evt.pauseMs / 1000;
+                    continue;
+                }
+                
+                const note = evt;
                 const tempo = params.tempoRandom 
                     ? params.tempoMin + Math.random() * (params.tempoMax - params.tempoMin)
                     : params.tempo;
                 
                 // 根据声调时值计算实际持续时间
-                const noteDuration = getNoteDurationByTone(note.tone || 1);
+                let noteDuration = getNoteDurationByTone(note.tone || 1);
+                
+                // 应用前音延长修饰
+                if (note.durationMultiplier) {
+                    noteDuration *= note.durationMultiplier;
+                }
+                
                 totalTime += (tempo / 1000) * noteDuration;
             }
             
@@ -3620,46 +3807,55 @@
         }
         
         // 将文本转换为音符序列
-        function textToNotes(text) {
-            const notes = [];
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                if (char.trim()) {
-                    notes.push(charToNote(char, i));
-                }
-            }
-            return notes;
-        }
-        
-        // 渲染音频到 AudioBuffer
+        // 渲染音频到 AudioBuffer（支持统一事件模型）
         async function renderAudioToBuffer(text, offlineContext) {
-            const notes = textToNotes(text);
+            const events = textToNotes(text);
             const destination = offlineContext.destination;
             
             let currentTime = 0.5; // 起始偏移
             
-            for (let i = 0; i < notes.length; i++) {
-                const note = notes[i];
+            for (let i = 0; i < events.length; i++) {
+                const evt = events[i];
+                
+                // 停顿事件：只推进时间
+                if (evt.type === 'pause') {
+                    currentTime += evt.pauseMs / 1000;
+                    continue;
+                }
+                
+                const note = evt;
                 const tempo = params.tempoRandom 
                     ? params.tempoMin + Math.random() * (params.tempoMax - params.tempoMin)
                     : params.tempo;
                 
-                const noteDurationMs = getNoteDurationByTone(note.tone || 1) * tempo;
+                let noteDurationMs = getNoteDurationByTone(note.tone || 1) * tempo;
+                
+                // 应用前音延长修饰
+                if (note.durationMultiplier) {
+                    noteDurationMs *= note.durationMultiplier;
+                }
+                
                 const noteDuration = noteDurationMs / 1000;
+                
+                // 应用后音轻起修饰（音量）
+                let velocity = note.velocity || 0.5;
+                if (note.velocityMultiplier) {
+                    velocity *= note.velocityMultiplier;
+                }
                 
                 // 创建音源
                 if (note.isChord && chordsLoaded) {
                     // 播放和弦
-                    await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, note.velocity || 0.6);
+                    await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, velocity);
                 } else if (currentInstrument === 'piano' && samplesLoaded && note.sampleNote) {
                     // 使用钢琴采样
-                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration);
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
                 } else if (['saxophone', 'flute', 'synth', 'train'].includes(currentInstrument) && note.sampleNote) {
                     // 使用其他乐器采样
-                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration);
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
                 } else {
                     // 使用合成音色
-                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration);
+                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
                 }
                 
                 currentTime += noteDuration;
@@ -3670,7 +3866,7 @@
         }
         
         // 渲染采样到 buffer
-        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration) {
+        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
             const bufferKey = `${currentInstrument}_${note.sampleNote}`;
             const buffer = audioBuffers[bufferKey];
             
@@ -3688,7 +3884,8 @@
             
             // 创建增益节点
             const gainNode = offlineContext.createGain();
-            const velocity = (note.velocity || 0.5) * params.masterVolume;
+            const baseVelocity = overrideVelocity !== undefined ? overrideVelocity : (note.velocity || 0.5);
+            const velocity = baseVelocity * params.masterVolume;
             gainNode.gain.setValueAtTime(velocity, startTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
             
@@ -3702,7 +3899,7 @@
         }
         
         // 渲染合成音色到 buffer
-        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration) {
+        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
             const oscillator = offlineContext.createOscillator();
             const gainNode = offlineContext.createGain();
             
@@ -3717,7 +3914,8 @@
             oscillator.frequency.value = note.frequency;
             
             // 包络
-            const velocity = (note.velocity || 0.5) * params.masterVolume;
+            const baseVelocity = overrideVelocity !== undefined ? overrideVelocity : (note.velocity || 0.5);
+            const velocity = baseVelocity * params.masterVolume;
             const attack = 0.02;
             const release = Math.min(duration * 0.3, 0.1);
             
