@@ -3715,24 +3715,34 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        // 检查 AudioBuffer 是否接近静音
-        function checkBufferIsSilent(buffer, thresholdDb = -60) {
-            if (!buffer || buffer.length === 0) return true;
+        // 检查 AudioBuffer 质量（静音 + 偏弱检测）
+        function checkBufferIsSilent(buffer, silenceThresholdDb = -60, weakThresholdDb = -30) {
+            if (!buffer || buffer.length === 0) return { silent: true, weak: true, peak: 0, rms: 0 };
             
-            const thresholdLinear = Math.pow(10, thresholdDb / 20);
+            const silenceLinear = Math.pow(10, silenceThresholdDb / 20);
+            const weakLinear = Math.pow(10, weakThresholdDb / 20);
+            
+            let maxPeak = 0;
             let sumSquares = 0;
             const channelData = buffer.getChannelData(0);
-            const sampleCount = Math.min(channelData.length, 44100 * 5); // 检查前5秒
+            const sampleCount = channelData.length;
             
             for (let i = 0; i < sampleCount; i++) {
+                const absVal = Math.abs(channelData[i]);
+                if (absVal > maxPeak) maxPeak = absVal;
                 sumSquares += channelData[i] * channelData[i];
             }
             
             const rms = Math.sqrt(sumSquares / sampleCount);
-            const isSilent = rms < thresholdLinear;
+            const silent = maxPeak < silenceLinear && rms < silenceLinear;
+            const weak = maxPeak < weakLinear || rms < weakLinear * 0.5;
             
-            console.log(`导出 buffer RMS: ${rms.toFixed(6)}, threshold: ${thresholdLinear.toFixed(6)}, silent: ${isSilent}`);
-            return isSilent;
+            const peakDb = maxPeak > 0 ? 20 * Math.log10(maxPeak) : -Infinity;
+            const rmsDb = rms > 0 ? 20 * Math.log10(rms) : -Infinity;
+            
+            console.log(`导出 buffer quality: Peak=${peakDb.toFixed(1)}dB, RMS=${rmsDb.toFixed(1)}dB, silent=${silent}, weak=${weak}`);
+            
+            return { silent, weak, peak: maxPeak, rms };
         }
 
         // ==================== WAV 导出功能 ====================
@@ -3767,15 +3777,17 @@
                 // 渲染音频
                 const renderedBuffer = await renderAudioToBuffer(text, offlineContext);
                 
-                // 检查导出结果是否为静音
-                const isSilent = checkBufferIsSilent(renderedBuffer);
-                if (isSilent) {
-                    console.error('⚠️ 导出结果为静音！请检查采样加载状态');
+                // 检查导出结果质量
+                const quality = checkBufferIsSilent(renderedBuffer);
+                if (quality.silent) {
+                    console.error('⚠️ 导出结果为静音！');
                     exportStatus.textContent = '⚠️ 导出异常：结果为空/静音，请检查乐器选择';
-                    isPlaying = false;
                     exportBtn.disabled = false;
                     exportBtn.textContent = '💾 导出 WAV';
                     return;
+                } else if (quality.weak) {
+                    console.warn('⚠️ 导出结果偏弱 (Peak < -30dB)，可能需要放大试听');
+                    exportStatus.textContent = `⚠️ 导出偏弱 (${(20 * Math.log10(quality.peak)).toFixed(1)}dB)，实际有音频数据`;
                 }
                 
                 exportStatus.textContent = '正在生成 WAV 文件...';
@@ -3931,12 +3943,15 @@
             return await offlineContext.startRendering();
         }
         
-        // 渲染采样到 buffer
+        // 渲染采样到 buffer（与实时播放 playSampleTone() 对齐）
         async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
             const bufferKey = getSampleBufferKey(currentInstrument, note.sampleNote);
             const buffer = audioBuffers[bufferKey];
             
-            if (!buffer) return;
+            if (!buffer) {
+                console.warn('Sample not found for', bufferKey);
+                return;
+            }
             
             const source = offlineContext.createBufferSource();
             source.buffer = buffer;
@@ -3948,20 +3963,47 @@
                 source.playbackRate.value = note.frequency / sampleInfo.freq;
             }
             
+            // ===== 增益计算：与实时播放一致 =====
+            const config = sampleConfig[currentInstrument];
+            const baseGain = sampleInfo?.gain || 1.0;
+            const safeVelocity = (typeof overrideVelocity === 'number' && isFinite(overrideVelocity))
+                ? overrideVelocity : (note.velocity || 0.5);
+            const finalVelocity = safeVelocity * params.masterVolume * baseGain;
+            const maxGain = 3.0;
+            const clampedVelocity = Math.min(finalVelocity, maxGain);
+            
+            console.log(`Export ${currentInstrument} ${note.sampleNote}: baseGain=${baseGain}, velocity=${safeVelocity}, final=${finalVelocity}, clamped=${clampedVelocity}`);
+            
             // 创建增益节点
             const gainNode = offlineContext.createGain();
-            const baseVelocity = overrideVelocity !== undefined ? overrideVelocity : (note.velocity || 0.5);
-            const velocity = baseVelocity * params.masterVolume;
-            gainNode.gain.setValueAtTime(velocity, startTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            // ===== 包络：与实时播放一致（attack/hold/decay） =====
+            const attackTime = Math.min(config.attack || 0.005, Math.max(0.001, duration * 0.2));
+            const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
+            const decayTime = Math.max(duration * 0.6, 0.05);
+            
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(clampedVelocity, startTime + attackTime);
+            gainNode.gain.setValueAtTime(clampedVelocity, startTime + attackTime + holdTime);
+            const totalDecayEnd = startTime + attackTime + holdTime + decayTime;
+            if (isFinite(totalDecayEnd) && totalDecayEnd > startTime) {
+                gainNode.gain.exponentialRampToValueAtTime(0.001, totalDecayEnd);
+            }
+            
+            // 混响（简化版，离线上下文不支持动态混响链，只加基本尾音）
+            const reverbGain = params.reverb > 0 ? params.reverb * 0.3 : 0;
             
             // 连接节点
             source.connect(gainNode);
             gainNode.connect(destination);
             
-            // 播放
-            source.start(startTime);
-            source.stop(startTime + duration);
+            // ===== 采样起点：应用 instrument offset =====
+            const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
+            const startOffsetSec = offsetMs / 1000;
+            
+            // ===== stop 尾部余量：与实时播放一致 =====
+            source.start(startTime, startOffsetSec);
+            source.stop(startTime + duration + 0.5);
         }
         
         // 渲染合成音色到 buffer
@@ -3979,7 +4021,7 @@
             oscillator.type = waveforms[currentInstrument] || 'sine';
             oscillator.frequency.value = note.frequency;
             
-            // 包络
+            // 包络（与实时版本一致）
             const baseVelocity = overrideVelocity !== undefined ? overrideVelocity : (note.velocity || 0.5);
             const velocity = baseVelocity * params.masterVolume;
             const attack = 0.02;
@@ -3988,13 +4030,14 @@
             gainNode.gain.setValueAtTime(0, startTime);
             gainNode.gain.linearRampToValueAtTime(velocity, startTime + attack);
             gainNode.gain.setValueAtTime(velocity, startTime + duration - release);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration + 0.2);
             
             oscillator.connect(gainNode);
             gainNode.connect(destination);
             
+            // 给足尾部余量
             oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
+            oscillator.stop(startTime + duration + 0.5);
         }
         
         // 渲染和弦到 buffer
