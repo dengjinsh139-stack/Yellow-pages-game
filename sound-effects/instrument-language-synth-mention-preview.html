@@ -676,16 +676,16 @@
         .character-voice-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .character-card {
-            background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            padding: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 9px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.16);
             transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
         }
 
@@ -699,55 +699,46 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 6px;
+            margin-bottom: 6px;
         }
 
         .character-card-name {
-            font-size: 0.96rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--text);
         }
 
         .character-card-tag {
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             color: var(--accent);
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 999px;
-            border: 1px solid rgba(255,230,109,0.28);
+            border: 1px solid rgba(255,230,109,0.24);
             background: rgba(255,230,109,0.08);
             white-space: nowrap;
         }
 
         .character-card-meta {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-            min-height: 34px;
-            line-height: 1.5;
-            margin-bottom: 10px;
+            display: none;
         }
 
         .character-card-actions {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            grid-template-columns: 1fr;
+            gap: 0;
         }
 
         .character-card-actions .btn {
-            font-size: 0.76rem;
-            padding: 8px 10px;
-        }
-
-        .character-card-actions .btn-character-insert {
-            grid-column: span 2;
-            background: linear-gradient(135deg, rgba(78,205,196,0.88), rgba(155,93,229,0.92));
+            font-size: 0.72rem;
+            padding: 7px 8px;
         }
 
         .character-voice-status {
-            font-size: 0.74rem;
+            font-size: 0.7rem;
             color: var(--text-dim);
             text-align: center;
-            padding: 8px 10px;
+            padding: 7px 9px;
             border-radius: 10px;
             background: rgba(0,0,0,0.18);
             border: 1px solid rgba(255,255,255,0.08);
@@ -1103,7 +1094,7 @@
 
                 <div class="panel-title">角色声纹预览</div>
                 <div class="character-voice-intro">
-                    这里预留了 10 个角色按钮位。你之后把角色称呼音频传上来后，可以直接在页面里试听，并一键把角色名插入文本。
+                    这里预留了 10 个角色按钮位。后续我把角色固定称呼音频正式接进仓库后，这里就会变成共享可试听的角色声纹面板。
                 </div>
                 <div class="character-voice-grid" id="characterVoiceGrid"></div>
                 <input type="file" id="characterAudioInput" accept="audio/*" style="display: none;">
@@ -1293,11 +1284,9 @@
                             <div class="character-card-name">${name}</div>
                             <span class="character-card-tag">${profile.instrument}</span>
                         </div>
-                        <div class="character-card-meta">${fileLabel}<br>点击试听后，会播放这个角色的固定称呼音频。</div>
+                        <div class="character-card-meta">${fileLabel}</div>
                         <div class="character-card-actions">
-                            <button class="btn btn-secondary" data-character-action="upload" data-character-name="${name}">📁 上传音频</button>
-                            <button class="btn" data-character-action="preview" data-character-name="${name}">▶ 试听角色</button>
-                            <button class="btn btn-character-insert" data-character-action="insert" data-character-name="${name}">✍ 插入 @${name}</button>
+                            <button class="btn" data-character-action="preview" data-character-name="${name}">▶ 试听</button>
                         </div>
                     </div>
                 `;
@@ -1385,17 +1374,6 @@
             source.onended = () => {
                 setCharacterVoiceStatus(`${characterName} 试听完成`, 'success');
             };
-        }
-
-        function insertCharacterMention(characterName) {
-            const input = document.getElementById('textInput');
-            if (!input) return;
-            const mentionText = `@${characterName}`;
-            const currentValue = input.value || '';
-            const needsSpace = currentValue && !/\s$/.test(currentValue);
-            input.value = currentValue + (needsSpace ? ' ' : '') + mentionText;
-            input.focus();
-            setCharacterVoiceStatus(`已插入 ${mentionText} 到文本框`, 'success');
         }
 
         // 参数
@@ -4820,7 +4798,6 @@
         window.closeEmotionPanel = closeEmotionPanel;
         window.clearEmotionFile = clearEmotionFile;
         window.previewCharacterVoice = previewCharacterVoice;
-        window.insertCharacterMention = insertCharacterMention;
         window.setMentionMotifEnabled = setMentionMotifEnabled;
         window.setCharacterMentionProfiles = setCharacterMentionProfiles;
         window.getCharacterMentionProfiles = getCharacterMentionProfiles;
