@@ -664,6 +664,105 @@
             .instrument-grid { grid-template-columns: repeat(3, 1fr); }
             .preset-grid { grid-template-columns: 1fr; }
         }
+
+        /* 角色声纹面板 */
+        .character-voice-intro {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .character-voice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .character-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .character-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,230,109,0.4);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.24);
+        }
+
+        .character-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .character-card-name {
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .character-card-tag {
+            font-size: 0.68rem;
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,230,109,0.28);
+            background: rgba(255,230,109,0.08);
+            white-space: nowrap;
+        }
+
+        .character-card-meta {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            min-height: 34px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .character-card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .character-card-actions .btn {
+            font-size: 0.76rem;
+            padding: 8px 10px;
+        }
+
+        .character-card-actions .btn-character-insert {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(78,205,196,0.88), rgba(155,93,229,0.92));
+        }
+
+        .character-voice-status {
+            font-size: 0.74rem;
+            color: var(--text-dim);
+            text-align: center;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.18);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .character-voice-status.success {
+            color: #7ef7c7;
+            border-color: rgba(126,247,199,0.28);
+        }
+
+        .character-voice-status.warn {
+            color: #ffd36a;
+            border-color: rgba(255,211,106,0.28);
+        }
+
     </style>
 </head>
 <body data-build="ILS_BUILD_2026_04_20_B">
@@ -1000,6 +1099,17 @@
                     <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
                 </div>
 
+
+
+                <div class="panel-title">角色声纹预览</div>
+                <div class="character-voice-intro">
+                    这里预留了 10 个角色按钮位。你之后把角色称呼音频传上来后，可以直接在页面里试听，并一键把角色名插入文本。
+                </div>
+                <div class="character-voice-grid" id="characterVoiceGrid"></div>
+                <input type="file" id="characterAudioInput" accept="audio/*" style="display: none;">
+                <div id="characterVoiceStatus" class="character-voice-status">等待角色音频接入</div>
+
+
                 <div class="panel-title">演奏历史</div>
                 <div class="notes-display" id="historyDisplay" style="max-height: 120px;">
                     <span style="opacity: 0.5;">暂无记录</span>
@@ -1077,7 +1187,16 @@
                         { note: 'A4', durationMs: 170, velocity: 0.75, pauseMs: 30 },
                         { note: 'F5', durationMs: 220, velocity: 0.9 }
                     ]
-                }
+                },
+                '主角': { aliases: ['主角'], instrument: 'xylophone' },
+                '艾米': { aliases: ['艾米'], instrument: 'flute' },
+                '小艾米': { aliases: ['小艾米'], instrument: 'synth' },
+                '老艾米': { aliases: ['老艾米'], instrument: 'guitar' },
+                '角色6': { aliases: ['角色6'], instrument: 'trumpet' },
+                '角色7': { aliases: ['角色7'], instrument: 'piano' },
+                '角色8': { aliases: ['角色8'], instrument: 'xylophone' },
+                '角色9': { aliases: ['角色9'], instrument: 'flute' },
+                '角色10': { aliases: ['角色10'], instrument: 'synth' }
             }
         };
 
@@ -1123,6 +1242,160 @@
 
         function getCharacterMentionProfiles() {
             return JSON.parse(JSON.stringify(mentionMotifConfig.characterProfiles));
+        }
+
+        const characterVoiceSlotOrder = ['小牧', '主角', '艾米', '小艾米', '老艾米', '角色6', '角色7', '角色8', '角色9', '角色10'];
+        const characterVoiceProfiles = Object.fromEntries(characterVoiceSlotOrder.map((name, index) => {
+            const mentionProfile = mentionMotifConfig.characterProfiles[name] || {};
+            return [name, {
+                name,
+                instrument: mentionProfile.instrument || 'piano',
+                fileName: '',
+                audioBuffer: null,
+                audioArrayBuffer: null,
+                colorIndex: index,
+            }];
+        }));
+        let currentCharacterUploadTarget = null;
+
+        function setCharacterVoiceStatus(message, level = 'info') {
+            const status = document.getElementById('characterVoiceStatus');
+            if (!status) return;
+            status.className = `character-voice-status ${level === 'success' ? 'success' : level === 'warn' ? 'warn' : ''}`.trim();
+            status.textContent = message;
+        }
+
+        function syncCharacterVoiceProfilesToMentionConfig() {
+            for (const name of characterVoiceSlotOrder) {
+                if (!mentionMotifConfig.characterProfiles[name]) {
+                    mentionMotifConfig.characterProfiles[name] = {
+                        aliases: [name],
+                        instrument: characterVoiceProfiles[name]?.instrument || 'piano',
+                    };
+                }
+                mentionMotifConfig.characterProfiles[name].aliases = [name];
+                mentionMotifConfig.characterProfiles[name].instrument = characterVoiceProfiles[name]?.instrument || mentionMotifConfig.characterProfiles[name].instrument || 'piano';
+                mentionMotifConfig.characterProfiles[name].hasPreviewAudio = !!characterVoiceProfiles[name]?.audioArrayBuffer;
+                mentionMotifConfig.characterProfiles[name].previewFileName = characterVoiceProfiles[name]?.fileName || '';
+            }
+        }
+
+        function renderCharacterVoiceGrid() {
+            const grid = document.getElementById('characterVoiceGrid');
+            if (!grid) return;
+
+            grid.innerHTML = characterVoiceSlotOrder.map((name) => {
+                const profile = characterVoiceProfiles[name];
+                const fileLabel = profile.fileName ? `已接入：${profile.fileName}` : '未接入角色音频';
+                return `
+                    <div class="character-card" data-character-card="${name}">
+                        <div class="character-card-header">
+                            <div class="character-card-name">${name}</div>
+                            <span class="character-card-tag">${profile.instrument}</span>
+                        </div>
+                        <div class="character-card-meta">${fileLabel}<br>点击试听后，会播放这个角色的固定称呼音频。</div>
+                        <div class="character-card-actions">
+                            <button class="btn btn-secondary" data-character-action="upload" data-character-name="${name}">📁 上传音频</button>
+                            <button class="btn" data-character-action="preview" data-character-name="${name}">▶ 试听角色</button>
+                            <button class="btn btn-character-insert" data-character-action="insert" data-character-name="${name}">✍ 插入 @${name}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function ensureCharacterAudioDecoded(characterName) {
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile || profile.audioBuffer || !profile.audioArrayBuffer || !audioContext) return profile?.audioBuffer || null;
+            try {
+                profile.audioBuffer = await audioContext.decodeAudioData(profile.audioArrayBuffer.slice(0));
+                return profile.audioBuffer;
+            } catch (err) {
+                console.error('角色音频解码失败:', characterName, err);
+                setCharacterVoiceStatus(`${characterName} 音频解码失败：${err.message}`, 'warn');
+                return null;
+            }
+        }
+
+        function openCharacterAudioUpload(characterName) {
+            currentCharacterUploadTarget = characterName;
+            const input = document.getElementById('characterAudioInput');
+            if (!input) return;
+            input.value = '';
+            input.click();
+        }
+
+        async function handleCharacterAudioFileSelection(event) {
+            const file = event.target.files && event.target.files[0];
+            const characterName = currentCharacterUploadTarget;
+            if (!file || !characterName) return;
+
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile) return;
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                profile.fileName = file.name;
+                profile.audioArrayBuffer = arrayBuffer;
+                profile.audioBuffer = null;
+
+                if (audioContext) {
+                    await ensureCharacterAudioDecoded(characterName);
+                    setCharacterVoiceStatus(`${characterName} 音频已载入，可直接试听`, 'success');
+                } else {
+                    setCharacterVoiceStatus(`${characterName} 音频已缓存。启动音频引擎后可试听`, 'warn');
+                }
+
+                syncCharacterVoiceProfilesToMentionConfig();
+                renderCharacterVoiceGrid();
+            } catch (err) {
+                console.error('角色音频读取失败:', err);
+                setCharacterVoiceStatus(`读取音频失败：${err.message}`, 'warn');
+            }
+        }
+
+        async function previewCharacterVoice(characterName) {
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile) return;
+            if (!audioContext) {
+                setCharacterVoiceStatus(`请先启动音频引擎，再试听 ${characterName}`, 'warn');
+                return;
+            }
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            const buffer = await ensureCharacterAudioDecoded(characterName);
+            if (!buffer) {
+                setCharacterVoiceStatus(`${characterName} 还没有接入音频`, 'warn');
+                return;
+            }
+
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = Math.max(0.15, params.masterVolume * 0.9);
+            source.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+            source.start();
+            updateSpectrum();
+            setCharacterVoiceStatus(`正在试听 ${characterName}`, 'success');
+            source.onended = () => {
+                setCharacterVoiceStatus(`${characterName} 试听完成`, 'success');
+            };
+        }
+
+        function insertCharacterMention(characterName) {
+            const input = document.getElementById('textInput');
+            if (!input) return;
+            const mentionText = `@${characterName}`;
+            const currentValue = input.value || '';
+            const needsSpace = currentValue && !/\s$/.test(currentValue);
+            input.value = currentValue + (needsSpace ? ' ' : '') + mentionText;
+            input.focus();
+            setCharacterVoiceStatus(`已插入 ${mentionText} 到文本框`, 'success');
         }
 
         // 参数
@@ -4527,6 +4800,8 @@
                 playTone: typeof playTone
             });
             
+            syncCharacterVoiceProfilesToMentionConfig();
+            renderCharacterVoiceGrid();
             bindUIEvents();
             verifyCriticalBindings();
             console.log('🚀 页面初始化完成');
@@ -4544,6 +4819,8 @@
         window.selectEmotion = selectEmotion;
         window.closeEmotionPanel = closeEmotionPanel;
         window.clearEmotionFile = clearEmotionFile;
+        window.previewCharacterVoice = previewCharacterVoice;
+        window.insertCharacterMention = insertCharacterMention;
         window.setMentionMotifEnabled = setMentionMotifEnabled;
         window.setCharacterMentionProfiles = setCharacterMentionProfiles;
         window.getCharacterMentionProfiles = getCharacterMentionProfiles;
