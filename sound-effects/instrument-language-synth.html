@@ -1047,9 +1047,10 @@
         </div>
     </div>
 
+    <script src="mention-motif-core.js"></script>
     <script>
         // ===== BUILD MARKER =====
-        console.log('ILS_BUILD_MARKER_2026_04_20_B');
+        console.log('ILS_BUILD_MARKER_2026_04_21_MENTION_SAFE');
         console.log('SCRIPT_START');
         // 全局变量
         let audioContext;
@@ -1060,6 +1061,69 @@
         let currentInstrument = 'piano';
         let playQueue = [];
         let currentNoteIndex = 0;
+
+        // mention + motif 配置（安全接入版）
+        const mentionMotifConfig = {
+            enabled: true,
+            mentionPrefix: '@',
+            characterProfiles: {
+                '小牧': {
+                    aliases: ['小牧'],
+                    instrument: 'piano',
+                    insertPauseBeforeMs: 90,
+                    insertPauseAfterMs: 120,
+                    motifNotes: [
+                        { note: 'D5', durationMs: 180, velocity: 0.85, pauseMs: 40 },
+                        { note: 'A4', durationMs: 170, velocity: 0.75, pauseMs: 30 },
+                        { note: 'F5', durationMs: 220, velocity: 0.9 }
+                    ]
+                }
+            }
+        };
+
+        const mentionMotifNoteFrequencies = {
+            'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+            'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
+        };
+
+        function getMentionMotifCore() {
+            return window.MentionMotifCore || null;
+        }
+
+        function getMentionMotifHelpers() {
+            return {
+                noteNameToFrequency: mentionMotifNoteFrequencies,
+                mapToPentatonic: typeof mapToPentatonic === 'function' ? mapToPentatonic : null,
+                midiToFreq: typeof midiToFreq !== 'undefined' ? midiToFreq : {},
+                noteNumberToName: typeof noteNumberToName === 'function' ? noteNumberToName : null
+            };
+        }
+
+        function resolveEventInstrument(event) {
+            return event && event.instrumentOverride ? event.instrumentOverride : currentInstrument;
+        }
+
+        function setMentionMotifEnabled(enabled) {
+            mentionMotifConfig.enabled = !!enabled;
+            return mentionMotifConfig.enabled;
+        }
+
+        function setCharacterMentionProfiles(profiles, options = {}) {
+            const nextProfiles = profiles && typeof profiles === 'object' ? profiles : {};
+            if (options.merge) {
+                mentionMotifConfig.characterProfiles = {
+                    ...mentionMotifConfig.characterProfiles,
+                    ...nextProfiles
+                };
+            } else {
+                mentionMotifConfig.characterProfiles = { ...nextProfiles };
+            }
+            return JSON.parse(JSON.stringify(mentionMotifConfig.characterProfiles));
+        }
+
+        function getCharacterMentionProfiles() {
+            return JSON.parse(JSON.stringify(mentionMotifConfig.characterProfiles));
+        }
 
         // 参数
         const params = {
@@ -2411,18 +2475,50 @@
             return styles[emotion] || styles.calm;
         }
 
-        // 文本转音符序列（统一事件模型：note + pause）
-        function textToNotes(text) {
+        function applyPauseModifiers(events) {
+            for (let i = 0; i < events.length; i++) {
+                const evt = events[i];
+                if (!evt || evt.type !== 'pause') continue;
+
+                let prevNoteIdx = -1;
+                for (let j = i - 1; j >= 0; j--) {
+                    if (events[j] && events[j].type === 'note') {
+                        prevNoteIdx = j;
+                        break;
+                    }
+                }
+
+                let nextNoteIdx = -1;
+                for (let j = i + 1; j < events.length; j++) {
+                    if (events[j] && events[j].type === 'note') {
+                        nextNoteIdx = j;
+                        break;
+                    }
+                }
+
+                if (prevNoteIdx >= 0 && typeof evt.preNoteMultiplier === 'number') {
+                    events[prevNoteIdx].durationMultiplier = evt.preNoteMultiplier;
+                }
+
+                if (nextNoteIdx >= 0 && typeof evt.nextNoteVelocityMultiplier === 'number') {
+                    events[nextNoteIdx].velocityMultiplier = evt.nextNoteVelocityMultiplier;
+                }
+            }
+            return events;
+        }
+
+        function textSegmentToEvents(text, charIndexOffset = 0) {
             const tokens = tokenizeText(text);
             const events = [];
             const bpm = params.bpm || 120;
-            
-            // 第一遍：生成基础 note 和 pause 事件
+            let localCharIndex = 0;
+
             for (let i = 0; i < tokens.length; i++) {
                 const token = tokens[i];
-                
+
                 if (token.type === 'char') {
-                    const note = charToNote(token.char, i);
+                    const note = charToNote(token.char, charIndexOffset + localCharIndex);
+                    localCharIndex += 1;
                     if (note) {
                         events.push({ type: 'note', ...note });
                     }
@@ -2442,53 +2538,41 @@
                     }
                 }
             }
-            
-            // 第二遍：应用前后音修饰
-            // 找到所有有效音符的索引
-            const noteIndices = [];
-            for (let i = 0; i < events.length; i++) {
-                if (events[i].type === 'note') {
-                    noteIndices.push(i);
+
+            return applyPauseModifiers(events).filter(e => e !== null && e !== undefined && typeof e === 'object');
+        }
+
+        // 文本转音符序列（统一事件模型：note + pause + mention motif）
+        function textToNotes(text) {
+            const sourceText = typeof text === 'string' ? text : '';
+            const core = getMentionMotifCore();
+
+            if (!core || !mentionMotifConfig.enabled) {
+                return textSegmentToEvents(sourceText, 0);
+            }
+
+            const segments = core.splitTextWithMentions(sourceText, mentionMotifConfig);
+            if (!segments.length) {
+                return textSegmentToEvents(sourceText, 0);
+            }
+
+            const events = [];
+            let charIndexOffset = 0;
+            for (const segment of segments) {
+                if (segment.type === 'text') {
+                    events.push(...textSegmentToEvents(segment.text, charIndexOffset));
+                    charIndexOffset += (segment.text || '').length;
+                    continue;
+                }
+
+                if (segment.type === 'mention') {
+                    const motifEvents = core.convertMentionProfileToEvents(segment.character, segment.profile, getMentionMotifHelpers());
+                    events.push(...motifEvents);
+                    charIndexOffset += (segment.raw || segment.text || '').length;
                 }
             }
-            
-            // 处理每个 pause 事件的前后修饰
-            for (let i = 0; i < events.length; i++) {
-                const evt = events[i];
-                if (evt.type !== 'pause') continue;
-                
-                // 找到前一个有效音符
-                let prevNoteIdx = -1;
-                for (let j = i - 1; j >= 0; j--) {
-                    if (events[j].type === 'note') {
-                        prevNoteIdx = j;
-                        break;
-                    }
-                }
-                
-                // 找到后一个有效音符
-                let nextNoteIdx = -1;
-                for (let j = i + 1; j < events.length; j++) {
-                    if (events[j].type === 'note') {
-                        nextNoteIdx = j;
-                        break;
-                    }
-                }
-                
-                // 前一个音延长（如果存在）
-                if (prevNoteIdx >= 0) {
-                    events[prevNoteIdx].durationMultiplier = evt.preNoteMultiplier;
-                }
-                
-                // 后一个音轻起（如果存在）
-                if (nextNoteIdx >= 0) {
-                    events[nextNoteIdx].velocityMultiplier = evt.nextNoteVelocityMultiplier;
-                }
-            }
-            
-            // 过滤掉任何 null 或 undefined 值
-            const validEvents = events.filter(e => e !== null && e !== undefined && typeof e === 'object');
-            return validEvents;
+
+            return events.filter(e => e !== null && e !== undefined && typeof e === 'object');
         }
 
         // 常用汉字声调映射表（简化版 - 高频字）
@@ -2674,13 +2758,14 @@
         }
 
         // 使用真实采样播放音符
-        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5) {
+        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5, instrumentOverride = null) {
             if (!audioContext) return;
             
-            // 根据当前乐器选择配置
-            const config = sampleConfig[currentInstrument];
+            const activeInstrument = instrumentOverride || currentInstrument;
+            // 根据事件乐器选择配置
+            const config = sampleConfig[activeInstrument];
             if (!config) {
-                console.warn('No sample config for instrument:', currentInstrument);
+                console.warn('No sample config for instrument:', activeInstrument);
                 return;
             }
             
@@ -2703,7 +2788,7 @@
             }
             
             const sampleNote = freqToSampleNote[nearestFreq];
-            const bufferKey = currentInstrument === 'piano' ? sampleNote : currentInstrument + '_' + sampleNote;
+            const bufferKey = activeInstrument === 'piano' ? sampleNote : activeInstrument + '_' + sampleNote;
             const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
@@ -2725,7 +2810,7 @@
             const safeVelocity = (typeof velocity === 'number' && isFinite(velocity)) ? velocity : 0.5;
             const finalVelocity = safeVelocity * baseGain;
             
-            console.log(`Playing ${currentInstrument} ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
+            console.log(`Playing ${activeInstrument} ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
             
             // 增益节点
             const gainNode = audioContext.createGain();
@@ -2779,7 +2864,7 @@
             }
             
             // 播放 - 使用当前乐器的音频偏移设置（毫秒转秒）
-            const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
+            const offsetMs = params.instrumentOffsets[activeInstrument] || 0;
             const startOffsetSec = offsetMs / 1000;
             source.start(now, startOffsetSec);
             source.stop(now + duration + 0.5);
@@ -2790,14 +2875,26 @@
             return { source, gainNode };
         }
 
+        function getSynthWaveform(instrument) {
+            const waveforms = {
+                guitar: 'sawtooth',
+                xylophone: 'triangle',
+                trumpet: 'square',
+                synth: 'sawtooth',
+                train: 'square'
+            };
+            return waveforms[instrument] || 'triangle';
+        }
+
         // 合成器音色（其他乐器用）
-        function playSynthTone(frequency, duration, velocity = 0.5) {
+        function playSynthTone(frequency, duration, velocity = 0.5, instrumentOverride = null) {
             if (!audioContext) return;
             
+            const activeInstrument = instrumentOverride || currentInstrument;
             const osc = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
-            osc.type = 'triangle';
+            osc.type = getSynthWaveform(activeInstrument);
             osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
             
             const now = audioContext.currentTime;
@@ -2815,28 +2912,25 @@
             updateSpectrum();
         }
 
-        // 演奏单个音符（根据当前乐器选择播放方式）
-        function playTone(frequency, noteName, duration, velocity = 0.5) {
-            // 检查当前乐器是否有采样可用
-            const hasSamples = hasInstrumentSamples(currentInstrument);
-            
-            // 木琴是混合模式：检查是否有该具体音符的采样
-            if (currentInstrument === 'xylophone') {
+        // 演奏单个音符（根据事件乐器上下文选择播放方式）
+        function playTone(frequency, noteName, duration, velocity = 0.5, instrumentOverride = null) {
+            const activeInstrument = instrumentOverride || currentInstrument;
+            const hasSamples = hasInstrumentSamples(activeInstrument);
+
+            if (activeInstrument === 'xylophone') {
                 const config = sampleConfig.xylophone;
                 const sampleInfo = config.samples[noteName];
-                // 如果有真实采样文件且已加载，使用采样
                 if (sampleInfo && sampleInfo.file && audioBuffers['xylophone_' + noteName]) {
-                    return playSampleTone(frequency, noteName, duration / 1000, velocity);
+                    return playSampleTone(frequency, noteName, duration / 1000, velocity, activeInstrument);
                 }
-                // 否则使用合成
-                return playSynthTone(frequency, duration / 1000, velocity);
+                return playSynthTone(frequency, duration / 1000, velocity, activeInstrument);
             }
-            
+
             if (hasSamples) {
-                return playSampleTone(frequency, noteName, duration / 1000, velocity);
-            } else {
-                return playSynthTone(frequency, duration / 1000, velocity);
+                return playSampleTone(frequency, noteName, duration / 1000, velocity, activeInstrument);
             }
+
+            return playSynthTone(frequency, duration / 1000, velocity, activeInstrument);
         }
 
         // 演奏带滑音的音符（声调效果）
@@ -3126,10 +3220,16 @@
                         continue;
                     }
                     
-                    // 如果普通音符无法播放（采样未加载），跳过
-                    if (!canPlayNormalNotes) {
+                    // 如果普通音符无法播放（采样未加载），旧逻辑会跳过。
+                    // mention motif 允许走局部回退（例如临时转合成器），避免整段被吞。
+                    const eventInstrument = resolveEventInstrument(note);
+                    const canPlayEventNormally = hasInstrumentSamples(eventInstrument) || eventInstrument === 'guitar' || eventInstrument === 'trumpet';
+                    if (!canPlayNormalNotes && !note.isMentionMotif) {
                         console.log(`第 ${i+1} 个是普通音符，但采样未加载，跳过`);
                         continue;
+                    }
+                    if (!canPlayEventNormally && note.isMentionMotif) {
+                        console.log(`第 ${i+1} 个是 mention motif，目标乐器 ${eventInstrument} 采样未加载，回退为合成器播放`);
                     }
                     
                     // 休止符处理（兼容旧数据）
@@ -3183,8 +3283,8 @@
                     
                     console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 声调=${note.tone}, 时值=${noteValue.name}, 时长=${noteDuration.toFixed(0)}ms`);
                     
-                    // 播放单音（使用节奏引擎计算的时长）
-                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
+                    // 播放单音（支持 mention motif 的局部乐器覆盖）
+                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster, eventInstrument);
                     
                     // 高亮当前事件（使用真实事件索引 i）
                     highlightNote(i);
@@ -3256,6 +3356,8 @@
                 
                 if (n.isChord) {
                     displayText = '🎵Chord';
+                } else if (n.isMentionMotif) {
+                    displayText = `✦${n.note}`;
                 } else if (n.isRest) {
                     displayText = '休';
                 } else {
@@ -3266,7 +3368,8 @@
                 }
                 
                 const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}"
+                const motifInfo = n.isMentionMotif ? ` motif:${n.motifCharacter || 'unknown'} instrument:${n.instrumentOverride || currentInstrument}` : '';
+                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}${motifInfo}"
                     style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px;">
                     <span style="font-size: 0.9rem;">${displayText}</span>
                     <span style="font-size: 0.6rem; opacity: 0.7;">${rhythmInfo}</span>
@@ -3996,19 +4099,20 @@
                 const noteDuration = timing.duration / 1000;
                 const velocity = timing.velocity;
                 
-                // 乐器分支判断（与实时播放一致）
-                const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
-                const hasSample = note.sampleNote && samplesLoaded;
+                // 乐器分支判断（支持事件级乐器覆盖）
+                const eventInstrument = resolveEventInstrument(note);
+                const isPiano = eventInstrument === 'piano';
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(eventInstrument);
+                const hasSample = note.sampleNote && hasInstrumentSamples(eventInstrument);
                 
                 if (note.isChord && chordsLoaded) {
                     await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, velocity);
                     chordNotesRendered++;
                 } else if ((isPiano || isSampleInstrument) && hasSample) {
-                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, eventInstrument);
                     sampleNotesRendered++;
                 } else {
-                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
+                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, eventInstrument);
                     synthNotesRendered++;
                 }
                 
@@ -4029,8 +4133,9 @@
         }
         
         // 渲染采样到 buffer（与实时播放 playSampleTone() 严格对齐）
-        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
-            const bufferKey = getSampleBufferKey(currentInstrument, note.sampleNote);
+        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, instrumentOverride = null) {
+            const activeInstrument = instrumentOverride || currentInstrument;
+            const bufferKey = getSampleBufferKey(activeInstrument, note.sampleNote);
             const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
@@ -4042,7 +4147,7 @@
             source.buffer = buffer;
             
             // ===== 播放速率：与实时一致 =====
-            const sampleConfig_obj = sampleConfig[currentInstrument];
+            const sampleConfig_obj = sampleConfig[activeInstrument];
             const sampleInfo = sampleConfig_obj ? sampleConfig_obj.samples[note.sampleNote] : null;
             if (sampleInfo && note.frequency !== sampleInfo.freq) {
                 source.playbackRate.value = note.frequency / sampleInfo.freq;
@@ -4060,7 +4165,7 @@
             const gainNode = offlineContext.createGain();
             
             // ===== 包络：与 playSampleTone() 严格对齐 =====
-            const config = sampleConfig[currentInstrument];
+            const config = sampleConfig[activeInstrument];
             const attackTime = Math.min(config.attack || 0.005, Math.max(0.001, duration * 0.2));
             const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
             const decayTime = Math.max(duration * 0.6, 0.05);
@@ -4100,7 +4205,7 @@
             gainNode.connect(destination);
             
             // ===== 采样起点：应用 instrument offset =====
-            const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
+            const offsetMs = params.instrumentOffsets[activeInstrument] || 0;
             const startOffsetSec = offsetMs / 1000;
             
             // ===== stop 尾部余量：与实时一致 =====
@@ -4109,18 +4214,12 @@
         }
         
         // 渲染合成音色到 buffer
-        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
+        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, instrumentOverride = null) {
+            const activeInstrument = instrumentOverride || currentInstrument;
             const oscillator = offlineContext.createOscillator();
             const gainNode = offlineContext.createGain();
             
-            // 根据乐器选择波形
-            const waveforms = {
-                'guitar': 'sawtooth',
-                'xylophone': 'triangle',
-                'trumpet': 'square',
-                'synth': 'sawtooth'
-            };
-            oscillator.type = waveforms[currentInstrument] || 'sine';
+            oscillator.type = getSynthWaveform(activeInstrument) || 'sine';
             oscillator.frequency.value = note.frequency;
             
             // 包络（与实时版本一致）
@@ -4445,6 +4544,9 @@
         window.selectEmotion = selectEmotion;
         window.closeEmotionPanel = closeEmotionPanel;
         window.clearEmotionFile = clearEmotionFile;
+        window.setMentionMotifEnabled = setMentionMotifEnabled;
+        window.setCharacterMentionProfiles = setCharacterMentionProfiles;
+        window.getCharacterMentionProfiles = getCharacterMentionProfiles;
         
         // SCRIPT_END
         console.log('SCRIPT_END');
