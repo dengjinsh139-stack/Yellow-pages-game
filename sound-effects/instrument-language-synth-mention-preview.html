@@ -881,9 +881,9 @@
                         <span>🎵 和弦长度</span>
                         <span class="control-value" id="chordDurationValue">完整</span>
                     </div>
-                    <input type="range" id="chordDuration" min="0" max="100" value="100" oninput="updateParams()">
+                    <input type="range" id="chordDuration" min="0" max="4" step="1" value="4" oninput="updateParams()">
                     <div style="margin-top: 4px; font-size: 0.7rem; color: var(--text-dim);">
-                        0%=静音 50%=半长 100%=完整
+                        0=静音 1=很短 2=半长 3=大半 4=完整
                     </div>
                 </div>
 
@@ -1408,6 +1408,33 @@
                 4: '16'         // 四声 = 16分音符（默认值，避免过短）
             }
         };
+
+        const chordDurationPresets = [
+            { slider: 0, label: '静音', ratio: 0.0 },
+            { slider: 1, label: '很短', ratio: 0.18 },
+            { slider: 2, label: '半长', ratio: 0.38 },
+            { slider: 3, label: '大半', ratio: 0.65 },
+            { slider: 4, label: '完整', ratio: 1.0 }
+        ];
+
+        function getChordDurationPresetFromSliderValue(value) {
+            const slider = Math.max(0, Math.min(4, parseInt(value ?? 4, 10) || 0));
+            return chordDurationPresets.find(item => item.slider === slider) || chordDurationPresets[4];
+        }
+
+        function getClosestChordDurationPresetFromRatio(ratio) {
+            const safeRatio = Math.max(0, Math.min(1, typeof ratio === 'number' ? ratio : 1));
+            let best = chordDurationPresets[0];
+            let bestDiff = Infinity;
+            for (const preset of chordDurationPresets) {
+                const diff = Math.abs(preset.ratio - safeRatio);
+                if (diff < bestDiff) {
+                    best = preset;
+                    bestDiff = diff;
+                }
+            }
+            return best;
+        }
 
         // 乐器默认参数配置
         const instrumentDefaults = {
@@ -2208,7 +2235,7 @@
             params.tempoRandom = defaults.tempoRandom;
             params.noteDuration = defaults.noteDuration;
             params.reverb = defaults.reverb / 100; // 转换为 0-1 范围
-            params.chordDuration = defaults.chordDuration / 100; // 转换为 0-1 范围
+            params.chordDuration = getClosestChordDurationPresetFromRatio(defaults.chordDuration / 100).ratio; // 离散5挡
             params.bpm = defaults.bpm;
             params.notesPerBeat = defaults.notesPerBeat;
             params.rhythmRandom = defaults.rhythmRandom;
@@ -2221,7 +2248,7 @@
             document.getElementById('tempoRandom').checked = defaults.tempoRandom;
             document.getElementById('noteDuration').value = defaults.noteDuration;
             document.getElementById('reverb').value = defaults.reverb;
-            document.getElementById('chordDuration').value = defaults.chordDuration;
+            document.getElementById('chordDuration').value = getClosestChordDurationPresetFromRatio(defaults.chordDuration / 100).slider;
             document.getElementById('bpm').value = defaults.bpm;
             document.getElementById('notesPerBeat').value = defaults.notesPerBeat;
             document.getElementById('rhythmRandom').checked = defaults.rhythmRandom;
@@ -2599,7 +2626,9 @@
             params.masterVolume = parseInt(document.getElementById('masterVolume').value) / 100;
             params.noteDuration = parseInt(document.getElementById('noteDuration').value);
             params.reverb = parseInt(document.getElementById('reverb').value) / 100;
-            params.chordDuration = parseInt(document.getElementById('chordDuration').value) / 100;
+            const chordDurationSliderValue = parseInt(document.getElementById('chordDuration').value, 10);
+            const chordDurationPreset = getChordDurationPresetFromSliderValue(chordDurationSliderValue);
+            params.chordDuration = chordDurationPreset.ratio;
 
             // 确保 tempoMin <= tempoMax
             if (params.tempoMin > params.tempoMax) {
@@ -2642,14 +2671,8 @@
             
             document.getElementById('reverbValue').textContent = Math.round(params.reverb * 100) + '%';
             
-            // 更新和弦长度显示
-            let chordLabel = '完整';
-            if (params.chordDuration === 0) chordLabel = '静音';
-            else if (params.chordDuration <= 0.3) chordLabel = '很短';
-            else if (params.chordDuration <= 0.5) chordLabel = '半长';
-            else if (params.chordDuration <= 0.8) chordLabel = '大半';
-            else chordLabel = '完整';
-            document.getElementById('chordDurationValue').textContent = chordLabel;
+            // 更新和弦长度显示（真正5挡）
+            document.getElementById('chordDurationValue').textContent = chordDurationPreset.label;
             
             // ===== 节奏引擎参数 =====
             params.bpm = parseInt(document.getElementById('bpm').value);
@@ -4123,11 +4146,16 @@
             if (params.chordDuration <= 0) {
                 return null; // 静音
             }
-            const actualDuration = baseDuration * params.chordDuration;
+
+            const actualDuration = Math.max(0, baseDuration * params.chordDuration);
             if (actualDuration <= 0) {
                 return null; // 静音
             }
-            const fadeOutTime = 0.1;
+
+            // 让短挡位和长挡位的听感差异更明显：
+            // - 短挡位更快收尾
+            // - 长挡位保留更长主体并给少量尾音
+            const fadeOutTime = Math.max(0.04, Math.min(0.16, actualDuration * 0.22));
             const fadeStart = Math.max(0, actualDuration - fadeOutTime);
             return { actualDuration, fadeOutTime, fadeStart };
         }
