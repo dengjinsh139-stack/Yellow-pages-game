@@ -1170,7 +1170,7 @@
             characterProfiles: {
                 '小牧': {
                     aliases: ['小牧'],
-                    instrument: 'piano',
+                    instrument: 'xylophone',
                     insertPauseBeforeMs: 90,
                     insertPauseAfterMs: 120,
                     motifNotes: [
@@ -1180,10 +1180,10 @@
                     ]
                 },
                 '主角': { aliases: ['主角'], instrument: 'xylophone' },
-                '艾米': { aliases: ['艾米'], instrument: 'flute' },
+                '艾米': { aliases: ['艾米'], instrument: 'piano' },
                 '小艾米': { aliases: ['小艾米'], instrument: 'synth' },
                 '老艾米': { aliases: ['老艾米'], instrument: 'guitar' },
-                '角色6': { aliases: ['角色6'], instrument: 'trumpet' },
+                '芙洛芙': { aliases: ['芙洛芙'], instrument: 'flute' },
                 '角色7': { aliases: ['角色7'], instrument: 'piano' },
                 '角色8': { aliases: ['角色8'], instrument: 'xylophone' },
                 '角色9': { aliases: ['角色9'], instrument: 'flute' },
@@ -1235,7 +1235,7 @@
             return JSON.parse(JSON.stringify(mentionMotifConfig.characterProfiles));
         }
 
-        const characterVoiceSlotOrder = ['小牧', '主角', '艾米', '小艾米', '老艾米', '角色6', '角色7', '角色8', '角色9', '角色10'];
+        const characterVoiceSlotOrder = ['小牧', '主角', '艾米', '小艾米', '老艾米', '芙洛芙', '角色7', '角色8', '角色9', '角色10'];
         const characterVoiceProfiles = Object.fromEntries(characterVoiceSlotOrder.map((name, index) => {
             const mentionProfile = mentionMotifConfig.characterProfiles[name] || {};
             return [name, {
