@@ -1030,7 +1030,7 @@
                 <h3>🎵 五声音阶音素映射</h3>
                 <ul>
                     <li>使用中国传统五声音阶（宫商角徵羽）</li>
-                    <li>对应音符：D(1)、E(2)、G(3)、A(5)、B(6)</li>
+                    <li>对应音符：D(1)、E(2)、F(3)、A(5)、B(6)</li>
                     <li>不含半音，旋律更加和谐流畅</li>
                     <li>适合中国风格的音乐表达</li>
                 </ul>
@@ -1104,8 +1104,8 @@
         };
 
         const mentionMotifNoteFrequencies = {
-            'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
-            'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
+            'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'A4': 440.00, 'B4': 493.88,
+            'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'A5': 880.00, 'B5': 987.77
         };
 
         function getMentionMotifCore() {
@@ -2628,16 +2628,16 @@
         function getToneRegion(tone) {
             // 音高区域映射 - 区间内随机选择
             // 一声（阴平）：D4→F4 范围（D4, E4, F4）
-            // 二声（阳平）：F4→B4 范围（F4, G4, A4, B4）
+            // 二声（阳平）：F4→B4 范围（F4, A4, B4）
             // 三声（上声）：D5→F5 范围（D5, E5, F5）
-            // 四声（去声）：F5→B5 范围（F5, G5, A5, B5）
+            // 四声（去声）：F5→B5 范围（F5, A5, B5）
             // 轻声：延续前音或休止
             const regions = {
                 0: { notes: ['rest'], rest: true },                    // 轻声 - 休止
                 1: { notes: ['D4', 'E4', 'F4'], rest: false },         // 阴平 - D4到F4随机
-                2: { notes: ['F4', 'G4', 'A4', 'B4'], rest: false },   // 阳平 - F4到B4随机
+                2: { notes: ['F4', 'A4', 'B4'], rest: false },         // 阳平 - F4/A4/B4随机
                 3: { notes: ['D5', 'E5', 'F5'], rest: false },         // 上声 - D5到F5随机
-                4: { notes: ['F5', 'G5', 'A5', 'B5'], rest: false }    // 去声 - F5到B5随机
+                4: { notes: ['F5', 'A5', 'B5'], rest: false }          // 去声 - F5/A5/B5随机
             };
             return regions[tone] || regions[1];
         }
@@ -2657,8 +2657,8 @@
         function charToNote(char, index) {
             // 五声音阶频率表
             const pentatonicFreqs = {
-                'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
-                'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
+                'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'A4': 440.00, 'B4': 493.88,
+                'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'A5': 880.00, 'B5': 987.77
             };
             
             // 非中文字符使用原来的映射
@@ -2704,7 +2704,7 @@
 
         // 原有字符映射（非中文用）
         function charToNoteLegacy(char, index, pentatonicFreqs) {
-            const pentatonicNotes = ['D', 'E', 'G', 'A', 'B'];
+            const pentatonicNotes = ['D', 'E', 'F', 'A', 'B'];
             
             let noteIndex = 0;
             let octave = 4;
@@ -3527,19 +3527,19 @@
         const midiToFreq = {
             62: 293.66,  // D4
             64: 329.63,  // E4
-            67: 392.00,  // G4
+            65: 349.23,  // F4
             69: 440.00,  // A4
             71: 493.88,  // B4
             74: 587.33,  // D5
             76: 659.25,  // E5
-            79: 783.99,  // G5
+            77: 698.46,  // F5
             81: 880.00,  // A5
             83: 987.77   // B5
         };
 
         // 将任意 MIDI 音符映射到最近的五声音阶音符
         function mapToPentatonic(midiNote) {
-            const pentatonicNotes = [62, 64, 67, 69, 71, 74, 76, 79, 81, 83]; // D4-B5
+            const pentatonicNotes = [62, 64, 65, 69, 71, 74, 76, 77, 81, 83]; // D4 E4 F4 A4 B4 D5 E5 F5 A5 B5
             let nearest = pentatonicNotes[0];
             let minDiff = Math.abs(midiNote - nearest);
             
@@ -3776,8 +3776,8 @@
         // MIDI 音符编号转音符名称
         function noteNumberToName(noteNumber) {
             const names = {
-                62: 'D4', 64: 'E4', 67: 'G4', 69: 'A4', 71: 'B4',
-                74: 'D5', 76: 'E5', 79: 'G5', 81: 'A5', 83: 'B5'
+                62: 'D4', 64: 'E4', 65: 'F4', 69: 'A4', 71: 'B4',
+                74: 'D5', 76: 'E5', 77: 'F5', 81: 'A5', 83: 'B5'
             };
             return names[noteNumber] || 'A4';
         }
