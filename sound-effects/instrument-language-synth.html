@@ -694,7 +694,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v3.6.31 · 10键对齐版</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v3.6.32 · 10键对齐版</p>
         </header>
 
         <div class="main-panel">
@@ -3839,21 +3839,25 @@
             if (exportStatus) exportStatus.textContent = '正在准备音频渲染...';
             
             try {
-                console.log('🎵 [EXPORT] Step 1: Calculating duration...');
-                const duration = await calculateAudioDuration(text);
-                console.log(`🎵 [EXPORT] Step 1 done: duration=${duration.toFixed(2)}s`);
+                console.log('🎵 [EXPORT] Step 1: Generating events...');
+                const events = textToNotes(text);
+                console.log(`🎵 [EXPORT] Step 1 done: ${events.length} events`);
                 
-                console.log('🎵 [EXPORT] Step 2: Creating OfflineAudioContext...');
+                console.log('🎵 [EXPORT] Step 2: Calculating duration...');
+                const duration = await calculateAudioDuration(events);
+                console.log(`🎵 [EXPORT] Step 2 done: duration=${duration.toFixed(2)}s`);
+                
+                console.log('🎵 [EXPORT] Step 3: Creating OfflineAudioContext...');
                 const offlineContext = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
                     2, Math.ceil(duration * sampleRate), sampleRate
                 );
-                console.log('🎵 [EXPORT] Step 2 done');
+                console.log('🎵 [EXPORT] Step 3 done');
                 
                 if (exportStatus) exportStatus.textContent = `正在渲染音频 (${Math.ceil(duration)}秒)...`;
                 
-                console.log('🎵 [EXPORT] Step 3: Rendering audio to buffer...');
-                const renderedBuffer = await renderAudioToBuffer(text, offlineContext);
-                console.log(`🎵 [EXPORT] Step 3 done: renderedBuffer=${renderedBuffer ? 'ok' : 'null'}, channels=${renderedBuffer?.numberOfChannels}, duration=${renderedBuffer?.duration}`);
+                console.log('🎵 [EXPORT] Step 4: Rendering audio to buffer...');
+                const renderedBuffer = await renderAudioToBuffer(events, offlineContext);
+                console.log(`🎵 [EXPORT] Step 4 done: renderedBuffer=${renderedBuffer ? 'ok' : 'null'}, channels=${renderedBuffer?.numberOfChannels}, duration=${renderedBuffer?.duration}`);
                 
                 if (!renderedBuffer) {
                     console.error('❌ [EXPORT] renderAudioToBuffer returned null/undefined');
@@ -3905,8 +3909,7 @@
         }
         
         // 计算音频总时长
-        async function calculateAudioDuration(text) {
-            const events = textToNotes(text);
+        async function calculateAudioDuration(events) {
             let totalTime = 0.5; // 起始偏移
             const beatDuration = 60000 / params.bpm;
             
@@ -3997,14 +4000,13 @@
         }
 
         // 渲染音频到 AudioBuffer（统一事件模型 + 统一节奏引擎）
-        async function renderAudioToBuffer(text, offlineContext) {
+        async function renderAudioToBuffer(events, offlineContext) {
             console.log('🎵 [RENDER] renderAudioToBuffer() called');
             
-            const events = textToNotes(text);
-            console.log(`🎵 [RENDER] events generated: ${events.length} events`);
+            console.log(`🎵 [RENDER] events count: ${events.length}`);
             
             if (events.length === 0) {
-                console.warn('⚠️ [RENDER] No events generated from text');
+                console.warn('⚠️ [RENDER] No events to render');
                 throw new Error('无法从文本生成音符事件');
             }
             
