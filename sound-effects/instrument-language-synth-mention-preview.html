@@ -2902,6 +2902,8 @@
                     const audioEvent = buildCharacterAudioEvent(segment.character);
                     if (audioEvent) {
                         events.push(audioEvent);
+                        charIndexOffset += (segment.raw || segment.text || '').length;
+                        continue;
                     }
                     const motifEvents = core.convertMentionProfileToEvents(segment.character, segment.profile, getMentionMotifHelpers());
                     events.push(...motifEvents);
