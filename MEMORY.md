@@ -44,10 +44,11 @@
 
 ### 版本号管理约定
 **统一版本号来源**：`nav-config.js` 中的 `APP_VERSION`，由 `pre-commit hook` 自动管理。
-- **不要**在 HTML 中写死版本号
-- 新页面需要动态读取：`script src="../nav-config.js"`，然后 JS 替换 DOM 中的版本号
+- **不要**在 HTML 中写死版本号（页面加载后 JS 会用 `APP_VERSION` 自动覆盖显示）
+- 只改 `nav-config.js` 中的版本号，不要改 HTML 源码里的版本文字
+- 新页面需要：`script src="../nav-config.js"`，然后 JS 用 `APP_VERSION` 替换 DOM
 - Hook 规则：PATCH >= 40 时 MINOR + 1, PATCH = 0
-- 手动改版本号时同步改 `nav-config.js`
+- 推送前检查：`grep APP_VERSION nav-config.js` 确认是当前版本
 
 ---
 *Last updated: 2026-04-22 17:56*
