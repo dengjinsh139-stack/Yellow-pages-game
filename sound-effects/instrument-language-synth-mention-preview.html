@@ -1235,13 +1235,21 @@
             return JSON.parse(JSON.stringify(mentionMotifConfig.characterProfiles));
         }
 
+        const defaultCharacterVoiceAssets = {
+            '小牧': { fileName: 'xiaomu.mp3', assetPath: '../assets/audio/character-voices/xiaomu.mp3' },
+            '艾米': { fileName: 'amy.mp3', assetPath: '../assets/audio/character-voices/amy.mp3' },
+            '芙洛芙': { fileName: 'fuluofu.mp3', assetPath: '../assets/audio/character-voices/fuluofu.mp3' },
+        };
+
         const characterVoiceSlotOrder = ['小牧', '主角', '艾米', '小艾米', '老艾米', '芙洛芙', '角色7', '角色8', '角色9', '角色10'];
         const characterVoiceProfiles = Object.fromEntries(characterVoiceSlotOrder.map((name, index) => {
             const mentionProfile = mentionMotifConfig.characterProfiles[name] || {};
+            const defaultAsset = defaultCharacterVoiceAssets[name] || {};
             return [name, {
                 name,
                 instrument: mentionProfile.instrument || 'piano',
-                fileName: '',
+                fileName: defaultAsset.fileName || '',
+                assetPath: defaultAsset.assetPath || '',
                 audioBuffer: null,
                 audioArrayBuffer: null,
                 colorIndex: index,
@@ -1268,7 +1276,53 @@
                 mentionMotifConfig.characterProfiles[name].instrument = characterVoiceProfiles[name]?.instrument || mentionMotifConfig.characterProfiles[name].instrument || 'piano';
                 mentionMotifConfig.characterProfiles[name].hasPreviewAudio = !!characterVoiceProfiles[name]?.audioArrayBuffer;
                 mentionMotifConfig.characterProfiles[name].previewFileName = characterVoiceProfiles[name]?.fileName || '';
+                mentionMotifConfig.characterProfiles[name].previewAudioPath = characterVoiceProfiles[name]?.assetPath || '';
             }
+        }
+
+        async function ensureCharacterAudioLoaded(characterName) {
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile) return null;
+            if (profile.audioArrayBuffer) return profile.audioArrayBuffer;
+            if (!profile.assetPath) return null;
+
+            try {
+                const response = await fetch(profile.assetPath);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                profile.audioArrayBuffer = await response.arrayBuffer();
+                if (!profile.fileName) {
+                    profile.fileName = profile.assetPath.split('/').pop() || `${characterName}.mp3`;
+                }
+                syncCharacterVoiceProfilesToMentionConfig();
+                renderCharacterVoiceGrid();
+                return profile.audioArrayBuffer;
+            } catch (err) {
+                console.error('角色默认音频加载失败:', characterName, err);
+                return null;
+            }
+        }
+
+        async function loadDefaultCharacterVoiceAssets() {
+            const loadedNames = [];
+            for (const name of Object.keys(defaultCharacterVoiceAssets)) {
+                const loaded = await ensureCharacterAudioLoaded(name);
+                if (loaded) loadedNames.push(name);
+            }
+            if (loadedNames.length > 0) {
+                setCharacterVoiceStatus(`已接入角色音频：${loadedNames.join('、')}`, 'success');
+            }
+        }
+
+        function buildCharacterAudioEvent(characterName) {
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile || (!profile.audioArrayBuffer && !profile.assetPath)) return null;
+            return {
+                type: 'characterAudio',
+                characterName,
+                isMentionMotif: true,
+                motifCharacter: characterName,
+                instrumentOverride: profile.instrument || null,
+            };
         }
 
         function renderCharacterVoiceGrid() {
@@ -1357,12 +1411,16 @@
 
             const buffer = await ensureCharacterAudioDecoded(characterName);
             if (!buffer) {
+                await ensureCharacterAudioLoaded(characterName);
+            }
+            const readyBuffer = await ensureCharacterAudioDecoded(characterName);
+            if (!readyBuffer) {
                 setCharacterVoiceStatus(`${characterName} 还没有接入音频`, 'warn');
                 return;
             }
 
             const source = audioContext.createBufferSource();
-            source.buffer = buffer;
+            source.buffer = readyBuffer;
             const gainNode = audioContext.createGain();
             gainNode.gain.value = Math.max(0.15, params.masterVolume * 0.9);
             source.connect(gainNode);
@@ -2072,6 +2130,7 @@
                 // 加载采样
                 document.getElementById('statusText').textContent = '加载采样中...';
                 await loadSamples();
+                await loadDefaultCharacterVoiceAssets();
                 
                 // 生成音符键盘
                 generateNoteKeyboard();
@@ -2840,6 +2899,10 @@
                 }
 
                 if (segment.type === 'mention') {
+                    const audioEvent = buildCharacterAudioEvent(segment.character);
+                    if (audioEvent) {
+                        events.push(audioEvent);
+                    }
                     const motifEvents = core.convertMentionProfileToEvents(segment.character, segment.profile, getMentionMotifHelpers());
                     events.push(...motifEvents);
                     charIndexOffset += (segment.raw || segment.text || '').length;
@@ -2903,6 +2966,27 @@
             // 默认根据字符编码分配（让分布均匀）
             const code = char.charCodeAt(0);
             return (code % 4) + 1;
+        }
+
+        function playCharacterAudioBuffer(audioBuffer, characterName) {
+            return new Promise((resolve) => {
+                if (!audioContext || !audioBuffer) {
+                    resolve();
+                    return;
+                }
+
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = Math.max(0.15, params.masterVolume * 0.9);
+                source.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioContext.destination);
+                source.onended = () => resolve();
+                source.start();
+                updateSpectrum();
+                setCharacterVoiceStatus(`正在播放 ${characterName} 角色音频`, 'success');
+            });
         }
 
         // 字符转音符（五声音阶 + 声调映射版 - 区间内随机）
@@ -3482,6 +3566,19 @@
                         await sleep(event.pauseMs);
                         continue;
                     }
+
+                    if (event.type === 'characterAudio') {
+                        highlightNote(i);
+                        await ensureCharacterAudioLoaded(event.characterName);
+                        const audioBuffer = await ensureCharacterAudioDecoded(event.characterName);
+                        if (!audioBuffer) {
+                            setCharacterVoiceStatus(`${event.characterName} 角色音频未就绪，改为仅播放 motif`, 'warn');
+                            continue;
+                        }
+                        await playCharacterAudioBuffer(audioBuffer, event.characterName);
+                        await sleep(20);
+                        continue;
+                    }
                     
                     // 下面的都是 note 事件
                     const note = event;
@@ -3619,6 +3716,14 @@
                         style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; opacity: 0.6; color: var(--text-dim);">
                         <span style="font-size: 0.9rem;">⏸</span>
                         <span style="font-size: 0.6rem; opacity: 0.7;">${symbol}</span>
+                    </span>`;
+                }
+
+                if (evt.type === 'characterAudio') {
+                    return `<span class="note-item" id="note-${i}" title="角色音频 ${evt.characterName}"
+                        style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; color: var(--accent);">
+                        <span style="font-size: 0.9rem;">🎤${evt.characterName}</span>
+                        <span style="font-size: 0.6rem; opacity: 0.7;">voice</span>
                     </span>`;
                 }
                 
@@ -4708,6 +4813,25 @@
 
             const btnExport = document.getElementById('btn-export-wav');
             if (btnExport) btnExport.addEventListener('click', exportToWAV);
+
+            const characterVoiceGrid = document.getElementById('characterVoiceGrid');
+            if (characterVoiceGrid) {
+                characterVoiceGrid.addEventListener('click', async (e) => {
+                    const btn = e.target.closest('[data-character-action]');
+                    if (!btn) return;
+                    const action = btn.dataset.characterAction;
+                    const characterName = btn.dataset.characterName;
+                    if (!characterName) return;
+                    if (action === 'preview') {
+                        await previewCharacterVoice(characterName);
+                    }
+                });
+            }
+
+            const characterAudioInput = document.getElementById('characterAudioInput');
+            if (characterAudioInput) {
+                characterAudioInput.addEventListener('change', handleCharacterAudioFileSelection);
+            }
 
             // 预设按钮（事件委托）
             const presetGrid = document.querySelector('.preset-grid');
