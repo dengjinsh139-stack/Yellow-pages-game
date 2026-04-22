@@ -103,7 +103,117 @@
             padding: 20px;
         }
 
-        /* 头部 */
+        /* 角色声纹卡片 */
+        .character-voice-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .character-voice-title {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .character-voice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .character-voice-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .character-voice-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .character-voice-card.active {
+            border-color: var(--accent);
+            background: rgba(255, 230, 109, 0.05);
+        }
+        
+        .character-voice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .character-voice-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .character-voice-instrument {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(78, 205, 196, 0.15);
+            color: var(--secondary);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+        }
+        
+        .character-voice-preview-btn {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.8), rgba(78, 205, 196, 0.8));
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .character-voice-preview-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+        
+        .character-voice-preview-btn.playing {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* 角色声纹检测提示 */
+        .character-detect-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            background: rgba(255, 230, 109, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(255, 230, 109, 0.3);
+            margin-left: 8px;
+        }
+        
+        .character-detect-badge.hidden {
+            display: none;
+        }
         header {
             text-align: center;
             padding: 30px 20px;
@@ -807,6 +917,50 @@
                 </div>
 
                 <!-- 节奏引擎控制 -->
+                <!-- 角色声纹卡片 -->
+                <div class="character-voice-section">
+                    <div class="character-voice-title">
+                        <span>🎭</span>
+                        <span>角色声纹</span>
+                        <span class="character-detect-badge hidden" id="characterDetectBadge">
+                            <span>✨</span>
+                            <span id="characterDetectText">检测到角色</span>
+                        </span>
+                    </div>
+                    <div class="character-voice-grid">
+                        <div class="character-voice-card" data-character="小牧" data-instrument="xylophone">
+                            <div class="character-voice-header">
+                                <span class="character-voice-name">小牧</span>
+                                <span class="character-voice-instrument">xylophone</span>
+                            </div>
+                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('小牧')">
+                                <span>▶</span>
+                                <span>试听</span>
+                            </button>
+                        </div>
+                        <div class="character-voice-card" data-character="艾米" data-instrument="piano">
+                            <div class="character-voice-header">
+                                <span class="character-voice-name">艾米</span>
+                                <span class="character-voice-instrument">piano</span>
+                            </div>
+                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('艾米')">
+                                <span>▶</span>
+                                <span>试听</span>
+                            </button>
+                        </div>
+                        <div class="character-voice-card" data-character="芙洛芙" data-instrument="flute">
+                            <div class="character-voice-header">
+                                <span class="character-voice-name">芙洛芙</span>
+                                <span class="character-voice-instrument">flute</span>
+                            </div>
+                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('芙洛芙')">
+                                <span>▶</span>
+                                <span>试听</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="panel-title" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">🥁 节奏引擎</div>
                 
                 <!-- BPM 控制 -->
@@ -919,7 +1073,9 @@
 - 你好世界
 - 今天天气真好
 - 生日快乐
-- 或任何你想说的话"></textarea>
+- 或任何你想说的话
+
+💡 输入角色名（小牧、艾米、芙洛芙）可触发专属声纹" oninput="onTextInput(this.value)"></textarea>
                     <div class="input-hint">支持中文、英文、数字 · 系统会自动分析情感并匹配演奏风格</div>
                 </div>
 
@@ -1103,7 +1259,147 @@
             }
         };
 
-        const chordDurationPresets = [
+        // ===== 角色声纹配置 =====
+        const characterVoiceConfig = {
+            '小牧': {
+                name: '小牧',
+                instrument: 'xylophone',
+                audioUrl: '../assets/audio/character-voices/xiaomu.mp3',
+                motifNotes: [
+                    { note: 'D5', durationMs: 180, velocity: 0.88 },
+                    { note: 'A4', durationMs: 150, velocity: 0.8 },
+                    { note: 'F5', durationMs: 210, velocity: 0.9 }
+                ]
+            },
+            '艾米': {
+                name: '艾米',
+                instrument: 'piano',
+                audioUrl: '../assets/audio/character-voices/char2_temp.mp3',
+                motifNotes: [
+                    { note: 'A4', durationMs: 170, velocity: 0.8 },
+                    { note: 'D5', durationMs: 190, velocity: 0.88 },
+                    { note: 'F5', durationMs: 220, velocity: 0.92 }
+                ]
+            },
+            '芙洛芙': {
+                name: '芙洛芙',
+                instrument: 'flute',
+                audioUrl: '../assets/audio/character-voices/char3_temp.mp3',
+                motifNotes: [
+                    { note: 'E5', durationMs: 220, velocity: 0.78 },
+                    { note: 'A5', durationMs: 240, velocity: 0.82 },
+                    { note: 'F5', durationMs: 200, velocity: 0.76 }
+                ]
+            }
+        };
+
+        // 角色音频缓存
+        const characterAudioBuffers = {};
+
+        // 加载角色音频文件
+        async function loadCharacterVoiceAudio(characterName) {
+            const config = characterVoiceConfig[characterName];
+            if (!config || !config.audioUrl) {
+                console.log(`[CharacterVoice] 无音频文件: ${characterName}`);
+                return null;
+            }
+            
+            if (characterAudioBuffers[characterName]) {
+                return characterAudioBuffers[characterName];
+            }
+            
+            try {
+                const response = await fetch(config.audioUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                characterAudioBuffers[characterName] = audioBuffer;
+                console.log(`[CharacterVoice] 已加载: ${characterName}`);
+                return audioBuffer;
+            } catch (err) {
+                console.error(`[CharacterVoice] 加载失败: ${characterName}`, err);
+                return null;
+            }
+        }
+
+        // 播放角色声纹（试听或检测触发）
+        async function playCharacterVoice(characterName) {
+            if (!audioContext) {
+                alert('请先启动音频引擎');
+                return;
+            }
+            
+            const config = characterVoiceConfig[characterName];
+            if (!config) return;
+            
+            // 尝试播放音频文件
+            const audioBuffer = await loadCharacterVoiceAudio(characterName);
+            if (audioBuffer) {
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = params.masterVolume;
+                source.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioContext.destination);
+                source.start();
+                updateSpectrum();
+                console.log(`[CharacterVoice] 播放音频: ${characterName}`);
+            } else {
+                // 无音频时使用乐器演奏主题音
+                console.log(`[CharacterVoice] 使用合成音色: ${characterName}`);
+                const originalInstrument = currentInstrument;
+                currentInstrument = config.instrument;
+                
+                for (const note of config.motifNotes) {
+                    const freq = {
+                        'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+                        'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
+                    }[note.note];
+                    if (freq) {
+                        playTone(freq, note.note, note.durationMs, note.velocity * params.masterVolume);
+                        await sleep(note.durationMs + 50);
+                    }
+                }
+                
+                currentInstrument = originalInstrument;
+            }
+            
+            // 视觉反馈
+            const card = document.querySelector(`.character-voice-card[data-character="${characterName}"]`);
+            if (card) {
+                card.classList.add('active');
+                setTimeout(() => card.classList.remove('active'), 1000);
+            }
+        }
+
+        // 检测文本中的角色名
+        function detectCharactersInText(text) {
+            const detected = [];
+            for (const [name, config] of Object.entries(characterVoiceConfig)) {
+                if (text.includes(name)) {
+                    detected.push(name);
+                }
+            }
+            return detected;
+        }
+
+        // 显示角色检测提示
+        function showCharacterDetectBadge(characters) {
+            const badge = document.getElementById('characterDetectBadge');
+            const text = document.getElementById('characterDetectText');
+            if (characters.length > 0) {
+                text.textContent = `检测到: ${characters.join('、')}`;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // 文本输入事件 - 实时检测角色名
+        function onTextInput(text) {
+            const detected = detectCharactersInText(text);
+            showCharacterDetectBadge(detected);
+        }
             { slider: 0, label: '静音', ratio: 0.0 },
             { slider: 1, label: '很短', ratio: 0.18 },
             { slider: 2, label: '半长', ratio: 0.38 },
