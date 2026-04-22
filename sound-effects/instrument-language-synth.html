@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>乐器语言合成器 | Instrument Language Synth</title>
+    <script src="../nav-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const subtitle = document.querySelector('.subtitle');
+            if (subtitle && typeof APP_VERSION !== 'undefined') {
+                subtitle.textContent = `INSTRUMENT LANGUAGE SYNTHESIZER ${APP_VERSION} · 10键对齐版`;
+            }
+        });
+    </script>
     <style>
         :root {
             --primary: #ff6b6b;
@@ -685,7 +694,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.4 · 独立音量控制</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v3.6.31 · 10键对齐版</p>
         </header>
 
         <div class="main-panel">
@@ -2545,16 +2554,16 @@
         function getToneRegion(tone) {
             // 音高区域映射 - 区间内随机选择
             // 一声（阴平）：D4→F4 范围（D4, E4, F4）
-            // 二声（阳平）：F4→B4 范围（F4, G4, A4, B4）
+            // 二声（阳平）：F4→B4 范围（F4, A4, B4）
             // 三声（上声）：D5→F5 范围（D5, E5, F5）
-            // 四声（去声）：F5→B5 范围（F5, G5, A5, B5）
+            // 四声（去声）：F5→B5 范围（F5, A5, B5）
             // 轻声：延续前音或休止
             const regions = {
                 0: { notes: ['rest'], rest: true },                    // 轻声 - 休止
                 1: { notes: ['D4', 'E4', 'F4'], rest: false },         // 阴平 - D4到F4随机
-                2: { notes: ['F4', 'G4', 'A4', 'B4'], rest: false },   // 阳平 - F4到B4随机
+                2: { notes: ['F4', 'A4', 'B4'], rest: false },          // 阳平 - F4到B4随机（不含G4）
                 3: { notes: ['D5', 'E5', 'F5'], rest: false },         // 上声 - D5到F5随机
-                4: { notes: ['F5', 'G5', 'A5', 'B5'], rest: false }    // 去声 - F5到B5随机
+                4: { notes: ['F5', 'A5', 'B5'], rest: false }           // 去声 - F5到B5随机（不含G5）
             };
             return regions[tone] || regions[1];
         }
