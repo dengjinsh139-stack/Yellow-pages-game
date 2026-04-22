@@ -694,7 +694,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v3.6.32 · 10键对齐版</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v3.6.34 · 10键对齐版</p>
         </header>
 
         <div class="main-panel">
@@ -3843,20 +3843,31 @@
                 const events = textToNotes(text);
                 console.log(`🎵 [EXPORT] Step 1 done: ${events.length} events`);
                 
-                console.log('🎵 [EXPORT] Step 2: Calculating duration...');
-                const duration = await calculateAudioDuration(events);
-                console.log(`🎵 [EXPORT] Step 2 done: duration=${duration.toFixed(2)}s`);
+                console.log('🎵 [EXPORT] Step 2: Pre-computing all timings...');
+                const beatDuration = 60000 / params.bpm;
+                // 预计算所有timing，避免随机模式导致时长计算和渲染不一致
+                const eventsWithTiming = events.map(evt => {
+                    if (evt.type === 'pause') {
+                        return { ...evt, _timing: { duration: evt.pauseMs || 0, velocity: 0 } };
+                    }
+                    return { ...evt, _timing: computeEventTiming(evt, beatDuration, params.bpm) };
+                });
+                console.log(`🎵 [EXPORT] Step 2 done: ${eventsWithTiming.length} timings computed`);
                 
-                console.log('🎵 [EXPORT] Step 3: Creating OfflineAudioContext...');
+                console.log('🎵 [EXPORT] Step 3: Calculating duration...');
+                const duration = await calculateAudioDuration(eventsWithTiming);
+                console.log(`🎵 [EXPORT] Step 3 done: duration=${duration.toFixed(2)}s`);
+                
+                console.log('🎵 [EXPORT] Step 4: Creating OfflineAudioContext...');
                 const offlineContext = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
                     2, Math.ceil(duration * sampleRate), sampleRate
                 );
-                console.log('🎵 [EXPORT] Step 3 done');
+                console.log('🎵 [EXPORT] Step 4 done');
                 
                 if (exportStatus) exportStatus.textContent = `正在渲染音频 (${Math.ceil(duration)}秒)...`;
                 
-                console.log('🎵 [EXPORT] Step 4: Rendering audio to buffer...');
-                const renderedBuffer = await renderAudioToBuffer(events, offlineContext);
+                console.log('🎵 [EXPORT] Step 5: Rendering audio to buffer...');
+                const renderedBuffer = await renderAudioToBuffer(eventsWithTiming, offlineContext);
                 console.log(`🎵 [EXPORT] Step 4 done: renderedBuffer=${renderedBuffer ? 'ok' : 'null'}, channels=${renderedBuffer?.numberOfChannels}, duration=${renderedBuffer?.duration}`);
                 
                 if (!renderedBuffer) {
@@ -3911,16 +3922,21 @@
         // 计算音频总时长
         async function calculateAudioDuration(events) {
             let totalTime = 0.5; // 起始偏移
-            const beatDuration = 60000 / params.bpm;
             
             for (let i = 0; i < events.length; i++) {
                 const evt = events[i];
-                const timing = computeEventTiming(evt, beatDuration, params.bpm);
-                totalTime += timing.duration / 1000;
-                // 添加微小间隔
-                if (evt.type === 'note' && !evt.isChord && !evt.isRest) {
-                    totalTime += 0.02;
+                
+                // 停顿事件
+                if (evt.type === 'pause') {
+                    totalTime += evt.pauseMs / 1000;
+                    continue;
                 }
+                
+                // 使用预计算的timing（如果存在）
+                const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
+                totalTime += timing.duration / 1000;
+                // 所有非停顿事件都加微小间隔（与渲染逻辑严格对齐）
+                totalTime += 0.02;
             }
             
             // 混响尾巴时长
@@ -4031,7 +4047,8 @@
                 }
                 
                 const note = evt;
-                const timing = computeEventTiming(evt, beatDuration, params.bpm);
+                // 使用预计算的timing（如果存在），避免随机模式导致不一致
+                const timing = evt._timing || computeEventTiming(evt, beatDuration, params.bpm);
                 const noteDuration = timing.duration / 1000;
                 const velocity = timing.velocity;
                 
@@ -4069,11 +4086,37 @@
         
         // 渲染采样到 buffer（与实时播放 playSampleTone() 严格对齐）
         async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
-            const bufferKey = getSampleBufferKey(currentInstrument, note.sampleNote);
+            // 根据当前乐器选择配置
+            const config = sampleConfig[currentInstrument];
+            if (!config) {
+                console.warn('🎵 [RENDER] No sample config for instrument:', currentInstrument);
+                return;
+            }
+            
+            // ===== 找到最接近目标频率的采样（与 playSampleTone 严格对齐）=====
+            const freqToSampleNote = {};
+            for (const [sampleNote, info] of Object.entries(config.samples)) {
+                freqToSampleNote[info.freq] = sampleNote;
+            }
+            
+            let nearestFreq = 440;
+            let minDiff = Infinity;
+            for (const freq of Object.keys(freqToSampleNote).map(f => parseFloat(f))) {
+                const diff = Math.abs(freq - note.frequency);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearestFreq = freq;
+                }
+            }
+            
+            const sampleNote = freqToSampleNote[nearestFreq];
+            const bufferKey = currentInstrument === 'piano' ? sampleNote : `${currentInstrument}_${sampleNote}`;
             const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
-                console.warn('🎵 [RENDER] Sample not found for', bufferKey);
+                console.warn('🎵 [RENDER] Sample not found for', bufferKey, '- falling back to synth');
+                // 采样找不到时fallback到合成音色，而不是直接跳过
+                await renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity);
                 return;
             }
             
@@ -4081,32 +4124,27 @@
             source.buffer = buffer;
             
             // ===== 播放速率：与实时一致 =====
-            const sampleConfig_obj = sampleConfig[currentInstrument];
-            const sampleInfo = sampleConfig_obj ? sampleConfig_obj.samples[note.sampleNote] : null;
-            if (sampleInfo && note.frequency !== sampleInfo.freq) {
-                source.playbackRate.value = note.frequency / sampleInfo.freq;
+            if (note.frequency !== nearestFreq) {
+                source.playbackRate.value = note.frequency / nearestFreq;
             }
             
             // ===== 增益计算：与 playSampleTone() 严格对齐 =====
-            // playSampleTone: finalVelocity = safeVelocity * baseGain (不含 masterVolume)
+            const sampleInfo = config.samples[sampleNote];
             const baseGain = sampleInfo?.gain || 1.0;
             const safeVelocity = (typeof overrideVelocity === 'number' && isFinite(overrideVelocity))
                 ? overrideVelocity : (note.velocity || 0.5);
-            const finalVelocity = safeVelocity * baseGain;  // 对齐：不乘 masterVolume
+            const finalVelocity = safeVelocity * baseGain;
             const maxGain = 3.0;
             const clampedVelocity = Math.min(finalVelocity, maxGain);
             
             const gainNode = offlineContext.createGain();
             
             // ===== 包络：与 playSampleTone() 严格对齐 =====
-            const config = sampleConfig[currentInstrument];
             const attackTime = Math.min(config.attack || 0.005, Math.max(0.001, duration * 0.2));
             const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
             const decayTime = Math.max(duration * 0.6, 0.05);
             
-            // 先设置初值（与实时一致）
             gainNode.gain.value = clampedVelocity;
-            // 然后从0开始做包络
             gainNode.gain.setValueAtTime(0, startTime);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, startTime + attackTime);
             gainNode.gain.setValueAtTime(clampedVelocity, startTime + attackTime + holdTime);
