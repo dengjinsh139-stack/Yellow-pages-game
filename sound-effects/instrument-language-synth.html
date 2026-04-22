@@ -2741,19 +2741,53 @@
 
         // 文本转音符序列（统一事件模型：note + pause）
         function textToNotes(text) {
+            // 先检测角色名并替换为标记
+            const characterVoiceEvents = [];
+            let processedText = text;
+            let offset = 0;
+            
+            for (const [name, config] of Object.entries(characterVoiceConfig)) {
+                let index = processedText.indexOf(name);
+                while (index !== -1) {
+                    characterVoiceEvents.push({
+                        type: 'characterVoice',
+                        character: name,
+                        position: index
+                    });
+                    // 替换为占位符避免重复检测
+                    processedText = processedText.substring(0, index) + '\0'.repeat(name.length) + processedText.substring(index + name.length);
+                    index = processedText.indexOf(name);
+                }
+            }
+            
+            // 按位置排序
+            characterVoiceEvents.sort((a, b) => a.position - b.position);
+            
             const tokens = tokenizeText(text);
             const events = [];
             const bpm = params.bpm || 120;
             
-            // 第一遍：生成基础 note 和 pause 事件
+            // 当前字符位置跟踪
+            let charPosition = 0;
+            let voiceEventIndex = 0;
+            
+            // 第一遍：生成基础 note、pause 和 characterVoice 事件
             for (let i = 0; i < tokens.length; i++) {
                 const token = tokens[i];
+                
+                // 检查是否有角色声纹事件需要插入
+                while (voiceEventIndex < characterVoiceEvents.length && 
+                       characterVoiceEvents[voiceEventIndex].position <= charPosition) {
+                    events.push(characterVoiceEvents[voiceEventIndex]);
+                    voiceEventIndex++;
+                }
                 
                 if (token.type === 'char') {
                     const note = charToNote(token.char, i);
                     if (note) {
                         events.push({ type: 'note', ...note });
                     }
+                    charPosition += 1;
                 } else if (token.type === 'punctuation' || token.type === 'space') {
                     const symbol = token.symbol;
                     const rule = getPunctuationRule(symbol);
@@ -2768,7 +2802,14 @@
                             resetPhrase: phrasingConfig.sentenceResetEnabled && rule.resetPhrase
                         });
                     }
+                    charPosition += symbol.length;
                 }
+            }
+            
+            // 插入剩余的角色声纹事件
+            while (voiceEventIndex < characterVoiceEvents.length) {
+                events.push(characterVoiceEvents[voiceEventIndex]);
+                voiceEventIndex++;
             }
             
             // 第二遍：应用前后音修饰
@@ -3434,6 +3475,14 @@
                     
                     const event = notes[i];
                     
+                    // ===== 角色声纹检测 =====
+                    if (event.type === 'characterVoice') {
+                        console.log(`第 ${i+1} 个是角色声纹 [${event.character}]`);
+                        highlightNote(i);
+                        await playCharacterVoice(event.character);
+                        continue;
+                    }
+                    
                     // ===== 停顿事件处理 =====
                     if (event.type === 'pause') {
                         console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms, reset=${event.resetPhrase}`);
@@ -3564,6 +3613,15 @@
             display.innerHTML = events.map((evt, i) => {
                 // 跳过 null 值
                 if (!evt) return '';
+                
+                // 角色声纹事件显示
+                if (evt.type === 'characterVoice') {
+                    return `<span class="note-item" id="note-${i}" title="角色声纹: ${evt.character}"
+                        style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; background: rgba(255, 230, 109, 0.15); border: 1px solid rgba(255, 230, 109, 0.3); border-radius: 8px;">
+                        <span style="font-size: 0.9rem;">🎭${evt.character}</span>
+                        <span style="font-size: 0.6rem; opacity: 0.7;">声纹</span>
+                    </span>`;
+                }
                 
                 // 停顿事件显示
                 if (evt.type === 'pause') {
