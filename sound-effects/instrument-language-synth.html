@@ -1176,17 +1176,12 @@
                     <!-- 语义分类文件面板 -->
                     <div id="phraseTriggerFilePanel" style="display: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - 专属 MIDI</span>
+                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - MIDI 状态</span>
                             <button id="btn-close-phrase-trigger" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem;">✕</button>
                         </div>
-                        <div id="phraseTriggerFileList" style="margin-bottom: 10px; font-size: 0.75rem; color: var(--text-dim);">
-                            <p>暂无 MIDI 文件</p>
+                        <div id="phraseTriggerFileList" style="font-size: 0.75rem; color: var(--text-dim);">
+                            <p>加载中...</p>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="file" id="phraseTriggerMidiInput" accept=".mid,.midi" style="display: none;">
-                            <button id="btn-upload-phrase-midi" class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 8px;">📁 上传 MIDI</button>
-                        </div>
-                        <div id="phraseTriggerFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; text-align: center;"></div>
                     </div>
                 </div>
 
@@ -1871,7 +1866,47 @@
             }
         };
         
+        // 语义分类预置 MIDI 路径映射
+        const phraseMidiPaths = {
+            greeting: '../assets/audio/phrase-midi/greeting.mid',
+            thanks: '../assets/audio/phrase-midi/thanks.mid',
+            apology: '../assets/audio/phrase-midi/apology.mid',
+            farewell: '../assets/audio/phrase-midi/farewell.mid',
+            request: '../assets/audio/phrase-midi/request.mid',
+            confirm: '../assets/audio/phrase-midi/confirm.mid',
+            praise: '../assets/audio/phrase-midi/praise.mid',
+            comfort: '../assets/audio/phrase-midi/comfort.mid'
+        };
+        
         let currentPhraseTrigger = null;
+        
+        // 加载所有预置语义分类 MIDI
+        async function loadPhraseTriggerMidis() {
+            const loadPromises = [];
+            for (const [key, path] of Object.entries(phraseMidiPaths)) {
+                const promise = fetch(path)
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        return response.arrayBuffer();
+                    })
+                    .then(arrayBuffer => {
+                        const midiData = parseMidi(arrayBuffer);
+                        phraseTriggerCategories[key].midi = {
+                            name: path.split('/').pop(),
+                            data: arrayBuffer
+                        };
+                        phraseTriggerCategories[key].parsedMidi = midiData;
+                        console.log(`[PhraseTrigger] 已加载 MIDI: ${key} → ${path}`);
+                    })
+                    .catch(err => {
+                        console.warn(`[PhraseTrigger] 未加载 MIDI: ${key} (${err.message})`);
+                        // 不抛出错误，让其他分类继续加载
+                    });
+                loadPromises.push(promise);
+            }
+            await Promise.all(loadPromises);
+            console.log('[PhraseTrigger] 所有预置 MIDI 加载完成');
+        }
         
         // 检测语义分类
         function detectPhraseTriggerCategory(text) {
@@ -1905,59 +1940,21 @@
             currentPhraseTrigger = null;
         }
         
-        // 更新语义分类文件列表
+        // 更新语义分类文件列表（只读显示加载状态）
         function updatePhraseTriggerFileList(categoryKey) {
             const category = phraseTriggerCategories[categoryKey];
             const listDiv = document.getElementById('phraseTriggerFileList');
             
             let html = '';
-            if (category.midi) {
-                html += `<p>🎹 MIDI: ${category.midi.name} <button class="btn-delete-phrase-trigger" data-category="${categoryKey}" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
+            if (category.parsedMidi) {
+                html += `<p>✅ MIDI 已加载: ${category.midi?.name || 'unknown'}</p>`;
+                html += `<p style="font-size: 0.65rem; opacity: 0.7;">音轨数: ${category.parsedMidi.numTracks} | 时间精度: ${category.parsedMidi.timeDivision}</p>`;
             } else {
-                html = '<p>暂无 MIDI 文件，请上传</p>';
+                html = '<p>○ 暂无预置 MIDI 文件</p>';
+                html += `<p style="font-size: 0.65rem; opacity: 0.5;">请将 MIDI 文件放到 assets/audio/phrase-midi/${categoryKey}.mid</p>`;
             }
             
             listDiv.innerHTML = html;
-        }
-        
-        // 清除语义分类 MIDI
-        function clearPhraseTriggerMidi(categoryKey) {
-            if (phraseTriggerCategories[categoryKey]) {
-                phraseTriggerCategories[categoryKey].midi = null;
-                phraseTriggerCategories[categoryKey].parsedMidi = null;
-                updatePhraseTriggerFileList(categoryKey);
-                document.getElementById('phraseTriggerFileStatus').textContent = '已删除 MIDI 文件';
-            }
-        }
-        
-        // 处理语义分类 MIDI 上传
-        async function handlePhraseTriggerMidi(event) {
-            if (!currentPhraseTrigger) return;
-            
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const statusDiv = document.getElementById('phraseTriggerFileStatus');
-            statusDiv.textContent = '正在解析 MIDI...';
-            
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const midiData = parseMidi(arrayBuffer);
-                
-                phraseTriggerCategories[currentPhraseTrigger].midi = {
-                    name: file.name,
-                    data: arrayBuffer
-                };
-                phraseTriggerCategories[currentPhraseTrigger].parsedMidi = midiData;
-                
-                updatePhraseTriggerFileList(currentPhraseTrigger);
-                statusDiv.textContent = `✅ MIDI 已保存到 ${phraseTriggerCategories[currentPhraseTrigger].name}`;
-                
-                event.target.value = '';
-            } catch (err) {
-                console.error('MIDI 解析错误:', err);
-                statusDiv.textContent = '❌ 解析失败: ' + err.message;
-            }
         }
         
         // 生成语义分类卡片
@@ -2279,6 +2276,12 @@
                 // 加载采样
                 document.getElementById('statusText').textContent = '加载采样中...';
                 await loadSamples();
+                
+                // 加载语义分类预置 MIDI
+                await loadPhraseTriggerMidis();
+                
+                // 生成语义分类卡片
+                generatePhraseTriggerCards();
                 
                 // 生成音符键盘
                 generateNoteKeyboard();
@@ -5193,25 +5196,6 @@
             const btnClosePhraseTrigger = document.getElementById('btn-close-phrase-trigger');
             if (btnClosePhraseTrigger) btnClosePhraseTrigger.addEventListener('click', closePhraseTriggerPanel);
 
-            const btnUploadPhraseMidi = document.getElementById('btn-upload-phrase-midi');
-            const inputPhraseMidi = document.getElementById('phraseTriggerMidiInput');
-            if (btnUploadPhraseMidi && inputPhraseMidi) {
-                btnUploadPhraseMidi.addEventListener('click', () => inputPhraseMidi.click());
-                inputPhraseMidi.addEventListener('change', handlePhraseTriggerMidi);
-            }
-
-            // 语义分类删除按钮（事件委托）
-            const phraseTriggerFileList = document.getElementById('phraseTriggerFileList');
-            if (phraseTriggerFileList) {
-                phraseTriggerFileList.addEventListener('click', (e) => {
-                    const btn = e.target.closest('.btn-delete-phrase-trigger');
-                    if (btn) {
-                        const categoryKey = btn.dataset.category;
-                        if (categoryKey) clearPhraseTriggerMidi(categoryKey);
-                    }
-                });
-            }
-
             console.log('✅ UI 事件绑定完成');
         }
 
@@ -5263,7 +5247,6 @@
             
             bindUIEvents();
             verifyCriticalBindings();
-            generatePhraseTriggerCards();
             console.log('🚀 页面初始化完成');
         });
 
@@ -5283,7 +5266,6 @@
         // 语义分类触发暴露
         window.selectPhraseTrigger = selectPhraseTrigger;
         window.closePhraseTriggerPanel = closePhraseTriggerPanel;
-        window.clearPhraseTriggerMidi = clearPhraseTriggerMidi;
         window.detectPhraseTriggerCategory = detectPhraseTriggerCategory;
         
         // SCRIPT_END
