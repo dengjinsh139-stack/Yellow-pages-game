@@ -1979,6 +1979,85 @@
             }
         }
 
+        // ==================== V2: 语义分类局部插入版 ====================
+        
+        // 将文本转换为事件序列（支持语义分类局部插入）
+        function textToEvents(text) {
+            // 第一步：找出所有有 MIDI 的语义分类匹配
+            const matches = [];
+            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
+                if (!category.parsedMidi) continue; // 只匹配有 MIDI 的分类
+                for (const keyword of category.keywords) {
+                    const lowerText = text.toLowerCase();
+                    const lowerKeyword = keyword.toLowerCase();
+                    let idx = lowerText.indexOf(lowerKeyword);
+                    while (idx !== -1) {
+                        matches.push({
+                            start: idx,
+                            end: idx + keyword.length,
+                            key: key,
+                            keyword: keyword,
+                            category: category
+                        });
+                        idx = lowerText.indexOf(lowerKeyword, idx + 1);
+                    }
+                }
+            }
+            
+            if (matches.length === 0) {
+                return textToNotes(text);
+            }
+            
+            // 按位置排序，优先位置靠前，位置相同取长度长的
+            matches.sort((a, b) => a.start - b.start || b.keyword.length - a.keyword.length);
+            
+            // 过滤重叠匹配
+            const filteredMatches = [];
+            for (const match of matches) {
+                let overlap = false;
+                for (const existing of filteredMatches) {
+                    if (match.start < existing.end && match.end > existing.start) {
+                        overlap = true;
+                        break;
+                    }
+                }
+                if (!overlap) filteredMatches.push(match);
+            }
+            
+            // 按顺序生成事件
+            const events = [];
+            let lastEnd = 0;
+            
+            for (const match of filteredMatches) {
+                if (match.start > lastEnd) {
+                    const prefixEvents = textToNotes(text.substring(lastEnd, match.start));
+                    if (Array.isArray(prefixEvents)) {
+                        events.push(...prefixEvents);
+                    }
+                }
+                
+                events.push({
+                    type: 'phraseMidi',
+                    category: match.key,
+                    categoryName: match.category.name,
+                    emoji: match.category.emoji,
+                    keyword: match.keyword,
+                    char: match.keyword
+                });
+                
+                lastEnd = match.end;
+            }
+            
+            if (lastEnd < text.length) {
+                const suffixEvents = textToNotes(text.substring(lastEnd));
+                if (Array.isArray(suffixEvents)) {
+                    events.push(...suffixEvents);
+                }
+            }
+            
+            return events;
+        }
+
         // ==================== 情绪专属文件系统 ====================
         
         // 情绪配置 - 每个情绪可以有专属的 MIDI 或音频文件
@@ -3683,43 +3762,48 @@
                 console.log('没有专属文件，继续播放文字转音乐');
             }
             
-            // 转换为音符
-            let notes = textToNotes(text);
-            // 过滤掉 null 值
-            notes = notes.filter(n => n !== null && n !== undefined);
-            console.log('转换后的音符数量:', notes.length);
-            console.log('音符数据:', notes);
+            // ===== V2: 语义分类 + 逐字分音混合 =====
+            let events = textToEvents(text);
+            events = events.filter(n => n !== null && n !== undefined);
+            console.log('转换后的事件数量:', events.length);
+            console.log('事件数据:', events);
             
-            // 显示音符序列
-            displayNotes(notes);
+            // 显示事件序列
+            displayNotes(events);
             
-            if (notes.length === 0) {
-                console.log('没有可播放的音符');
+            if (events.length === 0) {
+                console.log('没有可播放的事件');
                 isPlaying = false;
-                document.getElementById('statusText').textContent = '没有可播放的音符';
+                document.getElementById('statusText').textContent = '没有可播放的事件';
                 return;
             }
             
-            // 依次演奏 - 使用节奏引擎 + 标点气口系统
-            console.log('开始演奏，事件数量:', notes.length);
-            console.log('节奏引擎设置:', {
-                bpm: params.bpm,
-                notesPerBeat: params.notesPerBeat,
-                rhythmRandom: params.rhythmRandom,
-                toneValues: params.toneNoteValues
-            });
+            // 依次演奏
+            console.log('开始演奏，事件数量:', events.length);
             
             // 计算一拍的时间 (ms)
             const beatDuration = 60000 / params.bpm;
             
             try {
-                for (let i = 0; i < notes.length; i++) {
+                for (let i = 0; i < events.length; i++) {
                     if (!isPlaying) {
                         console.log('演奏被中断');
                         break;
                     }
                     
-                    const event = notes[i];
+                    const event = events[i];
+                    
+                    // ===== 语义分类 MIDI 事件 =====
+                    if (event.type === 'phraseMidi') {
+                        console.log(`第 ${i+1} 个是语义分类 MIDI [${event.categoryName}]`);
+                        highlightNote(i);
+                        document.getElementById('statusText').textContent = `🎯 ${event.categoryName}`;
+                        const midiData = phraseTriggerCategories[event.category]?.parsedMidi;
+                        if (midiData) {
+                            await playMidiAsync(midiData);
+                        }
+                        continue;
+                    }
                     
                     // ===== 角色声纹检测 =====
                     if (event.type === 'characterVoice') {
@@ -3731,8 +3815,7 @@
                     
                     // ===== 停顿事件处理 =====
                     if (event.type === 'pause') {
-                        console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms, reset=${event.resetPhrase}`);
-                        // 高亮显示停顿
+                        console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms`);
                         highlightNote(i);
                         await sleep(event.pauseMs);
                         continue;
@@ -3859,6 +3942,15 @@
             display.innerHTML = events.map((evt, i) => {
                 // 跳过 null 值
                 if (!evt) return '';
+                
+                // 语义分类 MIDI 事件显示
+                if (evt.type === 'phraseMidi') {
+                    return `<span class="note-item" id="note-${i}" title="语义分类: ${evt.categoryName} (${evt.keyword})"
+                        style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; background: rgba(78, 205, 196, 0.15); border: 1px solid rgba(78, 205, 196, 0.3); border-radius: 8px;">
+                        <span style="font-size: 0.9rem;">${evt.emoji} ${evt.categoryName}</span>
+                        <span style="font-size: 0.6rem; opacity: 0.7;">${evt.keyword}</span>
+                    </span>`;
+                }
                 
                 // 角色声纹事件显示
                 if (evt.type === 'characterVoice') {
@@ -4444,7 +4536,7 @@
             
             try {
                 console.log('🎵 [EXPORT] Step 1: Generating events...');
-                const events = textToNotes(text);
+                const events = textToEvents(text);
                 console.log(`🎵 [EXPORT] Step 1 done: ${events.length} events`);
                 
                 console.log('🎵 [EXPORT] Step 2: Pre-computing all timings...');
@@ -4533,6 +4625,33 @@
                 // 停顿事件
                 if (evt.type === 'pause') {
                     totalTime += evt.pauseMs / 1000;
+                    continue;
+                }
+                
+                // 语义分类 MIDI 事件
+                if (evt.type === 'phraseMidi') {
+                    const category = phraseTriggerCategories[evt.category];
+                    if (!category || !category.parsedMidi) continue;
+                    
+                    const midiData = category.parsedMidi;
+                    const allNotes = [];
+                    for (const track of midiData.tracks) {
+                        for (const event of track) {
+                            if (event.type === 'noteOn') allNotes.push(event);
+                        }
+                    }
+                    
+                    if (allNotes.length === 0) continue;
+                    
+                    allNotes.sort((a, b) => a.time - b.time);
+                    const msPerTick = 60000 / (120 * midiData.timeDivision);
+                    
+                    const lastNote = allNotes[allNotes.length - 1];
+                    const lastNoteTimeMs = lastNote.time * msPerTick;
+                    const noteDurationMs = params.noteDuration;
+                    
+                    totalTime += (lastNoteTimeMs + noteDurationMs) / 1000;
+                    totalTime += 0.02;
                     continue;
                 }
                 
@@ -4747,6 +4866,66 @@
                         currentTime += motifDuration;
                         console.log(`[RENDER] Character voice (synth): ${characterName}, duration=${motifDuration.toFixed(2)}s`);
                     }
+                    notesRendered++;
+                    continue;
+                }
+                
+                // ===== 语义分类 MIDI 事件 =====
+                if (evt.type === 'phraseMidi') {
+                    const category = phraseTriggerCategories[evt.category];
+                    if (!category || !category.parsedMidi) continue;
+                    
+                    console.log(`[RENDER] phraseMidi: ${evt.categoryName}`);
+                    
+                    const midiData = category.parsedMidi;
+                    const allNotes = [];
+                    for (const track of midiData.tracks) {
+                        for (const event of track) {
+                            if (event.type === 'noteOn') allNotes.push(event);
+                        }
+                    }
+                    allNotes.sort((a, b) => a.time - b.time);
+                    
+                    const msPerTick = 60000 / (120 * midiData.timeDivision);
+                    let midiCurrentTime = currentTime;
+                    let lastNoteTime = 0;
+                    
+                    for (const mnote of allNotes) {
+                        const waitMs = (mnote.time - lastNoteTime) * msPerTick;
+                        midiCurrentTime += waitMs / 1000;
+                        lastNoteTime = mnote.time;
+                        
+                        const pentatonicNote = mapToPentatonic(mnote.note);
+                        const freq = midiToFreq[pentatonicNote];
+                        if (!freq) continue;
+                        
+                        const noteVel = (mnote.velocity / 127) * params.masterVolume;
+                        const noteDur = params.noteDuration / 1000;
+                        
+                        const oscillator = offlineContext.createOscillator();
+                        const gainNode = offlineContext.createGain();
+                        const waveforms = {
+                            'guitar': 'sawtooth',
+                            'xylophone': 'triangle',
+                            'trumpet': 'square',
+                            'synth': 'sawtooth',
+                            'piano': 'triangle',
+                            'flute': 'sine',
+                            'saxophone': 'sawtooth',
+                            'train': 'triangle'
+                        };
+                        oscillator.type = waveforms[currentInstrument] || 'sine';
+                        oscillator.frequency.value = freq;
+                        gainNode.gain.setValueAtTime(0, midiCurrentTime);
+                        gainNode.gain.linearRampToValueAtTime(noteVel, midiCurrentTime + 0.02);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, midiCurrentTime + noteDur + 0.2);
+                        oscillator.connect(gainNode);
+                        gainNode.connect(destination);
+                        oscillator.start(midiCurrentTime);
+                        oscillator.stop(midiCurrentTime + noteDur + 0.5);
+                    }
+                    
+                    currentTime = midiCurrentTime + 0.5;
                     notesRendered++;
                     continue;
                 }
