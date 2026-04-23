@@ -4319,6 +4319,7 @@
             // 节奏引擎计算
             let currentNoteValue = params.toneNoteValues[note.tone] || '8';
             let currentNotesPerBeat = params.notesPerBeat;
+            let noteDuration;
             
             // 随机模式：随机变化时值和每拍音符数
             if (params.rhythmRandom) {
@@ -4330,12 +4331,22 @@
             // 获取时值配置
             const noteValue = noteValueConfig[currentNoteValue];
             
-            // 计算音符实际时长
-            let noteDuration = beatDuration * noteValue.duration / currentNotesPerBeat;
-            
-            // 三连音特殊处理
-            if (noteValue.isTriplet) {
-                noteDuration = beatDuration / 3;
+            // ===== 防御：确保 noteValue 存在 =====
+            if (!noteValue || !isFinite(noteValue.duration)) {
+                console.warn(`[computeEventTiming] Invalid noteValue "${currentNoteValue}" for tone ${note.tone}, falling back to '8'`);
+                const fallbackValue = noteValueConfig['8'];
+                noteDuration = beatDuration * fallbackValue.duration / currentNotesPerBeat;
+                if (fallbackValue.isTriplet) {
+                    noteDuration = beatDuration / 3;
+                }
+            } else {
+                // 计算音符实际时长
+                noteDuration = beatDuration * noteValue.duration / currentNotesPerBeat;
+                
+                // 三连音特殊处理
+                if (noteValue.isTriplet) {
+                    noteDuration = beatDuration / 3;
+                }
             }
             
             // 应用前音延长修饰
@@ -4354,6 +4365,16 @@
             // 应用后音轻起修饰（仅对足够长的音生效）
             if (note.velocityMultiplier && noteDuration >= 160) {
                 velocityWithMaster *= note.velocityMultiplier;
+            }
+            
+            // ===== 防御：确保返回值都是有限值 =====
+            if (!isFinite(noteDuration) || noteDuration <= 0) {
+                console.warn(`[computeEventTiming] Invalid noteDuration ${noteDuration}, using fallback 400ms`);
+                noteDuration = 400;
+            }
+            if (!isFinite(velocityWithMaster) || velocityWithMaster < 0) {
+                console.warn(`[computeEventTiming] Invalid velocity ${velocityWithMaster}, using fallback 0.5`);
+                velocityWithMaster = 0.5;
             }
             
             return { duration: noteDuration, velocity: velocityWithMaster };
@@ -4408,6 +4429,12 @@
                 const noteDuration = timing.duration / 1000;
                 const velocity = timing.velocity;
                 
+                // ===== 防御：跳过无效参数的事件 =====
+                if (!isFinite(noteDuration) || noteDuration <= 0 || !isFinite(velocity)) {
+                    console.warn(`[renderAudioToBuffer] Skipping invalid note at index ${i}: type=${evt.type}, duration=${noteDuration}, velocity=${velocity}, note=${note.note || note.char || '?'}`);
+                    continue;
+                }
+                
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
                 const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
@@ -4442,6 +4469,12 @@
         
         // 渲染采样到 buffer（与实时播放 playSampleTone() 严格对齐）
         async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
+            // ===== 防御：跳过无效参数 =====
+            if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(overrideVelocity)) {
+                console.warn('[renderSampleToBuffer] Invalid params, skipping:', { startTime, duration, overrideVelocity });
+                return;
+            }
+            
             // 根据当前乐器选择配置
             const config = sampleConfig[currentInstrument];
             if (!config) {
@@ -4543,6 +4576,12 @@
         
         // 渲染合成音色到 buffer
         async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
+            // ===== 防御：跳过无效参数 =====
+            if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(overrideVelocity)) {
+                console.warn('[renderSynthToBuffer] Invalid params, skipping:', { startTime, duration, overrideVelocity });
+                return;
+            }
+            
             const oscillator = offlineContext.createOscillator();
             const gainNode = offlineContext.createGain();
             
@@ -4595,6 +4634,12 @@
         
         // 渲染和弦到 buffer
         async function renderChordToBuffer(offlineContext, destination, startTime, duration, velocity) {
+            // ===== 防御：跳过无效参数 =====
+            if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(velocity)) {
+                console.warn('[renderChordToBuffer] Invalid params, skipping:', { startTime, duration, velocity });
+                return;
+            }
+            
             if (chordBuffers.length === 0) return;
             
             // 统一和弦时长计算
