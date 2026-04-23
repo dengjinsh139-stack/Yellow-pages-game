@@ -1760,10 +1760,22 @@
             '../assets/audio/chords/chord6.mp3'
         ]; // 和弦文件列表
 
-        // 每个音符的独立音量设置 (默认1.0)
+        // 每个乐器每个音符的独立音量设置 (默认1.0)
         const noteVolumes = {
-            'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0,
-            'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0
+            piano:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            xylophone:  { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            guitar:     { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            flute:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            trumpet:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            saxophone:  { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            synth:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            train:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 }
+        };
+
+        // 每个乐器的 Chord 按钮独立音量 (默认1.0)
+        const chordVolumes = {
+            piano: 1.0, xylophone: 1.0, guitar: 1.0, flute: 1.0,
+            trumpet: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0
         };
 
         // 音符频率表
@@ -2448,17 +2460,17 @@
                 volumeSlider.className = 'note-volume-slider';
                 volumeSlider.min = '0';
                 volumeSlider.max = '200';
-                volumeSlider.value = Math.round(noteVolumes[noteInfo.note] * 100);
+                volumeSlider.value = Math.round(noteVolumes[currentInstrument][noteInfo.note] * 100);
                 volumeSlider.dataset.note = noteInfo.note;
                 
                 const volumeLabel = document.createElement('span');
                 volumeLabel.className = 'note-volume-label';
-                volumeLabel.textContent = `${Math.round(noteVolumes[noteInfo.note] * 100)}%`;
+                volumeLabel.textContent = `${Math.round(noteVolumes[currentInstrument][noteInfo.note] * 100)}%`;
                 
                 // 音量调节事件
                 volumeSlider.addEventListener('input', (e) => {
                     const volume = parseInt(e.target.value) / 100;
-                    noteVolumes[noteInfo.note] = volume;
+                    noteVolumes[currentInstrument][noteInfo.note] = volume;
                     volumeLabel.textContent = `${e.target.value}%`;
                 });
                 
@@ -2487,7 +2499,7 @@
             // Chord 按钮点击事件
             chordKey.addEventListener('mousedown', () => {
                 chordKey.classList.add('active');
-                playChordAsync(1000, 0.6);
+                playChordAsync(1000, 0.6 * chordVolumes[currentInstrument]);
             });
             chordKey.addEventListener('mouseup', () => releaseNoteKey(chordKey));
             chordKey.addEventListener('mouseleave', () => releaseNoteKey(chordKey));
@@ -2496,7 +2508,7 @@
             chordKey.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 chordKey.classList.add('active');
-                playChordAsync(1000, 0.6);
+                playChordAsync(1000, 0.6 * chordVolumes[currentInstrument]);
             });
             chordKey.addEventListener('touchend', (e) => {
                 e.preventDefault();
@@ -2512,13 +2524,14 @@
             chordVolumeSlider.className = 'note-volume-slider';
             chordVolumeSlider.min = '0';
             chordVolumeSlider.max = '200';
-            chordVolumeSlider.value = '100';
+            chordVolumeSlider.value = Math.round(chordVolumes[currentInstrument] * 100).toString();
             
             const chordVolumeLabel = document.createElement('span');
             chordVolumeLabel.className = 'note-volume-label';
-            chordVolumeLabel.textContent = '100%';
+            chordVolumeLabel.textContent = `${Math.round(chordVolumes[currentInstrument] * 100)}%`;
             
             chordVolumeSlider.addEventListener('input', (e) => {
+                chordVolumes[currentInstrument] = parseInt(e.target.value) / 100;
                 chordVolumeLabel.textContent = `${e.target.value}%`;
             });
             
@@ -2555,7 +2568,7 @@
             
             // 基础演奏力度 * 全局音量 * 用户调节
             const baseVelocity = 0.7;
-            const userVolume = noteVolumes[noteInfo.note] || 1.0;
+            const userVolume = (noteVolumes[currentInstrument][noteInfo.note] !== undefined) ? noteVolumes[currentInstrument][noteInfo.note] : 1.0;
             const finalVelocity = baseVelocity * params.masterVolume * userVolume;
             
             // 木琴是混合模式：检查是否有该具体音符的采样
@@ -3558,7 +3571,7 @@
                     noteDuration = Math.max(noteDuration, minAudibleMs);
                     
                     // 应用全局音量 + 音符独立音量
-                    let userVolume = noteVolumes[note.note] || 1.0;
+                    let userVolume = (noteVolumes[currentInstrument][note.note] !== undefined) ? noteVolumes[currentInstrument][note.note] : 1.0;
                     let velocityWithMaster = note.velocity * params.masterVolume * userVolume;
                     
                     // 应用后音轻起修饰（仅对足够长的音生效，避免过短音被吞）
@@ -3660,7 +3673,7 @@
                 }
                 
                 const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
-                const userVol = noteVolumes[n.note] || 1.0;
+                const userVol = noteVolumes[currentInstrument][n.note] || 1.0;
                 const volIndicator = userVol !== 1.0 ? `<span style="font-size: 0.55rem; color: ${userVol > 1.0 ? '#ff6b9d' : '#4ecdc4'};">${Math.round(userVol*100)}%</span>` : '';
                 const volStyle = userVol !== 1.0 ? `border: 1px solid ${userVol > 1.0 ? 'rgba(255,107,107,0.4)' : 'rgba(78,205,196,0.4)'};` : '';
                 return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo} 音量:${Math.round(userVol*100)}%"
@@ -4389,7 +4402,7 @@
             noteDuration = Math.max(noteDuration, minAudibleMs);
             
             // 计算音量
-            let userVolume = noteVolumes[note.note] || 1.0;
+            let userVolume = (noteVolumes[currentInstrument][note.note] !== undefined) ? noteVolumes[currentInstrument][note.note] : 1.0;
             let velocityWithMaster = note.velocity * params.masterVolume * userVolume;
             
             // 应用后音轻起修饰（仅对足够长的音生效）
