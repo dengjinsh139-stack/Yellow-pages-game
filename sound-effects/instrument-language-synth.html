@@ -3566,7 +3566,7 @@
                         velocityWithMaster *= note.velocityMultiplier;
                     }
                     
-                    console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 声调=${note.tone}, 时值=${noteValue.name}, 时长=${noteDuration.toFixed(0)}ms`);
+                    console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 声调=${note.tone}, 时值=${noteValue.name}, 时长=${noteDuration.toFixed(0)}ms, 独立音量=${(userVolume*100).toFixed(0)}%, 最终velocity=${velocityWithMaster.toFixed(3)}`);
                     
                     // 播放单音（使用节奏引擎计算的时长）
                     playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
@@ -3660,10 +3660,14 @@
                 }
                 
                 const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}"
-                    style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px;">
+                const userVol = noteVolumes[n.note] || 1.0;
+                const volIndicator = userVol !== 1.0 ? `<span style="font-size: 0.55rem; color: ${userVol > 1.0 ? '#ff6b9d' : '#4ecdc4'};">${Math.round(userVol*100)}%</span>` : '';
+                const volStyle = userVol !== 1.0 ? `border: 1px solid ${userVol > 1.0 ? 'rgba(255,107,107,0.4)' : 'rgba(78,205,196,0.4)'};` : '';
+                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo} 音量:${Math.round(userVol*100)}%"
+                    style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; ${volStyle}">
                     <span style="font-size: 0.9rem;">${displayText}</span>
                     <span style="font-size: 0.6rem; opacity: 0.7;">${rhythmInfo}</span>
+                    ${volIndicator}
                 </span>`;
             }).join('');
         }
