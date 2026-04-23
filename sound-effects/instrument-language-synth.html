@@ -4427,6 +4427,11 @@
             let currentTime = 0.5; // 起始偏移
             const beatDuration = 60000 / params.bpm;
             
+            // 统计事件类型
+            const eventTypeCounts = {};
+            events.forEach(e => { eventTypeCounts[e.type] = (eventTypeCounts[e.type] || 0) + 1; });
+            console.log(`🎵 [RENDER] Event types:`, eventTypeCounts);
+            
             let notesRendered = 0;
             let pausesRendered = 0;
             let sampleNotesRendered = 0;
@@ -4506,22 +4511,29 @@
                 
                 // ===== 防御：跳过无效参数的事件 =====
                 if (!isFinite(noteDuration) || noteDuration <= 0 || !isFinite(velocity)) {
-                    console.warn(`[renderAudioToBuffer] Skipping invalid note at index ${i}: type=${evt.type}, duration=${noteDuration}, velocity=${velocity}, note=${note.note || note.char || '?'}`);
+                    console.warn(`[renderAudioToBuffer] ❌ Skipping invalid note at index ${i}: type=${evt.type}, duration=${noteDuration}, velocity=${velocity}, note=${note.note || note.char || '?'}`);
                     continue;
                 }
+                
+                console.log(`[renderAudioToBuffer] ▶ Rendering note ${i}/${events.length}: note=${note.note}, freq=${note.frequency?.toFixed(1)}, duration=${noteDuration.toFixed(3)}s, velocity=${velocity.toFixed(3)}, tone=${note.tone}, isChord=${note.isChord}`);
                 
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
                 const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
                 const hasSample = note.sampleNote && samplesLoaded;
                 
+                console.log(`[renderAudioToBuffer]   instrument=${currentInstrument}, isPiano=${isPiano}, isSampleInstrument=${isSampleInstrument}, hasSample=${hasSample}, sampleNote=${note.sampleNote}, chordsLoaded=${chordsLoaded}, isChord=${note.isChord}`);
+                
                 if (note.isChord && chordsLoaded) {
+                    console.log(`[renderAudioToBuffer]   → renderChordToBuffer`);
                     await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, velocity);
                     chordNotesRendered++;
                 } else if ((isPiano || isSampleInstrument) && hasSample) {
+                    console.log(`[renderAudioToBuffer]   → renderSampleToBuffer (sampleNote=${note.sampleNote})`);
                     await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
                     sampleNotesRendered++;
                 } else {
+                    console.log(`[renderAudioToBuffer]   → renderSynthToBuffer`);
                     await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
                     synthNotesRendered++;
                 }
