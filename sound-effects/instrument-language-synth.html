@@ -1343,7 +1343,13 @@
                 analyser.connect(audioContext.destination);
                 source.start();
                 updateSpectrum();
-                console.log(`[CharacterVoice] 播放音频: ${characterName}`);
+                console.log(`[CharacterVoice] 播放音频: ${characterName}, duration=${audioBuffer.duration.toFixed(2)}s`);
+                
+                // ===== 等待音频播放完成，确保顺序执行 =====
+                await new Promise(resolve => {
+                    source.onended = resolve;
+                });
+                console.log(`[CharacterVoice] 音频播放完成: ${characterName}`);
             } else {
                 // 无音频时使用乐器演奏主题音
                 console.log(`[CharacterVoice] 使用合成音色: ${characterName}`);
