@@ -2765,7 +2765,7 @@
             // 按位置排序
             characterVoiceEvents.sort((a, b) => a.position - b.position);
             
-            const tokens = tokenizeText(text);
+            const tokens = tokenizeText(processedText);
             const events = [];
             const bpm = params.bpm || 120;
             
