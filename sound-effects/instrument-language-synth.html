@@ -1163,6 +1163,33 @@
                     <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
                 </div>
 
+                <!-- 语义分类触发 MIDI 面板 -->
+                <div class="phrase-trigger-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="panel-title" style="margin-bottom: 12px;">
+                        <span>🎯</span>
+                        <span>语义分类触发</span>
+                    </div>
+                    <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
+                        <!-- 动态生成分类卡片 -->
+                    </div>
+                    
+                    <!-- 语义分类文件面板 -->
+                    <div id="phraseTriggerFilePanel" style="display: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - 专属 MIDI</span>
+                            <button id="btn-close-phrase-trigger" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem;">✕</button>
+                        </div>
+                        <div id="phraseTriggerFileList" style="margin-bottom: 10px; font-size: 0.75rem; color: var(--text-dim);">
+                            <p>暂无 MIDI 文件</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="file" id="phraseTriggerMidiInput" accept=".mid,.midi" style="display: none;">
+                            <button id="btn-upload-phrase-midi" class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 8px;">📁 上传 MIDI</button>
+                        </div>
+                        <div id="phraseTriggerFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; text-align: center;"></div>
+                    </div>
+                </div>
+
                 <div class="panel-title">演奏历史</div>
                 <div class="notes-display" id="historyDisplay" style="max-height: 120px;">
                     <span style="opacity: 0.5;">暂无记录</span>
@@ -1782,6 +1809,178 @@
             'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
             'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
         };
+
+        // ==================== 语义分类触发 MIDI 系统 ====================
+        
+        const phraseTriggerCategories = {
+            greeting: {
+                name: '打招呼',
+                emoji: '👋',
+                keywords: ['你好', '早上好', '晚上好', '早安', '晚安', '嗨', '哈喽', 'hello', 'hi', '打扰了', '不好意思打扰一下', '初次见面', '好久不见'],
+                midi: null,
+                parsedMidi: null
+            },
+            thanks: {
+                name: '感谢',
+                emoji: '🙏',
+                keywords: ['谢谢', '多谢', '非常感谢', '辛苦了', '麻烦你了', '感激不尽', '太感谢了', '多亏你了'],
+                midi: null,
+                parsedMidi: null
+            },
+            apology: {
+                name: '道歉',
+                emoji: '🙇',
+                keywords: ['对不起', '抱歉', '不好意思', '失礼了', '是我不对', '我的问题', '给你添麻烦了', '请原谅我'],
+                midi: null,
+                parsedMidi: null
+            },
+            farewell: {
+                name: '告别',
+                emoji: '👋',
+                keywords: ['再见', '回头见', '明天见', '下次见', '拜拜', '先这样', '我先走了'],
+                midi: null,
+                parsedMidi: null
+            },
+            request: {
+                name: '请求',
+                emoji: '🙏',
+                keywords: ['请问', '能不能', '可以吗', '帮我一下', '麻烦你', '想请教一下', '我有个问题', '能帮我看看吗'],
+                midi: null,
+                parsedMidi: null
+            },
+            confirm: {
+                name: '确认',
+                emoji: '✅',
+                keywords: ['好的', '好', '可以', '没问题', '明白了', '收到', '行', '就这么办'],
+                midi: null,
+                parsedMidi: null
+            },
+            praise: {
+                name: '赞美',
+                emoji: '✨',
+                keywords: ['好厉害', '太棒了', '干得漂亮', '做得很好', '真不错', '加油', '你可以的', '我支持你'],
+                midi: null,
+                parsedMidi: null
+            },
+            comfort: {
+                name: '安慰',
+                emoji: '🤗',
+                keywords: ['你还好吗', '没事吧', '别担心', '我在', '慢慢来', '会好的', '抱抱你', '我陪你'],
+                midi: null,
+                parsedMidi: null
+            }
+        };
+        
+        let currentPhraseTrigger = null;
+        
+        // 检测语义分类
+        function detectPhraseTriggerCategory(text) {
+            const source = (text || '').toLowerCase();
+            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
+                if (!category.keywords || !category.keywords.length) continue;
+                const matched = category.keywords.find(keyword =>
+                    source.includes(String(keyword).toLowerCase())
+                );
+                if (matched) {
+                    return { key, category, matchedKeyword: matched };
+                }
+            }
+            return null;
+        }
+        
+        // 选择语义分类（显示上传面板）
+        function selectPhraseTrigger(categoryKey) {
+            currentPhraseTrigger = categoryKey;
+            const category = phraseTriggerCategories[categoryKey];
+            if (!category) return;
+            
+            document.getElementById('phraseTriggerPanelTitle').textContent = `${category.emoji} ${category.name} - 专属 MIDI`;
+            document.getElementById('phraseTriggerFilePanel').style.display = 'block';
+            updatePhraseTriggerFileList(categoryKey);
+        }
+        
+        // 关闭语义分类面板
+        function closePhraseTriggerPanel() {
+            document.getElementById('phraseTriggerFilePanel').style.display = 'none';
+            currentPhraseTrigger = null;
+        }
+        
+        // 更新语义分类文件列表
+        function updatePhraseTriggerFileList(categoryKey) {
+            const category = phraseTriggerCategories[categoryKey];
+            const listDiv = document.getElementById('phraseTriggerFileList');
+            
+            let html = '';
+            if (category.midi) {
+                html += `<p>🎹 MIDI: ${category.midi.name} <button class="btn-delete-phrase-trigger" data-category="${categoryKey}" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">删除</button></p>`;
+            } else {
+                html = '<p>暂无 MIDI 文件，请上传</p>';
+            }
+            
+            listDiv.innerHTML = html;
+        }
+        
+        // 清除语义分类 MIDI
+        function clearPhraseTriggerMidi(categoryKey) {
+            if (phraseTriggerCategories[categoryKey]) {
+                phraseTriggerCategories[categoryKey].midi = null;
+                phraseTriggerCategories[categoryKey].parsedMidi = null;
+                updatePhraseTriggerFileList(categoryKey);
+                document.getElementById('phraseTriggerFileStatus').textContent = '已删除 MIDI 文件';
+            }
+        }
+        
+        // 处理语义分类 MIDI 上传
+        async function handlePhraseTriggerMidi(event) {
+            if (!currentPhraseTrigger) return;
+            
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('phraseTriggerFileStatus');
+            statusDiv.textContent = '正在解析 MIDI...';
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const midiData = parseMidi(arrayBuffer);
+                
+                phraseTriggerCategories[currentPhraseTrigger].midi = {
+                    name: file.name,
+                    data: arrayBuffer
+                };
+                phraseTriggerCategories[currentPhraseTrigger].parsedMidi = midiData;
+                
+                updatePhraseTriggerFileList(currentPhraseTrigger);
+                statusDiv.textContent = `✅ MIDI 已保存到 ${phraseTriggerCategories[currentPhraseTrigger].name}`;
+                
+                event.target.value = '';
+            } catch (err) {
+                console.error('MIDI 解析错误:', err);
+                statusDiv.textContent = '❌ 解析失败: ' + err.message;
+            }
+        }
+        
+        // 生成语义分类卡片
+        function generatePhraseTriggerCards() {
+            const grid = document.getElementById('phraseTriggerGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
+                const hasMidi = category.parsedMidi ? '✅' : '○';
+                const card = document.createElement('div');
+                card.className = 'preset-btn';
+                card.style.cssText = 'padding: 10px 8px; font-size: 0.8rem; cursor: pointer; text-align: center;';
+                card.dataset.category = key;
+                card.innerHTML = `
+                    <span style="font-size: 1.2rem; display: block; margin-bottom: 4px;">${category.emoji}</span>
+                    <span style="display: block; font-weight: 600;">${category.name}</span>
+                    <span style="font-size: 0.65rem; opacity: 0.7;">${hasMidi} ${category.keywords.length} 个关键词</span>
+                `;
+                card.addEventListener('click', () => selectPhraseTrigger(key));
+                grid.appendChild(card);
+            }
+        }
 
         // ==================== 情绪专属文件系统 ====================
         
@@ -3359,13 +3558,6 @@
         async function playText() {
             console.log('=== playText 开始 ===');
             
-            // 强制重置异常状态
-            if (isPlaying) {
-                console.log('检测到 isPlaying=true，强制重置');
-                stopPlaying();
-                await new Promise(r => setTimeout(r, 50));
-            }
-            
             const text = document.getElementById('textInput').value.trim();
             console.log('输入文本:', text);
             
@@ -3373,6 +3565,38 @@
                 document.getElementById('statusText').textContent = '请先输入文字';
                 console.log('文本为空，返回');
                 return;
+            }
+            
+            // ===== V1: 语义分类整句触发 =====
+            const matchedCategory = detectPhraseTriggerCategory(text);
+            if (matchedCategory && matchedCategory.category.parsedMidi) {
+                console.log(`🎯 语义分类命中: ${matchedCategory.category.name} (关键词: ${matchedCategory.matchedKeyword})`);
+                document.getElementById('statusText').textContent = `🎯 ${matchedCategory.category.name} → 播放分类 MIDI`;
+                
+                // 确保音频上下文已启动
+                if (!audioContext) {
+                    alert('请先启动音频引擎');
+                    return;
+                }
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                isPlaying = true;
+                addToHistory(`🎯 ${matchedCategory.category.name}: "${text.substring(0, 20)}${text.length > 20 ? '...' : ''}"`);
+                
+                await playMidiAsync(matchedCategory.category.parsedMidi);
+                
+                isPlaying = false;
+                document.getElementById('statusText').textContent = `${matchedCategory.category.name} MIDI 播放完成`;
+                return; // V1: 命中后不再继续分音
+            }
+            
+            // 强制重置异常状态
+            if (isPlaying) {
+                console.log('检测到 isPlaying=true，强制重置');
+                stopPlaying();
+                await new Promise(r => setTimeout(r, 50));
             }
             
             // Safari/Mac 兼容性：确保音频上下文已启动
@@ -4965,6 +5189,29 @@
                 });
             }
 
+            // ===== 语义分类触发事件绑定 =====
+            const btnClosePhraseTrigger = document.getElementById('btn-close-phrase-trigger');
+            if (btnClosePhraseTrigger) btnClosePhraseTrigger.addEventListener('click', closePhraseTriggerPanel);
+
+            const btnUploadPhraseMidi = document.getElementById('btn-upload-phrase-midi');
+            const inputPhraseMidi = document.getElementById('phraseTriggerMidiInput');
+            if (btnUploadPhraseMidi && inputPhraseMidi) {
+                btnUploadPhraseMidi.addEventListener('click', () => inputPhraseMidi.click());
+                inputPhraseMidi.addEventListener('change', handlePhraseTriggerMidi);
+            }
+
+            // 语义分类删除按钮（事件委托）
+            const phraseTriggerFileList = document.getElementById('phraseTriggerFileList');
+            if (phraseTriggerFileList) {
+                phraseTriggerFileList.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.btn-delete-phrase-trigger');
+                    if (btn) {
+                        const categoryKey = btn.dataset.category;
+                        if (categoryKey) clearPhraseTriggerMidi(categoryKey);
+                    }
+                });
+            }
+
             console.log('✅ UI 事件绑定完成');
         }
 
@@ -5016,6 +5263,7 @@
             
             bindUIEvents();
             verifyCriticalBindings();
+            generatePhraseTriggerCards();
             console.log('🚀 页面初始化完成');
         });
 
@@ -5031,6 +5279,12 @@
         window.selectEmotion = selectEmotion;
         window.closeEmotionPanel = closeEmotionPanel;
         window.clearEmotionFile = clearEmotionFile;
+        
+        // 语义分类触发暴露
+        window.selectPhraseTrigger = selectPhraseTrigger;
+        window.closePhraseTriggerPanel = closePhraseTriggerPanel;
+        window.clearPhraseTriggerMidi = clearPhraseTriggerMidi;
+        window.detectPhraseTriggerCategory = detectPhraseTriggerCategory;
         
         // SCRIPT_END
         console.log('SCRIPT_END');
