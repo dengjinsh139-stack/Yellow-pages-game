@@ -4288,6 +4288,26 @@
                     continue;
                 }
                 
+                // 角色声纹事件：估算实际播放时长
+                if (evt.type === 'characterVoice') {
+                    const config = characterVoiceConfig[evt.character];
+                    if (!config) continue;
+                    let voiceDuration = 0;
+                    // 优先用已缓存的音频时长
+                    const audioBuffer = characterAudioBuffers[evt.character];
+                    if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
+                        voiceDuration = audioBuffer.duration;
+                    } else {
+                        //  fallback：按 motifNotes 累加估算
+                        for (const note of config.motifNotes) {
+                            voiceDuration += note.durationMs / 1000 + 0.05;
+                        }
+                    }
+                    totalTime += voiceDuration;
+                    totalTime += 0.02; // 微小间隔对齐渲染逻辑
+                    continue;
+                }
+                
                 // 使用预计算的timing（如果存在）
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
                 totalTime += timing.duration / 1000;
