@@ -1779,6 +1779,18 @@
                 },
                 attack: 0.02,
                 release: 0.3
+            },
+            vocal: {
+                name: '虚拟人声',
+                emoji: '🎙️',
+                basePath: '../assets/audio/samples/vocal/',
+                samples: {
+                    // 虚拟人声五声音阶 - D4 使用4个随机采样
+                    'D4': { files: ['D4_01.wav', 'D4_02.wav', 'D4_03.wav', 'D4_04.wav'], freq: 293.66, gain: 1.5, random: true }
+                },
+                attack: 0.02,
+                release: 0.3,
+                isHybrid: true
             }
         };
 
@@ -2543,7 +2555,7 @@
                 'flute': '真实长笛采样 🪈',
                 'synth': '真实合成器采样 🎛️',
                 'train': '真实火车采样 🚂',
-                'guitar': '虚拟人声 (合成音色)',
+                'guitar': '虚拟人声 (采样音色)',
                 'xylophone': '真实木琴采样 🎹',
                 'trumpet': '小号 (合成音色)'
             };
@@ -2586,6 +2598,13 @@
                 document.getElementById('statusText').textContent = '木琴采样已加载';
             }
             
+            // 如果是虚拟人声，需要加载采样
+            if (instrument === 'guitar' && !audioBuffers['vocal_D4_01']) {
+                document.getElementById('statusText').textContent = '加载虚拟人声采样中...';
+                await loadVocalSamples();
+                document.getElementById('statusText').textContent = '虚拟人声采样已加载';
+            }
+            
             // 应用该乐器的默认参数
             applyInstrumentDefaults(instrument);
             
@@ -2608,6 +2627,69 @@
             } else {
                 playSynthTone(440, 0.2);
             }
+        }
+
+        // 加载虚拟人声采样
+        async function loadVocalSamples() {
+            if (audioBuffers['vocal_D4_01']) return; // 已加载
+            
+            const config = sampleConfig.vocal;
+            const loadPromises = [];
+            
+            for (const [note, info] of Object.entries(config.samples)) {
+                if (info.files && info.random) {
+                    // 随机采样：加载所有文件
+                    for (let i = 0; i < info.files.length; i++) {
+                        const file = info.files[i];
+                        const promise = fetch(config.basePath + file)
+                            .then(response => response.arrayBuffer())
+                            .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                            .then(audioBuffer => {
+                                audioBuffers[`vocal_${note}_${String(i + 1).padStart(2, '0')}`] = audioBuffer;
+                                console.log(`Loaded vocal: ${note} variant ${i + 1}`);
+                            })
+                            .catch(err => console.error(`Failed to load vocal ${note} variant ${i + 1}:`, err));
+                        
+                        loadPromises.push(promise);
+                    }
+                } else if (info.file) {
+                    // 单个采样文件
+                    const promise = fetch(config.basePath + info.file)
+                        .then(response => response.arrayBuffer())
+                        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                        .then(audioBuffer => {
+                            audioBuffers[`vocal_${note}`] = audioBuffer;
+                            console.log(`Loaded vocal: ${note}`);
+                        })
+                        .catch(err => console.error(`Failed to load vocal ${note}:`, err));
+                    
+                    loadPromises.push(promise);
+                }
+            }
+            
+            await Promise.all(loadPromises);
+        }
+
+        // 获取随机采样文件（用于虚拟人声）
+        function getRandomSampleFile(noteName, instrument) {
+            const config = sampleConfig[instrument];
+            if (!config) return null;
+            
+            const sampleInfo = config.samples[noteName];
+            if (!sampleInfo || !sampleInfo.random || !sampleInfo.files) {
+                return null;
+            }
+            
+            // 随机选择一个文件
+            const randomIndex = Math.floor(Math.random() * sampleInfo.files.length);
+            const fileName = sampleInfo.files[randomIndex];
+            const variantIndex = String(randomIndex + 1).padStart(2, '0');
+            
+            return {
+                fileName,
+                bufferKey: `${instrument}_${noteName}_${variantIndex}`,
+                sampleNote: noteName
+            };
         }
 
         // 应用乐器默认参数
@@ -2996,6 +3078,9 @@
                 return true;
             }
             if (instrument === 'xylophone' && audioBuffers['xylophone_F4']) {
+                return true;
+            }
+            if (instrument === 'guitar' && audioBuffers['vocal_D4_01']) {
                 return true;
             }
             return false;
@@ -3456,7 +3541,18 @@
                 return;
             }
             
-            // 找到最近的采样
+            // ===== 虚拟人声随机采样处理 =====
+            if (currentInstrument === 'guitar') {
+                const randomSample = getRandomSampleFile(targetNoteName, 'vocal');
+                if (randomSample) {
+                    const buffer = audioBuffers[randomSample.bufferKey];
+                    if (buffer) {
+                        return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, randomSample.sampleNote, config);
+                    }
+                }
+            }
+            
+            // 找到最近的采样（原有逻辑）
             const freqToSampleNote = {};
             for (const [note, info] of Object.entries(config.samples)) {
                 freqToSampleNote[info.freq] = note;
@@ -3483,16 +3579,23 @@
                 return;
             }
             
+            return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config);
+        }
+        
+        // 内部采样播放函数（与实时播放 playSampleTone() 严格对齐）
+        function playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config) {
             // 创建音频源
             const source = audioContext.createBufferSource();
             source.buffer = buffer;
             
             // 计算播放速度以达到目标音高
+            const sampleInfo = config.samples[sampleNote];
+            const nearestFreq = sampleInfo.freq;
             const playbackRate = targetFrequency / nearestFreq;
             source.playbackRate.value = playbackRate;
             
             // 音量计算：基础补偿 * 演奏力度
-            const baseGain = config.samples[sampleNote].gain || 1.0;
+            const baseGain = sampleInfo.gain || 1.0;
             // 确保 velocity 是有效数字
             const safeVelocity = (typeof velocity === 'number' && isFinite(velocity)) ? velocity : 0.5;
             const finalVelocity = safeVelocity * baseGain;
