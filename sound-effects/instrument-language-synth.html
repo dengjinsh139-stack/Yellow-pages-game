@@ -5016,29 +5016,26 @@
                         const noteVel = (mnote.velocity / 127) * params.masterVolume;
                         const noteDur = params.noteDuration / 1000;
                         
-                        // TODO: 导出应复用与实时播放统一的 MIDI note 渲染 helper
-                        // 当前使用手写 oscillator，与实时播放（采样/合成器）音色可能不一致
-                        const oscillator = offlineContext.createOscillator();
-                        const gainNode = offlineContext.createGain();
-                        const waveforms = {
-                            'guitar': 'sawtooth',
-                            'xylophone': 'triangle',
-                            'trumpet': 'square',
-                            'synth': 'sawtooth',
-                            'piano': 'triangle',
-                            'flute': 'sine',
-                            'saxophone': 'sawtooth',
-                            'train': 'triangle'
+                        // 构造note对象，与textToNotes生成的note格式一致
+                        const noteObj = {
+                            note: pentatonicNote,
+                            frequency: freq,
+                            velocity: noteVel,
+                            sampleNote: findNearestSample(pentatonicNote)
                         };
-                        oscillator.type = waveforms[currentInstrument] || 'sine';
-                        oscillator.frequency.value = freq;
-                        gainNode.gain.setValueAtTime(0, midiCurrentTime);
-                        gainNode.gain.linearRampToValueAtTime(noteVel, midiCurrentTime + 0.02);
-                        gainNode.gain.exponentialRampToValueAtTime(0.001, midiCurrentTime + noteDur + 0.2);
-                        oscillator.connect(gainNode);
-                        gainNode.connect(destination);
-                        oscillator.start(midiCurrentTime);
-                        oscillator.stop(midiCurrentTime + noteDur + 0.5);
+                        
+                        // 乐器分支判断（与实时播放一致）
+                        const isPiano = currentInstrument === 'piano';
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
+                        const hasSample = noteObj.sampleNote && samplesLoaded;
+                        
+                        if ((isPiano || isSampleInstrument) && hasSample) {
+                            // 使用采样渲染（与实时播放 playSampleTone 一致）
+                            await renderSampleToBuffer(offlineContext, destination, noteObj, midiCurrentTime, noteDur, noteVel);
+                        } else {
+                            // 使用合成音色渲染（与实时播放 playSynthTone 一致）
+                            await renderSynthToBuffer(offlineContext, destination, noteObj, midiCurrentTime, noteDur, noteVel);
+                        }
                     }
                     
                     currentTime = midiCurrentTime + 0.5;
