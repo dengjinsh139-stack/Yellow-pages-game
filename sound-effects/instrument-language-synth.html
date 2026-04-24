@@ -2400,7 +2400,7 @@
                 allNotes.sort((a, b) => a.time - b.time);
                 
                 // 计算时间比例（将 MIDI tick 转换为毫秒）
-                const msPerTick = 60000 / (120 * midiData.timeDivision);
+                const msPerTick = 60000 / (params.bpm * midiData.timeDivision);
                 
                 // 依次演奏
                 let lastTime = 0;
@@ -4574,7 +4574,7 @@
             allNotes.sort((a, b) => a.time - b.time);
             
             // 计算时间比例（将 MIDI tick 转换为毫秒）
-            const msPerTick = 60000 / (120 * midiData.timeDivision); // 假设 120 BPM
+            const msPerTick = 60000 / (params.bpm * midiData.timeDivision); // 使用合成器BPM
             
             // 显示 MIDI 音符序列
             displayMidiNotes(allNotes);
@@ -4882,7 +4882,7 @@
                     if (allNotes.length === 0) continue;
                     
                     allNotes.sort((a, b) => a.time - b.time);
-                    const msPerTick = 60000 / (120 * midiData.timeDivision);
+                    const msPerTick = 60000 / (params.bpm * midiData.timeDivision);
                     
                     const lastNote = allNotes[allNotes.length - 1];
                     const lastNoteTimeMs = lastNote.time * msPerTick;
@@ -5124,7 +5124,7 @@
                     }
                     allNotes.sort((a, b) => a.time - b.time);
                     
-                    const msPerTick = 60000 / (120 * midiData.timeDivision);
+                    const msPerTick = 60000 / (params.bpm * midiData.timeDivision);
                     let midiCurrentTime = currentTime;
                     let lastNoteTime = 0;
                     
