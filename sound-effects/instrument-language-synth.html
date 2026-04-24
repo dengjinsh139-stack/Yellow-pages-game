@@ -1149,28 +1149,6 @@
                     </div>
                 </div>
 
-                <!-- 情绪专属文件上传区域 -->
-                <div id="emotionFilePanel" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <span id="emotionPanelTitle" style="font-weight: 600; color: var(--primary);">😊 开心 - 专属文件</span>
-                        <button id="btn-close-emotion" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.2rem;">✕</button>
-                    </div>
-                    
-                    <div id="emotionFileList" style="margin-bottom: 12px; font-size: 0.8rem; color: var(--text-dim);">
-                        <p>暂无专属文件</p>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px;">
-                        <input type="file" id="emotionMidiInput" accept=".mid,.midi" style="display: none;">
-                        <button id="btn-upload-midi" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">📁 上传 MIDI</button>
-                        
-                        <input type="file" id="emotionAudioInput" accept="audio/*" style="display: none;">
-                        <button id="btn-upload-audio" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">🎵 上传音频</button>
-                    </div>
-                    
-                    <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
-                </div>
-
 
 
                 <div class="panel-title">演奏历史</div>
@@ -3789,32 +3767,6 @@
             
             // 根据情感调整参数
             adjustParamsByEmotion(emotion);
-            
-            // ===== 智能情绪预设 =====
-            // 如果检测到有情绪专属文件，播放情绪专属内容
-            if (emotionFiles[emotion]) {
-                console.log(`检测到情绪 ${emotion}，检查专属文件...`);
-                console.log('情绪数据:', emotionFiles[emotion]);
-                
-                // 选中该情绪（显示面板）
-                selectEmotion(emotion);
-                
-                // comfort 不在情绪阶段直接播放；交给 textToEvents() 的 phraseMidi 局部插入处理
-                // 情绪系统只负责显示 badge / 调整参数
-                
-                // 尝试播放情绪专属内容（原有逻辑）
-                const hasCustomFile = await playEmotionContentAsync(emotion);
-                console.log('是否有专属文件:', hasCustomFile);
-                
-                if (hasCustomFile) {
-                    // 如果有专属文件，播放完成后结束
-                    document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
-                    addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
-                    isPlaying = false;
-                    return;
-                }
-                console.log('没有专属文件，继续播放文字转音乐');
-            }
             
             // ===== V2: 语义分类 + 逐字分音混合 =====
             let events = textToEvents(text);
