@@ -1127,18 +1127,26 @@
                     </div>
                 </div>
 
-                <div class="panel-title">快速预设</div>
-                
-                <div class="preset-grid">
-                    <div class="preset-btn" data-preset="hello">👋 你好</div>
-                    <div class="preset-btn" data-preset="goodmorning">🌅 早上好</div>
-                    <div class="preset-btn" data-preset="iloveyou">❤️ 我爱你</div>
-                    <div class="preset-btn" data-preset="happybirthday">🎂 生日快乐</div>
-                    <div class="preset-btn" data-preset="goodnight">🌙 晚安</div>
-                    <div class="preset-btn" data-preset="thankyou">🙏 谢谢</div>
-                    <div class="preset-btn" data-preset="congrats">🎉 恭喜</div>
-                    <div class="preset-btn" data-preset="goodluck">🍀 祝好运</div>
-                    <div class="preset-btn" data-emotion="happy" data-preset="happy" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
+                <!-- 语义分类触发 MIDI 面板 -->
+                <div class="phrase-trigger-section" style="margin-top: 0; padding-top: 0;">
+                    <div class="panel-title" style="margin-bottom: 12px;">
+                        <span>🎯</span>
+                        <span>语义分类触发</span>
+                    </div>
+                    <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
+                        <!-- 动态生成分类卡片 -->
+                    </div>
+                    
+                    <!-- 语义分类文件面板 -->
+                    <div id="phraseTriggerFilePanel" style="display: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - MIDI 状态</span>
+                            <button id="btn-close-phrase-trigger" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem;">✕</button>
+                        </div>
+                        <div id="phraseTriggerFileList" style="font-size: 0.75rem; color: var(--text-dim);">
+                            <p>加载中...</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 情绪专属文件上传区域 -->
@@ -1163,27 +1171,7 @@
                     <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
                 </div>
 
-                <!-- 语义分类触发 MIDI 面板 -->
-                <div class="phrase-trigger-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div class="panel-title" style="margin-bottom: 12px;">
-                        <span>🎯</span>
-                        <span>语义分类触发</span>
-                    </div>
-                    <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
-                        <!-- 动态生成分类卡片 -->
-                    </div>
-                    
-                    <!-- 语义分类文件面板 -->
-                    <div id="phraseTriggerFilePanel" style="display: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - MIDI 状态</span>
-                            <button id="btn-close-phrase-trigger" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem;">✕</button>
-                        </div>
-                        <div id="phraseTriggerFileList" style="font-size: 0.75rem; color: var(--text-dim);">
-                            <p>加载中...</p>
-                        </div>
-                    </div>
-                </div>
+
 
                 <div class="panel-title">演奏历史</div>
                 <div class="notes-display" id="historyDisplay" style="max-height: 120px;">
@@ -1952,7 +1940,7 @@
             const category = phraseTriggerCategories[categoryKey];
             if (!category) return;
             
-            document.getElementById('phraseTriggerPanelTitle').textContent = `${category.emoji} ${category.name} - 专属 MIDI`;
+            document.getElementById('phraseTriggerPanelTitle').textContent = `${category.emoji} ${category.name} - 关键词与 MIDI`;
             document.getElementById('phraseTriggerFilePanel').style.display = 'block';
             updatePhraseTriggerFileList(categoryKey);
         }
@@ -1963,21 +1951,63 @@
             currentPhraseTrigger = null;
         }
         
-        // 更新语义分类文件列表（只读显示加载状态）
+        // 更新语义分类文件列表（显示 MIDI 状态 + 关键词 + 说明）
         function updatePhraseTriggerFileList(categoryKey) {
             const category = phraseTriggerCategories[categoryKey];
             const listDiv = document.getElementById('phraseTriggerFileList');
-            
-            let html = '';
-            if (category.parsedMidi) {
-                html += `<p>✅ MIDI 已加载: ${category.midi?.name || 'unknown'}</p>`;
-                html += `<p style="font-size: 0.65rem; opacity: 0.7;">音轨数: ${category.parsedMidi.numTracks} | 时间精度: ${category.parsedMidi.timeDivision}</p>`;
-            } else {
-                html = '<p>○ 暂无预置 MIDI 文件</p>';
-                html += `<p style="font-size: 0.65rem; opacity: 0.5;">请将 MIDI 文件放到 assets/audio/phrase-midi/${categoryKey}.mid</p>`;
-            }
-            
-            listDiv.innerHTML = html;
+            if (!category || !listDiv) return;
+
+            const midiStatusHtml = category.parsedMidi
+                ? `<p style="margin: 0 0 8px 0;">✅ MIDI 已加载: ${category.midi?.name || 'unknown'}</p>`
+                : `<p style="margin: 0 0 8px 0;">○ 暂无专属 MIDI</p>`;
+
+            const midiDetailHtml = category.parsedMidi
+                ? `<p style="font-size: 0.65rem; opacity: 0.7; margin: 0 0 10px 0;">
+                    音轨数: ${category.parsedMidi.numTracks || category.parsedMidi.tracks?.length || '-'} 
+                    | 时间精度: ${category.parsedMidi.timeDivision || category.parsedMidi.ticksPerQuarter || '-'}
+                   </p>`
+                : `<p style="font-size: 0.65rem; opacity: 0.55; margin: 0 0 10px 0;">
+                    可后续为该分类配置 MIDI 文件
+                   </p>`;
+
+            const keywordHtml = (category.keywords || []).map(keyword => `
+                <span style="
+                    display: inline-block;
+                    padding: 3px 7px;
+                    margin: 2px;
+                    border-radius: 999px;
+                    background: rgba(255,255,255,0.08);
+                    border: 1px solid rgba(255,255,255,0.12);
+                    font-size: 0.68rem;
+                    color: var(--text);
+                ">${keyword}</span>
+            `).join('');
+
+            listDiv.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div>
+                        <div style="font-size: 0.72rem; opacity: 0.65; margin-bottom: 4px;">MIDI 状态</div>
+                        ${midiStatusHtml}
+                        ${midiDetailHtml}
+                    </div>
+
+                    <div>
+                        <div style="font-size: 0.72rem; opacity: 0.65; margin-bottom: 5px;">关键词</div>
+                        <div style="line-height: 1.8;">
+                            ${keywordHtml || '<span style="opacity: 0.5;">暂无关键词</span>'}
+                        </div>
+                    </div>
+
+                    <div style="
+                        font-size: 0.65rem;
+                        opacity: 0.6;
+                        line-height: 1.5;
+                        margin-top: 4px;
+                    ">
+                        输入文本命中以上任意关键词时，会插入该分类 MIDI，并由当前选择的乐器演奏。
+                    </div>
+                </div>
+            `;
         }
         
         // 生成语义分类卡片
