@@ -3534,10 +3534,11 @@
         function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5) {
             if (!audioContext) return;
             
-            // 根据当前乐器选择配置
-            const config = sampleConfig[currentInstrument];
+            // 根据当前乐器选择配置（虚拟人声使用 vocal 配置）
+            const configKey = currentInstrument === 'guitar' ? 'vocal' : currentInstrument;
+            const config = sampleConfig[configKey];
             if (!config) {
-                console.warn('No sample config for instrument:', currentInstrument);
+                console.warn('No sample config for instrument:', currentInstrument, '-> looking for', configKey);
                 return;
             }
             
@@ -3571,7 +3572,7 @@
             }
             
             const sampleNote = freqToSampleNote[nearestFreq];
-            const bufferKey = currentInstrument === 'piano' ? sampleNote : currentInstrument + '_' + sampleNote;
+            const bufferKey = configKey === 'piano' ? sampleNote : configKey + '_' + sampleNote;
             const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
@@ -5216,10 +5217,11 @@
                 return;
             }
             
-            // 根据当前乐器选择配置
-            const config = sampleConfig[currentInstrument];
+            // 根据当前乐器选择配置（虚拟人声使用 vocal 配置）
+            const configKey = currentInstrument === 'guitar' ? 'vocal' : currentInstrument;
+            const config = sampleConfig[configKey];
             if (!config) {
-                console.warn('🎵 [RENDER] No sample config for instrument:', currentInstrument);
+                console.warn('🎵 [RENDER] No sample config for instrument:', currentInstrument, '-> looking for', configKey);
                 return;
             }
             
