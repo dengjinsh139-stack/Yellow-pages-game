@@ -1863,13 +1863,69 @@
                 keywords: ['你还好吗', '没事吧', '别担心', '我在', '慢慢来', '会好的', '抱抱你', '我陪你'],
                 midi: null,
                 parsedMidi: null
+            },
+            // 语义 MIDI 分类 - 自动映射（基于音符特征）
+            semantic01: {
+                name: '悲伤',
+                emoji: '💧',
+                keywords: ['伤心', '难过', '想哭', '痛苦', '失落', '遗憾', '心碎', '悲痛'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic02: {
+                name: '安慰',
+                emoji: '🤲',
+                keywords: ['没事的', '别怕', '放心', '我在呢', '抱抱', '陪着你', '会好的', '不要哭'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic03: {
+                name: '平静',
+                emoji: '🍃',
+                keywords: ['平静', '安静', '放松', '深呼吸', '静下来', ' serene', 'calm', 'peace'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic04: {
+                name: '开心',
+                emoji: '😊',
+                keywords: ['开心', '高兴', '快乐', '太好了', '耶', '棒', '赞', '完美'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic05: {
+                name: '鼓励',
+                emoji: '💪',
+                keywords: ['加油', '你可以', '坚持', '别放弃', '相信自己', '你能行', '挺住', '奋斗'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic06: {
+                name: '兴奋',
+                emoji: '🎉',
+                keywords: ['兴奋', '激动', '太棒了', '哇', 'Amazing', 'Awesome', '太厉害了', '不可思议'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic07: {
+                name: '紧张',
+                emoji: '😰',
+                keywords: ['紧张', '害怕', '担心', '焦虑', '不安', '压力', '好怕', '救命'],
+                midi: null,
+                parsedMidi: null
             }
         };
         
         // 语义分类预置 MIDI 路径映射
-        // 注：当前仓库只有 comfort.mid，其他分类待后续补充
         const phraseMidiPaths = {
-            comfort: '../midis/comfort.mid'
+            comfort: '../midis/comfort.mid',
+            semantic01: '../midis/semantic_01.mid',
+            semantic02: '../midis/semantic_02.mid',
+            semantic03: '../midis/semantic_03.mid',
+            semantic04: '../midis/semantic_04.mid',
+            semantic05: '../midis/semantic_05.mid',
+            semantic06: '../midis/semantic_06.mid',
+            semantic07: '../midis/semantic_07.mid'
         };
         
         let currentPhraseTrigger = null;
