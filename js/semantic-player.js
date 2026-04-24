@@ -12,8 +12,8 @@
 
     // ==================== 配置 ====================
     const SEMANTIC_MIDI_MAP = {
-        '安慰': 'midis/comfort.mid',
-        'comfort': 'midis/comfort.mid',
+        '安慰': '../midis/comfort.mid',
+        'comfort': '../midis/comfort.mid',
     };
 
     // 默认播放参数
@@ -497,15 +497,6 @@
     // 暴露到全局
     global.SemanticMidiPlayer = SemanticMidiPlayer;
     global.semanticPlayer = semanticPlayer;
-
-    // 便捷函数
-    global.playSemanticMidi = function(semantic, options) {
-        return semanticPlayer.play(semantic, options);
-    };
-
-    global.loadSemanticMidi = function(url) {
-        return semanticPlayer.load(url);
-    };
 
     console.log('[SemanticPlayer] 语义 MIDI 播放器已加载 v1.0.0');
     console.log('[SemanticPlayer] 已注册语义:', Object.keys(SEMANTIC_MIDI_MAP));

@@ -1846,7 +1846,7 @@
             confirm: {
                 name: '确认',
                 emoji: '✅',
-                keywords: ['好的', '好', '可以', '没问题', '明白了', '收到', '行', '就这么办'],
+                keywords: ['好的', '可以', '没问题', '明白了', '收到', '行', '就这么办', '没问题'],
                 midi: null,
                 parsedMidi: null
             },
@@ -1867,15 +1867,9 @@
         };
         
         // 语义分类预置 MIDI 路径映射
+        // 注：当前仓库只有 comfort.mid，其他分类待后续补充
         const phraseMidiPaths = {
-            greeting: '../assets/audio/phrase-midi/greeting.mid',
-            thanks: '../assets/audio/phrase-midi/thanks.mid',
-            apology: '../assets/audio/phrase-midi/apology.mid',
-            farewell: '../assets/audio/phrase-midi/farewell.mid',
-            request: '../assets/audio/phrase-midi/request.mid',
-            confirm: '../assets/audio/phrase-midi/confirm.mid',
-            praise: '../assets/audio/phrase-midi/praise.mid',
-            comfort: '../assets/audio/phrase-midi/comfort.mid'
+            comfort: '../midis/comfort.mid'
         };
         
         let currentPhraseTrigger = null;
@@ -1909,7 +1903,7 @@
         }
         
         // 加载语义 MIDI 文件到情绪系统
-        async function loadSemanticMidi(emotionKey, url) {
+        async function loadEmotionSemanticMidi(emotionKey, url) {
             if (!emotionFiles[emotionKey]) return;
             
             try {
@@ -2387,11 +2381,19 @@
                 document.getElementById('statusText').textContent = '加载采样中...';
                 await loadSamples();
                 
-                // 加载语义分类预置 MIDI
-                await loadPhraseTriggerMidis();
+                // 加载语义分类预置 MIDI（可选，失败不阻断）
+                try {
+                    await loadPhraseTriggerMidis();
+                } catch (err) {
+                    console.warn('[PhraseTrigger] 语义分类 MIDI 加载失败，不阻断启动:', err);
+                }
                 
                 // 加载语义 MIDI 文件（安慰）
-                await loadSemanticMidi('comfort', '../midis/comfort.mid');
+                try {
+                    await loadEmotionSemanticMidi('comfort', '../midis/comfort.mid');
+                } catch (err) {
+                    console.warn('[Semantic] 安慰 MIDI 加载失败，不阻断启动:', err);
+                }
                 
                 // 生成语义分类卡片
                 generatePhraseTriggerCards();
@@ -3761,16 +3763,8 @@
                 // 选中该情绪（显示面板）
                 selectEmotion(emotion);
                 
-                // A+B 融合: comfort 语义使用 semantic-player.js 专业 MIDI 解析器
-                if (emotion === 'comfort' && typeof semanticPlayer !== 'undefined') {
-                    console.log('[A+B] 使用 semanticPlayer 播放安慰语义 MIDI');
-                    document.getElementById('statusText').textContent = '演奏安慰语义...';
-                    await semanticPlayer.play('安慰', { velocity: params.masterVolume });
-                    document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
-                    addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
-                    isPlaying = false;
-                    return;
-                }
+                // comfort 不在情绪阶段直接播放；交给 textToEvents() 的 phraseMidi 局部插入处理
+                // 情绪系统只负责显示 badge / 调整参数
                 
                 // 尝试播放情绪专属内容（原有逻辑）
                 const hasCustomFile = await playEmotionContentAsync(emotion);
@@ -4935,6 +4929,8 @@
                         const noteVel = (mnote.velocity / 127) * params.masterVolume;
                         const noteDur = params.noteDuration / 1000;
                         
+                        // TODO: 导出应复用与实时播放统一的 MIDI note 渲染 helper
+                        // 当前使用手写 oscillator，与实时播放（采样/合成器）音色可能不一致
                         const oscillator = offlineContext.createOscillator();
                         const gainNode = offlineContext.createGain();
                         const waveforms = {
