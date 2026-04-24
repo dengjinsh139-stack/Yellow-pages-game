@@ -1038,11 +1038,11 @@
 
             <!-- 中间面板：文本输入与可视化 -->
             <div class="panel">
-                <div class="panel-title">输入文本</div>
+                <div class="panel-title">演奏输入</div>
                 
                 <!-- 模式切换 -->
                 <div class="mode-switch" style="display: flex; gap: 8px; margin-bottom: 16px; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                    <button class="mode-btn active" data-mode="text" id="btnModeText" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">📝 文案合成</button>
+                    <button class="mode-btn active" data-mode="text" id="btnModeText" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">📝 文字演奏</button>
                     <button class="mode-btn" data-mode="song" id="btnModeSong" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">🎼 歌曲播放</button>
                 </div>
                 
@@ -1064,35 +1064,28 @@
 
                 <!-- 歌曲播放模式 -->
                 <div id="songModePanel" style="display: none;">
-                    <!-- MIDI 上传 -->
-                    <div class="midi-upload-area" id="midiUploadArea" style="border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s; margin-bottom: 16px;">
-                        <div style="font-size: 2.5rem; margin-bottom: 12px;">📂</div>
-                        <div style="font-size: 1rem; color: var(--text); margin-bottom: 8px;">点击或拖拽 MIDI 文件到此处</div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">支持 .mid / .midi 格式</div>
+                    <!-- 紧凑 MIDI 卡片 -->
+                    <div class="midi-card" id="midiUploadArea" style="border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.3s; margin-bottom: 12px; background: rgba(0,0,0,0.2);">
+                        <div id="midiCardContent" style="display: flex; align-items: center; gap: 12px;">
+                            <div style="font-size: 1.5rem;">📂</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.9rem; color: var(--text);">点击上传 MIDI 文件</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">支持 .mid / .midi 格式</div>
+                            </div>
+                        </div>
                     </div>
                     <input type="file" id="midiFileInput" accept=".mid,.midi" style="display: none;">
                     
-                    <!-- MIDI 信息 -->
-                    <div id="midiInfoPanel" style="display: none; padding: 12px; background: rgba(78,205,196,0.1); border-radius: 10px; margin-bottom: 16px;">
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center;">
-                            <div><div style="font-size: 1.3rem; font-weight: 700; color: var(--primary);" id="songTracks">-</div><div style="font-size: 0.7rem; color: var(--text-dim);">音轨</div></div>
-                            <div><div style="font-size: 1.3rem; font-weight: 700; color: var(--primary);" id="songNotes">-</div><div style="font-size: 0.7rem; color: var(--text-dim);">音符</div></div>
-                            <div><div style="font-size: 1.3rem; font-weight: 700; color: var(--primary);" id="songDuration">-</div><div style="font-size: 0.7rem; color: var(--text-dim);">时长</div></div>
-                        </div>
-                    </div>
+                    <!-- MIDI 信息已整合到紧凑卡片中 -->
                     
-                    <!-- 播放控制 -->
-                    <div id="songControls" style="display: none; align-items: center; gap: 12px; margin-bottom: 16px;">
-                        <button id="btnSongPlay" style="width: 50px; height: 50px; border-radius: 50%; border: none; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-size: 1.2rem; cursor: pointer;">▶</button>
-                        <button id="btnSongStop" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: var(--text); font-size: 0.9rem; cursor: pointer;">⏹</button>
-                        <div style="flex: 1;">
-                            <div id="songProgressBar" style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; cursor: pointer;">
-                                <div id="songProgressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.1s;"></div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.7rem; color: var(--text-dim);">
-                                <span id="songCurrentTime">0:00</span>
-                                <span id="songTotalTime">0:00</span>
-                            </div>
+                    <!-- 进度条区域（圆形播放/停止按钮已移除，统一使用底部主操作区） -->
+                    <div id="songControls" style="display: none; margin-bottom: 12px;">
+                        <div id="songProgressBar" style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; cursor: pointer;">
+                            <div id="songProgressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.1s;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.75rem; color: var(--text-dim);">
+                            <span id="songCurrentTime">0:00</span>
+                            <span id="songTotalTime">0:00</span>
                         </div>
                     </div>
                     
@@ -1114,8 +1107,8 @@
                 </div>
 
                 <div class="btn-grid">
-                    <button id="btn-play-text" class="btn">▶ 演奏文字</button>
-                    <button id="btn-random-text" class="btn btn-secondary">🎲 随机示例</button>
+                    <button id="btn-main-play" class="btn">▶ 演奏文字</button>
+                    <button id="btn-upload-midi-main" class="btn btn-secondary" style="display: none;">📁 上传/更换 MIDI</button>
                     <button id="btn-clear-text" class="btn btn-secondary">🗑️ 清空</button>
                     <button id="btn-stop" class="btn btn-secondary">⏹ 停止</button>
                 </div>
@@ -5567,8 +5560,13 @@
         let songScheduledNotes = [];
         let songActiveSources = [];
         
+        // 当前模式
+        let currentMode = 'text';
+        
         // 模式切换
         function switchMode(mode) {
+            currentMode = mode;
+            
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === mode);
                 if (btn.dataset.mode === mode) {
@@ -5583,6 +5581,18 @@
             document.getElementById('textModePanel').style.display = mode === 'text' ? 'block' : 'none';
             document.getElementById('songModePanel').style.display = mode === 'song' ? 'block' : 'none';
             
+            // 更新主播放按钮文案
+            const btnMainPlay = document.getElementById('btn-main-play');
+            if (btnMainPlay) {
+                btnMainPlay.textContent = mode === 'text' ? '▶ 演奏文字' : '▶ 播放 MIDI';
+            }
+            
+            // 显示/隐藏 MIDI 上传按钮
+            const btnUploadMidi = document.getElementById('btn-upload-midi-main');
+            if (btnUploadMidi) {
+                btnUploadMidi.style.display = mode === 'song' ? 'inline-block' : 'none';
+            }
+            
             if (mode === 'text') {
                 stopSongPlayback();
             }
@@ -5596,11 +5606,7 @@
                     songMidi = parseMidi(e.target.result);
                     updateSongInfo();
                     document.getElementById('statusText').textContent = `已加载: ${file.name}`;
-                    document.getElementById('midiUploadArea').innerHTML = `
-                        <div style="font-size: 2rem;">✅</div>
-                        <div style="font-size: 1rem; color: var(--text); margin: 8px 0;">${file.name}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">点击更换文件</div>
-                    `;
+                    // 卡片内容会在 updateSongInfo() 中更新
                 } catch (err) {
                     console.error('MIDI 解析失败:', err);
                     alert('MIDI 文件解析失败');
@@ -5609,23 +5615,53 @@
             reader.readAsArrayBuffer(file);
         }
         
+        // 计算当前 BPM 下的总时长
+        function getSongDurationAtBPM() {
+            if (!songMidi) return 0;
+            const bpm = params.bpm;
+            const msPerTick = 60000 / (bpm * songMidi.ticksPerQuarter);
+            
+            let maxTick = 0;
+            for (const track of songMidi.tracks) {
+                for (const event of track) {
+                    if (event.type === 'noteOn' && event.time > maxTick) maxTick = event.time;
+                }
+            }
+            return (maxTick * msPerTick / 1000);
+        }
+        
         // 更新歌曲信息
         function updateSongInfo() {
             if (!songMidi) return;
             
-            document.getElementById('songTracks').textContent = songMidi.numTracks;
+            const noteCount = songMidi.tracks.reduce((sum, track) => 
+                sum + track.filter(e => e.type === 'noteOn').length, 0);
+            const durationSec = getSongDurationAtBPM();
+            const durationStr = `${Math.floor(durationSec / 60)}:${Math.floor(durationSec % 60).toString().padStart(2, '0')}`;
             
-            let noteCount = 0;
-            for (const track of songMidi.tracks) {
-                for (const event of track) {
-                    if (event.type === 'noteOn') noteCount++;
-                }
+            // 更新紧凑卡片
+            const cardContent = document.getElementById('midiCardContent');
+            if (cardContent) {
+                cardContent.innerHTML = `
+                    <div style="font-size: 1.5rem;">🎼</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.85rem; color: var(--text); font-weight: 600;">MIDI 已加载</div>
+                        <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 2px;">
+                            ${songMidi.numTracks} 音轨 · ${noteCount} 音符 · ${durationStr}
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--primary); margin-top: 2px;">
+                            🎸 ${instrumentNames[currentInstrument] || currentInstrument} · ⏱️ ${params.bpm} BPM
+                        </div>
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--text-dim);">点击更换</div>
+                `;
             }
-            document.getElementById('songNotes').textContent = noteCount;
-            document.getElementById('songDuration').textContent = songMidi.duration.toFixed(1) + 's';
             
             document.getElementById('midiInfoPanel').style.display = 'block';
-            document.getElementById('songControls').style.display = 'flex';
+            document.getElementById('songControls').style.display = 'block';
+            
+            // 更新总时间显示
+            document.getElementById('songTotalTime').textContent = durationStr;
             
             // 更新音符列表
             updateSongNoteList();
@@ -5720,7 +5756,7 @@
                 
                 // 更新进度
                 const current = note.time * msPerTick / 1000;
-                const total = songMidi.duration;
+                const total = getSongDurationAtBPM();
                 document.getElementById('songProgressFill').style.width = (current / total * 100) + '%';
                 
                 const curMin = Math.floor(current / 60);
@@ -5781,15 +5817,8 @@
                 if (e.target.files.length > 0) handleMidiFile(e.target.files[0]);
             });
             
-            // 播放控制
-            document.getElementById('btnSongPlay').addEventListener('click', () => {
-                if (isSongPlaying) {
-                    stopSongPlayback();
-                } else {
-                    playSongMidi();
-                }
-            });
-            document.getElementById('btnSongStop').addEventListener('click', stopSongPlayback);
+            // 播放控制已移至底部主操作区 btn-main-play 和 btn-stop
+            // songControls 内仅保留进度条
         }
 
         // ==================== 统一事件绑定 ====================
@@ -5819,11 +5848,23 @@
             }
 
             // 主控制按钮
-            const btnPlay = document.getElementById('btn-play-text');
-            if (btnPlay) btnPlay.addEventListener('click', testPlayText);
+            const btnMainPlay = document.getElementById('btn-main-play');
+            if (btnMainPlay) {
+                btnMainPlay.addEventListener('click', () => {
+                    if (currentMode === 'text') {
+                        testPlayText();
+                    } else {
+                        playSongMidi();
+                    }
+                });
+            }
 
-            const btnRandom = document.getElementById('btn-random-text');
-            if (btnRandom) btnRandom.addEventListener('click', playRandomText);
+            const btnUploadMidiMain = document.getElementById('btn-upload-midi-main');
+            if (btnUploadMidiMain) {
+                btnUploadMidiMain.addEventListener('click', () => {
+                    document.getElementById('midiFileInput').click();
+                });
+            }
 
             const btnClear = document.getElementById('btn-clear-text');
             if (btnClear) btnClear.addEventListener('click', clearText);
