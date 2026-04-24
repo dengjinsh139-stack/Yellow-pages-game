@@ -1040,6 +1040,14 @@
             <div class="panel">
                 <div class="panel-title">输入文本</div>
                 
+                <!-- 模式切换 -->
+                <div class="mode-switch" style="display: flex; gap: 8px; margin-bottom: 16px; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                    <button class="mode-btn active" data-mode="text" id="btnModeText" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">📝 文案合成</button>
+                    <button class="mode-btn" data-mode="song" id="btnModeSong" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">🎼 歌曲播放</button>
+                </div>
+                
+                <!-- 文案合成模式 -->
+                <div id="textModePanel">
                 <div class="text-input-area">
                     <textarea class="text-input" id="textInput" placeholder="在这里输入文字，我会将其转换为乐器演奏...
 
