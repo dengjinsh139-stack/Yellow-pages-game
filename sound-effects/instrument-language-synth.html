@@ -5704,8 +5704,10 @@
                 
                 if (!isSongPlaying) break;
                 
-                const frequency = 440 * Math.pow(2, (note.note - 69) / 12);
-                const noteName = noteNames[note.note % 12] + (Math.floor(note.note / 12) - 1);
+                // ===== 五声音阶映射 =====
+                const pentatonicNote = mapToPentatonic(note.note);
+                const frequency = midiToFreq[pentatonicNote] || (440 * Math.pow(2, (note.note - 69) / 12));
+                const noteName = noteNumberToName(pentatonicNote);
                 const velocity = (note.velocity / 127) * params.masterVolume;
                 const duration = 0.5;
                 
