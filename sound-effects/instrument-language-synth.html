@@ -3761,7 +3761,18 @@
                 // 选中该情绪（显示面板）
                 selectEmotion(emotion);
                 
-                // 尝试播放情绪专属内容
+                // A+B 融合: comfort 语义使用 semantic-player.js 专业 MIDI 解析器
+                if (emotion === 'comfort' && typeof semanticPlayer !== 'undefined') {
+                    console.log('[A+B] 使用 semanticPlayer 播放安慰语义 MIDI');
+                    document.getElementById('statusText').textContent = '演奏安慰语义...';
+                    await semanticPlayer.play('安慰', { velocity: params.masterVolume });
+                    document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
+                    addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
+                    isPlaying = false;
+                    return;
+                }
+                
+                // 尝试播放情绪专属内容（原有逻辑）
                 const hasCustomFile = await playEmotionContentAsync(emotion);
                 console.log('是否有专属文件:', hasCustomFile);
                 
