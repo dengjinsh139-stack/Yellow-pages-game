@@ -197,6 +197,24 @@
             50% { opacity: 0.7; }
         }
         
+        /* 语义分类检测提示 */
+        .phrase-detect-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            background: rgba(78, 205, 196, 0.15);
+            color: var(--secondary);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            margin-left: 8px;
+        }
+        
+        .phrase-detect-badge.hidden {
+            display: none;
+        }
+
         /* 角色声纹检测提示 */
         .character-detect-badge {
             display: inline-flex;
@@ -1132,6 +1150,10 @@
                     <div class="panel-title" style="margin-bottom: 12px;">
                         <span>🎯</span>
                         <span>语义分类触发</span>
+                        <span class="phrase-detect-badge hidden" id="phraseDetectBadge">
+                            <span>✨</span>
+                            <span id="phraseDetectText">检测到</span>
+                        </span>
                     </div>
                     <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
                         <!-- 动态生成分类卡片 -->
@@ -1387,10 +1409,41 @@
             }
         }
 
-        // 文本输入事件 - 实时检测角色名
+        // 检测文本中的语义分类关键词
+        function detectPhraseTriggersInText(text) {
+            const detected = [];
+            const source = (text || '').toLowerCase();
+            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
+                if (!category.keywords || !category.keywords.length) continue;
+                for (const keyword of category.keywords) {
+                    if (source.includes(String(keyword).toLowerCase())) {
+                        detected.push(category.name);
+                        break; // 每个分类只显示一次
+                    }
+                }
+            }
+            return detected;
+        }
+
+        // 显示语义分类检测提示
+        function showPhraseDetectBadge(categories) {
+            const badge = document.getElementById('phraseDetectBadge');
+            const text = document.getElementById('phraseDetectText');
+            if (categories.length > 0) {
+                text.textContent = `检测到: ${categories.join('、')}`;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // 文本输入事件 - 实时检测角色名和语义分类
         function onTextInput(text) {
-            const detected = detectCharactersInText(text);
-            showCharacterDetectBadge(detected);
+            const detectedCharacters = detectCharactersInText(text);
+            showCharacterDetectBadge(detectedCharacters);
+            
+            const detectedPhrases = detectPhraseTriggersInText(text);
+            showPhraseDetectBadge(detectedPhrases);
         }
 
         const chordDurationPresets = [
