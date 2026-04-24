@@ -5184,16 +5184,17 @@
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
                 const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
+                const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                 const hasSample = note.sampleNote && samplesLoaded;
                 
-                console.log(`[renderAudioToBuffer]   instrument=${currentInstrument}, isPiano=${isPiano}, isSampleInstrument=${isSampleInstrument}, hasSample=${hasSample}, sampleNote=${note.sampleNote}, chordsLoaded=${chordsLoaded}, isChord=${note.isChord}`);
+                console.log(`[renderAudioToBuffer]   instrument=${currentInstrument}, isPiano=${isPiano}, isSampleInstrument=${isSampleInstrument}, isVirtualVoice=${isVirtualVoice}, hasSample=${hasSample}, sampleNote=${note.sampleNote}, chordsLoaded=${chordsLoaded}, isChord=${note.isChord}`);
                 
                 if (note.isChord && chordsLoaded) {
                     console.log(`[renderAudioToBuffer]   → renderChordToBuffer`);
                     await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, velocity);
                     chordNotesRendered++;
-                } else if ((isPiano || isSampleInstrument) && hasSample) {
-                    console.log(`[renderAudioToBuffer]   → renderSampleToBuffer (sampleNote=${note.sampleNote})`);
+                } else if ((isPiano || isSampleInstrument || isVirtualVoice) && (hasSample || isVirtualVoice)) {
+                    console.log(`[renderAudioToBuffer]   → renderSampleToBuffer (sampleNote=${note.sampleNote}, virtualVoice=${isVirtualVoice})`);
                     await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
                     sampleNotesRendered++;
                 } else {
@@ -5251,7 +5252,9 @@
             }
             
             const sampleNote = freqToSampleNote[nearestFreq];
-            const bufferKey = currentInstrument === 'piano' ? sampleNote : `${currentInstrument}_${sampleNote}`;
+            // 虚拟人声使用 vocal_ 前缀，其他使用 currentInstrument_ 前缀
+            const bufferKeyPrefix = currentInstrument === 'guitar' ? 'vocal' : currentInstrument;
+            const bufferKey = currentInstrument === 'piano' ? sampleNote : `${bufferKeyPrefix}_${sampleNote}`;
             const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
