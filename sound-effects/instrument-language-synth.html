@@ -1807,56 +1807,7 @@
 
         // ==================== 语义分类触发 MIDI 系统 ====================
         
-        const phraseTriggerCategories = {
-            greeting: {
-                name: '打招呼',
-                emoji: '👋',
-                keywords: ['你好', '早上好', '晚上好', '早安', '晚安', '嗨', '哈喽', 'hello', 'hi', '打扰了', '不好意思打扰一下', '初次见面', '好久不见'],
-                midi: null,
-                parsedMidi: null
-            },
-            thanks: {
-                name: '感谢',
-                emoji: '🙏',
-                keywords: ['谢谢', '多谢', '非常感谢', '辛苦了', '麻烦你了', '感激不尽', '太感谢了', '多亏你了'],
-                midi: null,
-                parsedMidi: null
-            },
-            apology: {
-                name: '道歉',
-                emoji: '🙇',
-                keywords: ['对不起', '抱歉', '不好意思', '失礼了', '是我不对', '我的问题', '给你添麻烦了', '请原谅我'],
-                midi: null,
-                parsedMidi: null
-            },
-            farewell: {
-                name: '告别',
-                emoji: '👋',
-                keywords: ['再见', '回头见', '明天见', '下次见', '拜拜', '先这样', '我先走了'],
-                midi: null,
-                parsedMidi: null
-            },
-            request: {
-                name: '请求',
-                emoji: '🙏',
-                keywords: ['请问', '能不能', '可以吗', '帮我一下', '麻烦你', '想请教一下', '我有个问题', '能帮我看看吗'],
-                midi: null,
-                parsedMidi: null
-            },
-            confirm: {
-                name: '确认',
-                emoji: '✅',
-                keywords: ['好的', '可以', '没问题', '明白了', '收到', '行', '就这么办', '没问题'],
-                midi: null,
-                parsedMidi: null
-            },
-            praise: {
-                name: '赞美',
-                emoji: '✨',
-                keywords: ['好厉害', '太棒了', '干得漂亮', '做得很好', '真不错', '加油', '你可以的', '我支持你'],
-                midi: null,
-                parsedMidi: null
-            },
+                const phraseTriggerCategories = {
             comfort: {
                 name: '安慰',
                 emoji: '🤗',
@@ -1864,7 +1815,6 @@
                 midi: null,
                 parsedMidi: null
             },
-            // 语义 MIDI 分类 - 用户映射
             semantic01: {
                 name: '感谢',
                 emoji: '🙏',
