@@ -4,7 +4,7 @@
  * <script src="nav-config.js"></script>
  */
 
-const APP_VERSION = 'v3.11.10';
+const APP_VERSION = 'v3.12.0';
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
