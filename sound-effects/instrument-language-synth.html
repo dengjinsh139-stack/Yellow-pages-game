@@ -3587,7 +3587,6 @@
             updateSpectrum();
         }
 
-        // 演奏单个音符（根据当前乐器选择播放方式）
         function playTone(frequency, noteName, duration, velocity = 0.5) {
             // 检查当前乐器是否有采样可用
             const hasSamples = hasInstrumentSamples(currentInstrument);
@@ -3596,11 +3595,17 @@
             if (currentInstrument === 'xylophone') {
                 const config = sampleConfig.xylophone;
                 const sampleInfo = config.samples[noteName];
+                const bufferKey = 'xylophone_' + noteName;
+                const hasThisSample = sampleInfo && sampleInfo.file && audioBuffers[bufferKey];
+                
+                console.log(`[木琴调试] note=${noteName}, hasSample=${hasThisSample}, bufferExists=${!!audioBuffers[bufferKey]}, file=${sampleInfo?.file || 'none'}`);
+                
                 // 如果有真实采样文件且已加载，使用采样
-                if (sampleInfo && sampleInfo.file && audioBuffers['xylophone_' + noteName]) {
+                if (hasThisSample) {
                     return playSampleTone(frequency, noteName, duration / 1000, velocity);
                 }
                 // 否则使用合成
+                console.warn(`[木琴调试] ⚠️ ${noteName} 采样缺失，回退到合成器`);
                 return playSynthTone(frequency, duration / 1000, velocity);
             }
             
