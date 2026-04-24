@@ -3803,6 +3803,8 @@
                     if (event.type === 'phraseMidi') {
                         console.log(`第 ${i+1} 个是语义分类 MIDI [${event.categoryName}]`);
                         highlightNote(i);
+                        // 同时高亮右侧语义分类卡片
+                        highlightPhraseTriggerCard(event.category);
                         document.getElementById('statusText').textContent = `🎯 ${event.categoryName}`;
                         const midiData = phraseTriggerCategories[event.category]?.parsedMidi;
                         if (midiData) {
@@ -4012,13 +4014,58 @@
             }).join('');
         }
 
-        // 高亮音符
+        // 高亮音符（根据事件类型使用不同颜色）
         function highlightNote(index) {
             document.querySelectorAll('.note-item').forEach((el, i) => {
                 if (!el) return;
-                el.style.background = i === index ? 
-                    'rgba(78, 205, 196, 0.5)' : 'rgba(255, 107, 107, 0.2)';
-                el.style.color = i === index ? '#fff' : 'var(--primary)';
+                if (i === index) {
+                    // 根据元素背景色判断事件类型，使用对应的高亮颜色
+                    const bg = el.style.background || '';
+                    if (bg.includes('78, 205, 196')) {
+                        // phraseMidi - 保持青色
+                        el.style.background = 'rgba(78, 205, 196, 0.6)';
+                        el.style.color = '#fff';
+                        el.style.boxShadow = '0 0 12px rgba(78, 205, 196, 0.5)';
+                    } else if (bg.includes('255, 230, 109')) {
+                        // characterVoice - 保持黄色
+                        el.style.background = 'rgba(255, 230, 109, 0.6)';
+                        el.style.color = '#fff';
+                        el.style.boxShadow = '0 0 12px rgba(255, 230, 109, 0.5)';
+                    } else {
+                        // 普通 note - 默认青色
+                        el.style.background = 'rgba(78, 205, 196, 0.5)';
+                        el.style.color = '#fff';
+                        el.style.boxShadow = '0 0 8px rgba(78, 205, 196, 0.3)';
+                    }
+                } else {
+                    // 恢复原始背景色
+                    const bg = el.style.background || '';
+                    if (bg.includes('78, 205, 196')) {
+                        el.style.background = 'rgba(78, 205, 196, 0.15)';
+                    } else if (bg.includes('255, 230, 109')) {
+                        el.style.background = 'rgba(255, 230, 109, 0.15)';
+                    } else {
+                        el.style.background = 'rgba(255, 107, 107, 0.2)';
+                    }
+                    el.style.color = 'var(--primary)';
+                    el.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        // 高亮右侧语义分类卡片（播放反馈）
+        function highlightPhraseTriggerCard(categoryKey) {
+            document.querySelectorAll('.phrase-trigger-grid .preset-btn').forEach(card => {
+                if (card.dataset.category === categoryKey) {
+                    card.style.transform = 'scale(1.05)';
+                    card.style.boxShadow = '0 0 15px rgba(78, 205, 196, 0.6)';
+                    card.style.borderColor = 'var(--primary)';
+                    setTimeout(() => {
+                        card.style.transform = '';
+                        card.style.boxShadow = '';
+                        card.style.borderColor = '';
+                    }, 500);
+                }
             });
         }
 
