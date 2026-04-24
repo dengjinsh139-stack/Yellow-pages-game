@@ -3598,14 +3598,20 @@
                 const bufferKey = 'xylophone_' + noteName;
                 const hasThisSample = sampleInfo && sampleInfo.file && audioBuffers[bufferKey];
                 
-                console.log(`[木琴调试] note=${noteName}, hasSample=${hasThisSample}, bufferExists=${!!audioBuffers[bufferKey]}, file=${sampleInfo?.file || 'none'}`);
-                
-                // 如果有真实采样文件且已加载，使用采样
+                // 如果有精确匹配的真实采样，直接使用
                 if (hasThisSample) {
                     return playSampleTone(frequency, noteName, duration / 1000, velocity);
                 }
-                // 否则使用合成
-                console.warn(`[木琴调试] ⚠️ ${noteName} 采样缺失，回退到合成器`);
+                
+                // 没有精确匹配（如 G4/G5），使用最近的采样 + playbackRate 调整
+                const nearestSample = findNearestSample(noteName);
+                if (nearestSample && nearestSample !== noteName && audioBuffers['xylophone_' + nearestSample]) {
+                    console.log(`[木琴] ${noteName} 无精确采样，使用 ${nearestSample} + playbackRate`);
+                    return playSampleTone(frequency, nearestSample, duration / 1000, velocity);
+                }
+                
+                // 回退到合成器
+                console.warn(`[木琴] ⚠️ ${noteName} 无可用采样，回退到合成器`);
                 return playSynthTone(frequency, duration / 1000, velocity);
             }
             
