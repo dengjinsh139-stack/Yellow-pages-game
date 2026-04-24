@@ -3,16 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>乐器语言合成器 | Instrument Language Synth</title>
-    <script src="../nav-config.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const subtitle = document.querySelector('.subtitle');
-            if (subtitle && typeof APP_VERSION !== 'undefined') {
-                subtitle.textContent = `INSTRUMENT LANGUAGE SYNTHESIZER ${APP_VERSION} · 10键对齐版`;
-            }
-        });
-    </script>
+    <title>乐器语言合成器 Mention 预览 | Instrument Language Synth Mention Preview</title>
     <style>
         :root {
             --primary: #ff6b6b;
@@ -103,117 +94,7 @@
             padding: 20px;
         }
 
-        /* 角色声纹卡片 */
-        .character-voice-section {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .character-voice-title {
-            font-size: 0.85rem;
-            color: var(--secondary);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .character-voice-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        
-        .character-voice-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .character-voice-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--secondary);
-            transform: translateY(-2px);
-        }
-        
-        .character-voice-card.active {
-            border-color: var(--accent);
-            background: rgba(255, 230, 109, 0.05);
-        }
-        
-        .character-voice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .character-voice-name {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-        
-        .character-voice-instrument {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: rgba(78, 205, 196, 0.15);
-            color: var(--secondary);
-            border: 1px solid rgba(78, 205, 196, 0.3);
-        }
-        
-        .character-voice-preview-btn {
-            width: 100%;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.8), rgba(78, 205, 196, 0.8));
-            color: white;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        
-        .character-voice-preview-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
-        }
-        
-        .character-voice-preview-btn.playing {
-            animation: pulse 1s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        /* 角色声纹检测提示 */
-        .character-detect-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            background: rgba(255, 230, 109, 0.15);
-            color: var(--accent);
-            border: 1px solid rgba(255, 230, 109, 0.3);
-            margin-left: 8px;
-        }
-        
-        .character-detect-badge.hidden {
-            display: none;
-        }
+        /* 头部 */
         header {
             text-align: center;
             padding: 30px 20px;
@@ -783,6 +664,96 @@
             .instrument-grid { grid-template-columns: repeat(3, 1fr); }
             .preset-grid { grid-template-columns: 1fr; }
         }
+
+        /* 角色声纹面板 */
+        .character-voice-intro {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .character-voice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .character-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 9px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .character-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,230,109,0.4);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.24);
+        }
+
+        .character-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .character-card-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .character-card-tag {
+            font-size: 0.62rem;
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,230,109,0.24);
+            background: rgba(255,230,109,0.08);
+            white-space: nowrap;
+        }
+
+        .character-card-meta {
+            display: none;
+        }
+
+        .character-card-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .character-card-actions .btn {
+            font-size: 0.72rem;
+            padding: 7px 8px;
+        }
+
+        .character-voice-status {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-align: center;
+            padding: 7px 9px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.18);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .character-voice-status.success {
+            color: #7ef7c7;
+            border-color: rgba(126,247,199,0.28);
+        }
+
+        .character-voice-status.warn {
+            color: #ffd36a;
+            border-color: rgba(255,211,106,0.28);
+        }
+
     </style>
 </head>
 <body data-build="ILS_BUILD_2026_04_20_B">
@@ -804,7 +775,7 @@
         
         <header>
             <h1>🎹 乐器语言合成器</h1>
-            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v3.7.4 · 10键对齐版</p>
+            <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v1.4 · Mention + MIDI Motif Preview</p>
         </header>
 
         <div class="main-panel">
@@ -1029,9 +1000,7 @@
 - 你好世界
 - 今天天气真好
 - 生日快乐
-- 或任何你想说的话
-
-💡 输入角色名（小牧、艾米、芙洛芙）可触发专属声纹" oninput="onTextInput(this.value)"></textarea>
+- 或任何你想说的话"></textarea>
                     <div class="input-hint">支持中文、英文、数字 · 系统会自动分析情感并匹配演奏风格</div>
                 </div>
 
@@ -1083,50 +1052,8 @@
 
             <!-- 右侧面板：预设与历史 -->
             <div class="panel">
-                <!-- 角色声纹卡片 -->
-                <div class="character-voice-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div class="character-voice-title">
-                        <span>🎭</span>
-                        <span>角色声纹</span>
-                        <span class="character-detect-badge hidden" id="characterDetectBadge">
-                            <span>✨</span>
-                            <span id="characterDetectText">检测到角色</span>
-                        </span>
-                    </div>
-                    <div class="character-voice-grid">
-                        <div class="character-voice-card" data-character="小牧" data-instrument="flute">
-                            <div class="character-voice-header">
-                                <span class="character-voice-name">小牧</span>
-                                <span class="character-voice-instrument">flute</span>
-                            </div>
-                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('小牧')">
-                                <span>▶</span>
-                                <span>试听</span>
-                            </button>
-                        </div>
-                        <div class="character-voice-card" data-character="艾米" data-instrument="xylophone">
-                            <div class="character-voice-header">
-                                <span class="character-voice-name">艾米</span>
-                                <span class="character-voice-instrument">xylophone</span>
-                            </div>
-                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('艾米')">
-                                <span>▶</span>
-                                <span>试听</span>
-                            </button>
-                        </div>
-                        <div class="character-voice-card" data-character="芙洛芙" data-instrument="piano">
-                            <div class="character-voice-header">
-                                <span class="character-voice-name">芙洛芙</span>
-                                <span class="character-voice-instrument">piano</span>
-                            </div>
-                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('芙洛芙')">
-                                <span>▶</span>
-                                <span>试听</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
+                <div class="panel-title">快速预设</div>
+                
                 <div class="panel-title">快速预设</div>
                 
                 <div class="preset-grid">
@@ -1163,27 +1090,16 @@
                     <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
                 </div>
 
-                <!-- 语义分类触发 MIDI 面板 -->
-                <div class="phrase-trigger-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div class="panel-title" style="margin-bottom: 12px;">
-                        <span>🎯</span>
-                        <span>语义分类触发</span>
-                    </div>
-                    <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
-                        <!-- 动态生成分类卡片 -->
-                    </div>
-                    
-                    <!-- 语义分类文件面板 -->
-                    <div id="phraseTriggerFilePanel" style="display: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - MIDI 状态</span>
-                            <button id="btn-close-phrase-trigger" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem;">✕</button>
-                        </div>
-                        <div id="phraseTriggerFileList" style="font-size: 0.75rem; color: var(--text-dim);">
-                            <p>加载中...</p>
-                        </div>
-                    </div>
+
+
+                <div class="panel-title">角色声纹预览</div>
+                <div class="character-voice-intro">
+                    这里预留了 10 个角色按钮位。后续我把角色固定称呼音频正式接进仓库后，这里就会变成共享可试听的角色声纹面板。
                 </div>
+                <div class="character-voice-grid" id="characterVoiceGrid"></div>
+                <input type="file" id="characterAudioInput" accept="audio/*" style="display: none;">
+                <div id="characterVoiceStatus" class="character-voice-status">等待角色音频接入</div>
+
 
                 <div class="panel-title">演奏历史</div>
                 <div class="notes-display" id="historyDisplay" style="max-height: 120px;">
@@ -1232,9 +1148,10 @@
         </div>
     </div>
 
+    <script src="mention-motif-core.js"></script>
     <script>
         // ===== BUILD MARKER =====
-        console.log('ILS_BUILD_MARKER_2026_04_20_B');
+        console.log('ILS_BUILD_MARKER_2026_04_21_MENTION_SAFE');
         console.log('SCRIPT_START');
         // 全局变量
         let audioContext;
@@ -1245,6 +1162,219 @@
         let currentInstrument = 'piano';
         let playQueue = [];
         let currentNoteIndex = 0;
+
+        // mention + motif 配置（安全接入版）
+        const mentionMotifConfig = {
+            enabled: true,
+            mentionPrefix: '@',
+            characterProfiles: {
+                '小牧': {
+                    aliases: ['小牧'],
+                    instrument: 'xylophone',
+                    insertPauseBeforeMs: 90,
+                    insertPauseAfterMs: 120,
+                    motifNotes: [
+                        { note: 'D5', durationMs: 180, velocity: 0.85, pauseMs: 40 },
+                        { note: 'A4', durationMs: 170, velocity: 0.75, pauseMs: 30 },
+                        { note: 'F5', durationMs: 220, velocity: 0.9 }
+                    ]
+                },
+                '主角': { aliases: ['主角'], instrument: 'xylophone' },
+                '艾米': { aliases: ['艾米'], instrument: 'piano' },
+                '小艾米': { aliases: ['小艾米'], instrument: 'synth' },
+                '老艾米': { aliases: ['老艾米'], instrument: 'guitar' },
+                '芙洛芙': { aliases: ['芙洛芙'], instrument: 'flute' },
+                '角色7': { aliases: ['角色7'], instrument: 'piano' },
+                '角色8': { aliases: ['角色8'], instrument: 'xylophone' },
+                '角色9': { aliases: ['角色9'], instrument: 'flute' },
+                '角色10': { aliases: ['角色10'], instrument: 'synth' }
+            }
+        };
+
+        const mentionMotifNoteFrequencies = {
+            'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+            'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
+        };
+
+        function getMentionMotifCore() {
+            return window.MentionMotifCore || null;
+        }
+
+        function getMentionMotifHelpers() {
+            return {
+                noteNameToFrequency: mentionMotifNoteFrequencies,
+                mapToPentatonic: typeof mapToPentatonic === 'function' ? mapToPentatonic : null,
+                midiToFreq: typeof midiToFreq !== 'undefined' ? midiToFreq : {},
+                noteNumberToName: typeof noteNumberToName === 'function' ? noteNumberToName : null
+            };
+        }
+
+        function resolveEventInstrument(event) {
+            return event && event.instrumentOverride ? event.instrumentOverride : currentInstrument;
+        }
+
+        function setMentionMotifEnabled(enabled) {
+            mentionMotifConfig.enabled = !!enabled;
+            return mentionMotifConfig.enabled;
+        }
+
+        function setCharacterMentionProfiles(profiles, options = {}) {
+            const nextProfiles = profiles && typeof profiles === 'object' ? profiles : {};
+            if (options.merge) {
+                mentionMotifConfig.characterProfiles = {
+                    ...mentionMotifConfig.characterProfiles,
+                    ...nextProfiles
+                };
+            } else {
+                mentionMotifConfig.characterProfiles = { ...nextProfiles };
+            }
+            return JSON.parse(JSON.stringify(mentionMotifConfig.characterProfiles));
+        }
+
+        function getCharacterMentionProfiles() {
+            return JSON.parse(JSON.stringify(mentionMotifConfig.characterProfiles));
+        }
+
+        const characterVoiceSlotOrder = ['小牧', '主角', '艾米', '小艾米', '老艾米', '芙洛芙', '角色7', '角色8', '角色9', '角色10'];
+        const characterVoiceProfiles = Object.fromEntries(characterVoiceSlotOrder.map((name, index) => {
+            const mentionProfile = mentionMotifConfig.characterProfiles[name] || {};
+            return [name, {
+                name,
+                instrument: mentionProfile.instrument || 'piano',
+                fileName: '',
+                audioBuffer: null,
+                audioArrayBuffer: null,
+                colorIndex: index,
+            }];
+        }));
+        let currentCharacterUploadTarget = null;
+
+        function setCharacterVoiceStatus(message, level = 'info') {
+            const status = document.getElementById('characterVoiceStatus');
+            if (!status) return;
+            status.className = `character-voice-status ${level === 'success' ? 'success' : level === 'warn' ? 'warn' : ''}`.trim();
+            status.textContent = message;
+        }
+
+        function syncCharacterVoiceProfilesToMentionConfig() {
+            for (const name of characterVoiceSlotOrder) {
+                if (!mentionMotifConfig.characterProfiles[name]) {
+                    mentionMotifConfig.characterProfiles[name] = {
+                        aliases: [name],
+                        instrument: characterVoiceProfiles[name]?.instrument || 'piano',
+                    };
+                }
+                mentionMotifConfig.characterProfiles[name].aliases = [name];
+                mentionMotifConfig.characterProfiles[name].instrument = characterVoiceProfiles[name]?.instrument || mentionMotifConfig.characterProfiles[name].instrument || 'piano';
+                mentionMotifConfig.characterProfiles[name].hasPreviewAudio = !!characterVoiceProfiles[name]?.audioArrayBuffer;
+                mentionMotifConfig.characterProfiles[name].previewFileName = characterVoiceProfiles[name]?.fileName || '';
+            }
+        }
+
+        function renderCharacterVoiceGrid() {
+            const grid = document.getElementById('characterVoiceGrid');
+            if (!grid) return;
+
+            grid.innerHTML = characterVoiceSlotOrder.map((name) => {
+                const profile = characterVoiceProfiles[name];
+                const fileLabel = profile.fileName ? `已接入：${profile.fileName}` : '未接入角色音频';
+                return `
+                    <div class="character-card" data-character-card="${name}">
+                        <div class="character-card-header">
+                            <div class="character-card-name">${name}</div>
+                            <span class="character-card-tag">${profile.instrument}</span>
+                        </div>
+                        <div class="character-card-meta">${fileLabel}</div>
+                        <div class="character-card-actions">
+                            <button class="btn" data-character-action="preview" data-character-name="${name}">▶ 试听</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function ensureCharacterAudioDecoded(characterName) {
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile || profile.audioBuffer || !profile.audioArrayBuffer || !audioContext) return profile?.audioBuffer || null;
+            try {
+                profile.audioBuffer = await audioContext.decodeAudioData(profile.audioArrayBuffer.slice(0));
+                return profile.audioBuffer;
+            } catch (err) {
+                console.error('角色音频解码失败:', characterName, err);
+                setCharacterVoiceStatus(`${characterName} 音频解码失败：${err.message}`, 'warn');
+                return null;
+            }
+        }
+
+        function openCharacterAudioUpload(characterName) {
+            currentCharacterUploadTarget = characterName;
+            const input = document.getElementById('characterAudioInput');
+            if (!input) return;
+            input.value = '';
+            input.click();
+        }
+
+        async function handleCharacterAudioFileSelection(event) {
+            const file = event.target.files && event.target.files[0];
+            const characterName = currentCharacterUploadTarget;
+            if (!file || !characterName) return;
+
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile) return;
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                profile.fileName = file.name;
+                profile.audioArrayBuffer = arrayBuffer;
+                profile.audioBuffer = null;
+
+                if (audioContext) {
+                    await ensureCharacterAudioDecoded(characterName);
+                    setCharacterVoiceStatus(`${characterName} 音频已载入，可直接试听`, 'success');
+                } else {
+                    setCharacterVoiceStatus(`${characterName} 音频已缓存。启动音频引擎后可试听`, 'warn');
+                }
+
+                syncCharacterVoiceProfilesToMentionConfig();
+                renderCharacterVoiceGrid();
+            } catch (err) {
+                console.error('角色音频读取失败:', err);
+                setCharacterVoiceStatus(`读取音频失败：${err.message}`, 'warn');
+            }
+        }
+
+        async function previewCharacterVoice(characterName) {
+            const profile = characterVoiceProfiles[characterName];
+            if (!profile) return;
+            if (!audioContext) {
+                setCharacterVoiceStatus(`请先启动音频引擎，再试听 ${characterName}`, 'warn');
+                return;
+            }
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            const buffer = await ensureCharacterAudioDecoded(characterName);
+            if (!buffer) {
+                setCharacterVoiceStatus(`${characterName} 还没有接入音频`, 'warn');
+                return;
+            }
+
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = Math.max(0.15, params.masterVolume * 0.9);
+            source.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+            source.start();
+            updateSpectrum();
+            setCharacterVoiceStatus(`正在试听 ${characterName}`, 'success');
+            source.onended = () => {
+                setCharacterVoiceStatus(`${characterName} 试听完成`, 'success');
+            };
+        }
 
         // 参数
         const params = {
@@ -1278,154 +1408,6 @@
                 4: '16'         // 四声 = 16分音符（默认值，避免过短）
             }
         };
-
-        // ===== 角色声纹配置 =====
-        const characterVoiceConfig = {
-            '小牧': {
-                name: '小牧',
-                instrument: 'flute',
-                audioUrl: '../assets/audio/character-voices/xiaomu.mp3',
-                motifNotes: [
-                    { note: 'D5', durationMs: 180, velocity: 0.88 },
-                    { note: 'A4', durationMs: 150, velocity: 0.8 },
-                    { note: 'F5', durationMs: 210, velocity: 0.9 }
-                ]
-            },
-            '艾米': {
-                name: '艾米',
-                instrument: 'xylophone',
-                audioUrl: '../assets/audio/character-voices/aimi.mp3',
-                motifNotes: [
-                    { note: 'A4', durationMs: 170, velocity: 0.8 },
-                    { note: 'D5', durationMs: 190, velocity: 0.88 },
-                    { note: 'F5', durationMs: 220, velocity: 0.92 }
-                ]
-            },
-            '芙洛芙': {
-                name: '芙洛芙',
-                instrument: 'piano',
-                audioUrl: '../assets/audio/character-voices/fuluofu.mp3',
-                motifNotes: [
-                    { note: 'E5', durationMs: 220, velocity: 0.78 },
-                    { note: 'A5', durationMs: 240, velocity: 0.82 },
-                    { note: 'F5', durationMs: 200, velocity: 0.76 }
-                ]
-            }
-        };
-
-        // 角色音频缓存
-        const characterAudioBuffers = {};
-
-        // 加载角色音频文件
-        async function loadCharacterVoiceAudio(characterName) {
-            const config = characterVoiceConfig[characterName];
-            if (!config || !config.audioUrl) {
-                console.log(`[CharacterVoice] 无音频文件: ${characterName}`);
-                return null;
-            }
-            
-            if (characterAudioBuffers[characterName]) {
-                return characterAudioBuffers[characterName];
-            }
-            
-            try {
-                const response = await fetch(config.audioUrl);
-                const arrayBuffer = await response.arrayBuffer();
-                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                characterAudioBuffers[characterName] = audioBuffer;
-                console.log(`[CharacterVoice] 已加载: ${characterName}`);
-                return audioBuffer;
-            } catch (err) {
-                console.error(`[CharacterVoice] 加载失败: ${characterName}`, err);
-                return null;
-            }
-        }
-
-        // 播放角色声纹（试听或检测触发）
-        async function playCharacterVoice(characterName) {
-            if (!audioContext) {
-                alert('请先启动音频引擎');
-                return;
-            }
-            
-            const config = characterVoiceConfig[characterName];
-            if (!config) return;
-            
-            // 尝试播放音频文件
-            const audioBuffer = await loadCharacterVoiceAudio(characterName);
-            if (audioBuffer) {
-                const source = audioContext.createBufferSource();
-                source.buffer = audioBuffer;
-                const gainNode = audioContext.createGain();
-                gainNode.gain.value = params.masterVolume;
-                source.connect(gainNode);
-                gainNode.connect(analyser);
-                analyser.connect(audioContext.destination);
-                source.start();
-                updateSpectrum();
-                console.log(`[CharacterVoice] 播放音频: ${characterName}, duration=${audioBuffer.duration.toFixed(2)}s`);
-                
-                // ===== 等待音频播放完成，确保顺序执行 =====
-                await new Promise(resolve => {
-                    source.onended = resolve;
-                });
-                console.log(`[CharacterVoice] 音频播放完成: ${characterName}`);
-            } else {
-                // 无音频时使用乐器演奏主题音
-                console.log(`[CharacterVoice] 使用合成音色: ${characterName}`);
-                const originalInstrument = currentInstrument;
-                currentInstrument = config.instrument;
-                
-                for (const note of config.motifNotes) {
-                    const freq = {
-                        'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
-                        'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
-                    }[note.note];
-                    if (freq) {
-                        playTone(freq, note.note, note.durationMs, note.velocity * params.masterVolume);
-                        await sleep(note.durationMs + 50);
-                    }
-                }
-                
-                currentInstrument = originalInstrument;
-            }
-            
-            // 视觉反馈
-            const card = document.querySelector(`.character-voice-card[data-character="${characterName}"]`);
-            if (card) {
-                card.classList.add('active');
-                setTimeout(() => card.classList.remove('active'), 1000);
-            }
-        }
-
-        // 检测文本中的角色名
-        function detectCharactersInText(text) {
-            const detected = [];
-            for (const [name, config] of Object.entries(characterVoiceConfig)) {
-                if (text.includes(name)) {
-                    detected.push(name);
-                }
-            }
-            return detected;
-        }
-
-        // 显示角色检测提示
-        function showCharacterDetectBadge(characters) {
-            const badge = document.getElementById('characterDetectBadge');
-            const text = document.getElementById('characterDetectText');
-            if (characters.length > 0) {
-                text.textContent = `检测到: ${characters.join('、')}`;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-
-        // 文本输入事件 - 实时检测角色名
-        function onTextInput(text) {
-            const detected = detectCharactersInText(text);
-            showCharacterDetectBadge(detected);
-        }
 
         const chordDurationPresets = [
             { slider: 0, label: '静音', ratio: 0.0 },
@@ -1780,22 +1762,10 @@
             '../assets/audio/chords/chord6.mp3'
         ]; // 和弦文件列表
 
-        // 每个乐器每个音符的独立音量设置 (默认1.0)
+        // 每个音符的独立音量设置 (默认1.0)
         const noteVolumes = {
-            piano:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            xylophone:  { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            guitar:     { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            flute:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            trumpet:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            saxophone:  { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            synth:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            train:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 }
-        };
-
-        // 每个乐器的 Chord 按钮独立音量 (默认1.0)
-        const chordVolumes = {
-            piano: 1.0, xylophone: 1.0, guitar: 1.0, flute: 1.0,
-            trumpet: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0
+            'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0,
+            'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0
         };
 
         // 音符频率表
@@ -1804,259 +1774,6 @@
             'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
             'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
         };
-
-        // ==================== 语义分类触发 MIDI 系统 ====================
-        
-        const phraseTriggerCategories = {
-            greeting: {
-                name: '打招呼',
-                emoji: '👋',
-                keywords: ['你好', '早上好', '晚上好', '早安', '晚安', '嗨', '哈喽', 'hello', 'hi', '打扰了', '不好意思打扰一下', '初次见面', '好久不见'],
-                midi: null,
-                parsedMidi: null
-            },
-            thanks: {
-                name: '感谢',
-                emoji: '🙏',
-                keywords: ['谢谢', '多谢', '非常感谢', '辛苦了', '麻烦你了', '感激不尽', '太感谢了', '多亏你了'],
-                midi: null,
-                parsedMidi: null
-            },
-            apology: {
-                name: '道歉',
-                emoji: '🙇',
-                keywords: ['对不起', '抱歉', '不好意思', '失礼了', '是我不对', '我的问题', '给你添麻烦了', '请原谅我'],
-                midi: null,
-                parsedMidi: null
-            },
-            farewell: {
-                name: '告别',
-                emoji: '👋',
-                keywords: ['再见', '回头见', '明天见', '下次见', '拜拜', '先这样', '我先走了'],
-                midi: null,
-                parsedMidi: null
-            },
-            request: {
-                name: '请求',
-                emoji: '🙏',
-                keywords: ['请问', '能不能', '可以吗', '帮我一下', '麻烦你', '想请教一下', '我有个问题', '能帮我看看吗'],
-                midi: null,
-                parsedMidi: null
-            },
-            confirm: {
-                name: '确认',
-                emoji: '✅',
-                keywords: ['好的', '好', '可以', '没问题', '明白了', '收到', '行', '就这么办'],
-                midi: null,
-                parsedMidi: null
-            },
-            praise: {
-                name: '赞美',
-                emoji: '✨',
-                keywords: ['好厉害', '太棒了', '干得漂亮', '做得很好', '真不错', '加油', '你可以的', '我支持你'],
-                midi: null,
-                parsedMidi: null
-            },
-            comfort: {
-                name: '安慰',
-                emoji: '🤗',
-                keywords: ['你还好吗', '没事吧', '别担心', '我在', '慢慢来', '会好的', '抱抱你', '我陪你'],
-                midi: null,
-                parsedMidi: null
-            }
-        };
-        
-        // 语义分类预置 MIDI 路径映射
-        const phraseMidiPaths = {
-            greeting: '../assets/audio/phrase-midi/greeting.mid',
-            thanks: '../assets/audio/phrase-midi/thanks.mid',
-            apology: '../assets/audio/phrase-midi/apology.mid',
-            farewell: '../assets/audio/phrase-midi/farewell.mid',
-            request: '../assets/audio/phrase-midi/request.mid',
-            confirm: '../assets/audio/phrase-midi/confirm.mid',
-            praise: '../assets/audio/phrase-midi/praise.mid',
-            comfort: '../assets/audio/phrase-midi/comfort.mid'
-        };
-        
-        let currentPhraseTrigger = null;
-        
-        // 加载所有预置语义分类 MIDI
-        async function loadPhraseTriggerMidis() {
-            const loadPromises = [];
-            for (const [key, path] of Object.entries(phraseMidiPaths)) {
-                const promise = fetch(path)
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        return response.arrayBuffer();
-                    })
-                    .then(arrayBuffer => {
-                        const midiData = parseMidi(arrayBuffer);
-                        phraseTriggerCategories[key].midi = {
-                            name: path.split('/').pop(),
-                            data: arrayBuffer
-                        };
-                        phraseTriggerCategories[key].parsedMidi = midiData;
-                        console.log(`[PhraseTrigger] 已加载 MIDI: ${key} → ${path}`);
-                    })
-                    .catch(err => {
-                        console.warn(`[PhraseTrigger] 未加载 MIDI: ${key} (${err.message})`);
-                        // 不抛出错误，让其他分类继续加载
-                    });
-                loadPromises.push(promise);
-            }
-            await Promise.all(loadPromises);
-            console.log('[PhraseTrigger] 所有预置 MIDI 加载完成');
-        }
-        
-        // 检测语义分类
-        function detectPhraseTriggerCategory(text) {
-            const source = (text || '').toLowerCase();
-            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
-                if (!category.keywords || !category.keywords.length) continue;
-                const matched = category.keywords.find(keyword =>
-                    source.includes(String(keyword).toLowerCase())
-                );
-                if (matched) {
-                    return { key, category, matchedKeyword: matched };
-                }
-            }
-            return null;
-        }
-        
-        // 选择语义分类（显示上传面板）
-        function selectPhraseTrigger(categoryKey) {
-            currentPhraseTrigger = categoryKey;
-            const category = phraseTriggerCategories[categoryKey];
-            if (!category) return;
-            
-            document.getElementById('phraseTriggerPanelTitle').textContent = `${category.emoji} ${category.name} - 专属 MIDI`;
-            document.getElementById('phraseTriggerFilePanel').style.display = 'block';
-            updatePhraseTriggerFileList(categoryKey);
-        }
-        
-        // 关闭语义分类面板
-        function closePhraseTriggerPanel() {
-            document.getElementById('phraseTriggerFilePanel').style.display = 'none';
-            currentPhraseTrigger = null;
-        }
-        
-        // 更新语义分类文件列表（只读显示加载状态）
-        function updatePhraseTriggerFileList(categoryKey) {
-            const category = phraseTriggerCategories[categoryKey];
-            const listDiv = document.getElementById('phraseTriggerFileList');
-            
-            let html = '';
-            if (category.parsedMidi) {
-                html += `<p>✅ MIDI 已加载: ${category.midi?.name || 'unknown'}</p>`;
-                html += `<p style="font-size: 0.65rem; opacity: 0.7;">音轨数: ${category.parsedMidi.numTracks} | 时间精度: ${category.parsedMidi.timeDivision}</p>`;
-            } else {
-                html = '<p>○ 暂无预置 MIDI 文件</p>';
-                html += `<p style="font-size: 0.65rem; opacity: 0.5;">请将 MIDI 文件放到 assets/audio/phrase-midi/${categoryKey}.mid</p>`;
-            }
-            
-            listDiv.innerHTML = html;
-        }
-        
-        // 生成语义分类卡片
-        function generatePhraseTriggerCards() {
-            const grid = document.getElementById('phraseTriggerGrid');
-            if (!grid) return;
-            
-            grid.innerHTML = '';
-            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
-                const hasMidi = category.parsedMidi ? '✅' : '○';
-                const card = document.createElement('div');
-                card.className = 'preset-btn';
-                card.style.cssText = 'padding: 10px 8px; font-size: 0.8rem; cursor: pointer; text-align: center;';
-                card.dataset.category = key;
-                card.innerHTML = `
-                    <span style="font-size: 1.2rem; display: block; margin-bottom: 4px;">${category.emoji}</span>
-                    <span style="display: block; font-weight: 600;">${category.name}</span>
-                    <span style="font-size: 0.65rem; opacity: 0.7;">${hasMidi} ${category.keywords.length} 个关键词</span>
-                `;
-                card.addEventListener('click', () => selectPhraseTrigger(key));
-                grid.appendChild(card);
-            }
-        }
-
-        // ==================== V2: 语义分类局部插入版 ====================
-        
-        // 将文本转换为事件序列（支持语义分类局部插入）
-        function textToEvents(text) {
-            // 第一步：找出所有有 MIDI 的语义分类匹配
-            const matches = [];
-            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
-                if (!category.parsedMidi) continue; // 只匹配有 MIDI 的分类
-                for (const keyword of category.keywords) {
-                    const lowerText = text.toLowerCase();
-                    const lowerKeyword = keyword.toLowerCase();
-                    let idx = lowerText.indexOf(lowerKeyword);
-                    while (idx !== -1) {
-                        matches.push({
-                            start: idx,
-                            end: idx + keyword.length,
-                            key: key,
-                            keyword: keyword,
-                            category: category
-                        });
-                        idx = lowerText.indexOf(lowerKeyword, idx + 1);
-                    }
-                }
-            }
-            
-            if (matches.length === 0) {
-                return textToNotes(text);
-            }
-            
-            // 按位置排序，优先位置靠前，位置相同取长度长的
-            matches.sort((a, b) => a.start - b.start || b.keyword.length - a.keyword.length);
-            
-            // 过滤重叠匹配
-            const filteredMatches = [];
-            for (const match of matches) {
-                let overlap = false;
-                for (const existing of filteredMatches) {
-                    if (match.start < existing.end && match.end > existing.start) {
-                        overlap = true;
-                        break;
-                    }
-                }
-                if (!overlap) filteredMatches.push(match);
-            }
-            
-            // 按顺序生成事件
-            const events = [];
-            let lastEnd = 0;
-            
-            for (const match of filteredMatches) {
-                if (match.start > lastEnd) {
-                    const prefixEvents = textToNotes(text.substring(lastEnd, match.start));
-                    if (Array.isArray(prefixEvents)) {
-                        events.push(...prefixEvents);
-                    }
-                }
-                
-                events.push({
-                    type: 'phraseMidi',
-                    category: match.key,
-                    categoryName: match.category.name,
-                    emoji: match.category.emoji,
-                    keyword: match.keyword,
-                    char: match.keyword
-                });
-                
-                lastEnd = match.end;
-            }
-            
-            if (lastEnd < text.length) {
-                const suffixEvents = textToNotes(text.substring(lastEnd));
-                if (Array.isArray(suffixEvents)) {
-                    events.push(...suffixEvents);
-                }
-            }
-            
-            return events;
-        }
 
         // ==================== 情绪专属文件系统 ====================
         
@@ -2355,12 +2072,6 @@
                 // 加载采样
                 document.getElementById('statusText').textContent = '加载采样中...';
                 await loadSamples();
-                
-                // 加载语义分类预置 MIDI
-                await loadPhraseTriggerMidis();
-                
-                // 生成语义分类卡片
-                generatePhraseTriggerCards();
                 
                 // 生成音符键盘
                 generateNoteKeyboard();
@@ -2739,17 +2450,17 @@
                 volumeSlider.className = 'note-volume-slider';
                 volumeSlider.min = '0';
                 volumeSlider.max = '200';
-                volumeSlider.value = Math.round(noteVolumes[currentInstrument][noteInfo.note] * 100);
+                volumeSlider.value = Math.round(noteVolumes[noteInfo.note] * 100);
                 volumeSlider.dataset.note = noteInfo.note;
                 
                 const volumeLabel = document.createElement('span');
                 volumeLabel.className = 'note-volume-label';
-                volumeLabel.textContent = `${Math.round(noteVolumes[currentInstrument][noteInfo.note] * 100)}%`;
+                volumeLabel.textContent = `${Math.round(noteVolumes[noteInfo.note] * 100)}%`;
                 
                 // 音量调节事件
                 volumeSlider.addEventListener('input', (e) => {
                     const volume = parseInt(e.target.value) / 100;
-                    noteVolumes[currentInstrument][noteInfo.note] = volume;
+                    noteVolumes[noteInfo.note] = volume;
                     volumeLabel.textContent = `${e.target.value}%`;
                 });
                 
@@ -2778,7 +2489,7 @@
             // Chord 按钮点击事件
             chordKey.addEventListener('mousedown', () => {
                 chordKey.classList.add('active');
-                playChordAsync(1000, 0.6 * chordVolumes[currentInstrument]);
+                playChordAsync(1000, 0.6);
             });
             chordKey.addEventListener('mouseup', () => releaseNoteKey(chordKey));
             chordKey.addEventListener('mouseleave', () => releaseNoteKey(chordKey));
@@ -2787,7 +2498,7 @@
             chordKey.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 chordKey.classList.add('active');
-                playChordAsync(1000, 0.6 * chordVolumes[currentInstrument]);
+                playChordAsync(1000, 0.6);
             });
             chordKey.addEventListener('touchend', (e) => {
                 e.preventDefault();
@@ -2803,14 +2514,13 @@
             chordVolumeSlider.className = 'note-volume-slider';
             chordVolumeSlider.min = '0';
             chordVolumeSlider.max = '200';
-            chordVolumeSlider.value = Math.round(chordVolumes[currentInstrument] * 100).toString();
+            chordVolumeSlider.value = '100';
             
             const chordVolumeLabel = document.createElement('span');
             chordVolumeLabel.className = 'note-volume-label';
-            chordVolumeLabel.textContent = `${Math.round(chordVolumes[currentInstrument] * 100)}%`;
+            chordVolumeLabel.textContent = '100%';
             
             chordVolumeSlider.addEventListener('input', (e) => {
-                chordVolumes[currentInstrument] = parseInt(e.target.value) / 100;
                 chordVolumeLabel.textContent = `${e.target.value}%`;
             });
             
@@ -2847,7 +2557,7 @@
             
             // 基础演奏力度 * 全局音量 * 用户调节
             const baseVelocity = 0.7;
-            const userVolume = (noteVolumes[currentInstrument][noteInfo.note] !== undefined) ? noteVolumes[currentInstrument][noteInfo.note] : 1.0;
+            const userVolume = noteVolumes[noteInfo.note] || 1.0;
             const finalVelocity = baseVelocity * params.masterVolume * userVolume;
             
             // 木琴是混合模式：检查是否有该具体音符的采样
@@ -3039,55 +2749,53 @@
             return styles[emotion] || styles.calm;
         }
 
-        // 文本转音符序列（统一事件模型：note + pause）
-        function textToNotes(text) {
-            // 先检测角色名并替换为标记
-            const characterVoiceEvents = [];
-            let processedText = text;
-            let offset = 0;
-            
-            for (const [name, config] of Object.entries(characterVoiceConfig)) {
-                let index = processedText.indexOf(name);
-                while (index !== -1) {
-                    characterVoiceEvents.push({
-                        type: 'characterVoice',
-                        character: name,
-                        position: index
-                    });
-                    // 替换为占位符避免重复检测
-                    processedText = processedText.substring(0, index) + '\0'.repeat(name.length) + processedText.substring(index + name.length);
-                    index = processedText.indexOf(name);
+        function applyPauseModifiers(events) {
+            for (let i = 0; i < events.length; i++) {
+                const evt = events[i];
+                if (!evt || evt.type !== 'pause') continue;
+
+                let prevNoteIdx = -1;
+                for (let j = i - 1; j >= 0; j--) {
+                    if (events[j] && events[j].type === 'note') {
+                        prevNoteIdx = j;
+                        break;
+                    }
+                }
+
+                let nextNoteIdx = -1;
+                for (let j = i + 1; j < events.length; j++) {
+                    if (events[j] && events[j].type === 'note') {
+                        nextNoteIdx = j;
+                        break;
+                    }
+                }
+
+                if (prevNoteIdx >= 0 && typeof evt.preNoteMultiplier === 'number') {
+                    events[prevNoteIdx].durationMultiplier = evt.preNoteMultiplier;
+                }
+
+                if (nextNoteIdx >= 0 && typeof evt.nextNoteVelocityMultiplier === 'number') {
+                    events[nextNoteIdx].velocityMultiplier = evt.nextNoteVelocityMultiplier;
                 }
             }
-            
-            // 按位置排序
-            characterVoiceEvents.sort((a, b) => a.position - b.position);
-            
-            const tokens = tokenizeText(processedText);
+            return events;
+        }
+
+        function textSegmentToEvents(text, charIndexOffset = 0) {
+            const tokens = tokenizeText(text);
             const events = [];
             const bpm = params.bpm || 120;
-            
-            // 当前字符位置跟踪
-            let charPosition = 0;
-            let voiceEventIndex = 0;
-            
-            // 第一遍：生成基础 note、pause 和 characterVoice 事件
+            let localCharIndex = 0;
+
             for (let i = 0; i < tokens.length; i++) {
                 const token = tokens[i];
-                
-                // 检查是否有角色声纹事件需要插入
-                while (voiceEventIndex < characterVoiceEvents.length && 
-                       characterVoiceEvents[voiceEventIndex].position <= charPosition) {
-                    events.push(characterVoiceEvents[voiceEventIndex]);
-                    voiceEventIndex++;
-                }
-                
+
                 if (token.type === 'char') {
-                    const note = charToNote(token.char, i);
+                    const note = charToNote(token.char, charIndexOffset + localCharIndex);
+                    localCharIndex += 1;
                     if (note) {
                         events.push({ type: 'note', ...note });
                     }
-                    charPosition += 1;
                 } else if (token.type === 'punctuation' || token.type === 'space') {
                     const symbol = token.symbol;
                     const rule = getPunctuationRule(symbol);
@@ -3102,62 +2810,43 @@
                             resetPhrase: phrasingConfig.sentenceResetEnabled && rule.resetPhrase
                         });
                     }
-                    charPosition += symbol.length;
                 }
             }
-            
-            // 插入剩余的角色声纹事件
-            while (voiceEventIndex < characterVoiceEvents.length) {
-                events.push(characterVoiceEvents[voiceEventIndex]);
-                voiceEventIndex++;
+
+            return applyPauseModifiers(events).filter(e => e !== null && e !== undefined && typeof e === 'object');
+        }
+
+        // 文本转音符序列（统一事件模型：note + pause + mention motif）
+        function textToNotes(text) {
+            const sourceText = typeof text === 'string' ? text : '';
+            const core = getMentionMotifCore();
+
+            if (!core || !mentionMotifConfig.enabled) {
+                return textSegmentToEvents(sourceText, 0);
             }
-            
-            // 第二遍：应用前后音修饰
-            // 找到所有有效音符的索引
-            const noteIndices = [];
-            for (let i = 0; i < events.length; i++) {
-                if (events[i].type === 'note') {
-                    noteIndices.push(i);
-                }
+
+            const segments = core.splitTextWithMentions(sourceText, mentionMotifConfig);
+            if (!segments.length) {
+                return textSegmentToEvents(sourceText, 0);
             }
-            
-            // 处理每个 pause 事件的前后修饰
-            for (let i = 0; i < events.length; i++) {
-                const evt = events[i];
-                if (evt.type !== 'pause') continue;
-                
-                // 找到前一个有效音符
-                let prevNoteIdx = -1;
-                for (let j = i - 1; j >= 0; j--) {
-                    if (events[j].type === 'note') {
-                        prevNoteIdx = j;
-                        break;
-                    }
+
+            const events = [];
+            let charIndexOffset = 0;
+            for (const segment of segments) {
+                if (segment.type === 'text') {
+                    events.push(...textSegmentToEvents(segment.text, charIndexOffset));
+                    charIndexOffset += (segment.text || '').length;
+                    continue;
                 }
-                
-                // 找到后一个有效音符
-                let nextNoteIdx = -1;
-                for (let j = i + 1; j < events.length; j++) {
-                    if (events[j].type === 'note') {
-                        nextNoteIdx = j;
-                        break;
-                    }
-                }
-                
-                // 前一个音延长（如果存在）
-                if (prevNoteIdx >= 0) {
-                    events[prevNoteIdx].durationMultiplier = evt.preNoteMultiplier;
-                }
-                
-                // 后一个音轻起（如果存在）
-                if (nextNoteIdx >= 0) {
-                    events[nextNoteIdx].velocityMultiplier = evt.nextNoteVelocityMultiplier;
+
+                if (segment.type === 'mention') {
+                    const motifEvents = core.convertMentionProfileToEvents(segment.character, segment.profile, getMentionMotifHelpers());
+                    events.push(...motifEvents);
+                    charIndexOffset += (segment.raw || segment.text || '').length;
                 }
             }
-            
-            // 过滤掉任何 null 或 undefined 值
-            const validEvents = events.filter(e => e !== null && e !== undefined && typeof e === 'object');
-            return validEvents;
+
+            return events.filter(e => e !== null && e !== undefined && typeof e === 'object');
         }
 
         // 常用汉字声调映射表（简化版 - 高频字）
@@ -3191,16 +2880,16 @@
         function getToneRegion(tone) {
             // 音高区域映射 - 区间内随机选择
             // 一声（阴平）：D4→F4 范围（D4, E4, F4）
-            // 二声（阳平）：F4→B4 范围（F4, A4, B4）
+            // 二声（阳平）：F4→B4 范围（F4, G4, A4, B4）
             // 三声（上声）：D5→F5 范围（D5, E5, F5）
-            // 四声（去声）：F5→B5 范围（F5, A5, B5）
+            // 四声（去声）：F5→B5 范围（F5, G5, A5, B5）
             // 轻声：延续前音或休止
             const regions = {
                 0: { notes: ['rest'], rest: true },                    // 轻声 - 休止
                 1: { notes: ['D4', 'E4', 'F4'], rest: false },         // 阴平 - D4到F4随机
-                2: { notes: ['F4', 'A4', 'B4'], rest: false },          // 阳平 - F4到B4随机（不含G4）
+                2: { notes: ['F4', 'G4', 'A4', 'B4'], rest: false },   // 阳平 - F4到B4随机
                 3: { notes: ['D5', 'E5', 'F5'], rest: false },         // 上声 - D5到F5随机
-                4: { notes: ['F5', 'A5', 'B5'], rest: false }           // 去声 - F5到B5随机（不含G5）
+                4: { notes: ['F5', 'G5', 'A5', 'B5'], rest: false }    // 去声 - F5到B5随机
             };
             return regions[tone] || regions[1];
         }
@@ -3343,13 +3032,14 @@
         }
 
         // 使用真实采样播放音符
-        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5) {
+        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5, instrumentOverride = null) {
             if (!audioContext) return;
             
-            // 根据当前乐器选择配置
-            const config = sampleConfig[currentInstrument];
+            const activeInstrument = instrumentOverride || currentInstrument;
+            // 根据事件乐器选择配置
+            const config = sampleConfig[activeInstrument];
             if (!config) {
-                console.warn('No sample config for instrument:', currentInstrument);
+                console.warn('No sample config for instrument:', activeInstrument);
                 return;
             }
             
@@ -3372,7 +3062,7 @@
             }
             
             const sampleNote = freqToSampleNote[nearestFreq];
-            const bufferKey = currentInstrument === 'piano' ? sampleNote : currentInstrument + '_' + sampleNote;
+            const bufferKey = activeInstrument === 'piano' ? sampleNote : activeInstrument + '_' + sampleNote;
             const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
@@ -3394,7 +3084,7 @@
             const safeVelocity = (typeof velocity === 'number' && isFinite(velocity)) ? velocity : 0.5;
             const finalVelocity = safeVelocity * baseGain;
             
-            console.log(`Playing ${currentInstrument} ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
+            console.log(`Playing ${activeInstrument} ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
             
             // 增益节点
             const gainNode = audioContext.createGain();
@@ -3448,7 +3138,7 @@
             }
             
             // 播放 - 使用当前乐器的音频偏移设置（毫秒转秒）
-            const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
+            const offsetMs = params.instrumentOffsets[activeInstrument] || 0;
             const startOffsetSec = offsetMs / 1000;
             source.start(now, startOffsetSec);
             source.stop(now + duration + 0.5);
@@ -3459,14 +3149,26 @@
             return { source, gainNode };
         }
 
+        function getSynthWaveform(instrument) {
+            const waveforms = {
+                guitar: 'sawtooth',
+                xylophone: 'triangle',
+                trumpet: 'square',
+                synth: 'sawtooth',
+                train: 'square'
+            };
+            return waveforms[instrument] || 'triangle';
+        }
+
         // 合成器音色（其他乐器用）
-        function playSynthTone(frequency, duration, velocity = 0.5) {
+        function playSynthTone(frequency, duration, velocity = 0.5, instrumentOverride = null) {
             if (!audioContext) return;
             
+            const activeInstrument = instrumentOverride || currentInstrument;
             const osc = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
-            osc.type = 'triangle';
+            osc.type = getSynthWaveform(activeInstrument);
             osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
             
             const now = audioContext.currentTime;
@@ -3484,28 +3186,25 @@
             updateSpectrum();
         }
 
-        // 演奏单个音符（根据当前乐器选择播放方式）
-        function playTone(frequency, noteName, duration, velocity = 0.5) {
-            // 检查当前乐器是否有采样可用
-            const hasSamples = hasInstrumentSamples(currentInstrument);
-            
-            // 木琴是混合模式：检查是否有该具体音符的采样
-            if (currentInstrument === 'xylophone') {
+        // 演奏单个音符（根据事件乐器上下文选择播放方式）
+        function playTone(frequency, noteName, duration, velocity = 0.5, instrumentOverride = null) {
+            const activeInstrument = instrumentOverride || currentInstrument;
+            const hasSamples = hasInstrumentSamples(activeInstrument);
+
+            if (activeInstrument === 'xylophone') {
                 const config = sampleConfig.xylophone;
                 const sampleInfo = config.samples[noteName];
-                // 如果有真实采样文件且已加载，使用采样
                 if (sampleInfo && sampleInfo.file && audioBuffers['xylophone_' + noteName]) {
-                    return playSampleTone(frequency, noteName, duration / 1000, velocity);
+                    return playSampleTone(frequency, noteName, duration / 1000, velocity, activeInstrument);
                 }
-                // 否则使用合成
-                return playSynthTone(frequency, duration / 1000, velocity);
+                return playSynthTone(frequency, duration / 1000, velocity, activeInstrument);
             }
-            
+
             if (hasSamples) {
-                return playSampleTone(frequency, noteName, duration / 1000, velocity);
-            } else {
-                return playSynthTone(frequency, duration / 1000, velocity);
+                return playSampleTone(frequency, noteName, duration / 1000, velocity, activeInstrument);
             }
+
+            return playSynthTone(frequency, duration / 1000, velocity, activeInstrument);
         }
 
         // 演奏带滑音的音符（声调效果）
@@ -3640,6 +3339,13 @@
         async function playText() {
             console.log('=== playText 开始 ===');
             
+            // 强制重置异常状态
+            if (isPlaying) {
+                console.log('检测到 isPlaying=true，强制重置');
+                stopPlaying();
+                await new Promise(r => setTimeout(r, 50));
+            }
+            
             const text = document.getElementById('textInput').value.trim();
             console.log('输入文本:', text);
             
@@ -3647,16 +3353,6 @@
                 document.getElementById('statusText').textContent = '请先输入文字';
                 console.log('文本为空，返回');
                 return;
-            }
-            
-            // V1 语义分类整句触发已迁移到 V2 局部插入版
-            // textToEvents() 会自动处理语义分类 + 逐字分音混合
-            
-            // 强制重置异常状态
-            if (isPlaying) {
-                console.log('检测到 isPlaying=true，强制重置');
-                stopPlaying();
-                await new Promise(r => setTimeout(r, 50));
             }
             
             // Safari/Mac 兼容性：确保音频上下文已启动
@@ -3740,60 +3436,48 @@
                 console.log('没有专属文件，继续播放文字转音乐');
             }
             
-            // ===== V2: 语义分类 + 逐字分音混合 =====
-            let events = textToEvents(text);
-            events = events.filter(n => n !== null && n !== undefined);
-            console.log('转换后的事件数量:', events.length);
-            console.log('事件数据:', events);
+            // 转换为音符
+            let notes = textToNotes(text);
+            // 过滤掉 null 值
+            notes = notes.filter(n => n !== null && n !== undefined);
+            console.log('转换后的音符数量:', notes.length);
+            console.log('音符数据:', notes);
             
-            // 显示事件序列
-            displayNotes(events);
+            // 显示音符序列
+            displayNotes(notes);
             
-            if (events.length === 0) {
-                console.log('没有可播放的事件');
+            if (notes.length === 0) {
+                console.log('没有可播放的音符');
                 isPlaying = false;
-                document.getElementById('statusText').textContent = '没有可播放的事件';
+                document.getElementById('statusText').textContent = '没有可播放的音符';
                 return;
             }
             
-            // 依次演奏
-            console.log('开始演奏，事件数量:', events.length);
+            // 依次演奏 - 使用节奏引擎 + 标点气口系统
+            console.log('开始演奏，事件数量:', notes.length);
+            console.log('节奏引擎设置:', {
+                bpm: params.bpm,
+                notesPerBeat: params.notesPerBeat,
+                rhythmRandom: params.rhythmRandom,
+                toneValues: params.toneNoteValues
+            });
             
             // 计算一拍的时间 (ms)
             const beatDuration = 60000 / params.bpm;
             
             try {
-                for (let i = 0; i < events.length; i++) {
+                for (let i = 0; i < notes.length; i++) {
                     if (!isPlaying) {
                         console.log('演奏被中断');
                         break;
                     }
                     
-                    const event = events[i];
-                    
-                    // ===== 语义分类 MIDI 事件 =====
-                    if (event.type === 'phraseMidi') {
-                        console.log(`第 ${i+1} 个是语义分类 MIDI [${event.categoryName}]`);
-                        highlightNote(i);
-                        document.getElementById('statusText').textContent = `🎯 ${event.categoryName}`;
-                        const midiData = phraseTriggerCategories[event.category]?.parsedMidi;
-                        if (midiData) {
-                            await playMidiAsync(midiData);
-                        }
-                        continue;
-                    }
-                    
-                    // ===== 角色声纹检测 =====
-                    if (event.type === 'characterVoice') {
-                        console.log(`第 ${i+1} 个是角色声纹 [${event.character}]`);
-                        highlightNote(i);
-                        await playCharacterVoice(event.character);
-                        continue;
-                    }
+                    const event = notes[i];
                     
                     // ===== 停顿事件处理 =====
                     if (event.type === 'pause') {
-                        console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms`);
+                        console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms, reset=${event.resetPhrase}`);
+                        // 高亮显示停顿
                         highlightNote(i);
                         await sleep(event.pauseMs);
                         continue;
@@ -3810,10 +3494,16 @@
                         continue;
                     }
                     
-                    // 如果普通音符无法播放（采样未加载），跳过
-                    if (!canPlayNormalNotes) {
+                    // 如果普通音符无法播放（采样未加载），旧逻辑会跳过。
+                    // mention motif 允许走局部回退（例如临时转合成器），避免整段被吞。
+                    const eventInstrument = resolveEventInstrument(note);
+                    const canPlayEventNormally = hasInstrumentSamples(eventInstrument) || eventInstrument === 'guitar' || eventInstrument === 'trumpet';
+                    if (!canPlayNormalNotes && !note.isMentionMotif) {
                         console.log(`第 ${i+1} 个是普通音符，但采样未加载，跳过`);
                         continue;
+                    }
+                    if (!canPlayEventNormally && note.isMentionMotif) {
+                        console.log(`第 ${i+1} 个是 mention motif，目标乐器 ${eventInstrument} 采样未加载，回退为合成器播放`);
                     }
                     
                     // 休止符处理（兼容旧数据）
@@ -3857,7 +3547,7 @@
                     noteDuration = Math.max(noteDuration, minAudibleMs);
                     
                     // 应用全局音量 + 音符独立音量
-                    let userVolume = (noteVolumes[currentInstrument][note.note] !== undefined) ? noteVolumes[currentInstrument][note.note] : 1.0;
+                    let userVolume = noteVolumes[note.note] || 1.0;
                     let velocityWithMaster = note.velocity * params.masterVolume * userVolume;
                     
                     // 应用后音轻起修饰（仅对足够长的音生效，避免过短音被吞）
@@ -3865,10 +3555,10 @@
                         velocityWithMaster *= note.velocityMultiplier;
                     }
                     
-                    console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}`);
+                    console.log(`播放第 ${i+1}/${notes.length} 个音符: ${note.note}, 声调=${note.tone}, 时值=${noteValue.name}, 时长=${noteDuration.toFixed(0)}ms`);
                     
-                    // 播放单音（使用节奏引擎计算的时长）
-                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
+                    // 播放单音（支持 mention motif 的局部乐器覆盖）
+                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster, eventInstrument);
                     
                     // 高亮当前事件（使用真实事件索引 i）
                     highlightNote(i);
@@ -3921,24 +3611,6 @@
                 // 跳过 null 值
                 if (!evt) return '';
                 
-                // 语义分类 MIDI 事件显示
-                if (evt.type === 'phraseMidi') {
-                    return `<span class="note-item" id="note-${i}" title="语义分类: ${evt.categoryName} (${evt.keyword})"
-                        style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; background: rgba(78, 205, 196, 0.15); border: 1px solid rgba(78, 205, 196, 0.3); border-radius: 8px;">
-                        <span style="font-size: 0.9rem;">${evt.emoji} ${evt.categoryName}</span>
-                        <span style="font-size: 0.6rem; opacity: 0.7;">${evt.keyword}</span>
-                    </span>`;
-                }
-                
-                // 角色声纹事件显示
-                if (evt.type === 'characterVoice') {
-                    return `<span class="note-item" id="note-${i}" title="角色声纹: ${evt.character}"
-                        style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; background: rgba(255, 230, 109, 0.15); border: 1px solid rgba(255, 230, 109, 0.3); border-radius: 8px;">
-                        <span style="font-size: 0.9rem;">🎭${evt.character}</span>
-                        <span style="font-size: 0.6rem; opacity: 0.7;">声纹</span>
-                    </span>`;
-                }
-                
                 // 停顿事件显示
                 if (evt.type === 'pause') {
                     const pauseSymbols = { ' ': '·', '、': '、', '，': '，', ',': ',', '：': '：', ':': ':', '；': '；', ';': ';', '。': '。', '.': '.', '？': '？', '?': '?', '！': '！', '!': '!', '…': '…', '……': '…', '...': '…' };
@@ -3958,6 +3630,8 @@
                 
                 if (n.isChord) {
                     displayText = '🎵Chord';
+                } else if (n.isMentionMotif) {
+                    displayText = `✦${n.note}`;
                 } else if (n.isRest) {
                     displayText = '休';
                 } else {
@@ -3968,14 +3642,11 @@
                 }
                 
                 const regionInfo = n.region ? `[${n.region.join(',')}]` : '';
-                const userVol = noteVolumes[currentInstrument][n.note] || 1.0;
-                const volIndicator = userVol !== 1.0 ? `<span style="font-size: 0.55rem; color: ${userVol > 1.0 ? '#ff6b9d' : '#4ecdc4'};">${Math.round(userVol*100)}%</span>` : '';
-                const volStyle = userVol !== 1.0 ? `border: 1px solid ${userVol > 1.0 ? 'rgba(255,107,107,0.4)' : 'rgba(78,205,196,0.4)'};` : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo} 音量:${Math.round(userVol*100)}%"
-                    style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; ${volStyle}">
+                const motifInfo = n.isMentionMotif ? ` motif:${n.motifCharacter || 'unknown'} instrument:${n.instrumentOverride || currentInstrument}` : '';
+                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo}${motifInfo}"
+                    style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px;">
                     <span style="font-size: 0.9rem;">${displayText}</span>
                     <span style="font-size: 0.6rem; opacity: 0.7;">${rhythmInfo}</span>
-                    ${volIndicator}
                 </span>`;
             }).join('');
         }
@@ -4366,7 +4037,7 @@
         // 显示 MIDI 音符
         function displayMidiNotes(notes) {
             const display = document.getElementById('notesDisplay');
-            display.innerHTML = events.map((n, i) => {
+            display.innerHTML = notes.map((n, i) => {
                 const mapped = mapToPentatonic(n.note);
                 const name = noteNumberToName(mapped);
                 return `<span class="note-item" id="note-${i}" title="原音符: ${n.note} → ${name}">${name}</span>`;
@@ -4513,41 +4184,21 @@
             if (exportStatus) exportStatus.textContent = '正在准备音频渲染...';
             
             try {
-                console.log('🎵 [EXPORT] Step 1: Generating events...');
-                const matchedCategory = detectPhraseTriggerCategory(text);
-            if (matchedCategory) {
-                document.getElementById('statusText').textContent = `🎯 检测到语义分类: ${matchedCategory.category.name}`;
-            }
-            
-            const events = textToEvents(text);
-                console.log(`🎵 [EXPORT] Step 1 done: ${events.length} events`);
+                console.log('🎵 [EXPORT] Step 1: Calculating duration...');
+                const duration = await calculateAudioDuration(text);
+                console.log(`🎵 [EXPORT] Step 1 done: duration=${duration.toFixed(2)}s`);
                 
-                console.log('🎵 [EXPORT] Step 2: Pre-computing all timings...');
-                const beatDuration = 60000 / params.bpm;
-                // 预计算所有timing，避免随机模式导致时长计算和渲染不一致
-                const eventsWithTiming = events.map(evt => {
-                    if (evt.type === 'pause') {
-                        return { ...evt, _timing: { duration: evt.pauseMs || 0, velocity: 0 } };
-                    }
-                    return { ...evt, _timing: computeEventTiming(evt, beatDuration, params.bpm) };
-                });
-                console.log(`🎵 [EXPORT] Step 2 done: ${eventsWithTiming.length} timings computed`);
-                
-                console.log('🎵 [EXPORT] Step 3: Calculating duration...');
-                const duration = await calculateAudioDuration(eventsWithTiming);
-                console.log(`🎵 [EXPORT] Step 3 done: duration=${duration.toFixed(2)}s`);
-                
-                console.log('🎵 [EXPORT] Step 4: Creating OfflineAudioContext...');
+                console.log('🎵 [EXPORT] Step 2: Creating OfflineAudioContext...');
                 const offlineContext = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
                     2, Math.ceil(duration * sampleRate), sampleRate
                 );
-                console.log('🎵 [EXPORT] Step 4 done');
+                console.log('🎵 [EXPORT] Step 2 done');
                 
                 if (exportStatus) exportStatus.textContent = `正在渲染音频 (${Math.ceil(duration)}秒)...`;
                 
-                console.log('🎵 [EXPORT] Step 5: Rendering audio to buffer...');
-                const renderedBuffer = await renderAudioToBuffer(eventsWithTiming, offlineContext);
-                console.log(`🎵 [EXPORT] Step 4 done: renderedBuffer=${renderedBuffer ? 'ok' : 'null'}, channels=${renderedBuffer?.numberOfChannels}, duration=${renderedBuffer?.duration}`);
+                console.log('🎵 [EXPORT] Step 3: Rendering audio to buffer...');
+                const renderedBuffer = await renderAudioToBuffer(text, offlineContext);
+                console.log(`🎵 [EXPORT] Step 3 done: renderedBuffer=${renderedBuffer ? 'ok' : 'null'}, channels=${renderedBuffer?.numberOfChannels}, duration=${renderedBuffer?.duration}`);
                 
                 if (!renderedBuffer) {
                     console.error('❌ [EXPORT] renderAudioToBuffer returned null/undefined');
@@ -4599,70 +4250,19 @@
         }
         
         // 计算音频总时长
-        async function calculateAudioDuration(events) {
+        async function calculateAudioDuration(text) {
+            const events = textToNotes(text);
             let totalTime = 0.5; // 起始偏移
+            const beatDuration = 60000 / params.bpm;
             
             for (let i = 0; i < events.length; i++) {
                 const evt = events[i];
-                
-                // 停顿事件
-                if (evt.type === 'pause') {
-                    totalTime += evt.pauseMs / 1000;
-                    continue;
-                }
-                
-                // 语义分类 MIDI 事件
-                if (evt.type === 'phraseMidi') {
-                    const category = phraseTriggerCategories[evt.category];
-                    if (!category || !category.parsedMidi) continue;
-                    
-                    const midiData = category.parsedMidi;
-                    const allNotes = [];
-                    for (const track of midiData.tracks) {
-                        for (const event of track) {
-                            if (event.type === 'noteOn') allNotes.push(event);
-                        }
-                    }
-                    
-                    if (allNotes.length === 0) continue;
-                    
-                    allNotes.sort((a, b) => a.time - b.time);
-                    const msPerTick = 60000 / (120 * midiData.timeDivision);
-                    
-                    const lastNote = allNotes[allNotes.length - 1];
-                    const lastNoteTimeMs = lastNote.time * msPerTick;
-                    const noteDurationMs = params.noteDuration;
-                    
-                    totalTime += (lastNoteTimeMs + noteDurationMs) / 1000;
-                    totalTime += 0.02;
-                    continue;
-                }
-                
-                // 角色声纹事件：估算实际播放时长
-                if (evt.type === 'characterVoice') {
-                    const config = characterVoiceConfig[evt.character];
-                    if (!config) continue;
-                    let voiceDuration = 0;
-                    // 优先用已缓存的音频时长
-                    const audioBuffer = characterAudioBuffers[evt.character];
-                    if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
-                        voiceDuration = audioBuffer.duration;
-                    } else {
-                        //  fallback：按 motifNotes 累加估算
-                        for (const note of config.motifNotes) {
-                            voiceDuration += note.durationMs / 1000 + 0.05;
-                        }
-                    }
-                    totalTime += voiceDuration;
-                    totalTime += 0.02; // 微小间隔对齐渲染逻辑
-                    continue;
-                }
-                
-                // 使用预计算的timing（如果存在）
-                const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
+                const timing = computeEventTiming(evt, beatDuration, params.bpm);
                 totalTime += timing.duration / 1000;
-                // 所有非停顿事件都加微小间隔（与渲染逻辑严格对齐）
-                totalTime += 0.02;
+                // 添加微小间隔
+                if (evt.type === 'note' && !evt.isChord && !evt.isRest) {
+                    totalTime += 0.02;
+                }
             }
             
             // 混响尾巴时长
@@ -4689,7 +4289,6 @@
             // 节奏引擎计算
             let currentNoteValue = params.toneNoteValues[note.tone] || '8';
             let currentNotesPerBeat = params.notesPerBeat;
-            let noteDuration;
             
             // 随机模式：随机变化时值和每拍音符数
             if (params.rhythmRandom) {
@@ -4701,22 +4300,12 @@
             // 获取时值配置
             const noteValue = noteValueConfig[currentNoteValue];
             
-            // ===== 防御：确保 noteValue 存在 =====
-            if (!noteValue || !isFinite(noteValue.duration)) {
-                console.warn(`[computeEventTiming] Invalid noteValue "${currentNoteValue}" for tone ${note.tone}, falling back to '8'`);
-                const fallbackValue = noteValueConfig['8'];
-                noteDuration = beatDuration * fallbackValue.duration / currentNotesPerBeat;
-                if (fallbackValue.isTriplet) {
-                    noteDuration = beatDuration / 3;
-                }
-            } else {
-                // 计算音符实际时长
-                noteDuration = beatDuration * noteValue.duration / currentNotesPerBeat;
-                
-                // 三连音特殊处理
-                if (noteValue.isTriplet) {
-                    noteDuration = beatDuration / 3;
-                }
+            // 计算音符实际时长
+            let noteDuration = beatDuration * noteValue.duration / currentNotesPerBeat;
+            
+            // 三连音特殊处理
+            if (noteValue.isTriplet) {
+                noteDuration = beatDuration / 3;
             }
             
             // 应用前音延长修饰
@@ -4729,22 +4318,12 @@
             noteDuration = Math.max(noteDuration, minAudibleMs);
             
             // 计算音量
-            let userVolume = (noteVolumes[currentInstrument][note.note] !== undefined) ? noteVolumes[currentInstrument][note.note] : 1.0;
+            let userVolume = noteVolumes[note.note] || 1.0;
             let velocityWithMaster = note.velocity * params.masterVolume * userVolume;
             
             // 应用后音轻起修饰（仅对足够长的音生效）
             if (note.velocityMultiplier && noteDuration >= 160) {
                 velocityWithMaster *= note.velocityMultiplier;
-            }
-            
-            // ===== 防御：确保返回值都是有限值 =====
-            if (!isFinite(noteDuration) || noteDuration <= 0) {
-                console.warn(`[computeEventTiming] Invalid noteDuration ${noteDuration}, using fallback 400ms`);
-                noteDuration = 400;
-            }
-            if (!isFinite(velocityWithMaster) || velocityWithMaster < 0) {
-                console.warn(`[computeEventTiming] Invalid velocity ${velocityWithMaster}, using fallback 0.5`);
-                velocityWithMaster = 0.5;
             }
             
             return { duration: noteDuration, velocity: velocityWithMaster };
@@ -4763,24 +4342,20 @@
         }
 
         // 渲染音频到 AudioBuffer（统一事件模型 + 统一节奏引擎）
-        async function renderAudioToBuffer(events, offlineContext) {
+        async function renderAudioToBuffer(text, offlineContext) {
             console.log('🎵 [RENDER] renderAudioToBuffer() called');
             
-            console.log(`🎵 [RENDER] events count: ${events.length}`);
+            const events = textToNotes(text);
+            console.log(`🎵 [RENDER] events generated: ${events.length} events`);
             
             if (events.length === 0) {
-                console.warn('⚠️ [RENDER] No events to render');
+                console.warn('⚠️ [RENDER] No events generated from text');
                 throw new Error('无法从文本生成音符事件');
             }
             
             const destination = offlineContext.destination;
             let currentTime = 0.5; // 起始偏移
             const beatDuration = 60000 / params.bpm;
-            
-            // 统计事件类型
-            const eventTypeCounts = {};
-            events.forEach(e => { eventTypeCounts[e.type] = (eventTypeCounts[e.type] || 0) + 1; });
-            console.log(`🎵 [RENDER] Event types:`, eventTypeCounts);
             
             let notesRendered = 0;
             let pausesRendered = 0;
@@ -4798,153 +4373,25 @@
                     continue;
                 }
                 
-                // ===== 角色声纹事件 =====
-                if (evt.type === 'characterVoice') {
-                    const characterName = evt.character;
-                    const config = characterVoiceConfig[characterName];
-                    if (!config) continue;
-                    
-                    // 尝试使用预加载的音频 buffer
-                    const audioBuffer = characterAudioBuffers[characterName];
-                    if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
-                        const source = offlineContext.createBufferSource();
-                        source.buffer = audioBuffer;
-                        const gainNode = offlineContext.createGain();
-                        gainNode.gain.value = params.masterVolume;
-                        source.connect(gainNode);
-                        gainNode.connect(destination);
-                        source.start(currentTime);
-                        currentTime += audioBuffer.duration;
-                        console.log(`[RENDER] Character voice (audio): ${characterName}, duration=${audioBuffer.duration.toFixed(2)}s`);
-                    } else {
-                        // 音频未加载，用乐器合成主题音
-                        const originalInstrument = currentInstrument;
-                        currentInstrument = config.instrument;
-                        let motifDuration = 0;
-                        const freqMap = {
-                            'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
-                            'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
-                        };
-                        for (const note of config.motifNotes) {
-                            const freq = freqMap[note.note];
-                            if (freq) {
-                                const noteDur = note.durationMs / 1000;
-                                const noteVel = note.velocity * params.masterVolume;
-                                // 使用合成音色渲染（不受采样加载状态影响）
-                                const oscillator = offlineContext.createOscillator();
-                                const noteGain = offlineContext.createGain();
-                                oscillator.type = 'triangle';
-                                oscillator.frequency.value = freq;
-                                noteGain.gain.setValueAtTime(0, currentTime + motifDuration);
-                                noteGain.gain.linearRampToValueAtTime(noteVel, currentTime + motifDuration + 0.02);
-                                noteGain.gain.exponentialRampToValueAtTime(0.001, currentTime + motifDuration + noteDur + 0.2);
-                                oscillator.connect(noteGain);
-                                noteGain.connect(destination);
-                                oscillator.start(currentTime + motifDuration);
-                                oscillator.stop(currentTime + motifDuration + noteDur + 0.5);
-                                motifDuration += noteDur + 0.05;
-                            }
-                        }
-                        currentInstrument = originalInstrument;
-                        currentTime += motifDuration;
-                        console.log(`[RENDER] Character voice (synth): ${characterName}, duration=${motifDuration.toFixed(2)}s`);
-                    }
-                    notesRendered++;
-                    continue;
-                }
-                
-                // ===== 语义分类 MIDI 事件 =====
-                if (evt.type === 'phraseMidi') {
-                    const category = phraseTriggerCategories[evt.category];
-                    if (!category || !category.parsedMidi) continue;
-                    
-                    console.log(`[RENDER] phraseMidi: ${evt.categoryName}`);
-                    
-                    const midiData = category.parsedMidi;
-                    const allNotes = [];
-                    for (const track of midiData.tracks) {
-                        for (const event of track) {
-                            if (event.type === 'noteOn') allNotes.push(event);
-                        }
-                    }
-                    allNotes.sort((a, b) => a.time - b.time);
-                    
-                    const msPerTick = 60000 / (120 * midiData.timeDivision);
-                    let midiCurrentTime = currentTime;
-                    let lastNoteTime = 0;
-                    
-                    for (const mnote of allNotes) {
-                        const waitMs = (mnote.time - lastNoteTime) * msPerTick;
-                        midiCurrentTime += waitMs / 1000;
-                        lastNoteTime = mnote.time;
-                        
-                        const pentatonicNote = mapToPentatonic(mnote.note);
-                        const freq = midiToFreq[pentatonicNote];
-                        if (!freq) continue;
-                        
-                        const noteVel = (mnote.velocity / 127) * params.masterVolume;
-                        const noteDur = params.noteDuration / 1000;
-                        
-                        const oscillator = offlineContext.createOscillator();
-                        const gainNode = offlineContext.createGain();
-                        const waveforms = {
-                            'guitar': 'sawtooth',
-                            'xylophone': 'triangle',
-                            'trumpet': 'square',
-                            'synth': 'sawtooth',
-                            'piano': 'triangle',
-                            'flute': 'sine',
-                            'saxophone': 'sawtooth',
-                            'train': 'triangle'
-                        };
-                        oscillator.type = waveforms[currentInstrument] || 'sine';
-                        oscillator.frequency.value = freq;
-                        gainNode.gain.setValueAtTime(0, midiCurrentTime);
-                        gainNode.gain.linearRampToValueAtTime(noteVel, midiCurrentTime + 0.02);
-                        gainNode.gain.exponentialRampToValueAtTime(0.001, midiCurrentTime + noteDur + 0.2);
-                        oscillator.connect(gainNode);
-                        gainNode.connect(destination);
-                        oscillator.start(midiCurrentTime);
-                        oscillator.stop(midiCurrentTime + noteDur + 0.5);
-                    }
-                    
-                    currentTime = midiCurrentTime + 0.5;
-                    notesRendered++;
-                    continue;
-                }
-                
                 const note = evt;
-                // 使用预计算的timing（如果存在），避免随机模式导致不一致
-                const timing = evt._timing || computeEventTiming(evt, beatDuration, params.bpm);
+                const timing = computeEventTiming(evt, beatDuration, params.bpm);
                 const noteDuration = timing.duration / 1000;
                 const velocity = timing.velocity;
                 
-                // ===== 防御：跳过无效参数的事件 =====
-                if (!isFinite(noteDuration) || noteDuration <= 0 || !isFinite(velocity)) {
-                    console.warn(`[renderAudioToBuffer] ❌ Skipping invalid note at index ${i}: type=${evt.type}, duration=${noteDuration}, velocity=${velocity}, note=${note.note || note.char || '?'}`);
-                    continue;
-                }
-                
-                console.log(`[renderAudioToBuffer] ▶ Rendering note ${i}/${events.length}: note=${note.note}, freq=${note.frequency?.toFixed(1)}, duration=${noteDuration.toFixed(3)}s, velocity=${velocity.toFixed(3)}, tone=${note.tone}, isChord=${note.isChord}`);
-                
-                // 乐器分支判断（与实时播放一致）
-                const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
-                const hasSample = note.sampleNote && samplesLoaded;
-                
-                console.log(`[renderAudioToBuffer]   instrument=${currentInstrument}, isPiano=${isPiano}, isSampleInstrument=${isSampleInstrument}, hasSample=${hasSample}, sampleNote=${note.sampleNote}, chordsLoaded=${chordsLoaded}, isChord=${note.isChord}`);
+                // 乐器分支判断（支持事件级乐器覆盖）
+                const eventInstrument = resolveEventInstrument(note);
+                const isPiano = eventInstrument === 'piano';
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(eventInstrument);
+                const hasSample = note.sampleNote && hasInstrumentSamples(eventInstrument);
                 
                 if (note.isChord && chordsLoaded) {
-                    console.log(`[renderAudioToBuffer]   → renderChordToBuffer`);
                     await renderChordToBuffer(offlineContext, destination, currentTime, noteDuration, velocity);
                     chordNotesRendered++;
                 } else if ((isPiano || isSampleInstrument) && hasSample) {
-                    console.log(`[renderAudioToBuffer]   → renderSampleToBuffer (sampleNote=${note.sampleNote})`);
-                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, eventInstrument);
                     sampleNotesRendered++;
                 } else {
-                    console.log(`[renderAudioToBuffer]   → renderSynthToBuffer`);
-                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
+                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, eventInstrument);
                     synthNotesRendered++;
                 }
                 
@@ -4965,44 +4412,13 @@
         }
         
         // 渲染采样到 buffer（与实时播放 playSampleTone() 严格对齐）
-        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
-            // ===== 防御：跳过无效参数 =====
-            if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(overrideVelocity)) {
-                console.warn('[renderSampleToBuffer] Invalid params, skipping:', { startTime, duration, overrideVelocity });
-                return;
-            }
-            
-            // 根据当前乐器选择配置
-            const config = sampleConfig[currentInstrument];
-            if (!config) {
-                console.warn('🎵 [RENDER] No sample config for instrument:', currentInstrument);
-                return;
-            }
-            
-            // ===== 找到最接近目标频率的采样（与 playSampleTone 严格对齐）=====
-            const freqToSampleNote = {};
-            for (const [sampleNote, info] of Object.entries(config.samples)) {
-                freqToSampleNote[info.freq] = sampleNote;
-            }
-            
-            let nearestFreq = 440;
-            let minDiff = Infinity;
-            for (const freq of Object.keys(freqToSampleNote).map(f => parseFloat(f))) {
-                const diff = Math.abs(freq - note.frequency);
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    nearestFreq = freq;
-                }
-            }
-            
-            const sampleNote = freqToSampleNote[nearestFreq];
-            const bufferKey = currentInstrument === 'piano' ? sampleNote : `${currentInstrument}_${sampleNote}`;
+        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, instrumentOverride = null) {
+            const activeInstrument = instrumentOverride || currentInstrument;
+            const bufferKey = getSampleBufferKey(activeInstrument, note.sampleNote);
             const buffer = audioBuffers[bufferKey];
             
             if (!buffer) {
-                console.warn('🎵 [RENDER] Sample not found for', bufferKey, '- falling back to synth');
-                // 采样找不到时fallback到合成音色，而不是直接跳过
-                await renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity);
+                console.warn('🎵 [RENDER] Sample not found for', bufferKey);
                 return;
             }
             
@@ -5010,27 +4426,32 @@
             source.buffer = buffer;
             
             // ===== 播放速率：与实时一致 =====
-            if (note.frequency !== nearestFreq) {
-                source.playbackRate.value = note.frequency / nearestFreq;
+            const sampleConfig_obj = sampleConfig[activeInstrument];
+            const sampleInfo = sampleConfig_obj ? sampleConfig_obj.samples[note.sampleNote] : null;
+            if (sampleInfo && note.frequency !== sampleInfo.freq) {
+                source.playbackRate.value = note.frequency / sampleInfo.freq;
             }
             
             // ===== 增益计算：与 playSampleTone() 严格对齐 =====
-            const sampleInfo = config.samples[sampleNote];
+            // playSampleTone: finalVelocity = safeVelocity * baseGain (不含 masterVolume)
             const baseGain = sampleInfo?.gain || 1.0;
             const safeVelocity = (typeof overrideVelocity === 'number' && isFinite(overrideVelocity))
                 ? overrideVelocity : (note.velocity || 0.5);
-            const finalVelocity = safeVelocity * baseGain;
+            const finalVelocity = safeVelocity * baseGain;  // 对齐：不乘 masterVolume
             const maxGain = 3.0;
             const clampedVelocity = Math.min(finalVelocity, maxGain);
             
             const gainNode = offlineContext.createGain();
             
             // ===== 包络：与 playSampleTone() 严格对齐 =====
+            const config = sampleConfig[activeInstrument];
             const attackTime = Math.min(config.attack || 0.005, Math.max(0.001, duration * 0.2));
             const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
             const decayTime = Math.max(duration * 0.6, 0.05);
             
+            // 先设置初值（与实时一致）
             gainNode.gain.value = clampedVelocity;
+            // 然后从0开始做包络
             gainNode.gain.setValueAtTime(0, startTime);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, startTime + attackTime);
             gainNode.gain.setValueAtTime(clampedVelocity, startTime + attackTime + holdTime);
@@ -5063,7 +4484,7 @@
             gainNode.connect(destination);
             
             // ===== 采样起点：应用 instrument offset =====
-            const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
+            const offsetMs = params.instrumentOffsets[activeInstrument] || 0;
             const startOffsetSec = offsetMs / 1000;
             
             // ===== stop 尾部余量：与实时一致 =====
@@ -5072,24 +4493,12 @@
         }
         
         // 渲染合成音色到 buffer
-        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
-            // ===== 防御：跳过无效参数 =====
-            if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(overrideVelocity)) {
-                console.warn('[renderSynthToBuffer] Invalid params, skipping:', { startTime, duration, overrideVelocity });
-                return;
-            }
-            
+        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, instrumentOverride = null) {
+            const activeInstrument = instrumentOverride || currentInstrument;
             const oscillator = offlineContext.createOscillator();
             const gainNode = offlineContext.createGain();
             
-            // 根据乐器选择波形
-            const waveforms = {
-                'guitar': 'sawtooth',
-                'xylophone': 'triangle',
-                'trumpet': 'square',
-                'synth': 'sawtooth'
-            };
-            oscillator.type = waveforms[currentInstrument] || 'sine';
+            oscillator.type = getSynthWaveform(activeInstrument) || 'sine';
             oscillator.frequency.value = note.frequency;
             
             // 包络（与实时版本一致）
@@ -5131,12 +4540,6 @@
         
         // 渲染和弦到 buffer
         async function renderChordToBuffer(offlineContext, destination, startTime, duration, velocity) {
-            // ===== 防御：跳过无效参数 =====
-            if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(velocity)) {
-                console.warn('[renderChordToBuffer] Invalid params, skipping:', { startTime, duration, velocity });
-                return;
-            }
-            
             if (chordBuffers.length === 0) return;
             
             // 统一和弦时长计算
@@ -5354,10 +4757,6 @@
                 });
             }
 
-            // ===== 语义分类触发事件绑定 =====
-            const btnClosePhraseTrigger = document.getElementById('btn-close-phrase-trigger');
-            if (btnClosePhraseTrigger) btnClosePhraseTrigger.addEventListener('click', closePhraseTriggerPanel);
-
             console.log('✅ UI 事件绑定完成');
         }
 
@@ -5407,6 +4806,8 @@
                 playTone: typeof playTone
             });
             
+            syncCharacterVoiceProfilesToMentionConfig();
+            renderCharacterVoiceGrid();
             bindUIEvents();
             verifyCriticalBindings();
             console.log('🚀 页面初始化完成');
@@ -5424,15 +4825,13 @@
         window.selectEmotion = selectEmotion;
         window.closeEmotionPanel = closeEmotionPanel;
         window.clearEmotionFile = clearEmotionFile;
-        
-        // 语义分类触发暴露
-        window.selectPhraseTrigger = selectPhraseTrigger;
-        window.closePhraseTriggerPanel = closePhraseTriggerPanel;
-        window.detectPhraseTriggerCategory = detectPhraseTriggerCategory;
+        window.previewCharacterVoice = previewCharacterVoice;
+        window.setMentionMotifEnabled = setMentionMotifEnabled;
+        window.setCharacterMentionProfiles = setCharacterMentionProfiles;
+        window.getCharacterMentionProfiles = getCharacterMentionProfiles;
         
         // SCRIPT_END
         console.log('SCRIPT_END');
     </script>
-    <script src="../js/semantic-player.js"></script>
 </body>
 </html>
