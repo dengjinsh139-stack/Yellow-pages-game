@@ -197,6 +197,24 @@
             50% { opacity: 0.7; }
         }
         
+        /* 语义分类检测提示 */
+        .phrase-detect-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            background: rgba(255, 230, 109, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(255, 230, 109, 0.3);
+            margin-left: 8px;
+        }
+        
+        .phrase-detect-badge.hidden {
+            display: none;
+        }
+
         /* 角色声纹检测提示 */
         .character-detect-badge {
             display: inline-flex;
@@ -1127,47 +1145,14 @@
                     </div>
                 </div>
 
-                <div class="panel-title">快速预设</div>
-                
-                <div class="preset-grid">
-                    <div class="preset-btn" data-preset="hello">👋 你好</div>
-                    <div class="preset-btn" data-preset="goodmorning">🌅 早上好</div>
-                    <div class="preset-btn" data-preset="iloveyou">❤️ 我爱你</div>
-                    <div class="preset-btn" data-preset="happybirthday">🎂 生日快乐</div>
-                    <div class="preset-btn" data-preset="goodnight">🌙 晚安</div>
-                    <div class="preset-btn" data-preset="thankyou">🙏 谢谢</div>
-                    <div class="preset-btn" data-preset="congrats">🎉 恭喜</div>
-                    <div class="preset-btn" data-preset="goodluck">🍀 祝好运</div>
-                    <div class="preset-btn" data-emotion="happy" data-preset="happy" id="btn-happy" style="grid-column: span 2; background: linear-gradient(135deg, #ff6b9d, #feca57);">😊 开心</div>
-                </div>
-
-                <!-- 情绪专属文件上传区域 -->
-                <div id="emotionFilePanel" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <span id="emotionPanelTitle" style="font-weight: 600; color: var(--primary);">😊 开心 - 专属文件</span>
-                        <button id="btn-close-emotion" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.2rem;">✕</button>
-                    </div>
-                    
-                    <div id="emotionFileList" style="margin-bottom: 12px; font-size: 0.8rem; color: var(--text-dim);">
-                        <p>暂无专属文件</p>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px;">
-                        <input type="file" id="emotionMidiInput" accept=".mid,.midi" style="display: none;">
-                        <button id="btn-upload-midi" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">📁 上传 MIDI</button>
-                        
-                        <input type="file" id="emotionAudioInput" accept="audio/*" style="display: none;">
-                        <button id="btn-upload-audio" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">🎵 上传音频</button>
-                    </div>
-                    
-                    <div id="emotionFileStatus" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-align: center;"></div>
-                </div>
-
                 <!-- 语义分类触发 MIDI 面板 -->
-                <div class="phrase-trigger-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div class="panel-title" style="margin-bottom: 12px;">
-                        <span>🎯</span>
+                <div class="phrase-trigger-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="character-voice-title">
                         <span>语义分类触发</span>
+                        <span class="phrase-detect-badge hidden" id="phraseDetectBadge">
+                            <span>✨</span>
+                            <span id="phraseDetectText">检测到</span>
+                        </span>
                     </div>
                     <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
                         <!-- 动态生成分类卡片 -->
@@ -1184,6 +1169,8 @@
                         </div>
                     </div>
                 </div>
+
+
 
                 <div class="panel-title">演奏历史</div>
                 <div class="notes-display" id="historyDisplay" style="max-height: 120px;">
@@ -1421,10 +1408,41 @@
             }
         }
 
-        // 文本输入事件 - 实时检测角色名
+        // 检测文本中的语义分类关键词
+        function detectPhraseTriggersInText(text) {
+            const detected = [];
+            const source = (text || '').toLowerCase();
+            for (const [key, category] of Object.entries(phraseTriggerCategories)) {
+                if (!category.keywords || !category.keywords.length) continue;
+                for (const keyword of category.keywords) {
+                    if (source.includes(String(keyword).toLowerCase())) {
+                        detected.push(category.name);
+                        break; // 每个分类只显示一次
+                    }
+                }
+            }
+            return detected;
+        }
+
+        // 显示语义分类检测提示
+        function showPhraseDetectBadge(categories) {
+            const badge = document.getElementById('phraseDetectBadge');
+            const text = document.getElementById('phraseDetectText');
+            if (categories.length > 0) {
+                text.textContent = `检测到: ${categories.join('、')}`;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // 文本输入事件 - 实时检测角色名和语义分类
         function onTextInput(text) {
-            const detected = detectCharactersInText(text);
-            showCharacterDetectBadge(detected);
+            const detectedCharacters = detectCharactersInText(text);
+            showCharacterDetectBadge(detectedCharacters);
+            
+            const detectedPhrases = detectPhraseTriggersInText(text);
+            showPhraseDetectBadge(detectedPhrases);
         }
 
         const chordDurationPresets = [
@@ -1807,69 +1825,75 @@
 
         // ==================== 语义分类触发 MIDI 系统 ====================
         
-        const phraseTriggerCategories = {
-            greeting: {
-                name: '打招呼',
-                emoji: '👋',
-                keywords: ['你好', '早上好', '晚上好', '早安', '晚安', '嗨', '哈喽', 'hello', 'hi', '打扰了', '不好意思打扰一下', '初次见面', '好久不见'],
-                midi: null,
-                parsedMidi: null
-            },
-            thanks: {
-                name: '感谢',
-                emoji: '🙏',
-                keywords: ['谢谢', '多谢', '非常感谢', '辛苦了', '麻烦你了', '感激不尽', '太感谢了', '多亏你了'],
-                midi: null,
-                parsedMidi: null
-            },
-            apology: {
-                name: '道歉',
-                emoji: '🙇',
-                keywords: ['对不起', '抱歉', '不好意思', '失礼了', '是我不对', '我的问题', '给你添麻烦了', '请原谅我'],
-                midi: null,
-                parsedMidi: null
-            },
-            farewell: {
-                name: '告别',
-                emoji: '👋',
-                keywords: ['再见', '回头见', '明天见', '下次见', '拜拜', '先这样', '我先走了'],
-                midi: null,
-                parsedMidi: null
-            },
-            request: {
-                name: '请求',
-                emoji: '🙏',
-                keywords: ['请问', '能不能', '可以吗', '帮我一下', '麻烦你', '想请教一下', '我有个问题', '能帮我看看吗'],
-                midi: null,
-                parsedMidi: null
-            },
-            confirm: {
-                name: '确认',
-                emoji: '✅',
-                keywords: ['好的', '可以', '没问题', '明白了', '收到', '行', '就这么办', '没问题'],
-                midi: null,
-                parsedMidi: null
-            },
-            praise: {
-                name: '赞美',
-                emoji: '✨',
-                keywords: ['好厉害', '太棒了', '干得漂亮', '做得很好', '真不错', '加油', '你可以的', '我支持你'],
-                midi: null,
-                parsedMidi: null
-            },
+                const phraseTriggerCategories = {
             comfort: {
                 name: '安慰',
                 emoji: '🤗',
                 keywords: ['你还好吗', '没事吧', '别担心', '我在', '慢慢来', '会好的', '抱抱你', '我陪你'],
                 midi: null,
                 parsedMidi: null
+            },
+            semantic01: {
+                name: '感谢',
+                emoji: '🙏',
+                keywords: ['谢谢', '多谢', '非常感谢', '辛苦了', '麻烦你了', '感激不尽', '太感谢了', '多亏你了'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic02: {
+                name: '打招呼',
+                emoji: '👋',
+                keywords: ['你好', '您好', '哈喽', '嗨', '早上好', '下午好', '晚上好', '最近怎么样'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic03: {
+                name: '道歉',
+                emoji: '🙇',
+                keywords: ['对不起', '抱歉', '不好意思', '失礼了', '是我不对', '我的问题', '给你添麻烦了', '请原谅我'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic04: {
+                name: '请求',
+                emoji: '🙏',
+                keywords: ['请问', '能不能', '可以吗', '帮我一下', '麻烦你', '想请教一下', '我有个问题', '能帮我看看吗'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic05: {
+                name: '告别',
+                emoji: '👋',
+                keywords: ['再见', '回头见', '明天见', '下次见', '拜拜', '先这样', '我先走了'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic06: {
+                name: '赞美',
+                emoji: '✨',
+                keywords: ['好厉害', '太棒了', '干得漂亮', '做得很好', '真不错', '加油', '你可以的', '我支持你'],
+                midi: null,
+                parsedMidi: null
+            },
+            semantic07: {
+                name: '确认',
+                emoji: '✅',
+                keywords: ['好的', '可以', '没问题', '明白了', '收到', '行', '就这么办', '没问题'],
+                midi: null,
+                parsedMidi: null
             }
         };
         
         // 语义分类预置 MIDI 路径映射
-        // 注：当前仓库只有 comfort.mid，其他分类待后续补充
         const phraseMidiPaths = {
-            comfort: '../midis/comfort.mid'
+            comfort: '../midis/comfort.mid',
+            semantic01: '../midis/semantic_01.mid',
+            semantic02: '../midis/semantic_02.mid',
+            semantic03: '../midis/semantic_03.mid',
+            semantic04: '../midis/semantic_04.mid',
+            semantic05: '../midis/semantic_05.mid',
+            semantic06: '../midis/semantic_06.mid',
+            semantic07: '../midis/semantic_07.mid'
         };
         
         let currentPhraseTrigger = null;
@@ -1946,7 +1970,7 @@
             const category = phraseTriggerCategories[categoryKey];
             if (!category) return;
             
-            document.getElementById('phraseTriggerPanelTitle').textContent = `${category.emoji} ${category.name} - 专属 MIDI`;
+            document.getElementById('phraseTriggerPanelTitle').textContent = `${category.emoji} ${category.name} - 关键词与 MIDI`;
             document.getElementById('phraseTriggerFilePanel').style.display = 'block';
             updatePhraseTriggerFileList(categoryKey);
         }
@@ -1957,21 +1981,63 @@
             currentPhraseTrigger = null;
         }
         
-        // 更新语义分类文件列表（只读显示加载状态）
+        // 更新语义分类文件列表（显示 MIDI 状态 + 关键词 + 说明）
         function updatePhraseTriggerFileList(categoryKey) {
             const category = phraseTriggerCategories[categoryKey];
             const listDiv = document.getElementById('phraseTriggerFileList');
-            
-            let html = '';
-            if (category.parsedMidi) {
-                html += `<p>✅ MIDI 已加载: ${category.midi?.name || 'unknown'}</p>`;
-                html += `<p style="font-size: 0.65rem; opacity: 0.7;">音轨数: ${category.parsedMidi.numTracks} | 时间精度: ${category.parsedMidi.timeDivision}</p>`;
-            } else {
-                html = '<p>○ 暂无预置 MIDI 文件</p>';
-                html += `<p style="font-size: 0.65rem; opacity: 0.5;">请将 MIDI 文件放到 assets/audio/phrase-midi/${categoryKey}.mid</p>`;
-            }
-            
-            listDiv.innerHTML = html;
+            if (!category || !listDiv) return;
+
+            const midiStatusHtml = category.parsedMidi
+                ? `<p style="margin: 0 0 8px 0;">✅ MIDI 已加载: ${category.midi?.name || 'unknown'}</p>`
+                : `<p style="margin: 0 0 8px 0;">○ 暂无专属 MIDI</p>`;
+
+            const midiDetailHtml = category.parsedMidi
+                ? `<p style="font-size: 0.65rem; opacity: 0.7; margin: 0 0 10px 0;">
+                    音轨数: ${category.parsedMidi.numTracks || category.parsedMidi.tracks?.length || '-'} 
+                    | 时间精度: ${category.parsedMidi.timeDivision || category.parsedMidi.ticksPerQuarter || '-'}
+                   </p>`
+                : `<p style="font-size: 0.65rem; opacity: 0.55; margin: 0 0 10px 0;">
+                    可后续为该分类配置 MIDI 文件
+                   </p>`;
+
+            const keywordHtml = (category.keywords || []).map(keyword => `
+                <span style="
+                    display: inline-block;
+                    padding: 3px 7px;
+                    margin: 2px;
+                    border-radius: 999px;
+                    background: rgba(255,255,255,0.08);
+                    border: 1px solid rgba(255,255,255,0.12);
+                    font-size: 0.68rem;
+                    color: var(--text);
+                ">${keyword}</span>
+            `).join('');
+
+            listDiv.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div>
+                        <div style="font-size: 0.72rem; opacity: 0.65; margin-bottom: 4px;">MIDI 状态</div>
+                        ${midiStatusHtml}
+                        ${midiDetailHtml}
+                    </div>
+
+                    <div>
+                        <div style="font-size: 0.72rem; opacity: 0.65; margin-bottom: 5px;">关键词</div>
+                        <div style="line-height: 1.8;">
+                            ${keywordHtml || '<span style="opacity: 0.5;">暂无关键词</span>'}
+                        </div>
+                    </div>
+
+                    <div style="
+                        font-size: 0.65rem;
+                        opacity: 0.6;
+                        line-height: 1.5;
+                        margin-top: 4px;
+                    ">
+                        输入文本命中以上任意关键词时，会插入该分类 MIDI，并由当前选择的乐器演奏。
+                    </div>
+                </div>
+            `;
         }
         
         // 生成语义分类卡片
@@ -3521,7 +3587,6 @@
             updateSpectrum();
         }
 
-        // 演奏单个音符（根据当前乐器选择播放方式）
         function playTone(frequency, noteName, duration, velocity = 0.5) {
             // 检查当前乐器是否有采样可用
             const hasSamples = hasInstrumentSamples(currentInstrument);
@@ -3530,11 +3595,23 @@
             if (currentInstrument === 'xylophone') {
                 const config = sampleConfig.xylophone;
                 const sampleInfo = config.samples[noteName];
-                // 如果有真实采样文件且已加载，使用采样
-                if (sampleInfo && sampleInfo.file && audioBuffers['xylophone_' + noteName]) {
+                const bufferKey = 'xylophone_' + noteName;
+                const hasThisSample = sampleInfo && sampleInfo.file && audioBuffers[bufferKey];
+                
+                // 如果有精确匹配的真实采样，直接使用
+                if (hasThisSample) {
                     return playSampleTone(frequency, noteName, duration / 1000, velocity);
                 }
-                // 否则使用合成
+                
+                // 没有精确匹配（如 G4/G5），使用最近的采样 + playbackRate 调整
+                const nearestSample = findNearestSample(noteName);
+                if (nearestSample && nearestSample !== noteName && audioBuffers['xylophone_' + nearestSample]) {
+                    console.log(`[木琴] ${noteName} 无精确采样，使用 ${nearestSample} + playbackRate`);
+                    return playSampleTone(frequency, nearestSample, duration / 1000, velocity);
+                }
+                
+                // 回退到合成器
+                console.warn(`[木琴] ⚠️ ${noteName} 无可用采样，回退到合成器`);
                 return playSynthTone(frequency, duration / 1000, velocity);
             }
             
@@ -3754,32 +3831,6 @@
             // 根据情感调整参数
             adjustParamsByEmotion(emotion);
             
-            // ===== 智能情绪预设 =====
-            // 如果检测到有情绪专属文件，播放情绪专属内容
-            if (emotionFiles[emotion]) {
-                console.log(`检测到情绪 ${emotion}，检查专属文件...`);
-                console.log('情绪数据:', emotionFiles[emotion]);
-                
-                // 选中该情绪（显示面板）
-                selectEmotion(emotion);
-                
-                // comfort 不在情绪阶段直接播放；交给 textToEvents() 的 phraseMidi 局部插入处理
-                // 情绪系统只负责显示 badge / 调整参数
-                
-                // 尝试播放情绪专属内容（原有逻辑）
-                const hasCustomFile = await playEmotionContentAsync(emotion);
-                console.log('是否有专属文件:', hasCustomFile);
-                
-                if (hasCustomFile) {
-                    // 如果有专属文件，播放完成后结束
-                    document.getElementById('statusText').textContent = `${emotionFiles[emotion].name} 情绪播放完成`;
-                    addToHistory(`🎵 ${emotionFiles[emotion].name}: ${text.substring(0, 20)}`);
-                    isPlaying = false;
-                    return;
-                }
-                console.log('没有专属文件，继续播放文字转音乐');
-            }
-            
             // ===== V2: 语义分类 + 逐字分音混合 =====
             let events = textToEvents(text);
             events = events.filter(n => n !== null && n !== undefined);
@@ -3815,6 +3866,8 @@
                     if (event.type === 'phraseMidi') {
                         console.log(`第 ${i+1} 个是语义分类 MIDI [${event.categoryName}]`);
                         highlightNote(i);
+                        // 同时高亮右侧语义分类卡片
+                        highlightPhraseTriggerCard(event.category);
                         document.getElementById('statusText').textContent = `🎯 ${event.categoryName}`;
                         const midiData = phraseTriggerCategories[event.category]?.parsedMidi;
                         if (midiData) {
@@ -4024,13 +4077,58 @@
             }).join('');
         }
 
-        // 高亮音符
+        // 高亮音符（根据事件类型使用不同颜色）
         function highlightNote(index) {
             document.querySelectorAll('.note-item').forEach((el, i) => {
                 if (!el) return;
-                el.style.background = i === index ? 
-                    'rgba(78, 205, 196, 0.5)' : 'rgba(255, 107, 107, 0.2)';
-                el.style.color = i === index ? '#fff' : 'var(--primary)';
+                if (i === index) {
+                    // 根据元素背景色判断事件类型，使用对应的高亮颜色
+                    const bg = el.style.background || '';
+                    if (bg.includes('78, 205, 196')) {
+                        // phraseMidi - 保持青色
+                        el.style.background = 'rgba(78, 205, 196, 0.6)';
+                        el.style.color = '#fff';
+                        el.style.boxShadow = '0 0 12px rgba(78, 205, 196, 0.5)';
+                    } else if (bg.includes('255, 230, 109')) {
+                        // characterVoice - 保持黄色
+                        el.style.background = 'rgba(255, 230, 109, 0.6)';
+                        el.style.color = '#fff';
+                        el.style.boxShadow = '0 0 12px rgba(255, 230, 109, 0.5)';
+                    } else {
+                        // 普通 note - 默认青色
+                        el.style.background = 'rgba(78, 205, 196, 0.5)';
+                        el.style.color = '#fff';
+                        el.style.boxShadow = '0 0 8px rgba(78, 205, 196, 0.3)';
+                    }
+                } else {
+                    // 恢复原始背景色
+                    const bg = el.style.background || '';
+                    if (bg.includes('78, 205, 196')) {
+                        el.style.background = 'rgba(78, 205, 196, 0.15)';
+                    } else if (bg.includes('255, 230, 109')) {
+                        el.style.background = 'rgba(255, 230, 109, 0.15)';
+                    } else {
+                        el.style.background = 'rgba(255, 107, 107, 0.2)';
+                    }
+                    el.style.color = 'var(--primary)';
+                    el.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        // 高亮右侧语义分类卡片（播放反馈）
+        function highlightPhraseTriggerCard(categoryKey) {
+            document.querySelectorAll('.phrase-trigger-grid .preset-btn').forEach(card => {
+                if (card.dataset.category === categoryKey) {
+                    card.style.transform = 'scale(1.05)';
+                    card.style.boxShadow = '0 0 15px rgba(78, 205, 196, 0.6)';
+                    card.style.borderColor = 'var(--primary)';
+                    setTimeout(() => {
+                        card.style.transform = '';
+                        card.style.boxShadow = '';
+                        card.style.borderColor = '';
+                    }, 500);
+                }
             });
         }
 
@@ -4929,29 +5027,26 @@
                         const noteVel = (mnote.velocity / 127) * params.masterVolume;
                         const noteDur = params.noteDuration / 1000;
                         
-                        // TODO: 导出应复用与实时播放统一的 MIDI note 渲染 helper
-                        // 当前使用手写 oscillator，与实时播放（采样/合成器）音色可能不一致
-                        const oscillator = offlineContext.createOscillator();
-                        const gainNode = offlineContext.createGain();
-                        const waveforms = {
-                            'guitar': 'sawtooth',
-                            'xylophone': 'triangle',
-                            'trumpet': 'square',
-                            'synth': 'sawtooth',
-                            'piano': 'triangle',
-                            'flute': 'sine',
-                            'saxophone': 'sawtooth',
-                            'train': 'triangle'
+                        // 构造note对象，与textToNotes生成的note格式一致
+                        const noteObj = {
+                            note: pentatonicNote,
+                            frequency: freq,
+                            velocity: noteVel,
+                            sampleNote: findNearestSample(pentatonicNote)
                         };
-                        oscillator.type = waveforms[currentInstrument] || 'sine';
-                        oscillator.frequency.value = freq;
-                        gainNode.gain.setValueAtTime(0, midiCurrentTime);
-                        gainNode.gain.linearRampToValueAtTime(noteVel, midiCurrentTime + 0.02);
-                        gainNode.gain.exponentialRampToValueAtTime(0.001, midiCurrentTime + noteDur + 0.2);
-                        oscillator.connect(gainNode);
-                        gainNode.connect(destination);
-                        oscillator.start(midiCurrentTime);
-                        oscillator.stop(midiCurrentTime + noteDur + 0.5);
+                        
+                        // 乐器分支判断（与实时播放一致）
+                        const isPiano = currentInstrument === 'piano';
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
+                        const hasSample = noteObj.sampleNote && samplesLoaded;
+                        
+                        if ((isPiano || isSampleInstrument) && hasSample) {
+                            // 使用采样渲染（与实时播放 playSampleTone 一致）
+                            await renderSampleToBuffer(offlineContext, destination, noteObj, midiCurrentTime, noteDur, noteVel);
+                        } else {
+                            // 使用合成音色渲染（与实时播放 playSynthTone 一致）
+                            await renderSynthToBuffer(offlineContext, destination, noteObj, midiCurrentTime, noteDur, noteVel);
+                        }
                     }
                     
                     currentTime = midiCurrentTime + 0.5;
