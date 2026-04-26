@@ -5619,7 +5619,7 @@
         function getSongDurationAtBPM() {
             if (!songMidi) return 0;
             const bpm = params.bpm;
-            const msPerTick = 60000 / (bpm * songMidi.ticksPerQuarter);
+            const msPerTick = 60000 / (bpm * songMidi.timeDivision);
             
             let maxTick = 0;
             for (const track of songMidi.tracks) {
@@ -5675,7 +5675,7 @@
             if (!songMidi) return;
             
             const bpm = params.bpm;
-            const msPerTick = 60000 / (bpm * songMidi.ticksPerQuarter);
+            const msPerTick = 60000 / (bpm * songMidi.timeDivision);
             
             const allNotes = [];
             for (const track of songMidi.tracks) {
@@ -5715,7 +5715,7 @@
             document.getElementById('statusText').textContent = '播放中...';
             
             const bpm = params.bpm;
-            const msPerTick = 60000 / (bpm * songMidi.ticksPerQuarter);
+            const msPerTick = 60000 / (bpm * songMidi.timeDivision);
             
             const allNotes = [];
             for (const track of songMidi.tracks) {
