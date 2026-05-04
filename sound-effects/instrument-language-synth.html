@@ -3700,7 +3700,7 @@
             }
         }
 
-        function playVoiceShapingSlot(slot) {
+        async function playVoiceShapingSlot(slot) {
             ensureSlotA();
             const data = slot === 'A' ? voiceShapingSlotA : voiceShapingSlotB;
             if (!data) {
@@ -3711,14 +3711,14 @@
             const saved = JSON.parse(JSON.stringify(params.voiceShaping));
             Object.assign(params.voiceShaping, data);
             syncVoiceShapingUI();
-            // 锁定快照防止播放期间被修改
-            const lockedSnapshot = JSON.parse(JSON.stringify(params.voiceShaping));
-            // 等待完整播放结束后再恢复
-            testPlayText().then(() => {
+            try {
+                await playText();
+            } finally {
                 Object.assign(params.voiceShaping, saved);
                 syncVoiceShapingUI();
-                document.getElementById('voiceShapingStatus').textContent = '已恢复修改前参数，点击「应用 B」永久生效';
-            });
+                document.getElementById('voiceShapingStatus').textContent =
+                    '已恢复修改前参数，点击「应用 B」永久生效';
+            }
         }
 
         function copyVoiceShapingToSlot(slot) {
