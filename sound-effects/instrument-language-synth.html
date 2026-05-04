@@ -5807,12 +5807,16 @@
                             lastNoteEndTimeSec = noteEndSec;
                         }
 
+                        // MIDI数字→音名字符串，findNearestSample需要字符串音名
+                        const noteName = noteNumberToName(pentatonicNote);
+                        const sampleNote = findNearestSample(noteName);
+
                         // 构造note对象，与textToNotes生成的note格式一致
                         const noteObj = {
-                            note: pentatonicNote,
+                            note: noteName,
                             frequency: freq,
                             velocity: noteVel,
-                            sampleNote: findNearestSample(pentatonicNote)
+                            sampleNote: sampleNote || noteName
                         };
 
                         // 乐器分支判断（与实时播放一致）
