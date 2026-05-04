@@ -295,6 +295,15 @@
             }
         }
 
+        .right-panel {
+            position: sticky;
+            top: 80px;
+            align-self: start;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+
         /* 面板卡片 */
         .panel {
             background: var(--bg-card);
@@ -743,8 +752,7 @@
         }
 
         .start-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
 
         .start-overlay h2 {
@@ -1014,8 +1022,7 @@
         }
 
         .start-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
 
         .start-overlay h2 {
@@ -1358,9 +1365,8 @@
                     <!-- 动态生成频谱条 -->
                 </div>
             </div>
-            </div>
             <!-- 右侧面板：声音塑形与导出 -->
-            <div class="panel">
+            <div class="panel right-panel">
                 <div class="voice-shaping-core">
                     <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">🎛️ 声音塑形 / Voice Shaping</div>
 
@@ -1475,6 +1481,7 @@
 
             </div>
         </div>
+            </div>
         <!-- 底部全宽辅助区 -->
         <div class="bottom-section">
             <div class="bottom-card">
