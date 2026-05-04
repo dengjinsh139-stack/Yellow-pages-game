@@ -1393,6 +1393,7 @@
         const characterAudioBuffers = {};
 
         // 加载角色音频文件
+        // 加载角色音频文件
         // decodeContext: 可选，传入 AudioContext 或 OfflineAudioContext 用于解码。
         // 导出 WAV 时传入 offlineContext，避免依赖用户是否已启动实时音频引擎。
         async function loadCharacterVoiceAudio(characterName, decodeContext) {
@@ -1436,7 +1437,7 @@
             if (!config) return;
 
             // 尝试播放音频文件
-            const audioBuffer = await loadCharacterVoiceAudio(characterName, audioContext);
+            const audioBuffer = await loadCharacterVoiceAudio(characterName);
             if (audioBuffer) {
                 const source = audioContext.createBufferSource();
                 source.buffer = audioBuffer;
