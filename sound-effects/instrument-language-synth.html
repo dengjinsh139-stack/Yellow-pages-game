@@ -1087,7 +1087,11 @@
                     </div>
                 </div>
 
+<<<<<<< HEAD
                 <!-- 🌌 空间 / Effects -->
+=======
+                <!-- ===== 空间 / Effects ===== -->
+>>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
                 <div class="space-effects">
                     <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">🌌 空间 / Effects</div>
                     <div class="control-group" style="margin-bottom: 0;">
@@ -4664,8 +4668,8 @@
             const text = document.getElementById('textInput').value.trim();
             console.log('输入文本:', text);
 
-            // 直接调用 playText
-            playText();
+            // 直接调用 playText 并返回 Promise 供 A/B 等待
+            return playText();
         }
 
         // 演奏文本
@@ -6011,8 +6015,14 @@
 
         // 计算音频总时长
         async function calculateAudioDuration(events) {
+<<<<<<< HEAD
             let currentTime = 0.5; // 时间线起点
             let lastAudioEndTime = 0.5; // 最后一个音频实际结束时间
+=======
+            let currentTime = 0.5; // 起始偏移
+            let lastAudioEndTime = 0.5; // 最后一个音频实际结束时间
+            const overlapSec = params.voiceShaping.overlapMs / 1000;
+>>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
 
             for (let i = 0; i < events.length; i++) {
                 const evt = events[i];
@@ -6055,9 +6065,14 @@
                     // tail + semanticGap
                     const tailMs = 120;
                     const semanticGapMs = params.voiceShaping.semanticGap;
+<<<<<<< HEAD
                     const blockDuration = (lastNoteEndTimeMs + tailMs + semanticGapMs) / 1000;
 
                     currentTime += blockDuration;
+=======
+                    const segmentDuration = (lastNoteEndTimeMs + tailMs + semanticGapMs) / 1000;
+                    currentTime += segmentDuration;
+>>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
                     lastAudioEndTime = Math.max(lastAudioEndTime, currentTime);
                     continue;
                 }
@@ -6075,15 +6090,22 @@
                             voiceDuration += note.durationMs / 1000 + 0.05;
                         }
                     }
+<<<<<<< HEAD
                     const advance = Math.max(0, voiceDuration - (params.voiceShaping.overlapMs / 1000));
                     currentTime += advance;
                     lastAudioEndTime = Math.max(lastAudioEndTime, currentTime + (params.voiceShaping.overlapMs / 1000));
+=======
+                    const segmentDuration = voiceDuration + 0.02; // 微小间隔对齐渲染逻辑
+                    currentTime += segmentDuration;
+                    lastAudioEndTime = Math.max(lastAudioEndTime, currentTime);
+>>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
                     continue;
                 }
 
                 // 普通 note 事件
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
                 const duration = timing.duration / 1000;
+<<<<<<< HEAD
                 const overlapSec = params.voiceShaping.overlapMs / 1000;
                 const advance = Math.max(0, duration - overlapSec);
 
@@ -6095,12 +6117,22 @@
 
                 // 时间线前进（考虑 overlap）
                 currentTime += advance;
+=======
+                const noteEnd = currentTime + duration;
+                lastAudioEndTime = Math.max(lastAudioEndTime, noteEnd);
+                // 推进时间线：下一个音符在当前音符 release 前进入
+                currentTime += Math.max(0, duration - overlapSec);
+>>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
             }
 
             // 混响尾巴时长
             let reverbTail = 0;
             if (params.reverb > 0) {
+<<<<<<< HEAD
                 reverbTail = 1.5;
+=======
+                reverbTail = 1.5; // 1.5秒混响尾音
+>>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
             }
 
             // 最终时长 = max(时间线终点, 最后一个音频结束) + 混响尾 + 余量
