@@ -274,19 +274,35 @@
             color: var(--primary);
         }
 
-        /* 主面板 */
-        .main-panel {
+        /* 主工作台 */
+        .workbench {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-columns: 300px minmax(480px, 1fr) 360px;
             gap: 20px;
             margin-bottom: 20px;
+            align-items: start;
         }
 
-        @media (max-width: 1024px) {
-            .main-panel {
+        @media (max-width: 1200px) {
+            .workbench {
+                grid-template-columns: 260px minmax(400px, 1fr) 320px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .workbench {
                 grid-template-columns: 1fr;
             }
         }
+
+        .right-panel {
+            position: sticky;
+            top: 80px;
+            align-self: start;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
 
         /* 面板卡片 */
         .panel {
@@ -736,8 +752,7 @@
         }
 
         .start-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
 
         .start-overlay h2 {
@@ -798,7 +813,7 @@
         /* 响应式 */
         @media (max-width: 768px) {
             h1 { font-size: 1.6rem; }
-            .main-panel { grid-template-columns: 1fr; }
+            .workbench { grid-template-columns: 1fr; }
             .instrument-grid { grid-template-columns: repeat(3, 1fr); }
             .preset-grid { grid-template-columns: 1fr; }
         }
@@ -901,32 +916,157 @@
             margin-top: 8px;
         }
 
-    </style>
+    
+
+        /* 底部全宽辅助区 */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .bottom-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .bottom-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bottom-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-card .panel-title {
+            margin-bottom: 12px;
+        }
+
+        /* 音频工具栏 */
+        .audio-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 46, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+
+        .audio-toolbar .toolbar-title {
+            font-size: 0.9rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .audio-toolbar .toolbar-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .audio-toolbar .toolbar-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .audio-toolbar.hidden {
+            display: none;
+        }
+
+        /* 启动遮罩改为清晰模态 */
+        .start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .start-overlay .modal-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .start-overlay.hidden {
+            display: none;
+        }
+
+        .start-overlay h2 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--piano), var(--guitar));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .start-overlay p {
+            color: var(--text-dim);
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+</style>
 </head>
 <body data-build="ILS_BUILD_2026_04_20_B">
-    <!-- 背景动画 -->
     <div class="bg-animation"></div>
     <div class="staff-overlay"></div>
-
-    <!-- 启动遮罩 -->
-    <div class="start-overlay" id="startOverlay">
-        <h2>🎵 乐器语言合成器</h2>
-        <p>将文字转换为乐器演奏 · 选择音色 · 体验音乐语言</p>
-        <button id="btn-start-audio" class="btn" style="font-size: 1rem; padding: 15px 40px; width: auto;">
-            启动音频引擎
-        </button>
+    <!-- 音频工具栏 -->
+    <div class="audio-toolbar" id="audioToolbar">
+        <div class="toolbar-title">🎵 乐器语言合成器</div>
+        <button id="btn-start-audio" class="toolbar-btn">🔊 启动音频引擎</button>
     </div>
-
+    <!-- 启动遮罩（默认隐藏，仅作备用） -->
+    <div class="start-overlay hidden" id="startOverlay">
+        <div class="modal-card">
+            <h2>🎵 乐器语言合成器</h2>
+            <p>将文字转换为乐器演奏 · 选择音色 · 体验音乐语言</p>
+            <button id="btn-start-audio-modal" class="btn" style="font-size: 1rem; padding: 15px 40px; width: auto;">
+                启动音频引擎
+            </button>
+        </div>
+    </div>
     <div class="container">
+        <style>.container { padding-top: 60px; }</style>
         <a href="sound-effects-hub.html" class="back-link">← 返回音效中心</a>
-
-        <header>
+        <header style="padding-top: 15px;">
             <h1>🎹 乐器语言合成器</h1>
             <p class="subtitle">INSTRUMENT LANGUAGE SYNTHESIZER v3.7.4 · 10键对齐版</p>
         </header>
-
-        <div class="main-panel">
-            <!-- 左侧面板：乐器选择与参数 -->
+        <div class="workbench">
+            <!-- 左侧面板：乐器选择与基础演奏 -->
             <div class="panel">
                 <div class="panel-title">选择乐器</div>
 
@@ -1000,124 +1140,6 @@
                     <input type="range" id="masterVolume" min="0" max="200" value="100" oninput="updateParams()">
                 </div>
 
-                <!-- ===== 声音塑形 / Voice Shaping ===== -->
-                <div class="voice-shaping-core">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">🎛️ 声音塑形 / Voice Shaping</div>
-
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>低频清理 HPF</span>
-                            <span class="control-value" id="vsHpfValue">100Hz</span>
-                        </div>
-                        <input type="range" id="vsHpf" min="80" max="120" value="100" oninput="updateVoiceShaping()">
-                        <small style="color: var(--text-dim); font-size: 0.65rem;">身体感 ←→ 清爽</small>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>Mud Cut 浑浊削减</span>
-                            <span class="control-value" id="vsMudValue">-2dB</span>
-                        </div>
-                        <input type="range" id="vsMud" min="-4" max="0" step="0.5" value="-2" oninput="updateVoiceShaping()">
-                        <small style="color: var(--text-dim); font-size: 0.65rem;">浑浊 ←→ 干净</small>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>高频毛刺压制</span>
-                            <span class="control-value" id="vsHighValue">-1dB</span>
-                        </div>
-                        <input type="range" id="vsHigh" min="-3" max="0" step="0.5" value="-1" oninput="updateVoiceShaping()">
-                        <small style="color: var(--text-dim); font-size: 0.65rem;">柔和 ←→ 明亮 / 毛刺抑制</small>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>起音柔化 Attack</span>
-                            <span class="control-value" id="vsAttackValue">5ms</span>
-                        </div>
-                        <input type="range" id="vsAttack" min="0" max="20" value="5" oninput="updateVoiceShaping()">
-                        <small style="color: var(--text-dim); font-size: 0.65rem;">硬朗 ←→ 柔和</small>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>尾音长度 Release</span>
-                            <span class="control-value" id="vsReleaseValue">100ms</span>
-                        </div>
-                        <input type="range" id="vsRelease" min="50" max="180" value="100" oninput="updateVoiceShaping()">
-                        <small style="color: var(--text-dim); font-size: 0.65rem;">短促 ←→ 连贯</small>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>字间连接 Overlap</span>
-                            <span class="control-value" id="vsOverlapValue">10ms</span>
-                        </div>
-                        <input type="range" id="vsOverlap" min="0" max="30" value="10" oninput="updateVoiceShaping()">
-                        <small style="color: var(--text-dim); font-size: 0.65rem;">分明 ←→ 连续</small>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>语义 MIDI 气口</span>
-                            <span class="control-value" id="vsSemanticValue">100ms</span>
-                        </div>
-                        <input type="range" id="vsSemantic" min="60" max="140" value="100" oninput="updateVoiceShaping()">
-                        <small style="color: var(--text-dim); font-size: 0.65rem;">紧凑 ←→ 宽松</small>
-                    </div>
-
-                    <!-- A/B 对比 -->
-                    <div style="margin-top: 12px; padding: 10px; background: rgba(0,0,0,0.15); border-radius: 8px;">
-                        <div style="font-size: 0.75rem; color: var(--secondary); margin-bottom: 8px;">🎚️ A/B 对比</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="playVoiceShapingSlot('A')">▶️ 播放 A</button>
-                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="playVoiceShapingSlot('B')">▶️ 播放 B</button>
-                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="copyVoiceShapingToSlot('B')">💾 存为 B</button>
-                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="applyVoiceShapingSlot('B')">📥 应用 B</button>
-                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem; grid-column: span 2;" onclick="revertVoiceShapingToSlot('A')">↩️ 恢复 A</button>
-                        </div>
-                        <div id="voiceShapingStatus" style="font-size: 0.65rem; color: var(--accent); margin-top: 6px; text-align: center;"></div>
-                    </div>
-
-                    <!-- Preset 保存 -->
-                    <div style="margin-top: 10px; display: flex; gap: 6px;">
-                        <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 0.7rem;" onclick="saveVoiceShapingPreset()">💾 保存 Preset</button>
-                        <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 0.7rem;" onclick="loadVoiceShapingPreset()">📂 读取 Preset</button>
-                    </div>
-                </div>
-
-<<<<<<< HEAD
-                <!-- 🌌 空间 / Effects -->
-=======
-                <!-- ===== 空间 / Effects ===== -->
->>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
-                <div class="space-effects">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">🌌 空间 / Effects</div>
-                    <div class="control-group" style="margin-bottom: 0;">
-                        <div class="control-label">
-                            <span>混响 Reverb</span>
-                            <span class="control-value" id="reverbValue">30%</span>
-                        </div>
-                        <input type="range" id="reverb" min="0" max="100" value="30" oninput="updateParams()">
-                    </div>
-                </div>
-
-                <!-- 📥 导出 -->
-                <div class="export-section">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">📥 音频导出</div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
-                        <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
-                            <option value="44100">44.1kHz</option>
-                            <option value="48000" selected>48kHz</option>
-                            <option value="96000">96kHz</option>
-                        </select>
-                    </div>
-                    <div id="exportStatus" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-dim);"></div>
-                </div>
-
-                <!-- ===== 高级节奏 ▼ ===== -->
                 <div class="advanced-section">
                     <div class="advanced-toggle" onclick="toggleAdvanced('adv-rhythm')">▼ 高级节奏</div>
                     <div class="advanced-content" id="adv-rhythm">
@@ -1249,7 +1271,9 @@
                         </div>
                     </div>
                 </div>
-<div class="panel">
+            </div>
+            <!-- 中央面板：演奏输入主工作区 -->
+            <div class="panel">
                 <div class="panel-title">演奏输入</div>
 
                 <!-- 模式切换 -->
@@ -1341,9 +1365,126 @@
                     <!-- 动态生成频谱条 -->
                 </div>
             </div>
+            <!-- 右侧面板：声音塑形与导出 -->
+            <div class="panel right-panel">
+                <div class="voice-shaping-core">
+                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">🎛️ 声音塑形 / Voice Shaping</div>
 
-            <!-- 右侧面板：预设与历史 -->
-            <div class="panel">
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>低频清理 HPF</span>
+                            <span class="control-value" id="vsHpfValue">100Hz</span>
+                        </div>
+                        <input type="range" id="vsHpf" min="80" max="120" value="100" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">身体感 ←→ 清爽</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Mud Cut 浑浊削减</span>
+                            <span class="control-value" id="vsMudValue">-2dB</span>
+                        </div>
+                        <input type="range" id="vsMud" min="-4" max="0" step="0.5" value="-2" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">浑浊 ←→ 干净</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>高频毛刺压制</span>
+                            <span class="control-value" id="vsHighValue">-1dB</span>
+                        </div>
+                        <input type="range" id="vsHigh" min="-3" max="0" step="0.5" value="-1" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">柔和 ←→ 明亮 / 毛刺抑制</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>起音柔化 Attack</span>
+                            <span class="control-value" id="vsAttackValue">5ms</span>
+                        </div>
+                        <input type="range" id="vsAttack" min="0" max="20" value="5" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">硬朗 ←→ 柔和</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>尾音长度 Release</span>
+                            <span class="control-value" id="vsReleaseValue">100ms</span>
+                        </div>
+                        <input type="range" id="vsRelease" min="50" max="180" value="100" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">短促 ←→ 连贯</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>字间连接 Overlap</span>
+                            <span class="control-value" id="vsOverlapValue">10ms</span>
+                        </div>
+                        <input type="range" id="vsOverlap" min="0" max="30" value="10" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">分明 ←→ 连续</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>语义 MIDI 气口</span>
+                            <span class="control-value" id="vsSemanticValue">100ms</span>
+                        </div>
+                        <input type="range" id="vsSemantic" min="60" max="140" value="100" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">紧凑 ←→ 宽松</small>
+                    </div>
+
+                    <!-- A/B 对比 -->
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(0,0,0,0.15); border-radius: 8px;">
+                        <div style="font-size: 0.75rem; color: var(--secondary); margin-bottom: 8px;">🎚️ A/B 对比</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="playVoiceShapingSlot('A')">▶️ 播放 A</button>
+                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="playVoiceShapingSlot('B')">▶️ 播放 B</button>
+                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="copyVoiceShapingToSlot('B')">💾 存为 B</button>
+                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem;" onclick="applyVoiceShapingSlot('B')">📥 应用 B</button>
+                            <button class="btn btn-secondary" style="padding: 6px; font-size: 0.75rem; grid-column: span 2;" onclick="revertVoiceShapingToSlot('A')">↩️ 恢复 A</button>
+                        </div>
+                        <div id="voiceShapingStatus" style="font-size: 0.65rem; color: var(--accent); margin-top: 6px; text-align: center;"></div>
+                    </div>
+
+                    <!-- Preset 保存 -->
+                    <div style="margin-top: 10px; display: flex; gap: 6px;">
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 0.7rem;" onclick="saveVoiceShapingPreset()">💾 保存 Preset</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 0.7rem;" onclick="loadVoiceShapingPreset()">📂 读取 Preset</button>
+                    </div>
+                </div>
+
+
+                <div class="space-effects">
+                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">🌌 空间 / Effects</div>
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <div class="control-label">
+                            <span>混响 Reverb</span>
+                            <span class="control-value" id="reverbValue">30%</span>
+                        </div>
+                        <input type="range" id="reverb" min="0" max="100" value="30" oninput="updateParams()">
+                    </div>
+                </div>
+
+
+                <div class="export-section">
+                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">📥 音频导出</div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
+                        <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
+                            <option value="44100">44.1kHz</option>
+                            <option value="48000" selected>48kHz</option>
+                            <option value="96000">96kHz</option>
+                        </select>
+                    </div>
+                    <div id="exportStatus" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-dim);"></div>
+                </div>
+
+            </div>
+        </div>
+            </div>
+        <!-- 底部全宽辅助区 -->
+        <div class="bottom-section">
+            <div class="bottom-card">
                 <!-- 角色声纹卡片 -->
                 <div class="character-voice-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                     <div class="character-voice-title">
@@ -1386,8 +1527,6 @@
                             </button>
                         </div>
                     </div>
-                </div>
-
                 <!-- 语义分类触发 MIDI 面板 -->
                 <div class="phrase-trigger-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                     <div class="character-voice-title">
@@ -1429,7 +1568,6 @@
                 </div>
             </div>
         </div>
-
         <!-- 底部信息 -->
         <div class="info-section">
             <div class="info-card">
@@ -2906,6 +3044,7 @@
                 generateNoteKeyboard();
 
                 document.getElementById('startOverlay').classList.add('hidden');
+                    document.getElementById('audioToolbar').classList.add('hidden');
                 document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
                 addToHistory('真实钢琴音色已加载');
 
@@ -3704,7 +3843,7 @@
             }
         }
 
-        function playVoiceShapingSlot(slot) {
+        async function playVoiceShapingSlot(slot) {
             ensureSlotA();
             const data = slot === 'A' ? voiceShapingSlotA : voiceShapingSlotB;
             if (!data) {
@@ -3715,14 +3854,14 @@
             const saved = JSON.parse(JSON.stringify(params.voiceShaping));
             Object.assign(params.voiceShaping, data);
             syncVoiceShapingUI();
-            // 锁定快照防止播放期间被修改
-            const lockedSnapshot = JSON.parse(JSON.stringify(params.voiceShaping));
-            // 等待完整播放结束后再恢复
-            testPlayText().then(() => {
+            try {
+                await playText();
+            } finally {
                 Object.assign(params.voiceShaping, saved);
                 syncVoiceShapingUI();
-                document.getElementById('voiceShapingStatus').textContent = '已恢复修改前参数，点击「应用 B」永久生效';
-            });
+                document.getElementById('voiceShapingStatus').textContent =
+                    '已恢复修改前参数，点击「应用 B」永久生效';
+            }
         }
 
         function copyVoiceShapingToSlot(slot) {
@@ -4668,8 +4807,8 @@
             const text = document.getElementById('textInput').value.trim();
             console.log('输入文本:', text);
 
-            // 直接调用 playText 并返回 Promise 供 A/B 等待
-            return playText();
+            // 直接调用 playText
+            playText();
         }
 
         // 演奏文本
@@ -6015,14 +6154,8 @@
 
         // 计算音频总时长
         async function calculateAudioDuration(events) {
-<<<<<<< HEAD
             let currentTime = 0.5; // 时间线起点
             let lastAudioEndTime = 0.5; // 最后一个音频实际结束时间
-=======
-            let currentTime = 0.5; // 起始偏移
-            let lastAudioEndTime = 0.5; // 最后一个音频实际结束时间
-            const overlapSec = params.voiceShaping.overlapMs / 1000;
->>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
 
             for (let i = 0; i < events.length; i++) {
                 const evt = events[i];
@@ -6065,14 +6198,9 @@
                     // tail + semanticGap
                     const tailMs = 120;
                     const semanticGapMs = params.voiceShaping.semanticGap;
-<<<<<<< HEAD
                     const blockDuration = (lastNoteEndTimeMs + tailMs + semanticGapMs) / 1000;
 
                     currentTime += blockDuration;
-=======
-                    const segmentDuration = (lastNoteEndTimeMs + tailMs + semanticGapMs) / 1000;
-                    currentTime += segmentDuration;
->>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
                     lastAudioEndTime = Math.max(lastAudioEndTime, currentTime);
                     continue;
                 }
@@ -6090,22 +6218,15 @@
                             voiceDuration += note.durationMs / 1000 + 0.05;
                         }
                     }
-<<<<<<< HEAD
                     const advance = Math.max(0, voiceDuration - (params.voiceShaping.overlapMs / 1000));
                     currentTime += advance;
                     lastAudioEndTime = Math.max(lastAudioEndTime, currentTime + (params.voiceShaping.overlapMs / 1000));
-=======
-                    const segmentDuration = voiceDuration + 0.02; // 微小间隔对齐渲染逻辑
-                    currentTime += segmentDuration;
-                    lastAudioEndTime = Math.max(lastAudioEndTime, currentTime);
->>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
                     continue;
                 }
 
                 // 普通 note 事件
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
                 const duration = timing.duration / 1000;
-<<<<<<< HEAD
                 const overlapSec = params.voiceShaping.overlapMs / 1000;
                 const advance = Math.max(0, duration - overlapSec);
 
@@ -6117,22 +6238,12 @@
 
                 // 时间线前进（考虑 overlap）
                 currentTime += advance;
-=======
-                const noteEnd = currentTime + duration;
-                lastAudioEndTime = Math.max(lastAudioEndTime, noteEnd);
-                // 推进时间线：下一个音符在当前音符 release 前进入
-                currentTime += Math.max(0, duration - overlapSec);
->>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
             }
 
             // 混响尾巴时长
             let reverbTail = 0;
             if (params.reverb > 0) {
-<<<<<<< HEAD
                 reverbTail = 1.5;
-=======
-                reverbTail = 1.5; // 1.5秒混响尾音
->>>>>>> 3f5885a (智能备份: 2026年05月05日 00:24)
             }
 
             // 最终时长 = max(时间线终点, 最后一个音频结束) + 混响尾 + 余量
@@ -7194,6 +7305,23 @@
 
             // 启动按钮
             const btnStart = document.getElementById('btn-start-audio');
+            const btnStartModal = document.getElementById('btn-start-audio-modal');
+            if (btnStartModal) {
+                btnStartModal.addEventListener('click', async () => {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        await audioContext.resume();
+                    }
+                    if (audioContext.state === 'suspended') {
+                        await audioContext.resume();
+                    }
+                    document.getElementById('startOverlay').classList.add('hidden');
+                    document.getElementById('audioToolbar').classList.add('hidden');
+                    document.getElementById('audioToolbar').classList.add('hidden');
+                    initVisualizer();
+                    updateStatus('音频引擎已启动');
+                });
+            }
             if (btnStart) {
                 btnStart.addEventListener('click', initAudio);
                 console.log('✅ 启动按钮已绑定');
