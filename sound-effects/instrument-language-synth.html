@@ -1436,7 +1436,7 @@
             const voice = voiceRegistry[charReg.voiceId];
             const voiceDefault = voice ? voice.defaultShaping : {};
             const charOverride = charReg.shaping || {};
-            return { ...voiceDefault, ...global, ...charOverride };
+            return { ...global, ...voiceDefault, ...charOverride };
         }
         let dialogueVoiceMode = true;
 
@@ -1573,8 +1573,47 @@
                 source.buffer = audioBuffer;
                 const gainNode = audioContext.createGain();
                 gainNode.gain.value = params.masterVolume;
+
+                const vs = resolveVoiceShaping(characterName);
+
+                // ===== Voice Shaping：Envelope =====
+                const now = audioContext.currentTime;
+                const attackTime = Math.max(0.001, vs.attackMs / 1000);
+                const releaseTime = Math.max(0.05, vs.releaseMs / 1000);
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(params.masterVolume, now + attackTime);
+                gainNode.gain.setValueAtTime(params.masterVolume, now + audioBuffer.duration - Math.min(releaseTime * 0.3, audioBuffer.duration * 0.2));
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + audioBuffer.duration + releaseTime);
+
+                // ===== Voice Shaping：EQ 链 =====
+                let eqChainEnd = gainNode;
+                if (vs.hpfFreq > 0) {
+                    const hpf = audioContext.createBiquadFilter();
+                    hpf.type = 'highpass';
+                    hpf.frequency.value = vs.hpfFreq;
+                    gainNode.connect(hpf);
+                    eqChainEnd = hpf;
+                }
+                if (vs.mudCutGain < 0) {
+                    const mudFilter = audioContext.createBiquadFilter();
+                    mudFilter.type = 'peaking';
+                    mudFilter.frequency.value = vs.mudCutFreq;
+                    mudFilter.gain.value = vs.mudCutGain;
+                    mudFilter.Q.value = 1.2;
+                    eqChainEnd.connect(mudFilter);
+                    eqChainEnd = mudFilter;
+                }
+                if (vs.highCutGain < 0) {
+                    const highFilter = audioContext.createBiquadFilter();
+                    highFilter.type = 'highshelf';
+                    highFilter.frequency.value = vs.highCutFreq;
+                    highFilter.gain.value = vs.highCutGain;
+                    eqChainEnd.connect(highFilter);
+                    eqChainEnd = highFilter;
+                }
+
                 source.connect(gainNode);
-                gainNode.connect(analyser);
+                eqChainEnd.connect(analyser);
                 analyser.connect(audioContext.destination);
                 source.start();
                 updateSpectrum();
@@ -3551,16 +3590,15 @@
             // 临时应用，播放后恢复
             const saved = JSON.parse(JSON.stringify(params.voiceShaping));
             Object.assign(params.voiceShaping, data);
-            // 触发 UI 刷新
             syncVoiceShapingUI();
-            // 播放
-            testPlayText();
-            // 恢复（用户需手动应用才永久生效）
-            setTimeout(() => {
+            // 锁定快照防止播放期间被修改
+            const lockedSnapshot = JSON.parse(JSON.stringify(params.voiceShaping));
+            // 等待完整播放结束后再恢复
+            testPlayText().then(() => {
                 Object.assign(params.voiceShaping, saved);
                 syncVoiceShapingUI();
                 document.getElementById('voiceShapingStatus').textContent = '已恢复修改前参数，点击「应用 B」永久生效';
-            }, 500);
+            });
         }
 
         function copyVoiceShapingToSlot(slot) {
@@ -4634,8 +4672,9 @@
                             await playMidiAsync(midiData);
                         }
                         // 语义气口：MIDI 播完后加间隔，避免和后续对白音符粘连
+                        // 统一使用 params.voiceShaping.semanticGap，与 calculateAudioDuration / renderAudioToBuffer 共用同一来源
                         const semanticGap = params.voiceShaping.semanticGap;
-                        console.log(`[phraseMidi] 语义气口 ${semanticGap}ms`);
+                        console.log(`[phraseMidi] 语义气口 ${semanticGap}ms (voiceShaping.semanticGap)`);
                         await sleep(semanticGap);
                         continue;
                     }
@@ -5921,8 +5960,8 @@
                 // 使用预计算的timing（如果存在）
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
                 totalTime += timing.duration / 1000;
-                // 字间连接受 overlapMs 控制
-                totalTime += params.voiceShaping.overlapMs / 1000;
+                // 字间连接受 overlapMs 控制（缩短间隙）
+                totalTime += Math.max(0, timing.duration / 1000 - (params.voiceShaping.overlapMs / 1000));
             }
 
             // 混响尾巴时长
@@ -6081,8 +6120,45 @@
                         source.buffer = audioBuffer;
                         const gainNode = offlineContext.createGain();
                         gainNode.gain.value = params.masterVolume;
+
+                        // ===== Voice Shaping：Envelope =====
+                        const vs = resolveVoiceShaping(characterName);
+                        const attackTime = Math.max(0.001, vs.attackMs / 1000);
+                        const releaseTime = Math.max(0.05, vs.releaseMs / 1000);
+                        gainNode.gain.setValueAtTime(0, currentTime);
+                        gainNode.gain.linearRampToValueAtTime(params.masterVolume, currentTime + attackTime);
+                        gainNode.gain.setValueAtTime(params.masterVolume, currentTime + audioBuffer.duration - Math.min(releaseTime * 0.3, audioBuffer.duration * 0.2));
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + audioBuffer.duration + releaseTime);
+
+                        // ===== Voice Shaping：EQ 链 =====
+                        let eqChainEnd = gainNode;
+                        if (vs.hpfFreq > 0) {
+                            const hpf = offlineContext.createBiquadFilter();
+                            hpf.type = 'highpass';
+                            hpf.frequency.value = vs.hpfFreq;
+                            gainNode.connect(hpf);
+                            eqChainEnd = hpf;
+                        }
+                        if (vs.mudCutGain < 0) {
+                            const mudFilter = offlineContext.createBiquadFilter();
+                            mudFilter.type = 'peaking';
+                            mudFilter.frequency.value = vs.mudCutFreq;
+                            mudFilter.gain.value = vs.mudCutGain;
+                            mudFilter.Q.value = 1.2;
+                            eqChainEnd.connect(mudFilter);
+                            eqChainEnd = mudFilter;
+                        }
+                        if (vs.highCutGain < 0) {
+                            const highFilter = offlineContext.createBiquadFilter();
+                            highFilter.type = 'highshelf';
+                            highFilter.frequency.value = vs.highCutFreq;
+                            highFilter.gain.value = vs.highCutGain;
+                            eqChainEnd.connect(highFilter);
+                            eqChainEnd = highFilter;
+                        }
+
                         source.connect(gainNode);
-                        gainNode.connect(destination);
+                        eqChainEnd.connect(destination);
                         source.start(currentTime);
                         currentTime += audioBuffer.duration;
                         console.log(`[RENDER] Character voice (audio): ${characterName}, duration=${audioBuffer.duration.toFixed(2)}s`);
@@ -6235,7 +6311,7 @@
                     synthNotesRendered++;
                 }
 
-                currentTime += noteDuration + (params.voiceShaping.overlapMs / 1000); // 字间连接受 overlapMs 控制
+                currentTime += Math.max(0, noteDuration - (params.voiceShaping.overlapMs / 1000)); // overlapMs让音符提前进入，增大重叠
                 notesRendered++;
             }
 
