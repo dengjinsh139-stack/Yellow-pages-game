@@ -5,7 +5,7 @@
  */
 
 // 全局版本号 - 修改这里即可同步全站
-const APP_VERSION = 'v3.15.2';
+const APP_VERSION = 'v3.15.3';
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
@@ -36,10 +36,7 @@ const NAV_CONFIG = {
                 { id: 'wwise', label: '🎮 Wwise', href: 'wwise/wwise.html' }
             ]
         },
-        { id: 'projects', label: '📁 项目', href: 'projects-login.html', active: false },
-        { id: 'task', label: '📈 任务管理器', href: 'task-manager.html', active: false },
-        { id: 'caps', label: '📊 项目能力', href: 'capabilities.html', active: false },
-        { id: 'finance', label: '💰 理财相关', href: 'finance-login.html', active: false }
+        { id: 'task', label: '📈 任务管理器', href: 'task-manager.html', active: false }
     ]
 };
 
