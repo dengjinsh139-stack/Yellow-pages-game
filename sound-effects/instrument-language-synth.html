@@ -1133,6 +1133,137 @@
                     <input type="range" id="masterVolume" min="0" max="200" value="100" oninput="updateParams()">
                 </div>
 
+                <div class="advanced-section">
+                    <div class="advanced-toggle" onclick="toggleAdvanced('adv-rhythm')">▼ 高级节奏</div>
+                    <div class="advanced-content" id="adv-rhythm">
+                        <!-- 声调时值映射 -->
+                        <div style="margin-top: 8px; padding: 10px; background: rgba(0,0,0,0.15); border-radius: 6px;">
+                            <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">声调时值映射</div>
+                            <div class="control-group" style="margin-bottom: 6px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.7rem; color: var(--primary);">一声 阴平</span>
+                                    <span class="control-value" id="tone1Value" style="font-size: 0.65rem;">8分音符 ♪</span>
+                                </div>
+                                <select id="tone1NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
+                                    <option value="4">4分音符 ♩</option>
+                                    <option value="8" selected>8分音符 ♪</option>
+                                    <option value="16">16分音符 ♫</option>
+                                    <option value="32">32分音符 ♬</option>
+                                    <option value="triplet">三连音 ♪♪♪</option>
+                                </select>
+                            </div>
+                            <div class="control-group" style="margin-bottom: 6px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.7rem; color: var(--primary);">二声 阳平</span>
+                                    <span class="control-value" id="tone2Value" style="font-size: 0.65rem;">16分音符 ♫</span>
+                                </div>
+                                <select id="tone2NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
+                                    <option value="4">4分音符 ♩</option>
+                                    <option value="8">8分音符 ♪</option>
+                                    <option value="16" selected>16分音符 ♫</option>
+                                    <option value="32">32分音符 ♬</option>
+                                    <option value="triplet">三连音 ♪♪♪</option>
+                                </select>
+                            </div>
+                            <div class="control-group" style="margin-bottom: 6px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.7rem; color: var(--primary);">三声 上声</span>
+                                    <span class="control-value" id="tone3Value" style="font-size: 0.65rem;">三连音 ♪♪♪</span>
+                                </div>
+                                <select id="tone3NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
+                                    <option value="4">4分音符 ♩</option>
+                                    <option value="8">8分音符 ♪</option>
+                                    <option value="16">16分音符 ♫</option>
+                                    <option value="32">32分音符 ♬</option>
+                                    <option value="triplet" selected>三连音 ♪♪♪</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.7rem; color: var(--primary);">四声 去声</span>
+                                    <span class="control-value" id="tone4Value" style="font-size: 0.65rem;">16分音符 ♫</span>
+                                </div>
+                                <select id="tone4NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
+                                    <option value="4">4分音符 ♩</option>
+                                    <option value="8">8分音符 ♪</option>
+                                    <option value="16" selected>16分音符 ♫</option>
+                                    <option value="32">32分音符 ♬</option>
+                                    <option value="triplet">三连音 ♪♪♪</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- 实验性节奏随机 -->
+                        <div style="margin-top: 8px; padding: 8px; background: rgba(255,107,107,0.05); border-radius: 6px; border: 1px dashed rgba(255,107,107,0.15);">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <input type="checkbox" id="rhythmRandom" onchange="updateParams()" style="width: auto;">
+                                <label for="rhythmRandom" style="font-size: 0.75rem; color: var(--text); cursor: pointer;">🎲 实验性节奏随机</label>
+                            </div>
+                            <div style="font-size: 0.6rem; color: var(--primary); opacity: 0.8;">⚠️ 不建议剧情对白正式导出使用</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 高级采样 ▼ ===== -->
+                <div class="advanced-section">
+                    <div class="advanced-toggle" onclick="toggleAdvanced('adv-sample')">▼ 高级采样</div>
+                    <div class="advanced-content" id="adv-sample">
+                        <div class="control-group" style="margin-top: 8px;">
+                            <div class="control-label">
+                                <span>采样起点修正 / Sample Trim</span>
+                                <span class="control-value" id="offsetValue">0ms</span>
+                            </div>
+                            <input type="range" id="audioOffset" min="0" max="1000" value="0" step="10" oninput="updateParams()">
+                            <small style="color: var(--text-dim); font-size: 0.6rem;">会切掉采样头部，不建议日常调整</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 高级和弦 ▼ ===== -->
+                <div class="advanced-section">
+                    <div class="advanced-toggle" onclick="toggleAdvanced('adv-chord')">▼ 高级和弦</div>
+                    <div class="advanced-content" id="adv-chord">
+                        <div class="control-group" style="margin-top: 8px;">
+                            <div class="control-label">
+                                <span>和弦长度</span>
+                                <span class="control-value" id="chordDurationValue">完整</span>
+                            </div>
+                            <input type="range" id="chordDuration" min="0" max="4" step="1" value="4" oninput="updateParams()">
+                            <div style="margin-top: 3px; font-size: 0.65rem; color: var(--text-dim);">0=静音 1=很短 2=半长 3=大半 4=完整</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== Legacy ===== -->
+                <div class="legacy-section">
+                    <div class="legacy-toggle" onclick="toggleAdvanced('legacy-params')">▼ Legacy 旧参数</div>
+                    <div class="legacy-content" id="legacy-params">
+                        <!-- 播放间隔区间 -->
+                        <div class="control-group" style="margin-top: 8px; opacity: 0.5;">
+                            <div class="control-label">
+                                <span>Legacy 播放间隔</span>
+                                <span class="control-value" id="tempoRangeValue">200-400ms</span>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="tempoMin" min="50" max="1000" value="200" oninput="updateParams()" style="flex: 1;">
+                                <span style="color: var(--text-dim); font-size: 0.7rem;">-</span>
+                                <input type="range" id="tempoMax" min="50" max="1000" value="400" oninput="updateParams()" style="flex: 1;">
+                            </div>
+                            <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px;">
+                                <input type="checkbox" id="tempoRandom" checked onchange="updateParams()" style="width: auto;">
+                                <label for="tempoRandom" style="font-size: 0.7rem; color: var(--text-dim); cursor: pointer;">随机波动</label>
+                            </div>
+                        </div>
+                        <!-- 音色衰减 -->
+                        <div class="control-group" style="opacity: 0.5;">
+                            <div class="control-label">
+                                <span>Legacy 包络长度</span>
+                                <span class="control-value" id="durationValue">中</span>
+                            </div>
+                            <input type="range" id="noteDuration" min="100" max="1000" value="300" oninput="updateParams()">
+                            <small style="color: var(--text-dim); font-size: 0.6rem;">已被 Voice Shaping Attack/Release 覆盖</small>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- 中央面板：演奏输入主工作区 -->
             <div class="panel">
@@ -1342,144 +1473,6 @@
                     <div id="exportStatus" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-dim);"></div>
                 </div>
 
-            </div>
-        </div>
-        <!-- 底部全宽辅助区 -->
-        <div class="bottom-section">
-            <div class="bottom-card">
-                <div class="advanced-section">
-                    <div class="advanced-toggle" onclick="toggleAdvanced('adv-rhythm')">▼ 高级节奏</div>
-                    <div class="advanced-content" id="adv-rhythm">
-                        <!-- 声调时值映射 -->
-                        <div style="margin-top: 8px; padding: 10px; background: rgba(0,0,0,0.15); border-radius: 6px;">
-                            <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">声调时值映射</div>
-                            <div class="control-group" style="margin-bottom: 6px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.7rem; color: var(--primary);">一声 阴平</span>
-                                    <span class="control-value" id="tone1Value" style="font-size: 0.65rem;">8分音符 ♪</span>
-                                </div>
-                                <select id="tone1NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
-                                    <option value="4">4分音符 ♩</option>
-                                    <option value="8" selected>8分音符 ♪</option>
-                                    <option value="16">16分音符 ♫</option>
-                                    <option value="32">32分音符 ♬</option>
-                                    <option value="triplet">三连音 ♪♪♪</option>
-                                </select>
-                            </div>
-                            <div class="control-group" style="margin-bottom: 6px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.7rem; color: var(--primary);">二声 阳平</span>
-                                    <span class="control-value" id="tone2Value" style="font-size: 0.65rem;">16分音符 ♫</span>
-                                </div>
-                                <select id="tone2NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
-                                    <option value="4">4分音符 ♩</option>
-                                    <option value="8">8分音符 ♪</option>
-                                    <option value="16" selected>16分音符 ♫</option>
-                                    <option value="32">32分音符 ♬</option>
-                                    <option value="triplet">三连音 ♪♪♪</option>
-                                </select>
-                            </div>
-                            <div class="control-group" style="margin-bottom: 6px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.7rem; color: var(--primary);">三声 上声</span>
-                                    <span class="control-value" id="tone3Value" style="font-size: 0.65rem;">三连音 ♪♪♪</span>
-                                </div>
-                                <select id="tone3NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
-                                    <option value="4">4分音符 ♩</option>
-                                    <option value="8">8分音符 ♪</option>
-                                    <option value="16">16分音符 ♫</option>
-                                    <option value="32">32分音符 ♬</option>
-                                    <option value="triplet" selected>三连音 ♪♪♪</option>
-                                </select>
-                            </div>
-                            <div class="control-group">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.7rem; color: var(--primary);">四声 去声</span>
-                                    <span class="control-value" id="tone4Value" style="font-size: 0.65rem;">16分音符 ♫</span>
-                                </div>
-                                <select id="tone4NoteValue" onchange="updateParams()" style="width: 100%; margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px; font-size: 0.7rem;">
-                                    <option value="4">4分音符 ♩</option>
-                                    <option value="8">8分音符 ♪</option>
-                                    <option value="16" selected>16分音符 ♫</option>
-                                    <option value="32">32分音符 ♬</option>
-                                    <option value="triplet">三连音 ♪♪♪</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- 实验性节奏随机 -->
-                        <div style="margin-top: 8px; padding: 8px; background: rgba(255,107,107,0.05); border-radius: 6px; border: 1px dashed rgba(255,107,107,0.15);">
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <input type="checkbox" id="rhythmRandom" onchange="updateParams()" style="width: auto;">
-                                <label for="rhythmRandom" style="font-size: 0.75rem; color: var(--text); cursor: pointer;">🎲 实验性节奏随机</label>
-                            </div>
-                            <div style="font-size: 0.6rem; color: var(--primary); opacity: 0.8;">⚠️ 不建议剧情对白正式导出使用</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== 高级采样 ▼ ===== -->
-                <div class="advanced-section">
-                    <div class="advanced-toggle" onclick="toggleAdvanced('adv-sample')">▼ 高级采样</div>
-                    <div class="advanced-content" id="adv-sample">
-                        <div class="control-group" style="margin-top: 8px;">
-                            <div class="control-label">
-                                <span>采样起点修正 / Sample Trim</span>
-                                <span class="control-value" id="offsetValue">0ms</span>
-                            </div>
-                            <input type="range" id="audioOffset" min="0" max="1000" value="0" step="10" oninput="updateParams()">
-                            <small style="color: var(--text-dim); font-size: 0.6rem;">会切掉采样头部，不建议日常调整</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== 高级和弦 ▼ ===== -->
-                <div class="advanced-section">
-                    <div class="advanced-toggle" onclick="toggleAdvanced('adv-chord')">▼ 高级和弦</div>
-                    <div class="advanced-content" id="adv-chord">
-                        <div class="control-group" style="margin-top: 8px;">
-                            <div class="control-label">
-                                <span>和弦长度</span>
-                                <span class="control-value" id="chordDurationValue">完整</span>
-                            </div>
-                            <input type="range" id="chordDuration" min="0" max="4" step="1" value="4" oninput="updateParams()">
-                            <div style="margin-top: 3px; font-size: 0.65rem; color: var(--text-dim);">0=静音 1=很短 2=半长 3=大半 4=完整</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== Legacy ===== -->
-                <div class="legacy-section">
-                    <div class="legacy-toggle" onclick="toggleAdvanced('legacy-params')">▼ Legacy 旧参数</div>
-                    <div class="legacy-content" id="legacy-params">
-                        <!-- 播放间隔区间 -->
-                        <div class="control-group" style="margin-top: 8px; opacity: 0.5;">
-                            <div class="control-label">
-                                <span>Legacy 播放间隔</span>
-                                <span class="control-value" id="tempoRangeValue">200-400ms</span>
-                            </div>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="range" id="tempoMin" min="50" max="1000" value="200" oninput="updateParams()" style="flex: 1;">
-                                <span style="color: var(--text-dim); font-size: 0.7rem;">-</span>
-                                <input type="range" id="tempoMax" min="50" max="1000" value="400" oninput="updateParams()" style="flex: 1;">
-                            </div>
-                            <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px;">
-                                <input type="checkbox" id="tempoRandom" checked onchange="updateParams()" style="width: auto;">
-                                <label for="tempoRandom" style="font-size: 0.7rem; color: var(--text-dim); cursor: pointer;">随机波动</label>
-                            </div>
-                        </div>
-                        <!-- 音色衰减 -->
-                        <div class="control-group" style="opacity: 0.5;">
-                            <div class="control-label">
-                                <span>Legacy 包络长度</span>
-                                <span class="control-value" id="durationValue">中</span>
-                            </div>
-                            <input type="range" id="noteDuration" min="100" max="1000" value="300" oninput="updateParams()">
-                            <small style="color: var(--text-dim); font-size: 0.6rem;">已被 Voice Shaping Attack/Release 覆盖</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bottom-card">
                 <!-- 角色声纹卡片 -->
                 <div class="character-voice-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                     <div class="character-voice-title">
@@ -1523,7 +1516,11 @@
                         </div>
                     </div>
                 </div>
-
+            </div>
+        </div>
+        <!-- 底部全宽辅助区 -->
+        <div class="bottom-section">
+            <div class="bottom-card">
                 <!-- 语义分类触发 MIDI 面板 -->
                 <div class="phrase-trigger-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                     <div class="character-voice-title">
