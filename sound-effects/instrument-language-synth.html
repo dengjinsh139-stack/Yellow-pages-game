@@ -5822,9 +5822,10 @@
                         // 乐器分支判断（与实时播放一致）
                         const isPiano = currentInstrument === 'piano';
                         const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
+                        const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                         const hasSample = noteObj.sampleNote && samplesLoaded;
 
-                        if ((isPiano || isSampleInstrument) && hasSample) {
+                        if ((isPiano || isSampleInstrument || isVirtualVoice) && (hasSample || isVirtualVoice)) {
                             // 使用采样渲染（与实时播放 playSampleTone 一致）
                             await renderSampleToBuffer(offlineContext, destination, noteObj, midiCurrentTime, noteDur, noteVel);
                         } else {
