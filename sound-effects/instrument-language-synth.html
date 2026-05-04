@@ -1089,15 +1089,6 @@
 
                 <!-- 🌌 空间 / Effects -->
                 <div class="space-effects">
-                    <div style="font-size: 0.85rem; color: var(--synth); margin-bottom: 10px; font-weight: 600;">🌌 空间 / Effects</div>
-                    <div class="control-group" style="margin-bottom: 0;">
-                        <div class="control-label">
-                            <span>混响效果</span>
-                            <span class="control-value" id="reverbValue">30%</span>
-                        </div>
-                        <input type="range" id="reverb" min="0" max="100" value="30" oninput="updateParams()">
-                <!-- ===== 空间 / Effects ===== -->
-                <div class="space-effects">
                     <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 10px; font-weight: 600;">🌌 空间 / Effects</div>
                     <div class="control-group" style="margin-bottom: 0;">
                         <div class="control-label">
@@ -1328,20 +1319,6 @@
                     <button id="btn-upload-midi-main" class="btn btn-secondary" style="display: none;">📁 上传/更换 MIDI</button>
                     <button id="btn-clear-text" class="btn btn-secondary">🗑️ 清空</button>
                     <button id="btn-stop" class="btn btn-secondary">⏹ 停止</button>
-                </div>
-
-                <!-- 音频导出区域 -->
-                <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px;">📥 音频导出</div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
-                        <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
-                            <option value="44100">44.1kHz</option>
-                            <option value="48000" selected>48kHz</option>
-                            <option value="96000">96kHz</option>
-                        </select>
-                    </div>
-                    <div id="exportStatus" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-dim);"></div>
                 </div>
 
                 <!-- 10键音符面板 -->
@@ -6034,14 +6011,16 @@
 
         // 计算音频总时长
         async function calculateAudioDuration(events) {
-            let totalTime = 0.5; // 起始偏移
+            let currentTime = 0.5; // 时间线起点
+            let lastAudioEndTime = 0.5; // 最后一个音频实际结束时间
 
             for (let i = 0; i < events.length; i++) {
                 const evt = events[i];
 
-                // 停顿事件
+                // 停顿事件：只推进时间线
                 if (evt.type === 'pause') {
-                    totalTime += evt.pauseMs / 1000;
+                    currentTime += evt.pauseMs / 1000;
+                    lastAudioEndTime = Math.max(lastAudioEndTime, currentTime);
                     continue;
                 }
 
@@ -6063,7 +6042,7 @@
                     allNotes.sort((a, b) => a.time - b.time);
                     const msPerTick = 60000 / (params.bpm * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
 
-                    // 计算最后一个音符的真实结束时间，与实时/export一致
+                    // 计算最后一个音符的真实结束时间
                     let lastNoteEndTimeMs = 0;
                     for (const mnote of allNotes) {
                         const noteDurationMs = computeMidiNoteDurationMs(mnote, midiData);
@@ -6073,46 +6052,59 @@
                         }
                     }
 
-                    // 加上 tail + semanticGap，与实时/export一致
+                    // tail + semanticGap
                     const tailMs = 120;
                     const semanticGapMs = params.voiceShaping.semanticGap;
-                    totalTime += (lastNoteEndTimeMs + tailMs + semanticGapMs) / 1000;
+                    const blockDuration = (lastNoteEndTimeMs + tailMs + semanticGapMs) / 1000;
+
+                    currentTime += blockDuration;
+                    lastAudioEndTime = Math.max(lastAudioEndTime, currentTime);
                     continue;
                 }
 
-                // 角色声纹事件：估算实际播放时长
+                // 角色声纹事件
                 if (evt.type === 'characterVoice') {
                     const config = characterVoiceConfig[evt.character];
                     if (!config) continue;
                     let voiceDuration = 0;
-                    // 优先用已缓存的音频时长
                     const audioBuffer = characterAudioBuffers[evt.character];
                     if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
                         voiceDuration = audioBuffer.duration;
                     } else {
-                        //  fallback：按 motifNotes 累加估算
                         for (const note of config.motifNotes) {
                             voiceDuration += note.durationMs / 1000 + 0.05;
                         }
                     }
-                    totalTime += voiceDuration;
-                    totalTime += 0.02; // 微小间隔对齐渲染逻辑
+                    const advance = Math.max(0, voiceDuration - (params.voiceShaping.overlapMs / 1000));
+                    currentTime += advance;
+                    lastAudioEndTime = Math.max(lastAudioEndTime, currentTime + (params.voiceShaping.overlapMs / 1000));
                     continue;
                 }
 
-                // 使用预计算的timing（如果存在）
+                // 普通 note 事件
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
-                totalTime += timing.duration / 1000;
-                // 字间连接受 overlapMs 控制（缩短间隙）
-                totalTime += Math.max(0, timing.duration / 1000 - (params.voiceShaping.overlapMs / 1000));
+                const duration = timing.duration / 1000;
+                const overlapSec = params.voiceShaping.overlapMs / 1000;
+                const advance = Math.max(0, duration - overlapSec);
+
+                // 更新最后一个音频结束时间
+                const noteEnd = currentTime + duration;
+                if (noteEnd > lastAudioEndTime) {
+                    lastAudioEndTime = noteEnd;
+                }
+
+                // 时间线前进（考虑 overlap）
+                currentTime += advance;
             }
 
             // 混响尾巴时长
+            let reverbTail = 0;
             if (params.reverb > 0) {
-                totalTime += 1.5; // 1.5秒混响尾音
+                reverbTail = 1.5;
             }
 
-            return totalTime + 1.0; // 添加尾部余量
+            // 最终时长 = max(时间线终点, 最后一个音频结束) + 混响尾 + 余量
+            return Math.max(currentTime, lastAudioEndTime) + reverbTail + 1.0;
         }
 
         // 统一事件播放参数计算（实时播放和导出共用）
