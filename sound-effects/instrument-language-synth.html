@@ -3784,6 +3784,12 @@
 
         // 找到最近的采样
         function findNearestSample(targetNote) {
+            // 防御性类型检查
+            if (typeof targetNote !== 'string' || !targetNote) {
+                console.warn(`[findNearestSample] 收到非字符串 targetNote:`, targetNote);
+                return null;
+            }
+
             // 获取当前乐器的采样键名列表
             const instrumentPrefix = currentInstrument + '_';
             const sampleKeys = Object.keys(audioBuffers).filter(key => key.startsWith(instrumentPrefix));
