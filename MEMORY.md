@@ -13,6 +13,7 @@
 ### 当前版本: v3.15.0
 
 **版本历史:**
+- **v3.16.3** (2026-05-05) - UI/布局重构：右栏紧凑化（移除 overflow-y 滚动隐藏、压缩 Voice Shaping 高度、A/B 紧凑布局），左栏合并四个高级入口为单一「高级设置」，Effects 和 Export 首屏可见
 - **v3.15.0** (2026-05-04) - 角色声纹WAV导出脱离实时audioContext依赖；findNearestSample防御性类型检查
 - **v3.7.0** (2026-04-22) - 去掉 G4/G5 保持10键对齐，版本号统一动态读取 nav-config.js
 - **v3.6.23** (2026-04-20) - 和弦时长规则统一：实时播放与导出共用 computeChordTiming()，修复 chordDuration=0 时导出仍渲染和弦的 bug
