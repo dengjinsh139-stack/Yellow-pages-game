@@ -1259,17 +1259,10 @@
             <!-- 左侧面板：乐器选择与基础演奏 -->
             <div class="panel">
                 <div class="panel-scroll">
+                    <div class="panel-title">选择乐器</div>
 
-                    <!-- ===== 设置手风琴 ===== -->
-                    <div class="accordion" id="accordion-instruments">
-                        <div class="accordion-header open active" onclick="toggleAccordion(this, 'acc-instruments')">
-                            <span class="accordion-icon">▶</span>
-                            <span>🎹 乐器选择</span>
-                            <span class="accordion-badge" id="currentInstrumentBadge">钢琴</span>
-                        </div>
-                        <div class="accordion-body open" id="acc-instruments">
-                            <div class="accordion-body-inner">
-                        <div class="instrument-grid">
+                    <div class="instrument-grid">
+                        <div class="instrument-btn active" data-instrument="piano">
                             <span class="icon">🎹</span>
                             <span class="name">钢琴 <small style="color:var(--accent);font-size:0.7em;">真实采样</small></span>
                         </div>
@@ -1309,200 +1302,6 @@
                         <span id="currentVoiceLabel">钢琴</span>
                     </div>
 
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" id="accordion-characters">
-                        <div class="accordion-header" onclick="toggleAccordion(this, 'acc-characters')">
-                            <span class="accordion-icon">▶</span>
-                            <span>🎭 角色声纹</span>
-                            <span class="accordion-badge" id="characterCountBadge">3个角色</span>
-                        </div>
-                        <div class="accordion-body" id="acc-characters">
-                            <div class="accordion-body-inner">
-                <!-- 角色声纹卡片 -->
-                <div class="character-voice-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div class="character-voice-title">
-                        <span>🎭</span>
-                        <span>角色声纹</span>
-                        <span class="character-detect-badge hidden" id="characterDetectBadge">
-                            <span>✨</span>
-                            <span id="characterDetectText">检测到角色</span>
-                        </span>
-                    </div>
-                    <div class="character-voice-grid">
-                        <div class="character-voice-card" data-character="小牧" data-instrument="flute">
-                            <div class="character-voice-header">
-                                <span class="character-voice-name">小牧</span>
-                                <span class="character-voice-instrument">flute</span>
-                            </div>
-                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('小牧')">
-                                <span>▶</span>
-                                <span>试听</span>
-                            </button>
-                        </div>
-                        <div class="character-voice-card" data-character="艾米" data-instrument="xylophone">
-                            <div class="character-voice-header">
-                                <span class="character-voice-name">艾米</span>
-                                <span class="character-voice-instrument">xylophone</span>
-                            </div>
-                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('艾米')">
-                                <span>▶</span>
-                                <span>试听</span>
-                            </button>
-                        </div>
-                        <div class="character-voice-card" data-character="芙洛芙" data-instrument="piano">
-                            <div class="character-voice-header">
-                                <span class="character-voice-name">芙洛芙</span>
-                                <span class="character-voice-instrument">piano</span>
-                            </div>
-                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('芙洛芙')">
-                                <span>▶</span>
-                                <span>试听</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion" id="accordion-semantic">
-                        <div class="accordion-header" onclick="toggleAccordion(this, 'acc-semantic')">
-                            <span class="accordion-icon">▶</span>
-                            <span>🎯 语义分类</span>
-                            <span class="accordion-badge" id="semanticCountBadge">动态</span>
-                        </div>
-                        <div class="accordion-body" id="acc-semantic">
-                            <div class="accordion-body-inner">
-                <!-- 语义分类触发 MIDI 面板 -->
-                <div class="phrase-trigger-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div class="character-voice-title">
-                        <span>语义分类触发</span>
-                        <span class="phrase-detect-badge hidden" id="phraseDetectBadge">
-                            <span>✨</span>
-                            <span id="phraseDetectText">检测到</span>
-                        </span>
-                    </div>
-                    <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px;">
-                        <!-- 动态生成分类卡片 -->
-                    </div>
-
-                    <!-- 语义分类文件面板 -->
-                    <div id="phraseTriggerFilePanel" style="display: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - MIDI 状态</span>
-                            <button id="btn-close-phrase-trigger" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem;">✕</button>
-                        </div>
-                        <div id="phraseTriggerFileList" style="font-size: 0.75rem; color: var(--text-dim);">
-                            <p>加载中...</p>
-                        </div>
-                    </div>
-                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- 中央面板：演奏输入主工作区 -->
-            <div class="panel">
-                <div class="panel-scroll">
-                <div class="panel-title">演奏输入</div>
-
-                <!-- 模式切换 -->
-                <div class="mode-switch" style="display: flex; gap: 8px; margin-bottom: 16px; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                    <button class="mode-btn active" data-mode="text" id="btnModeText" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">📝 文字演奏</button>
-                    <button class="mode-btn" data-mode="song" id="btnModeSong" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">🎼 歌曲播放</button>
-                </div>
-
-                <!-- 文案合成模式 -->
-                <div id="textModePanel">
-                <div class="text-input-area">
-                    <textarea class="text-input" id="textInput" placeholder="在这里输入文字，我会将其转换为乐器演奏...
-
-试试输入：
-- 你好世界
-- 今天天气真好
-- 生日快乐
-- 或任何你想说的话
-
-💡 输入角色名（小牧、艾米、芙洛芙）可触发专属声纹" oninput="onTextInput(this.value)"></textarea>
-                    <div class="input-hint">支持中文、英文、数字 · 系统会自动分析情感并匹配演奏风格</div>
-                </div>
-                </div><!-- /textModePanel -->
-
-                <!-- 歌曲播放模式 -->
-                <div id="songModePanel" style="display: none;">
-                    <!-- 紧凑 MIDI 卡片 -->
-                    <div class="midi-card" id="midiUploadArea" style="border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.3s; margin-bottom: 12px; background: rgba(0,0,0,0.2);">
-                        <div id="midiCardContent" style="display: flex; align-items: center; gap: 12px;">
-                            <div style="font-size: 1.5rem;">📂</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 0.9rem; color: var(--text);">点击上传 MIDI 文件</div>
-                                <div style="font-size: 0.7rem; color: var(--text-dim);">支持 .mid / .midi 格式</div>
-                            </div>
-                        </div>
-                    </div>
-                    <input type="file" id="midiFileInput" accept=".mid,.midi" style="display: none;">
-
-                    <!-- MIDI 信息已整合到紧凑卡片中 -->
-
-                    <!-- 进度条区域（圆形播放/停止按钮已移除，统一使用底部主操作区） -->
-                    <div id="songControls" style="display: none; margin-bottom: 12px;">
-                        <div id="songProgressBar" style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; cursor: pointer;">
-                            <div id="songProgressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.1s;"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.75rem; color: var(--text-dim);">
-                            <span id="songCurrentTime">0:00</span>
-                            <span id="songTotalTime">0:00</span>
-                        </div>
-                    </div>
-
-                    <!-- 音符列表 -->
-                    <div id="songNoteList" style="max-height: 200px; overflow-y: auto; border-radius: 10px; background: rgba(0,0,0,0.2);"></div>
-                </div><!-- /songModePanel -->
-
-                <div class="status-bar">
-                    <div class="status-dot"></div>
-                    <span id="statusText">就绪</span>
-                    <span id="emotionBadge"></span>
-                </div>
-
-                <div class="visualizer-container">
-                    <canvas id="visualizer"></canvas>
-                    <div class="visualizer-overlay">
-                        <span id="waveInfo">Instrument: Piano | Ready</span>
-                    </div>
-                </div>
-
-                <div class="btn-grid">
-                    <button id="btn-main-play" class="btn">▶ 演奏文字</button>
-                    <button id="btn-upload-midi-main" class="btn btn-secondary" style="display: none;">📁 上传/更换 MIDI</button>
-                    <button id="btn-clear-text" class="btn btn-secondary">🗑️ 清空</button>
-                    <button id="btn-stop" class="btn btn-secondary">⏹ 停止</button>
-                </div>
-
-                <!-- 10键音符面板 -->
-                <div class="panel-title" style="margin-top: 15px;">音符键盘 <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: normal;">点击演奏</span></div>
-                <div class="note-keyboard" id="noteKeyboard">
-                    <!-- 动态生成10个音符按钮 -->
-                </div>
-
-                <div class="panel-title" style="margin-top: 15px;">音符序列</div>
-                <div class="notes-display" id="notesDisplay">
-                    <span style="opacity: 0.5;">等待输入...</span>
-                </div>
-
-                <!-- 频谱显示 -->
-                <div class="spectrum-display" id="spectrum">
-                    <!-- 动态生成频谱条 -->
-                </div>                </div>
-            </div>
-
-            <!-- 右侧面板：声音塑形与导出 -->
-            <div class="panel right-panel">
-                <div class="voice-shaping-core">
                     <div class="panel-title">基础演奏</div>
 
                     <!-- BPM -->
@@ -1662,6 +1461,106 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <!-- 中央面板：演奏输入主工作区 -->
+            <div class="panel">
+                <div class="panel-scroll">
+                <div class="panel-title">演奏输入</div>
+
+                <!-- 模式切换 -->
+                <div class="mode-switch" style="display: flex; gap: 8px; margin-bottom: 16px; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                    <button class="mode-btn active" data-mode="text" id="btnModeText" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">📝 文字演奏</button>
+                    <button class="mode-btn" data-mode="song" id="btnModeSong" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">🎼 歌曲播放</button>
+                </div>
+
+                <!-- 文案合成模式 -->
+                <div id="textModePanel">
+                <div class="text-input-area">
+                    <textarea class="text-input" id="textInput" placeholder="在这里输入文字，我会将其转换为乐器演奏...
+
+试试输入：
+- 你好世界
+- 今天天气真好
+- 生日快乐
+- 或任何你想说的话
+
+💡 输入角色名（小牧、艾米、芙洛芙）可触发专属声纹" oninput="onTextInput(this.value)"></textarea>
+                    <div class="input-hint">支持中文、英文、数字 · 系统会自动分析情感并匹配演奏风格</div>
+                </div>
+                </div><!-- /textModePanel -->
+
+                <!-- 歌曲播放模式 -->
+                <div id="songModePanel" style="display: none;">
+                    <!-- 紧凑 MIDI 卡片 -->
+                    <div class="midi-card" id="midiUploadArea" style="border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.3s; margin-bottom: 12px; background: rgba(0,0,0,0.2);">
+                        <div id="midiCardContent" style="display: flex; align-items: center; gap: 12px;">
+                            <div style="font-size: 1.5rem;">📂</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.9rem; color: var(--text);">点击上传 MIDI 文件</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">支持 .mid / .midi 格式</div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="midiFileInput" accept=".mid,.midi" style="display: none;">
+
+                    <!-- MIDI 信息已整合到紧凑卡片中 -->
+
+                    <!-- 进度条区域（圆形播放/停止按钮已移除，统一使用底部主操作区） -->
+                    <div id="songControls" style="display: none; margin-bottom: 12px;">
+                        <div id="songProgressBar" style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; cursor: pointer;">
+                            <div id="songProgressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.1s;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.75rem; color: var(--text-dim);">
+                            <span id="songCurrentTime">0:00</span>
+                            <span id="songTotalTime">0:00</span>
+                        </div>
+                    </div>
+
+                    <!-- 音符列表 -->
+                    <div id="songNoteList" style="max-height: 200px; overflow-y: auto; border-radius: 10px; background: rgba(0,0,0,0.2);"></div>
+                </div><!-- /songModePanel -->
+
+                <div class="status-bar">
+                    <div class="status-dot"></div>
+                    <span id="statusText">就绪</span>
+                    <span id="emotionBadge"></span>
+                </div>
+
+                <div class="visualizer-container">
+                    <canvas id="visualizer"></canvas>
+                    <div class="visualizer-overlay">
+                        <span id="waveInfo">Instrument: Piano | Ready</span>
+                    </div>
+                </div>
+
+                <div class="btn-grid">
+                    <button id="btn-main-play" class="btn">▶ 演奏文字</button>
+                    <button id="btn-upload-midi-main" class="btn btn-secondary" style="display: none;">📁 上传/更换 MIDI</button>
+                    <button id="btn-clear-text" class="btn btn-secondary">🗑️ 清空</button>
+                    <button id="btn-stop" class="btn btn-secondary">⏹ 停止</button>
+                </div>
+
+                <!-- 10键音符面板 -->
+                <div class="panel-title" style="margin-top: 15px;">音符键盘 <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: normal;">点击演奏</span></div>
+                <div class="note-keyboard" id="noteKeyboard">
+                    <!-- 动态生成10个音符按钮 -->
+                </div>
+
+                <div class="panel-title" style="margin-top: 15px;">音符序列</div>
+                <div class="notes-display" id="notesDisplay">
+                    <span style="opacity: 0.5;">等待输入...</span>
+                </div>
+
+                <!-- 频谱显示 -->
+                <div class="spectrum-display" id="spectrum">
+                    <!-- 动态生成频谱条 -->
+                </div>                </div>
+            </div>
+
+            <!-- 右侧面板：声音塑形与导出 -->
+            <div class="panel right-panel">
+                <div class="voice-shaping-core">
                     <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">🎛️ 声音塑形 / Voice Shaping</div>
 
                     <div class="control-group">
@@ -1783,6 +1682,75 @@
         <!-- 底部全宽辅助区 -->
         <div class="bottom-section">
             <div class="bottom-card">
+                <!-- 角色声纹卡片 -->
+                <div class="character-voice-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="character-voice-title">
+                        <span>🎭</span>
+                        <span>角色声纹</span>
+                        <span class="character-detect-badge hidden" id="characterDetectBadge">
+                            <span>✨</span>
+                            <span id="characterDetectText">检测到角色</span>
+                        </span>
+                    </div>
+                    <div class="character-voice-grid">
+                        <div class="character-voice-card" data-character="小牧" data-instrument="flute">
+                            <div class="character-voice-header">
+                                <span class="character-voice-name">小牧</span>
+                                <span class="character-voice-instrument">flute</span>
+                            </div>
+                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('小牧')">
+                                <span>▶</span>
+                                <span>试听</span>
+                            </button>
+                        </div>
+                        <div class="character-voice-card" data-character="艾米" data-instrument="xylophone">
+                            <div class="character-voice-header">
+                                <span class="character-voice-name">艾米</span>
+                                <span class="character-voice-instrument">xylophone</span>
+                            </div>
+                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('艾米')">
+                                <span>▶</span>
+                                <span>试听</span>
+                            </button>
+                        </div>
+                        <div class="character-voice-card" data-character="芙洛芙" data-instrument="piano">
+                            <div class="character-voice-header">
+                                <span class="character-voice-name">芙洛芙</span>
+                                <span class="character-voice-instrument">piano</span>
+                            </div>
+                            <button class="character-voice-preview-btn" onclick="playCharacterVoice('芙洛芙')">
+                                <span>▶</span>
+                                <span>试听</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 语义分类触发 MIDI 面板 -->
+                <div class="phrase-trigger-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="character-voice-title">
+                        <span>语义分类触发</span>
+                        <span class="phrase-detect-badge hidden" id="phraseDetectBadge">
+                            <span>✨</span>
+                            <span id="phraseDetectText">检测到</span>
+                        </span>
+                    </div>
+                    <div class="phrase-trigger-grid" id="phraseTriggerGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px;">
+                        <!-- 动态生成分类卡片 -->
+                    </div>
+
+                    <!-- 语义分类文件面板 -->
+                    <div id="phraseTriggerFilePanel" style="display: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span id="phraseTriggerPanelTitle" style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">分类 - MIDI 状态</span>
+                            <button id="btn-close-phrase-trigger" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem;">✕</button>
+                        </div>
+                        <div id="phraseTriggerFileList" style="font-size: 0.75rem; color: var(--text-dim);">
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 辅助信息（折叠） -->
                 <div class="advanced-section" style="border: none; padding: 0; margin-top: 0;">
                     <div class="advanced-toggle" onclick="toggleAdvanced('bottom-aux')">▼ 辅助信息（历史 / 关于 / 技巧）</div>
@@ -3937,29 +3905,6 @@
         function toggleAdvanced(id) {
             const el = document.getElementById(id);
             if (el) el.classList.toggle('open');
-        }
-
-        // ===== 手风琴切换 =====
-        function toggleAccordion(header, bodyId) {
-            const body = document.getElementById(bodyId);
-            const isOpen = body.classList.contains('open');
-            
-            // Close all accordions in same panel
-            const panel = header.closest('.panel-scroll');
-            if (panel) {
-                panel.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
-                panel.querySelectorAll('.accordion-header').forEach(h => {
-                    h.classList.remove('open');
-                    h.classList.remove('active');
-                });
-            }
-            
-            // Toggle clicked one
-            if (!isOpen) {
-                body.classList.add('open');
-                header.classList.add('open');
-                header.classList.add('active');
-            }
         }
 
         function updateParams() {
