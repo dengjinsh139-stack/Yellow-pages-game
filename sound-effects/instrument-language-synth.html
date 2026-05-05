@@ -3841,28 +3841,8 @@
             const userVolume = (noteVolumes[currentInstrument][playNote] !== undefined) ? noteVolumes[currentInstrument][playNote] : 1.0;
             const finalVelocity = baseVelocity * params.masterVolume * userVolume;
 
-            // 木琴是混合模式：检查是否有该具体音符的采样
-            if (currentInstrument === 'xylophone') {
-                const config = sampleConfig.xylophone;
-                const sampleInfo = config.samples[playNote];
-                // 如果有真实采样文件且已加载，使用采样
-                if (sampleInfo && sampleInfo.file && audioBuffers['xylophone_' + playNote]) {
-                    playSampleTone(playFreq, playNote, 0.5, finalVelocity);
-                } else {
-                    // 否则使用合成
-                    playSynthTone(playFreq, 0.5, finalVelocity);
-                }
-            } else {
-                // 检查当前乐器是否有采样可用
-                const hasSamples = hasInstrumentSamples(currentInstrument);
-                console.log(`[playNoteKey] hasInstrumentSamples(${currentInstrument}) = ${hasSamples}`);
-
-                if (hasSamples) {
-                    playSampleTone(playFreq, playNote, 0.5, finalVelocity);
-                } else {
-                    playSynthTone(playFreq, 0.5, finalVelocity);
-                }
-            }
+            // 所有乐器统一走 playTone（内部已处理采样/合成逻辑和 loading 提示）
+            playTone(playFreq, playNote, 500, finalVelocity);
 
             // 添加到历史
             addToHistory(`♪ ${playNote} (${Math.round(userVolume * 100)}%)`);
