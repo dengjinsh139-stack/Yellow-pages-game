@@ -1822,6 +1822,8 @@
             return { ...global, ...voiceDefault, ...charOverride };
         }
         let animationId = null;
+        let instrumentLoading = false;
+        const instrumentLoadPromises = {};
         let dialogueVoiceMode = true;
 
         // 全局版本号（运行态可读取）
@@ -3240,7 +3242,46 @@
         }
 
         // 选择乐器（钢琴、萨克斯、长笛、合成器有真实采样）
+        // 统一乐器采样加载入口
+        async function loadInstrumentSamples(instrument) {
+            const loaders = {
+                'piano': loadSamples,
+                'saxophone': loadSaxophoneSamples,
+                'flute': loadFluteSamples,
+                'synth': loadSynthSamples,
+                'train': loadTrainSamples,
+                'xylophone': loadXylophoneSamples,
+                'guitar': loadVocalSamples,
+            };
+            const loader = loaders[instrument];
+            if (loader) {
+                await loader();
+            }
+        }
+
+        // 确保乐器采样已就绪（带缓存）
+        async function ensureInstrumentReady(instrument) {
+            if (hasInstrumentSamples(instrument)) return true;
+            if (!instrumentLoadPromises[instrument]) {
+                instrumentLoadPromises[instrument] = (async () => {
+                    instrumentLoading = true;
+                    const names = {
+                        'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
+                        'synth': '合成器', 'train': '火车', 'xylophone': '木琴',
+                        'guitar': '虚拟人声'
+                    };
+                    document.getElementById('statusText').textContent = `正在加载 ${names[instrument] || instrument} 采样，请稍候...`;
+                    await loadInstrumentSamples(instrument);
+                    instrumentLoading = false;
+                    document.getElementById('statusText').textContent = `${names[instrument] || instrument} 采样已就绪`;
+                    return hasInstrumentSamples(instrument);
+                })();
+            }
+            return await instrumentLoadPromises[instrument];
+        }
+
         async function selectInstrument(instrument) {
+            await ensureInstrumentReady(instrument);
             currentInstrument = instrument;
             document.querySelectorAll('.instrument-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -3320,7 +3361,8 @@
                 (instrument === 'flute' && audioBuffers['flute_D4']) ||
                 (instrument === 'synth' && audioBuffers['synth_D4']) ||
                 (instrument === 'train' && audioBuffers['train_D4']) ||
-                (instrument === 'xylophone' && audioBuffers['xylophone_F4'])) {
+                (instrument === 'xylophone' && audioBuffers['xylophone_F4']) ||
+                (instrument === 'guitar' && audioBuffers['vocal_D4_01'])) {
                 playSampleTone(440, 'A4', 0.3, 0.5);
             } else {
                 playSynthTone(440, 0.3, 0.5);
@@ -3781,8 +3823,12 @@
         }
 
         // 演奏音符按钮
-        function playNoteKey(noteInfo, keyElement) {
+        async function playNoteKey(noteInfo, keyElement) {
             keyElement.classList.add('active');
+            // 确保乐器采样已就绪
+            if (!await ensureInstrumentReady(currentInstrument)) {
+                console.warn('[playNoteKey] 采样未就绪:', currentInstrument); return;
+            }
 
             // 虚拟人声：使用 sampleNote/sampleFreq 播放
             const playNote = isVirtualVoiceInstrument(currentInstrument) ? (noteInfo.sampleNote || noteInfo.note) : noteInfo.note;
@@ -4595,8 +4641,9 @@
             const buffer = audioBuffers[bufferKey];
 
             if (!buffer) {
-                console.warn('[playSampleTone] Sample not found for', bufferKey, 'available keys:', Object.keys(audioBuffers).filter(k => !k.includes('_')).join(','));
-                return;
+                console.warn('[playSampleTone] 采样未加载:', bufferKey, '乐器:', currentInstrument);
+                document.getElementById('statusText').textContent = '正在加载 ' + (currentInstrument === 'guitar' ? '虚拟人声' : currentInstrument) + ' 采样，请稍候...';
+                return; // 不允许 silent fallback
             }
 
             return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config);
@@ -4775,6 +4822,11 @@
             const hasSamples = hasInstrumentSamples(currentInstrument);
             console.log(`[playTone] instrument=${currentInstrument}, hasSamples=${hasSamples}, note=${noteName}`);
 
+            // 小号始终使用合成器
+            if (currentInstrument === 'trumpet') {
+                return playSynthTone(frequency, duration / 1000, velocity);
+            }
+
             // 木琴是混合模式：检查是否有该具体音符的采样
             if (currentInstrument === 'xylophone') {
                 const config = sampleConfig.xylophone;
@@ -4795,17 +4847,23 @@
                     return playSampleTone(frequency, nearestSample, duration / 1000, velocity);
                 }
 
-                // 回退到合成器
-                console.warn(`[木琴] ⚠️ ${noteName} 无可用采样，回退到合成器`);
-                return playSynthTone(frequency, duration / 1000, velocity);
+                // 采样未就绪，不 silent fallback
+                console.warn(`[木琴] ⚠️ ${noteName} 采样未就绪，跳过`);
+                document.getElementById('statusText').textContent = '正在加载木琴采样，请稍候...';
+                return;
             }
 
+            // 其他 sample-based 乐器
             if (hasSamples) {
                 console.log(`[${currentInstrument}] 使用采样音色`);
                 return playSampleTone(frequency, noteName, duration / 1000, velocity);
             } else {
-                console.log(`[${currentInstrument}] 采样未加载，回退到合成器`);
-                return playSynthTone(frequency, duration / 1000, velocity);
+                // 采样未就绪，不 silent fallback
+                console.warn(`[${currentInstrument}] 采样未就绪，跳过`);
+                const names = { 'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
+                    'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声' };
+                document.getElementById('statusText').textContent = '正在加载 ' + (names[currentInstrument] || currentInstrument) + ' 采样，请稍候...';
+                return;
             }
         }
 
@@ -5003,6 +5061,11 @@
                 document.getElementById('statusText').textContent = '加载采样中...';
                 await loadSamples();
                 document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
+            }
+
+            // 确保乐器采样已就绪（无论 audioContext 是否刚初始化）
+            if (!await ensureInstrumentReady(currentInstrument)) {
+                document.getElementById('statusText').textContent = '采样加载失败'; return;
             }
 
             // Safari 兼容性：检查并恢复音频上下文
@@ -7336,6 +7399,11 @@
         async function playSongMidi() {
             if (!songMidi || isSongPlaying) return;
 
+            // 确保乐器采样已就绪
+            if (!await ensureInstrumentReady(currentInstrument)) {
+                document.getElementById('statusText').textContent = '采样加载失败'; return;
+            }
+
             isSongPlaying = true;
             const btnMainPlay = document.getElementById('btn-main-play');
             if (btnMainPlay) btnMainPlay.textContent = '⏸ 播放中...';
@@ -7498,11 +7566,11 @@
             // 乐器按钮（事件委托）
             const instrumentGrid = document.querySelector('.instrument-grid');
             if (instrumentGrid) {
-                instrumentGrid.addEventListener('click', (e) => {
+                instrumentGrid.addEventListener('click', async (e) => {
                     const btn = e.target.closest('.instrument-btn');
                     if (btn) {
                         const instrument = btn.dataset.instrument;
-                        if (instrument) selectInstrument(instrument);
+                        if (instrument) await selectInstrument(instrument);
                     }
                 });
             }
