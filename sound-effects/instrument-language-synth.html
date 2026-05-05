@@ -4762,6 +4762,7 @@
         function playTone(frequency, noteName, duration, velocity = 0.5) {
             // 检查当前乐器是否有采样可用
             const hasSamples = hasInstrumentSamples(currentInstrument);
+            console.log(`[playTone] instrument=${currentInstrument}, hasSamples=${hasSamples}, note=${noteName}`);
 
             // 木琴是混合模式：检查是否有该具体音符的采样
             if (currentInstrument === 'xylophone') {
@@ -4772,6 +4773,7 @@
 
                 // 如果有精确匹配的真实采样，直接使用
                 if (hasThisSample) {
+                    console.log(`[木琴] 使用精确采样: ${bufferKey}`);
                     return playSampleTone(frequency, noteName, duration / 1000, velocity);
                 }
 
@@ -4788,8 +4790,10 @@
             }
 
             if (hasSamples) {
+                console.log(`[${currentInstrument}] 使用采样音色`);
                 return playSampleTone(frequency, noteName, duration / 1000, velocity);
             } else {
+                console.log(`[${currentInstrument}] 采样未加载，回退到合成器`);
                 return playSynthTone(frequency, duration / 1000, velocity);
             }
         }
