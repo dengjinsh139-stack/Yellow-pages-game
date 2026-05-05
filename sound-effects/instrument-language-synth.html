@@ -2453,6 +2453,7 @@
         // 音频缓冲区存储
         const audioBuffers = {};
         let samplesLoaded = false;
+        console.log('[INIT] samplesLoaded declared:', samplesLoaded);
 
         // 和弦音频
         const chordBuffers = [];
@@ -4991,6 +4992,10 @@
                 masterGain.connect(analyser);
                 analyser.connect(audioContext.destination);
                 if (!animationId) visualize();
+                // 自动初始化时也要加载采样
+                document.getElementById('statusText').textContent = '加载采样中...';
+                await loadSamples();
+                document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
             }
 
             // Safari 兼容性：检查并恢复音频上下文
