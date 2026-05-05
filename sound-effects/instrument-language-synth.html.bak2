@@ -1243,6 +1243,12 @@
                         </div>
                     </div>
 
+                    <!-- 当前 Voice -->
+                    <div class="current-voice-badge" id="currentVoiceBadge">
+                        <span>🎹</span>
+                        <span id="currentVoiceLabel">钢琴</span>
+                    </div>
+
                     <div class="panel-title">基础演奏</div>
 
                     <!-- BPM -->
@@ -1488,50 +1494,15 @@
                     <!-- 动态生成10个音符按钮 -->
                 </div>
 
-                <!-- 中栏底部 Tabs -->
-                <div class="center-tabs-bar">
-                    <div class="center-tab active" data-tab="notes" onclick="switchCenterTab('notes')">🎵 音符序列</div>
-                    <div class="center-tab" data-tab="expression" onclick="switchCenterTab('expression')">📐 表达段</div>
-                    <div class="center-tab" data-tab="character" onclick="switchCenterTab('character')">🎭 角色声纹</div>
-                    <div class="center-tab" data-tab="semantic" onclick="switchCenterTab('semantic')">🎯 语义触发</div>
+                <div class="panel-title" style="margin-top: 15px;">音符序列</div>
+                <div class="notes-display" id="notesDisplay">
+                    <span style="opacity: 0.5;">等待输入...</span>
                 </div>
 
-                <div class="center-tab-panel active" id="tab-panel-notes">
-                    <div class="panel-title" style="margin-top: 10px;">音符序列</div>
-                    <div class="notes-display" id="notesDisplay">
-                        <span style="opacity: 0.5;">等待输入...</span>
-                    </div>
-                    <!-- 频谱显示 -->
-                    <div class="spectrum-display" id="spectrum">
-                        <!-- 动态生成频谱条 -->
-                    </div>
-                </div>
-
-                <div class="center-tab-panel" id="tab-panel-expression">
-                    <div class="panel-title" style="margin-top: 10px;">📐 表达段 / Expression Segments</div>
-                    <div class="expression-toolbar">
-                        <button class="btn btn-small" onclick="generateExpressionSegments()">✨ 自动生成</button>
-                        <button class="btn btn-small btn-secondary" onclick="resetExpressionSegments()">↺ 重置</button>
-                    </div>
-                    <div class="expression-segments" id="expressionSegments">
-                        <span style="opacity: 0.5; font-size: 0.8rem;">输入文字后点击「自动生成」</span>
-                    </div>
-                </div>
-
-                <div class="center-tab-panel" id="tab-panel-character">
-                    <div class="panel-title" style="margin-top: 10px;">🎭 角色声纹</div>
-                    <div id="tabCharacterContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
-                        输入文字后自动检测角色声纹
-                    </div>
-                </div>
-
-                <div class="center-tab-panel" id="tab-panel-semantic">
-                    <div class="panel-title" style="margin-top: 10px;">🎯 语义触发</div>
-                    <div id="tabSemanticContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
-                        输入文字后自动检测语义分类
-                    </div>
-                </div>
-                </div>
+                <!-- 频谱显示 -->
+                <div class="spectrum-display" id="spectrum">
+                    <!-- 动态生成频谱条 -->
+                </div>                </div>
             </div>
 
             <!-- 右侧面板：声音塑形与导出 -->
@@ -1658,10 +1629,7 @@
         <!-- 底部全宽辅助区 -->
         <div class="bottom-section">
             <div class="bottom-card">
-
-                <details class="bottom-details">
-                    <summary>🎭 角色声纹 · 3 个角色</summary>
-<!-- 角色声纹卡片 -->
+                <!-- 角色声纹卡片 -->
                 <div class="character-voice-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                     <div class="character-voice-title">
                         <span>🎭</span>
@@ -1704,11 +1672,8 @@
                         </div>
                     </div>
                 </div>
-                </details>
 
-                <details class="bottom-details">
-                    <summary>🎯 语义分类 · 8 类规则</summary>
-<!-- 语义分类触发 MIDI 面板 -->
+                <!-- 语义分类触发 MIDI 面板 -->
                 <div class="phrase-trigger-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                     <div class="character-voice-title">
                         <span>语义分类触发</span>
@@ -1732,13 +1697,11 @@
                         </div>
                     </div>
                 </div>
-                </details>
 
-                <details class="bottom-details">
-                    <summary>ℹ️ 辅助信息</summary>
-<!-- 辅助信息（折叠） -->
+                <!-- 辅助信息（折叠） -->
                 <div class="advanced-section" style="border: none; padding: 0; margin-top: 0;">
-                    <div class="advanced-content" >
+                    <div class="advanced-toggle" onclick="toggleAdvanced('bottom-aux')">▼ 辅助信息（历史 / 关于 / 技巧）</div>
+                    <div class="advanced-content" id="bottom-aux">
                         <div class="panel-title" style="margin-top: 10px;">演奏历史</div>
                         <div class="notes-display" id="historyDisplay" style="max-height: 120px;">
                             <span style="opacity: 0.5;">暂无记录</span>
@@ -1761,7 +1724,6 @@
                         </div>
                     </div>
                 </div>
-                </details>
             </div>
         </div>
     </div>
@@ -3940,187 +3902,6 @@
         // 更新参数
 
         // ===== 高级/ Legacy 折叠 =====
-
-        // ===== 中栏 Tabs 切换 =====
-        function switchCenterTab(tab) {
-            document.querySelectorAll('.center-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.center-tab-panel').forEach(p => p.classList.remove('active'));
-            document.querySelector(`.center-tab[data-tab="${tab}"]`)?.classList.add('active');
-            const panel = document.getElementById(`tab-panel-${tab}`);
-            if (panel) panel.classList.add('active');
-        }
-
-        // ===== Expression Segments =====
-        let expressionSegments = [];
-
-        function generateExpressionSegments() {
-            const text = document.getElementById('textInput')?.value?.trim();
-            if (!text) {
-                document.getElementById('expressionSegments').innerHTML = '<span style="opacity:0.5;font-size:0.8rem;">请先输入文字</span>';
-                return;
-            }
-
-            // 按标点切分
-            const segments = splitTextIntoSegments(text);
-            expressionSegments = segments.map((seg, i) => ({
-                id: i,
-                text: seg.text,
-                tempoScale: seg.type === 'punctuation' ? 0.6 : 1.0,
-                velocityScale: seg.type === 'question' ? 1.2 : (seg.type === 'exclamation' ? 1.3 : 1.0),
-                pauseAfterMs: seg.type === 'ellipsis' ? 600 : (seg.type === 'question' ? 400 : (seg.type === 'comma' ? 200 : 0)),
-                curveType: seg.type === 'question' ? 'hesitate' : (seg.type === 'exclamation' ? 'accelerate' : 'flat')
-            }));
-
-            renderExpressionSegments();
-            updateTabCharacterAndSemantic(text);
-        }
-
-        function splitTextIntoSegments(text) {
-            const segments = [];
-            let current = '';
-            for (let i = 0; i < text.length; i++) {
-                const ch = text[i];
-                const nextCh = text[i + 1] || '';
-
-                if (/[。！？；]/.test(ch)) {
-                    if (current) segments.push({ text: current, type: 'normal' });
-                    segments.push({ text: ch, type: ch === '？' ? 'question' : (ch === '！' ? 'exclamation' : (ch === '；' ? 'semicolon' : 'period')) });
-                    current = '';
-                } else if (ch === '…' && nextCh === '…') {
-                    if (current) segments.push({ text: current, type: 'normal' });
-                    segments.push({ text: '……', type: 'ellipsis' });
-                    i++; // skip second …
-                    current = '';
-                } else if (ch === '，') {
-                    if (current) segments.push({ text: current, type: 'normal' });
-                    segments.push({ text: '，', type: 'comma' });
-                    current = '';
-                } else {
-                    current += ch;
-                }
-            }
-            if (current) segments.push({ text: current, type: 'normal' });
-            return segments;
-        }
-
-        function renderExpressionSegments() {
-            const container = document.getElementById('expressionSegments');
-            if (!expressionSegments.length) {
-                container.innerHTML = '<span style="opacity:0.5;font-size:0.8rem;">点击「自动生成」创建表达段</span>';
-                return;
-            }
-
-            container.innerHTML = expressionSegments.map((seg, i) => `
-                <div class="segment-card" data-segment-id="${seg.id}">
-                    <div class="segment-text">${i+1}. 「${seg.text}」</div>
-                    <div class="segment-controls">
-                        <div class="segment-control">
-                            <label>速度倍率</label>
-                            <input type="range" min="0.5" max="1.5" step="0.1" value="${seg.tempoScale}" onchange="updateSegment(${i}, 'tempoScale', this.value)">
-                            <div class="segment-value">${seg.tempoScale.toFixed(1)}x</div>
-                        </div>
-                        <div class="segment-control">
-                            <label>力度倍率</label>
-                            <input type="range" min="0.8" max="1.3" step="0.1" value="${seg.velocityScale}" onchange="updateSegment(${i}, 'velocityScale', this.value)">
-                            <div class="segment-value">${seg.velocityScale.toFixed(1)}x</div>
-                        </div>
-                        <div class="segment-control">
-                            <label>停顿 (ms)</label>
-                            <input type="range" min="0" max="800" step="50" value="${seg.pauseAfterMs}" onchange="updateSegment(${i}, 'pauseAfterMs', this.value)">
-                            <div class="segment-value">${seg.pauseAfterMs}ms</div>
-                        </div>
-                        <div class="segment-control">
-                            <label>曲线</label>
-                            <select onchange="updateSegment(${i}, 'curveType', this.value)">
-                                <option value="flat" ${seg.curveType==='flat'?'selected':''}>平直</option>
-                                <option value="accelerate" ${seg.curveType==='accelerate'?'selected':''}>渐快</option>
-                                <option value="decelerate" ${seg.curveType==='decelerate'?'selected':''}>渐慢</option>
-                                <option value="easeInOut" ${seg.curveType==='easeInOut'?'selected':''}>缓入缓出</option>
-                                <option value="hesitate" ${seg.curveType==='hesitate'?'selected':''}>迟疑</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateSegment(index, field, value) {
-            if (!expressionSegments[index]) return;
-            if (field === 'tempoScale' || field === 'velocityScale') {
-                expressionSegments[index][field] = parseFloat(value);
-            } else if (field === 'pauseAfterMs') {
-                expressionSegments[index][field] = parseInt(value);
-            } else {
-                expressionSegments[index][field] = value;
-            }
-            renderExpressionSegments();
-        }
-
-        function resetExpressionSegments() {
-            expressionSegments = expressionSegments.map(s => ({
-                ...s,
-                tempoScale: 1.0,
-                velocityScale: 1.0,
-                pauseAfterMs: 0,
-                curveType: 'flat'
-            }));
-            renderExpressionSegments();
-        }
-
-        function getExpressionSegments() {
-            return expressionSegments;
-        }
-
-        // 更新角色声纹和语义触发的 Tab 内容
-        function updateTabCharacterAndSemantic(text) {
-            const charContent = document.getElementById('tabCharacterContent');
-            const semContent = document.getElementById('tabSemanticContent');
-
-            // 角色声纹检测
-            const char = detectCharacter(text);
-            if (charContent) {
-                charContent.innerHTML = char
-                    ? `<div style="color: var(--primary);">✨ 检测到角色：${char.name}（${char.instrument}）</div><button class="btn btn-small" style="margin-top:6px;" onclick="selectInstrument('${char.instrument}')">切换乐器</button>`
-                    : '<span style="opacity:0.5;">未检测到特定角色声纹</span>';
-            }
-
-            // 语义触发检测
-            const triggered = detectSemanticCategories(text);
-            if (semContent) {
-                semContent.innerHTML = triggered.length
-                    ? `<div style="color: var(--primary);">✨ 触发分类：${triggered.map(t => t.name).join('、')}</div>`
-                    : '<span style="opacity:0.5;">未触发语义分类</span>';
-            }
-        }
-
-        function detectCharacter(text) {
-            for (const name in characterVoiceRegistry) {
-                const cfg = characterVoiceRegistry[name];
-                if (cfg.patterns.some(p => text.includes(p))) {
-                    return { name, instrument: cfg.instrument };
-                }
-            }
-            return null;
-        }
-
-        function detectSemanticCategories(text) {
-            const triggered = [];
-            for (const cat of phraseTriggerCategories) {
-                if (cat.patterns.some(p => text.includes(p))) {
-                    triggered.push(cat);
-                }
-            }
-            return triggered;
-        }
-
-        // 在 displayNotes 中调用，更新 Tab 内容
-        const originalDisplayNotes = displayNotes;
-        displayNotes = function(events) {
-            originalDisplayNotes(events);
-            const text = document.getElementById('textInput')?.value;
-            if (text) updateTabCharacterAndSemantic(text);
-        };
-
         function toggleAdvanced(id) {
             const el = document.getElementById(id);
             if (el) el.classList.toggle('open');
@@ -5528,39 +5309,6 @@
         }
 
         // 显示音符
-
-        // 应用表达段参数到音符事件
-        function applyExpressionSegments(events, segments) {
-            let segIndex = 0;
-            let charCount = 0;
-            const text = document.getElementById('textInput')?.value || '';
-
-            // 建立字符→segment 映射
-            const charToSeg = [];
-            let segIdx = 0;
-            for (const seg of segments) {
-                for (let i = 0; i < seg.text.length; i++) {
-                    charToSeg.push(segIdx);
-                }
-                segIdx++;
-            }
-
-            let charPos = 0;
-            for (const evt of events) {
-                if (evt.type === 'note' && evt.char) {
-                    const sIdx = charToSeg[charPos] ?? 0;
-                    const seg = segments[sIdx];
-                    if (seg) {
-                        evt.tempoScale = seg.tempoScale;
-                        evt.velocityScale = seg.velocityScale;
-                        evt.pauseAfterMs = seg.pauseAfterMs;
-                        evt.curveType = seg.curveType;
-                    }
-                    charPos++;
-                }
-            }
-        }
-
         function displayNotes(events) {
             const display = document.getElementById('notesDisplay');
             const toneMarks = { 0: '•', 1: '̄', 2: '́', 3: '̌', 4: '̀' };
@@ -6384,11 +6132,6 @@
             }
 
             const events = textToEvents(text);
-
-            // 应用表达段速度/力度曲线
-            if (expressionSegments.length > 0) {
-                applyExpressionSegments(events, expressionSegments);
-            }
                 console.log(`🎵 [EXPORT] Step 1 done: ${events.length} events`);
 
                 console.log('🎵 [EXPORT] Step 2: Pre-computing all timings...');
