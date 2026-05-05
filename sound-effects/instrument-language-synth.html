@@ -1817,6 +1817,7 @@
             const charOverride = charReg.shaping || {};
             return { ...global, ...voiceDefault, ...charOverride };
         }
+        let animationId = null;
         let dialogueVoiceMode = true;
 
         const dialogueVoiceScale = {
