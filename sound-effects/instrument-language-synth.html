@@ -3780,6 +3780,8 @@
             const playNote = isVirtualVoiceInstrument(currentInstrument) ? (noteInfo.sampleNote || noteInfo.note) : noteInfo.note;
             const playFreq = isVirtualVoiceInstrument(currentInstrument) ? (noteInfo.sampleFreq || noteInfo.freq) : noteInfo.freq;
 
+            console.log(`[playNoteKey] instrument=${currentInstrument}, note=${playNote}, freq=${playFreq}, samplesLoaded=${samplesLoaded}`);
+
             // 基础演奏力度 * 全局音量 * 用户调节
             const baseVelocity = 0.7;
             const userVolume = (noteVolumes[currentInstrument][playNote] !== undefined) ? noteVolumes[currentInstrument][playNote] : 1.0;
@@ -3799,6 +3801,7 @@
             } else {
                 // 检查当前乐器是否有采样可用
                 const hasSamples = hasInstrumentSamples(currentInstrument);
+                console.log(`[playNoteKey] hasInstrumentSamples(${currentInstrument}) = ${hasSamples}`);
 
                 if (hasSamples) {
                     playSampleTone(playFreq, playNote, 0.5, finalVelocity);
@@ -4584,7 +4587,7 @@
             const buffer = audioBuffers[bufferKey];
 
             if (!buffer) {
-                console.warn('Sample not found for', bufferKey);
+                console.warn('[playSampleTone] Sample not found for', bufferKey, 'available keys:', Object.keys(audioBuffers).filter(k => !k.includes('_')).join(','));
                 return;
             }
 
