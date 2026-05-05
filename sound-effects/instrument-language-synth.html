@@ -4968,7 +4968,7 @@
                 masterGain.gain.value = 0.8;
                 masterGain.connect(analyser);
                 analyser.connect(audioContext.destination);
-                initVisualizer();
+                if (!animationId) visualize();
             }
 
             // Safari 兼容性：检查并恢复音频上下文
@@ -4978,9 +4978,9 @@
                 console.log('音频上下文已恢复，状态:', audioContext.state);
             }
 
-            // 检查采样是否加载完成
+            // 检查采样是否加载完成（仅影响日志提示，合成器回退始终可用）
             const hasSamples = hasInstrumentSamples(currentInstrument);
-            const canPlayNormalNotes = hasSamples || currentInstrument === 'guitar' || currentInstrument === 'trumpet';
+            const canPlayNormalNotes = true; // 所有乐器都有 playSynthTone 合成回退
             const canPlayChords = chordBuffers.length > 0 && chordsLoaded;
 
             // 如果既不能播放普通音符也不能播放和弦，才提前返回
@@ -5099,8 +5099,9 @@
                         continue;
                     }
 
-                    // 如果普通音符无法播放（采样未加载），跳过
-                    if (!canPlayNormalNotes) {
+                    // 普通音符处理：采样未加载时 playTone 会自动回退到合成器
+                    // 无需在这里拦截，让 playTone 内部自行判断
+                    if (false) {
                         console.log(`第 ${i+1} 个是普通音符，但采样未加载，跳过`);
                         continue;
                     }
@@ -7448,7 +7449,7 @@
                     document.getElementById('startOverlay').classList.add('hidden');
                     document.getElementById('audioToolbar').classList.add('hidden');
                     document.getElementById('audioToolbar').classList.add('hidden');
-                    initVisualizer();
+                    if (!animationId) visualize();
                     updateStatus('音频引擎已启动');
                 });
             }
