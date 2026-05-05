@@ -12,6 +12,10 @@
             if (subtitle && typeof APP_VERSION !== 'undefined') {
                 subtitle.textContent = `INSTRUMENT LANGUAGE SYNTHESIZER ${APP_VERSION} · 10键对齐版`;
             }
+            const toolbarVersion = document.getElementById('toolbarVersion');
+            if (toolbarVersion && typeof APP_VERSION !== 'undefined') {
+                toolbarVersion.textContent = APP_VERSION;
+            }
         });
     </script>
     <style>
@@ -1182,7 +1186,7 @@
     <div class="staff-overlay"></div>
     <!-- 音频工具栏 -->
     <div class="audio-toolbar" id="audioToolbar">
-        <div class="toolbar-title">🎵 乐器语言合成器</div>
+        <div class="toolbar-title">🎵 乐器语言合成器 · <span id="toolbarVersion">v3.xx.x</span></div>
         <button id="btn-start-audio" class="toolbar-btn">🔊 启动音频引擎</button>
     </div>
     <!-- 启动遮罩（默认隐藏，仅作备用） -->
@@ -1636,30 +1640,30 @@
                         </span>
                     </div>
                     <div class="character-voice-grid">
-                        <div class="character-voice-card" data-character="小牧" data-instrument="flute">
+                        <div class="character-voice-card" data-character="小牧" data-instrument="xylophone">
                             <div class="character-voice-header">
                                 <span class="character-voice-name">小牧</span>
-                                <span class="character-voice-instrument">flute</span>
+                                <span class="character-voice-instrument">xylophone</span>
                             </div>
                             <button class="character-voice-preview-btn" onclick="playCharacterVoice('小牧')">
                                 <span>▶</span>
                                 <span>试听</span>
                             </button>
                         </div>
-                        <div class="character-voice-card" data-character="艾米" data-instrument="xylophone">
+                        <div class="character-voice-card" data-character="艾米" data-instrument="piano">
                             <div class="character-voice-header">
                                 <span class="character-voice-name">艾米</span>
-                                <span class="character-voice-instrument">xylophone</span>
+                                <span class="character-voice-instrument">piano</span>
                             </div>
                             <button class="character-voice-preview-btn" onclick="playCharacterVoice('艾米')">
                                 <span>▶</span>
                                 <span>试听</span>
                             </button>
                         </div>
-                        <div class="character-voice-card" data-character="芙洛芙" data-instrument="piano">
+                        <div class="character-voice-card" data-character="芙洛芙" data-instrument="flute">
                             <div class="character-voice-header">
                                 <span class="character-voice-name">芙洛芙</span>
-                                <span class="character-voice-instrument">piano</span>
+                                <span class="character-voice-instrument">flute</span>
                             </div>
                             <button class="character-voice-preview-btn" onclick="playCharacterVoice('芙洛芙')">
                                 <span>▶</span>
@@ -1820,6 +1824,9 @@
         let animationId = null;
         let dialogueVoiceMode = true;
 
+        // 全局版本号（运行态可读取）
+        window.APP_VERSION = (typeof APP_VERSION !== 'undefined') ? APP_VERSION : 'v3.x.x';
+
         const dialogueVoiceScale = {
             1: { note: 'A4', frequency: 440.00 },
             2: { note: 'B4', frequency: 493.88 },
@@ -1869,7 +1876,7 @@
         const characterVoiceConfig = {
             '小牧': {
                 name: '小牧',
-                instrument: 'flute',
+                instrument: 'xylophone',
                 audioUrl: '../assets/audio/character-voices/xiaomu.mp3',
                 motifNotes: [
                     { note: 'D5', durationMs: 180, velocity: 0.88 },
@@ -1879,7 +1886,7 @@
             },
             '艾米': {
                 name: '艾米',
-                instrument: 'xylophone',
+                instrument: 'piano',
                 audioUrl: '../assets/audio/character-voices/aimi.mp3',
                 motifNotes: [
                     { note: 'A4', durationMs: 170, velocity: 0.8 },
@@ -1889,7 +1896,7 @@
             },
             '芙洛芙': {
                 name: '芙洛芙',
-                instrument: 'piano',
+                instrument: 'flute',
                 audioUrl: '../assets/audio/character-voices/fuluofu.mp3',
                 motifNotes: [
                     { note: 'E5', durationMs: 220, velocity: 0.78 },
@@ -5277,7 +5284,8 @@
                 // 停顿事件显示
                 if (evt.type === 'pause') {
                     const pauseSymbols = { ' ': '·', '、': '、', '，': '，', ',': ',', '：': '：', ':': ':', '；': '；', ';': ';', '。': '。', '.': '.', '？': '？', '?': '?', '！': '！', '!': '!', '…': '…', '……': '…', '...': '…' };
-                    const symbol = pauseSymbols[evt.symbol] || evt.symbol;
+                    const pauseSymbol = evt.symbol || evt.char || '';
+                    const symbol = pauseSymbols[pauseSymbol] || pauseSymbol || '·';
                     return `<span class="note-item" id="note-${i}" title="停顿 ${evt.pauseMs.toFixed(0)}ms"
                         style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; opacity: 0.6; color: var(--text-dim);">
                         <span style="font-size: 0.9rem;">⏸</span>
