@@ -3312,9 +3312,9 @@
                 (instrument === 'synth' && audioBuffers['synth_D4']) ||
                 (instrument === 'train' && audioBuffers['train_D4']) ||
                 (instrument === 'xylophone' && audioBuffers['xylophone_F4'])) {
-                playSampleTone(440, 0.3);
+                playSampleTone(440, 'A4', 0.3, 0.5);
             } else {
-                playSynthTone(440, 0.2);
+                playSynthTone(440, 0.3, 0.5);
             }
         }
 
