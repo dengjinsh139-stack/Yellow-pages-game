@@ -3312,9 +3312,9 @@
                 (instrument === 'synth' && audioBuffers['synth_D4']) ||
                 (instrument === 'train' && audioBuffers['train_D4']) ||
                 (instrument === 'xylophone' && audioBuffers['xylophone_F4'])) {
-                playSampleTone(440, 0.3);
+                playSampleTone(440, 'A4', 0.3, 0.5);
             } else {
-                playSynthTone(440, 0.2);
+                playSynthTone(440, 0.3, 0.5);
             }
         }
 
@@ -3882,17 +3882,22 @@
                 synth: '合成器',
                 train: '火车'
             };
-            document.getElementById('offsetValue').textContent = offsetValue + 'ms';
-            document.getElementById('currentInstrumentForOffset').textContent = instrumentNames[currentInstrument] || currentInstrument;
-            document.getElementById('currentOffsetMs').textContent = offsetValue;
+            const offsetEl = document.getElementById('offsetValue');
+            if (offsetEl) offsetEl.textContent = offsetValue + 'ms';
+            const currInstEl = document.getElementById('currentInstrumentForOffset');
+            if (currInstEl) currInstEl.textContent = instrumentNames[currentInstrument] || currentInstrument;
+            const currOffEl = document.getElementById('currentOffsetMs');
+            if (currOffEl) currOffEl.textContent = offsetValue;
 
             // 更新播放间隔显示
             const randomText = params.tempoRandom ? ' (随机)' : '';
-            document.getElementById('tempoRangeValue').textContent =
+            const tempoRangeEl = document.getElementById('tempoRangeValue');
+            if (tempoRangeEl) tempoRangeEl.textContent =
                 `${params.tempoMin}-${params.tempoMax}ms${randomText}`;
 
             // 更新全局音量显示
-            document.getElementById('masterVolumeValue').textContent =
+            const masterVolEl = document.getElementById('masterVolumeValue');
+            if (masterVolEl) masterVolEl.textContent =
                 Math.round(params.masterVolume * 100) + '%';
 
             const durLabels = { 100: '短', 300: '中', 600: '长', 1000: '悠长' };
@@ -3901,12 +3906,15 @@
             else if (params.noteDuration <= 400) durLabel = '中';
             else if (params.noteDuration <= 700) durLabel = '长';
             else durLabel = '悠长';
-            document.getElementById('durationValue').textContent = durLabel;
+            const durEl = document.getElementById('durationValue');
+            if (durEl) durEl.textContent = durLabel;
 
-            document.getElementById('reverbValue').textContent = Math.round(params.reverb * 100) + '%';
+            const reverbEl = document.getElementById('reverbValue');
+            if (reverbEl) reverbEl.textContent = Math.round(params.reverb * 100) + '%';
 
             // 更新和弦长度显示（真正5挡）
-            document.getElementById('chordDurationValue').textContent = chordDurationPreset.label;
+            const chordDurEl = document.getElementById('chordDurationValue');
+            if (chordDurEl) chordDurEl.textContent = chordDurationPreset.label;
 
             // ===== 节奏引擎参数 =====
             params.bpm = parseInt(document.getElementById('bpm').value);
@@ -3920,18 +3928,24 @@
             params.toneNoteValues[4] = document.getElementById('tone4NoteValue').value;
 
             // 更新显示
-            document.getElementById('bpmValue').textContent = params.bpm;
-            document.getElementById('notesPerBeatValue').textContent = params.notesPerBeat + '个';
+            const bpmValueEl = document.getElementById('bpmValue');
+            if (bpmValueEl) bpmValueEl.textContent = params.bpm;
+            const npbValueEl = document.getElementById('notesPerBeatValue');
+            if (npbValueEl) npbValueEl.textContent = params.notesPerBeat + '个';
 
             // 更新声调时值显示
             const toneSymbols = { '4': '♩', '8': '♪', '16': '♫', '32': '♬', 'triplet': '♪♪♪' };
-            document.getElementById('tone1Value').textContent =
+            const tone1El = document.getElementById('tone1Value');
+            if (tone1El) tone1El.textContent =
                 noteValueConfig[params.toneNoteValues[1]].name + ' ' + toneSymbols[params.toneNoteValues[1]];
-            document.getElementById('tone2Value').textContent =
+            const tone2El = document.getElementById('tone2Value');
+            if (tone2El) tone2El.textContent =
                 noteValueConfig[params.toneNoteValues[2]].name + ' ' + toneSymbols[params.toneNoteValues[2]];
-            document.getElementById('tone3Value').textContent =
+            const tone3El = document.getElementById('tone3Value');
+            if (tone3El) tone3El.textContent =
                 noteValueConfig[params.toneNoteValues[3]].name + ' ' + toneSymbols[params.toneNoteValues[3]];
-            document.getElementById('tone4Value').textContent =
+            const tone4El = document.getElementById('tone4Value');
+            if (tone4El) tone4El.textContent =
                 noteValueConfig[params.toneNoteValues[4]].name + ' ' + toneSymbols[params.toneNoteValues[4]];
         }
 
