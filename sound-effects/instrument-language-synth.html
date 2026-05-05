@@ -1504,7 +1504,15 @@
             <!-- 右侧面板：声音塑形与导出 -->
             <div class="panel right-panel">
                 <div class="voice-shaping-core">
-                    <div class="panel-title">基础演奏</div>
+                <!-- 基础演奏 -->
+                <div class="accordion" id="accordion-base">
+                    <div class="accordion-header open active" onclick="toggleAccordion(this, 'acc-base')">
+                        <span class="accordion-icon">▶</span>
+                        <span>🎼 基础演奏</span>
+                        <span class="accordion-badge">BPM/密度/音量</span>
+                    </div>
+                    <div class="accordion-body open" id="acc-base">
+                        <div class="accordion-body-inner">
 
                     <!-- BPM -->
                     <div class="control-group">
@@ -1663,7 +1671,19 @@
                             </div>
                         </div>
                     </div>
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">🎛️ 声音塑形 / Voice Shaping</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice Shaping -->
+                <div class="accordion" id="accordion-vs">
+                    <div class="accordion-header" onclick="toggleAccordion(this, 'acc-vs')">
+                        <span class="accordion-icon">▶</span>
+                        <span>🎛️ Voice Shaping</span>
+                        <span class="accordion-badge">7参数</span>
+                    </div>
+                    <div class="accordion-body" id="acc-vs">
+                        <div class="accordion-body-inner">
 
                     <div class="control-group">
                         <div class="control-label">
@@ -1751,8 +1771,19 @@
 
 
 
-                <div class="space-effects">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">🌌 空间 / Effects</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Effects -->
+                <div class="accordion" id="accordion-effects">
+                    <div class="accordion-header" onclick="toggleAccordion(this, 'acc-effects')">
+                        <span class="accordion-icon">▶</span>
+                        <span>🌌 空间效果</span>
+                        <span class="accordion-badge">混响</span>
+                    </div>
+                    <div class="accordion-body" id="acc-effects">
+                        <div class="accordion-body-inner">
                     <div class="control-group" style="margin-bottom: 0;">
                         <div class="control-label">
                             <span>混响 Reverb</span>
@@ -1763,8 +1794,19 @@
                 </div>
 
 
-                <div class="export-section">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">📥 导出采样率</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 导出 -->
+                <div class="accordion" id="accordion-export">
+                    <div class="accordion-header" onclick="toggleAccordion(this, 'acc-export')">
+                        <span class="accordion-icon">▶</span>
+                        <span>📥 导出设置</span>
+                        <span class="accordion-badge">采样率</span>
+                    </div>
+                    <div class="accordion-body" id="acc-export">
+                        <div class="accordion-body-inner">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
                             <option value="44100">44.1kHz</option>
@@ -1773,6 +1815,8 @@
                         </select>
                     </div>
                     <div id="exportStatus" style="margin-top: 6px; font-size: 0.75rem; color: var(--text-dim);"></div>
+                        </div>
+                    </div>
                 </div>
 
             
