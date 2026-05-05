@@ -1823,6 +1823,7 @@
         }
         let animationId = null;
         let instrumentLoading = false;
+        let pendingInstrument = null;
         const instrumentLoadPromises = {};
         let dialogueVoiceMode = true;
 
@@ -3281,13 +3282,25 @@
         }
 
         async function selectInstrument(instrument) {
-            await ensureInstrumentReady(instrument);
-            currentInstrument = instrument;
+            // 1. 立即记录 pending，禁用播放控件
+            pendingInstrument = instrument;
+            disablePlaybackControls();
+
+            // 2. 立即更新 UI active 状态
             document.querySelectorAll('.instrument-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`[data-instrument="${instrument}"]`).classList.add('active');
+            const targetBtn = document.querySelector(`[data-instrument="${instrument}"]`);
+            if (targetBtn) targetBtn.classList.add('active');
 
+            // 3. 加载采样（期间 currentInstrument 仍是旧的，播放被禁用）
+            await ensureInstrumentReady(instrument);
+
+            // 4. 采样就绪后，更新 currentInstrument
+            currentInstrument = instrument;
+            pendingInstrument = null;
+
+            // 5. 更新 info 文字
             const instrumentNames = {
                 'piano': '真实钢琴采样 🎹',
                 'saxophone': '真实沙克斯采样 🎷',
@@ -3298,75 +3311,67 @@
                 'xylophone': '真实木琴采样 🎹',
                 'trumpet': '小号 (合成音色)'
             };
-
-            document.getElementById('waveInfo').textContent =
-                `Instrument: ${instrumentNames[instrument] || instrument} | 五声音阶`;
-
-            // 如果是萨克斯，需要加载采样
-            if (instrument === 'saxophone' && !audioBuffers['saxophone_D4']) {
-                document.getElementById('statusText').textContent = '加载萨克斯采样中...';
-                await loadSaxophoneSamples();
-                document.getElementById('statusText').textContent = '萨克斯采样已加载';
+            const waveInfo = document.getElementById('waveInfo');
+            if (waveInfo) {
+                waveInfo.textContent = `Instrument: ${instrumentNames[instrument] || instrument} | 五声音阶`;
             }
 
-            // 如果是长笛，需要加载采样
-            if (instrument === 'flute' && !audioBuffers['flute_D4']) {
-                document.getElementById('statusText').textContent = '加载长笛采样中...';
-                await loadFluteSamples();
-                document.getElementById('statusText').textContent = '长笛采样已加载';
-            }
-
-            // 如果是合成器，需要加载采样
-            if (instrument === 'synth' && !audioBuffers['synth_D4']) {
-                document.getElementById('statusText').textContent = '加载合成器采样中...';
-                await loadSynthSamples();
-                document.getElementById('statusText').textContent = '合成器采样已加载';
-            }
-
-            // 如果是火车，需要加载采样
-            if (instrument === 'train' && !audioBuffers['train_D4']) {
-                document.getElementById('statusText').textContent = '加载火车采样中...';
-                await loadTrainSamples();
-                document.getElementById('statusText').textContent = '火车采样已加载';
-            }
-
-            // 如果是木琴，需要加载采样
-            if (instrument === 'xylophone' && !audioBuffers['xylophone_F4']) {
-                document.getElementById('statusText').textContent = '加载木琴采样中...';
-                await loadXylophoneSamples();
-                document.getElementById('statusText').textContent = '木琴采样已加载';
-            }
-
-            // 如果是虚拟人声，需要加载采样
-            if (instrument === 'guitar' && !audioBuffers['vocal_D4_01']) {
-                document.getElementById('statusText').textContent = '加载虚拟人声采样中...';
-                await loadVocalSamples();
-                document.getElementById('statusText').textContent = '虚拟人声采样已加载';
-            }
-
-            // 应用该乐器的默认参数
+            // 6. 应用默认参数、更新滑块、重新生成键盘
             applyInstrumentDefaults(instrument);
-
-            // 切换乐器时，更新音频偏移滑块为当前乐器的设置
             const currentOffset = params.instrumentOffsets[instrument] || 0;
-            document.getElementById('audioOffset').value = currentOffset;
+            const offsetEl = document.getElementById('audioOffset');
+            if (offsetEl) offsetEl.value = currentOffset;
             updateParams();
-
-            // 重新生成音符键盘
             generateNoteKeyboard();
 
-            // 播放试听音
-            if ((instrument === 'piano' && samplesLoaded) ||
-                (instrument === 'saxophone' && audioBuffers['saxophone_D4']) ||
-                (instrument === 'flute' && audioBuffers['flute_D4']) ||
-                (instrument === 'synth' && audioBuffers['synth_D4']) ||
-                (instrument === 'train' && audioBuffers['train_D4']) ||
-                (instrument === 'xylophone' && audioBuffers['xylophone_F4']) ||
-                (instrument === 'guitar' && audioBuffers['vocal_D4_01'])) {
+            // 7. 启用播放控件
+            enablePlaybackControls();
+
+            // 8. 播放试听音（采样已就绪，必定走 sample）
+            const hasSamples = hasInstrumentSamples(instrument);
+            if (hasSamples) {
                 playSampleTone(440, 'A4', 0.3, 0.5);
             } else {
                 playSynthTone(440, 0.3, 0.5);
             }
+        }
+
+        // 禁用播放控件（采样加载期间）
+        function disablePlaybackControls() {
+            const btnMainPlay = document.getElementById('btn-main-play');
+            if (btnMainPlay) {
+                btnMainPlay.disabled = true;
+                btnMainPlay.style.opacity = '0.5';
+            }
+            const btnExport = document.getElementById('btn-export-wav');
+            if (btnExport) {
+                btnExport.disabled = true;
+                btnExport.style.opacity = '0.5';
+            }
+            // 禁用音符键盘
+            document.querySelectorAll('.note-key').forEach(key => {
+                key.style.pointerEvents = 'none';
+                key.style.opacity = '0.5';
+            });
+        }
+
+        // 启用播放控件
+        function enablePlaybackControls() {
+            const btnMainPlay = document.getElementById('btn-main-play');
+            if (btnMainPlay) {
+                btnMainPlay.disabled = false;
+                btnMainPlay.style.opacity = '1';
+            }
+            const btnExport = document.getElementById('btn-export-wav');
+            if (btnExport) {
+                btnExport.disabled = false;
+                btnExport.style.opacity = '1';
+            }
+            // 启用音符键盘
+            document.querySelectorAll('.note-key').forEach(key => {
+                key.style.pointerEvents = 'auto';
+                key.style.opacity = '1';
+            });
         }
 
         // 加载虚拟人声采样
@@ -3825,8 +3830,10 @@
         // 演奏音符按钮
         async function playNoteKey(noteInfo, keyElement) {
             keyElement.classList.add('active');
+            // 使用 pendingInstrument 或 currentInstrument
+            const targetInstrument = pendingInstrument || currentInstrument;
             // 确保乐器采样已就绪
-            if (!await ensureInstrumentReady(currentInstrument)) {
+            if (!await ensureInstrumentReady(targetInstrument)) {
                 console.warn('[playNoteKey] 采样未就绪:', currentInstrument); return;
             }
 
@@ -5007,6 +5014,10 @@
         async function playText() {
             console.log('=== playText 开始 ===');
 
+            // 使用 pendingInstrument（加载中）或 currentInstrument
+            const targetInstrument = pendingInstrument || currentInstrument;
+            console.log(`[playText] targetInstrument=${targetInstrument}, pending=${pendingInstrument}, current=${currentInstrument}`);
+
             const text = document.getElementById('textInput').value.trim();
             console.log('输入文本:', text);
 
@@ -5044,8 +5055,8 @@
             }
 
             // 确保乐器采样已就绪（无论 audioContext 是否刚初始化）
-            if (!await ensureInstrumentReady(currentInstrument)) {
-                document.getElementById('statusText').textContent = '采样加载失败'; return;
+            if (!await ensureInstrumentReady(targetInstrument)) {
+                document.getElementById('statusText').textContent = '正在加载采样，请稍候'; return;
             }
 
             // Safari 兼容性：检查并恢复音频上下文
@@ -5055,8 +5066,8 @@
                 console.log('音频上下文已恢复，状态:', audioContext.state);
             }
 
-            // 检查采样是否加载完成（仅影响日志提示，合成器回退始终可用）
-            const hasSamples = hasInstrumentSamples(currentInstrument);
+            // 检查采样是否加载完成
+            const hasSamples = hasInstrumentSamples(targetInstrument);
             const canPlayNormalNotes = true; // 所有乐器都有 playSynthTone 合成回退
             const canPlayChords = chordBuffers.length > 0 && chordsLoaded;
 
@@ -7379,9 +7390,12 @@
         async function playSongMidi() {
             if (!songMidi || isSongPlaying) return;
 
+            // 使用 pendingInstrument 或 currentInstrument
+            const targetInstrument = pendingInstrument || currentInstrument;
+
             // 确保乐器采样已就绪
-            if (!await ensureInstrumentReady(currentInstrument)) {
-                document.getElementById('statusText').textContent = '采样加载失败'; return;
+            if (!await ensureInstrumentReady(targetInstrument)) {
+                document.getElementById('statusText').textContent = '正在加载采样，请稍候'; return;
             }
 
             isSongPlaying = true;
@@ -7644,10 +7658,12 @@
             console.log('🔍 验证关键控件绑定...');
             const checks = [
                 { name: '启动按钮', id: 'btn-start-audio' },
-                { name: '播放按钮', id: 'btn-play-text' },
+                { name: '播放按钮', id: 'btn-main-play' },
+                { name: '清空按钮', id: 'btn-clear-text' },
+                { name: '停止按钮', id: 'btn-stop' },
                 { name: '导出按钮', id: 'btn-export-wav' },
                 { name: '文本输入框', id: 'textInput' },
-                { name: '主状态栏', id: 'status' }
+                { name: '主状态栏', id: 'statusText' }
             ];
 
             let allOk = true;
@@ -7664,8 +7680,7 @@
             if (allOk) {
                 console.log('✅ 所有关键控件检查通过');
             } else {
-                console.warn('⚠️ 部分控件缺失，可能影响功能');
-            }
+                }
             return allOk;
         }
 
