@@ -588,7 +588,7 @@
 
         .btn-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
         }
 
@@ -1478,9 +1478,10 @@
 
                 <div class="btn-grid">
                     <button id="btn-main-play" class="btn">▶ 演奏文字</button>
-                    <button id="btn-upload-midi-main" class="btn btn-secondary" style="display: none;">📁 上传/更换 MIDI</button>
                     <button id="btn-clear-text" class="btn btn-secondary">🗑️ 清空</button>
                     <button id="btn-stop" class="btn btn-secondary">⏹ 停止</button>
+                    <button id="btn-export-wav" class="btn" style="background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出</button>
+                    <button id="btn-upload-midi-main" class="btn btn-secondary" style="display: none;">📁 上传/更换 MIDI</button>
                 </div>
 
                 <!-- 10键音符面板 -->
@@ -1763,9 +1764,8 @@
 
 
                 <div class="export-section">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">📥 音频导出</div>
+                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">📥 导出采样率</div>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
                         <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
                             <option value="44100">44.1kHz</option>
                             <option value="48000" selected>48kHz</option>
