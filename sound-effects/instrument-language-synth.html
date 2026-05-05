@@ -4960,9 +4960,15 @@
 
             // Safari/Mac 兼容性：确保音频上下文已启动
             if (!audioContext) {
-                document.getElementById('statusText').textContent = '请先点击"启动音频引擎"';
-                console.log('audioContext 不存在');
-                return;
+                console.log('audioContext 不存在，自动初始化...');
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                masterGain = audioContext.createGain();
+                masterGain.gain.value = 0.8;
+                masterGain.connect(analyser);
+                analyser.connect(audioContext.destination);
+                initVisualizer();
             }
 
             // Safari 兼容性：检查并恢复音频上下文
