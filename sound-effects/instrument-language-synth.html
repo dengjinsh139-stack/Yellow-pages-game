@@ -4420,7 +4420,6 @@
             // 先检测角色名并替换为标记
             const characterVoiceEvents = [];
             let processedText = text;
-            let offset = 0;
 
             for (const [name, config] of Object.entries(characterVoiceConfig)) {
                 let index = processedText.indexOf(name);
