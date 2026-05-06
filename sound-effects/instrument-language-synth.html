@@ -1355,6 +1355,15 @@
                     <div class="adv-settings-wrap">
                         <div class="advanced-toggle" onclick="toggleAdvanced('adv-settings')">▼ 高级设置</div>
                         <div class="advanced-content" id="adv-settings">
+                            <!-- 映射模式选择 -->
+                            <div class="adv-subgroup">
+                                <div class="adv-subgroup-label">🗺️ 映射模式</div>
+                                <select id="mappingMode" onchange="updateParams(); refreshNoteDisplay();" style="width: 100%; padding: 4px; background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-size: 0.75rem;">
+                                    <option value="dialogue-fixed">对白固定</option>
+                                    <option value="legacy-tone-region">早期音区</option>
+                                </select>
+                            </div>
+
                             <!-- 1. 节奏 -->
                             <div class="adv-subgroup">
                                 <div class="adv-subgroup-label">🎼 节奏</div>
@@ -4328,6 +4337,12 @@
             const tone4El = document.getElementById('tone4Value');
             if (tone4El) tone4El.textContent =
                 noteValueConfig[params.toneNoteValues[4]].name + ' ' + toneSymbols[params.toneNoteValues[4]];
+
+            // 映射模式
+            const mappingModeEl = document.getElementById('mappingMode');
+            if (mappingModeEl) {
+                params.mappingMode = mappingModeEl.value;
+            }
         }
 
         // ===== 声音塑形：更新参数与显示 =====
@@ -5776,6 +5791,27 @@
                     }
                     evt.expressionCurveFactor = factor;
                 }
+            }
+        }
+
+        // ===== 刷新音符显示（切换参数后重新生成）=====
+        function refreshNoteDisplay() {
+            const text = document.getElementById('textInput')?.value;
+            if (!text || text.trim().length === 0) return;
+
+            try {
+                const notes = textToNotes(text);
+                const events = notes.filter(n => n !== null);
+                if (typeof expressionSegments !== 'undefined' && expressionSegments.length > 0) {
+                    applyExpressionSegments(events, expressionSegments);
+                }
+                displayNotes(events);
+
+                // 统计 unique notes 用于调试
+                const uniqueNotes = [...new Set(events.filter(e => e.type === 'note' || !e.type).map(e => e.note).filter(Boolean))];
+                console.log(`[refreshNoteDisplay] mappingMode=${params.mappingMode}, unique notes: ${uniqueNotes.join('/')}`);
+            } catch (err) {
+                console.error('[refreshNoteDisplay] 刷新失败:', err);
             }
         }
 
