@@ -4096,8 +4096,8 @@
         function detectCharacter(text) {
             for (const name in characterVoiceRegistry) {
                 const cfg = characterVoiceRegistry[name];
-                if (cfg.patterns.some(p => text.includes(p))) {
-                    return { name, instrument: cfg.instrument };
+                if (text.includes(name)) {
+                    return { name, instrument: cfg.voiceId };
                 }
             }
             return null;
@@ -4105,8 +4105,8 @@
 
         function detectSemanticCategories(text) {
             const triggered = [];
-            for (const cat of phraseTriggerCategories) {
-                if (cat.patterns.some(p => text.includes(p))) {
+            for (const cat of Object.values(phraseTriggerCategories)) {
+                if (cat.keywords && cat.keywords.some(k => text.includes(k))) {
                     triggered.push(cat);
                 }
             }
