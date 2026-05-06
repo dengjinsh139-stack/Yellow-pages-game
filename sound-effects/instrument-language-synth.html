@@ -355,7 +355,7 @@
 
         .right-panel-footer {
             flex-shrink: 0;
-            margin-top: 10px;
+            margin-top: 6px;
         }
 
 
@@ -363,8 +363,8 @@
         .panel {
             background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 16px;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
         }
@@ -374,10 +374,10 @@
             color: var(--secondary);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .panel-title::before {
@@ -389,15 +389,15 @@
         .instrument-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
         .instrument-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid transparent;
-            border-radius: 12px;
-            padding: 15px 10px;
+            border-radius: 10px;
+            padding: 10px 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
@@ -414,13 +414,13 @@
         }
 
         .instrument-btn .icon {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            margin-bottom: 3px;
             display: block;
         }
 
         .instrument-btn .name {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-dim);
         }
 
@@ -431,14 +431,14 @@
 
         /* 控制器 */
         .control-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .control-label {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-size: 0.8rem;
             color: var(--text-dim);
         }
@@ -472,16 +472,16 @@
 
         /* 文本输入区 */
         .text-input-area {
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         .text-input {
             width: 100%;
-            min-height: 80px;
+            min-height: 60px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 12px;
+            padding: 10px;
             color: var(--text);
             font-size: 0.95rem;
             resize: vertical;
@@ -494,9 +494,9 @@
         }
 
         .input-hint {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-dim);
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         /* 按钮 */
@@ -536,18 +536,19 @@
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         /* 可视化区域 */
         .visualizer-container {
             position: relative;
-            height: 180px;
+            height: 160px;
             background: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         #visualizer {
@@ -570,9 +571,9 @@
             align-items: flex-end;
             justify-content: center;
             gap: 3px;
-            height: 60px;
-            margin-top: 10px;
-            padding: 8px;
+            height: 40px;
+            margin-top: 6px;
+            padding: 6px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
         }
@@ -589,8 +590,8 @@
         .notes-display {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
-            padding: 15px;
-            min-height: 100px;
+            padding: 10px;
+            min-height: 60px;
             font-family: monospace;
             font-size: 0.85rem;
             color: var(--text-dim);
@@ -828,11 +829,11 @@
         .status-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
+            gap: 8px;
+            padding: 6px 12px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            margin-bottom: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
             font-size: 0.8rem;
         }
 
@@ -883,7 +884,7 @@
         }
 
         .voice-shaping-core .control-group {
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .voice-shaping-core .control-group:last-child {
@@ -891,32 +892,32 @@
         }
 
         .voice-shaping-core input[type="range"] {
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .voice-shaping-core small {
             display: block;
-            line-height: 1.2;
-            margin-top: 1px;
+            line-height: 1.1;
+            margin-top: 0px;
         }
 
         .ab-compact {
-            margin-top: 10px;
-            padding: 8px;
+            margin-top: 6px;
+            padding: 5px;
             background: rgba(0,0,0,0.15);
-            border-radius: 8px;
+            border-radius: 6px;
         }
 
         .ab-compact .ab-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 5px;
+            gap: 4px;
         }
 
         .ab-compact .ab-grid .btn {
             margin-bottom: 0;
-            padding: 5px 6px;
-            font-size: 0.72rem;
+            padding: 4px 5px;
+            font-size: 0.7rem;
         }
 
         .preset-row {
@@ -947,9 +948,9 @@
         .export-section {
             background: rgba(0, 212, 170, 0.05);
             border: 1px solid rgba(0, 212, 170, 0.1);
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 10px;
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 6px;
         }
 
         .advanced-section {
@@ -963,10 +964,10 @@
             cursor: pointer;
             font-size: 0.75rem;
             color: var(--text-dim);
-            padding: 6px 0;
+            padding: 4px 0;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             user-select: none;
         }
 
@@ -1500,7 +1501,7 @@
                 <div class="panel-title">演奏输入</div>
 
                 <!-- 模式切换 -->
-                <div class="mode-switch" style="display: flex; gap: 8px; margin-bottom: 16px; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <div class="mode-switch" style="display: flex; gap: 8px; margin-bottom: 10px; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
                     <button class="mode-btn active" data-mode="text" id="btnModeText" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">📝 文字演奏</button>
                     <button class="mode-btn" data-mode="song" id="btnModeSong" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">🎼 歌曲播放</button>
                 </div>
@@ -1553,7 +1554,7 @@
                 </div><!-- /songModePanel -->
 
                 <!-- 中栏 Tabs -->
-                <div class="center-tabs-bar">
+                <div class="center-tabs-bar" style="margin-top: 6px;">
                     <div class="center-tab active" data-tab="notes" onclick="switchCenterTab('notes')">🎵 音符序列</div>
                     <div class="center-tab" data-tab="expression" onclick="switchCenterTab('expression')">📐 表达段</div>
                     <div class="center-tab" data-tab="character" onclick="switchCenterTab('character')">🎭 角色声纹</div>
@@ -1561,7 +1562,7 @@
                 </div>
 
                 <div class="center-tab-panel active" id="tab-panel-notes">
-                    <div class="panel-title" style="margin-top: 10px;">音符序列</div>
+                    <div class="panel-title" style="margin-top: 6px;">音符序列</div>
                     <div class="notes-display" id="notesDisplay">
                         <span style="opacity: 0.5;">等待输入...</span>
                     </div>
@@ -1572,8 +1573,8 @@
                 </div>
 
                 <div class="center-tab-panel" id="tab-panel-expression">
-                    <div class="panel-title" style="margin-top: 10px;">📐 表达段 / Expression Segments</div>
-                    <div class="expression-toolbar">
+                    <div class="panel-title" style="margin-top: 6px;">📐 表达段 / Expression Segments</div>
+                    <div class="expression-toolbar" style="margin-bottom: 6px;">
                         <button class="btn btn-small" onclick="generateExpressionSegments()">✨ 自动生成</button>
                         <button class="btn btn-small btn-secondary" onclick="resetExpressionSegments()">↺ 重置</button>
                     </div>
@@ -1583,14 +1584,14 @@
                 </div>
 
                 <div class="center-tab-panel" id="tab-panel-character">
-                    <div class="panel-title" style="margin-top: 10px;">🎭 角色声纹</div>
+                    <div class="panel-title" style="margin-top: 6px;">🎭 角色声纹</div>
                     <div id="tabCharacterContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
                         输入文字后自动检测角色声纹
                     </div>
                 </div>
 
                 <div class="center-tab-panel" id="tab-panel-semantic">
-                    <div class="panel-title" style="margin-top: 10px;">🎯 语义触发</div>
+                    <div class="panel-title" style="margin-top: 6px;">🎯 语义触发</div>
                     <div id="tabSemanticContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
                         输入文字后自动检测语义分类
                     </div>
@@ -1628,7 +1629,7 @@
             <!-- 右侧面板：声音塑形与导出 -->
             <div class="panel right-panel">
                 <div class="voice-shaping-core">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">🎛️ 声音塑形 / Voice Shaping</div>
+                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 6px; font-weight: 600;">🎛️ 声音塑形 / Voice Shaping</div>
 
                     <div class="control-group">
                         <div class="control-label">
@@ -1707,7 +1708,7 @@
                     </div>
 
                     <!-- Preset 保存 -->
-                    <div class="preset-row">
+                    <div class="preset-row" style="margin-top: 6px;">
                         <button class="btn btn-secondary" onclick="saveVoiceShapingPreset()">💾 保存 Preset</button>
                         <button class="btn btn-secondary" onclick="loadVoiceShapingPreset()">📂 读取 Preset</button>
                     </div>
@@ -1717,7 +1718,7 @@
 
 
                 <div class="space-effects">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">🌌 空间 / Effects</div>
+                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 6px; font-weight: 600;">🌌 空间 / Effects</div>
                     <div class="control-group" style="margin-bottom: 0;">
                         <div class="control-label">
                             <span>混响 Reverb</span>
@@ -1729,7 +1730,7 @@
 
 
                 <div class="export-section">
-                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 8px; font-weight: 600;">📥 音频导出</div>
+                    <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 6px; font-weight: 600;">📥 音频导出</div>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
                         <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
