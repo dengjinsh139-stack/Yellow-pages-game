@@ -4506,7 +4506,8 @@
                     characterVoiceEvents.push({
                         type: 'characterVoice',
                         character: name,
-                        position: index
+                        position: index,
+                        sourceCharIndex: index
                     });
                     // 替换为占位符避免重复检测
                     processedText = processedText.substring(0, index) + '\0'.repeat(name.length) + processedText.substring(index + name.length);
@@ -5482,7 +5483,7 @@
                     if (event.type === 'characterVoice') {
                         console.log(`第 ${i+1} 个是角色声纹 [${event.character}]`);
                         highlightNote(i);
-                        await playCharacterVoice(event.character);
+                        await playCharacterVoice(event.character, event);
                         continue;
                     }
 
@@ -5651,7 +5652,8 @@
 
             for (let i = 0; i < events.length; i++) {
                 const evt = events[i];
-                const charPos = evt.sourceCharIndex ?? -1;
+                // characterVoice 使用 sourceCharIndex ?? position 来映射 segment
+                const charPos = evt.sourceCharIndex ?? evt.position ?? -1;
                 if (charPos < 0 || charPos >= charToSeg.length) continue;
 
                 const sIdx = charToSeg[charPos];
