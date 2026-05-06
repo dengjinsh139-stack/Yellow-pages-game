@@ -1174,6 +1174,85 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* Center Tabs - Expression Segments */
+        .center-tabs-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 6px;
+        }
+        .center-tab {
+            padding: 6px 12px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid transparent;
+            border-bottom: none;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .center-tab:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+        }
+        .center-tab.active {
+            background: rgba(255,255,255,0.08);
+            color: var(--primary);
+            border-color: rgba(255,255,255,0.15);
+            border-bottom: 2px solid var(--primary);
+        }
+        .center-tab-panel {
+            display: none;
+        }
+        .center-tab-panel.active {
+            display: block;
+        }
+        .expression-segments {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .segment-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
+        }
+        .segment-text {
+            font-size: 0.8rem;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .segment-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        .segment-control {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .segment-control label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+        }
+        .segment-control input[type="range"],
+        .segment-control select {
+            width: 100%;
+            font-size: 0.7rem;
+        }
+        .segment-value {
+            font-size: 0.7rem;
+            color: var(--secondary);
+            text-align: right;
+        }
+
         .start-overlay p {
             color: var(--text-dim);
             margin-bottom: 25px;
@@ -5345,6 +5424,12 @@
 
             // ===== V2: 语义分类 + 逐字分音混合 =====
             let events = textToEvents(text);
+
+            // 应用表达段参数
+            if (expressionSegments && expressionSegments.length > 0) {
+                applyExpressionSegments(events, expressionSegments);
+            }
+
             events = events.filter(n => n !== null && n !== undefined);
             console.log('转换后的事件数量:', events.length);
             console.log('事件数据:', events);
@@ -5559,7 +5644,7 @@
                 segIdx++;
             }
 
-            // 记录每个 segment 映射到哪些 event 索引（用于曲线计算）
+            // 记录每个 segment 映射到哪些 event 索引
             const segEventMap = new Map(); // segId -> [eventIndices]
 
             for (let i = 0; i < events.length; i++) {
@@ -5571,16 +5656,24 @@
                 const seg = segments[sIdx];
                 if (!seg) continue;
 
+                // tempo / velocity / curve / segmentId 应用到段内所有 event
                 evt.expressionTempoScale = seg.tempoScale;
                 evt.expressionVelocityScale = seg.velocityScale;
-                evt.expressionPauseAfterMs = seg.pauseAfterMs;
                 evt.expressionCurveType = seg.curveType;
                 evt.expressionSegmentId = seg.id;
 
-                // 收集该 segment 的 event 索引用于曲线计算
+                // 收集该 segment 的 event 索引
                 const indices = segEventMap.get(seg.id) || [];
                 indices.push(i);
                 segEventMap.set(seg.id, indices);
+            }
+
+            // pauseAfterMs 只应用到每个 segment 的最后一个 event
+            for (const [segId, indices] of segEventMap) {
+                const seg = segments.find(s => s.id === segId);
+                if (!seg || !indices.length) continue;
+                const lastIdx = indices[indices.length - 1];
+                events[lastIdx].expressionPauseAfterMs = seg.pauseAfterMs;
             }
 
             // 应用曲线计算（段内逐字比例）
