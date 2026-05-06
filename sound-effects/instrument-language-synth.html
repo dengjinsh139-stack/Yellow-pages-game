@@ -2843,7 +2843,7 @@
 
             for (const match of filteredMatches) {
                 if (match.start > lastEnd) {
-                    const prefixEvents = textToNotes(text.substring(lastEnd, match.start));
+                    const prefixEvents = textToNotes(text.substring(lastEnd, match.start), lastEnd);
                     if (Array.isArray(prefixEvents)) {
                         events.push(...prefixEvents);
                     }
@@ -2855,14 +2855,15 @@
                     categoryName: match.category.name,
                     emoji: match.category.emoji,
                     keyword: match.keyword,
-                    char: match.keyword
+                    char: match.keyword,
+                    sourceCharIndex: match.start
                 });
 
                 lastEnd = match.end;
             }
 
             if (lastEnd < text.length) {
-                const suffixEvents = textToNotes(text.substring(lastEnd));
+                const suffixEvents = textToNotes(text.substring(lastEnd), lastEnd);
                 if (Array.isArray(suffixEvents)) {
                     events.push(...suffixEvents);
                 }
@@ -4415,7 +4416,7 @@
         }
 
         // 文本转音符序列（统一事件模型：note + pause）
-        function textToNotes(text) {
+        function textToNotes(text, offset = 0) {
             // 先检测角色名并替换为标记
             const characterVoiceEvents = [];
             let processedText = text;
@@ -4442,8 +4443,8 @@
             const events = [];
             const bpm = params.bpm || 120;
 
-            // 当前字符位置跟踪
-            let charPosition = 0;
+            // 当前字符位置跟踪（相对于原始 text 的 offset）
+            let charPosition = offset;
             let voiceEventIndex = 0;
 
             // 第一遍：生成基础 note、pause 和 characterVoice 事件
@@ -4452,7 +4453,7 @@
 
                 // 检查是否有角色声纹事件需要插入
                 while (voiceEventIndex < characterVoiceEvents.length &&
-                       characterVoiceEvents[voiceEventIndex].position <= charPosition) {
+                       characterVoiceEvents[voiceEventIndex].position + offset <= charPosition) {
                     events.push(characterVoiceEvents[voiceEventIndex]);
                     voiceEventIndex++;
                 }
@@ -4460,7 +4461,7 @@
                 if (token.type === 'char') {
                     const note = charToNote(token.char, i);
                     if (note) {
-                        events.push({ type: 'note', ...note });
+                        events.push({ type: 'note', sourceCharIndex: charPosition, ...note });
                     }
                     charPosition += 1;
                 } else if (token.type === 'punctuation' || token.type === 'space') {
@@ -4474,7 +4475,7 @@
                         if (symbol === '！' || symbol === '!') {
                             applyDialogueExclamation(events);
                         }
-                        events.push(createDialoguePauseEvent(symbol));
+                        events.push({ ...createDialoguePauseEvent(symbol), sourceCharIndex: charPosition });
                         charPosition += symbol.length;
                         continue;
                     }
@@ -4483,6 +4484,7 @@
                     if (rule) {
                         events.push({
                             type: 'pause',
+                            sourceCharIndex: charPosition,
                             symbol: symbol,
                             beats: rule.beats,
                             pauseMs: getPauseMs(rule.beats, bpm),
@@ -5479,7 +5481,7 @@
                         velocityWithMaster *= note.velocityMultiplier;
                     }
 
-                    console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}`);
+                    console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}, expressionTempo=${expressionTempo.toFixed(2)}x`);
 
                     // 播放单音（使用节奏引擎计算的时长）
                     playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
@@ -5489,7 +5491,13 @@
 
                     // ===== 字间连接：overlapMs 让下一个音符提前进入 =====
                     const overlap = params.voiceShaping.overlapMs;
-                    const waitMs = Math.max(0, noteDuration - overlap);
+                    let waitMs = Math.max(0, noteDuration - overlap);
+
+                    // ===== Expression Segment：停顿后等待 =====
+                    if (note.expressionPauseAfterMs > 0) {
+                        waitMs += note.expressionPauseAfterMs;
+                    }
+
                     await sleep(waitMs);
                 }
             } catch (err) {
@@ -5529,10 +5537,8 @@
 
         // 显示音符
 
-        // 应用表达段参数到音符事件
+        // 应用表达段参数到音符事件（使用 expression* 前缀字段，不覆盖原对白字段）
         function applyExpressionSegments(events, segments) {
-            let segIndex = 0;
-            let charCount = 0;
             const text = document.getElementById('textInput')?.value || '';
 
             // 建立字符→segment 映射
@@ -5545,18 +5551,62 @@
                 segIdx++;
             }
 
-            let charPos = 0;
-            for (const evt of events) {
-                if (evt.type === 'note' && evt.char) {
-                    const sIdx = charToSeg[charPos] ?? 0;
-                    const seg = segments[sIdx];
-                    if (seg) {
-                        evt.tempoScale = seg.tempoScale;
-                        evt.velocityScale = seg.velocityScale;
-                        evt.pauseAfterMs = seg.pauseAfterMs;
-                        evt.curveType = seg.curveType;
+            // 记录每个 segment 映射到哪些 event 索引（用于曲线计算）
+            const segEventMap = new Map(); // segId -> [eventIndices]
+
+            for (let i = 0; i < events.length; i++) {
+                const evt = events[i];
+                const charPos = evt.sourceCharIndex ?? -1;
+                if (charPos < 0 || charPos >= charToSeg.length) continue;
+
+                const sIdx = charToSeg[charPos];
+                const seg = segments[sIdx];
+                if (!seg) continue;
+
+                evt.expressionTempoScale = seg.tempoScale;
+                evt.expressionVelocityScale = seg.velocityScale;
+                evt.expressionPauseAfterMs = seg.pauseAfterMs;
+                evt.expressionCurveType = seg.curveType;
+                evt.expressionSegmentId = seg.id;
+
+                // 收集该 segment 的 event 索引用于曲线计算
+                const indices = segEventMap.get(seg.id) || [];
+                indices.push(i);
+                segEventMap.set(seg.id, indices);
+            }
+
+            // 应用曲线计算（段内逐字比例）
+            for (const [segId, indices] of segEventMap) {
+                const seg = segments.find(s => s.id === segId);
+                if (!seg || !indices.length) continue;
+                const curveType = seg.curveType;
+                const n = indices.length;
+                for (let j = 0; j < n; j++) {
+                    const evt = events[indices[j]];
+                    let factor = 1.0;
+                    switch (curveType) {
+                        case 'flat':
+                            factor = 1.0;
+                            break;
+                        case 'accelerate':
+                            factor = 0.9 + (1.15 - 0.9) * (j / Math.max(1, n - 1));
+                            break;
+                        case 'decelerate':
+                            factor = 1.15 - (1.15 - 0.85) * (j / Math.max(1, n - 1));
+                            break;
+                        case 'hesitate':
+                            factor = 0.75;
+                            break;
+                        case 'easeInOut':
+                            {
+                                const t = j / Math.max(1, n - 1);
+                                factor = 0.85 + 0.3 * Math.sin(t * Math.PI);
+                            }
+                            break;
+                        default:
+                            factor = 1.0;
                     }
-                    charPos++;
+                    evt.expressionCurveFactor = factor;
                 }
             }
         }
@@ -6718,7 +6768,13 @@
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
                 const duration = timing.duration / 1000;
                 const overlapSec = params.voiceShaping.overlapMs / 1000;
-                const advance = Math.max(0, duration - overlapSec);
+                let advance = Math.max(0, duration - overlapSec);
+
+                // ===== Expression Segment：停顿计入时间线 =====
+                const pauseAfterSec = (evt.expressionPauseAfterMs || 0) / 1000;
+                if (pauseAfterSec > 0) {
+                    advance += pauseAfterSec;
+                }
 
                 // 更新最后一个音频结束时间
                 const noteEnd = currentTime + duration;
@@ -6726,7 +6782,7 @@
                     lastAudioEndTime = noteEnd;
                 }
 
-                // 时间线前进（考虑 overlap）
+                // 时间线前进（考虑 overlap + 停顿）
                 currentTime += advance;
             }
 
@@ -6791,6 +6847,12 @@
                 noteDuration *= note.durationMultiplier;
             }
 
+            // ===== Expression Segment：应用表达段速度倍率 =====
+            const expressionTempo = (note.expressionTempoScale || 1) * (note.expressionCurveFactor || 1);
+            if (expressionTempo !== 1) {
+                noteDuration = noteDuration / expressionTempo;
+            }
+
             // 最短可听下限保护
             const minAudibleMs = (60000 / bpm) * 0.23;
             noteDuration = Math.max(noteDuration, minAudibleMs);
@@ -6802,6 +6864,9 @@
             // 应用 velocityScale（对白模式力度缩放）
             const eventVelocityScale = note.velocityScale || 1;
             velocityWithMaster *= eventVelocityScale;
+
+            // ===== Expression Segment：应用表达段力度倍率 =====
+            velocityWithMaster *= note.expressionVelocityScale || 1;
 
             // 应用后音轻起修饰（仅对足够长的音生效）
             if (note.velocityMultiplier && noteDuration >= 160) {
@@ -7079,7 +7144,13 @@
                     synthNotesRendered++;
                 }
 
-                currentTime += Math.max(0, noteDuration - (params.voiceShaping.overlapMs / 1000)); // overlapMs让音符提前进入，增大重叠
+                currentTime += Math.max(0, noteDuration - (params.voiceShaping.overlapMs / 1000));
+
+                // ===== Expression Segment：停顿计入导出时间线 =====
+                if (note.expressionPauseAfterMs > 0) {
+                    currentTime += note.expressionPauseAfterMs / 1000;
+                }
+
                 notesRendered++;
             }
 
