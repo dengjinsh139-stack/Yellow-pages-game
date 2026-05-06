@@ -5475,6 +5475,15 @@
                     const eventVelocityScale = note.velocityScale || 1;
                     velocityWithMaster *= eventVelocityScale;
 
+                    // ===== Expression Segment：应用表达段速度倍率 =====
+                    const expressionTempo = (note.expressionTempoScale || 1) * (note.expressionCurveFactor || 1);
+                    if (expressionTempo !== 1) {
+                        noteDuration = noteDuration / expressionTempo;
+                    }
+
+                    // ===== Expression Segment：应用表达段力度倍率 =====
+                    velocityWithMaster *= note.expressionVelocityScale || 1;
+
                     // 应用后音轻起修饰（仅对足够长的音生效，避免过短音被吞）
                     if (note.velocityMultiplier && noteDuration >= 160) {
                         velocityWithMaster *= note.velocityMultiplier;
