@@ -5488,9 +5488,11 @@
 
                     // ===== 停顿事件处理 =====
                     if (event.type === 'pause') {
-                        console.log(`第 ${i+1} 个是停顿 [${event.symbol}], ${event.pauseMs.toFixed(0)}ms`);
+                        const pauseLabel = event.symbol || event.char || event.punctuation || '';
+                        const pauseMs = event.pauseMs || 0;
+                        console.log(`第 ${i+1} 个是停顿 [${pauseLabel}], ${pauseMs.toFixed(0)}ms`);
                         highlightNote(i);
-                        await sleep(event.pauseMs);
+                        await sleep(pauseMs);
                         continue;
                     }
 
@@ -5754,9 +5756,10 @@
                 // 停顿事件显示
                 if (evt.type === 'pause') {
                     const pauseSymbols = { ' ': '·', '、': '、', '，': '，', ',': ',', '：': '：', ':': ':', '；': '；', ';': ';', '。': '。', '.': '.', '？': '？', '?': '?', '！': '！', '!': '!', '…': '…', '……': '…', '...': '…' };
-                    const pauseSymbol = evt.symbol || evt.char || '';
-                    const symbol = pauseSymbols[pauseSymbol] || pauseSymbol || '·';
-                    return `<span class="note-item" id="note-${i}" title="停顿 ${evt.pauseMs.toFixed(0)}ms"
+                    const pauseLabel = evt.symbol || evt.char || evt.punctuation || '';
+                    const symbol = pauseSymbols[pauseLabel] || pauseLabel || '·';
+                    const pauseMs = evt.pauseMs || 0;
+                    return `<span class="note-item" id="note-${i}" title="停顿 ${pauseMs.toFixed(0)}ms"
                         style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; opacity: 0.6; color: var(--text-dim);">
                         <span style="font-size: 0.9rem;">⏸</span>
                         <span style="font-size: 0.6rem; opacity: 0.7;">${symbol}</span>
@@ -6403,7 +6406,7 @@
 
         // 可视化
         function visualize() {
-            if (!analyser) return;
+            if (!analyser || !canvas || !canvasCtx) return;
 
             const bufferLength = analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
