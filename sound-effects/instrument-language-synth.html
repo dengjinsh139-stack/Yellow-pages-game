@@ -1324,6 +1324,17 @@
 
                     <div class="panel-title">基础演奏</div>
 
+                    <!-- 映射模式 -->
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>🗺️ 映射模式</span>
+                        </div>
+                        <select id="mappingMode" onchange="updateParams(); refreshNoteDisplay();" style="width: 100%; padding: 4px; background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-size: 0.75rem;">
+                            <option value="dialogue-fixed">对白固定</option>
+                            <option value="legacy-tone-region">早期音区</option>
+                        </select>
+                    </div>
+
                     <!-- BPM -->
                     <div class="control-group">
                         <div class="control-label">
@@ -1349,17 +1360,6 @@
                             <span class="control-value" id="masterVolumeValue">100%</span>
                         </div>
                         <input type="range" id="masterVolume" min="0" max="200" value="100" oninput="updateParams()">
-                    </div>
-
-                    <!-- 映射模式 -->
-                    <div class="control-group">
-                        <div class="control-label">
-                            <span>🗺️ 映射模式</span>
-                        </div>
-                        <select id="mappingMode" onchange="updateParams(); refreshNoteDisplay();" style="width: 100%; padding: 4px; background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-size: 0.75rem;">
-                            <option value="dialogue-fixed">对白固定</option>
-                            <option value="legacy-tone-region">早期音区</option>
-                        </select>
                     </div>
 
                     <!-- ===== 高级设置（合并） ===== -->
@@ -1551,6 +1551,50 @@
                     <!-- 音符列表 -->
                     <div id="songNoteList" style="max-height: 200px; overflow-y: auto; border-radius: 10px; background: rgba(0,0,0,0.2);"></div>
                 </div><!-- /songModePanel -->
+
+                <!-- 中栏 Tabs -->
+                <div class="center-tabs-bar">
+                    <div class="center-tab active" data-tab="notes" onclick="switchCenterTab('notes')">🎵 音符序列</div>
+                    <div class="center-tab" data-tab="expression" onclick="switchCenterTab('expression')">📐 表达段</div>
+                    <div class="center-tab" data-tab="character" onclick="switchCenterTab('character')">🎭 角色声纹</div>
+                    <div class="center-tab" data-tab="semantic" onclick="switchCenterTab('semantic')">🎯 语义触发</div>
+                </div>
+
+                <div class="center-tab-panel active" id="tab-panel-notes">
+                    <div class="panel-title" style="margin-top: 10px;">音符序列</div>
+                    <div class="notes-display" id="notesDisplay">
+                        <span style="opacity: 0.5;">等待输入...</span>
+                    </div>
+                    <!-- 频谱显示 -->
+                    <div class="spectrum-display" id="spectrum">
+                        <!-- 动态生成频谱条 -->
+                    </div>
+                </div>
+
+                <div class="center-tab-panel" id="tab-panel-expression">
+                    <div class="panel-title" style="margin-top: 10px;">📐 表达段 / Expression Segments</div>
+                    <div class="expression-toolbar">
+                        <button class="btn btn-small" onclick="generateExpressionSegments()">✨ 自动生成</button>
+                        <button class="btn btn-small btn-secondary" onclick="resetExpressionSegments()">↺ 重置</button>
+                    </div>
+                    <div class="expression-segments" id="expressionSegments">
+                        <span style="opacity: 0.5; font-size: 0.8rem;">输入文字后点击「自动生成」</span>
+                    </div>
+                </div>
+
+                <div class="center-tab-panel" id="tab-panel-character">
+                    <div class="panel-title" style="margin-top: 10px;">🎭 角色声纹</div>
+                    <div id="tabCharacterContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
+                        输入文字后自动检测角色声纹
+                    </div>
+                </div>
+
+                <div class="center-tab-panel" id="tab-panel-semantic">
+                    <div class="panel-title" style="margin-top: 10px;">🎯 语义触发</div>
+                    <div id="tabSemanticContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
+                        输入文字后自动检测语义分类
+                    </div>
+                </div>
 
                 <div class="status-bar">
                     <div class="status-dot"></div>
