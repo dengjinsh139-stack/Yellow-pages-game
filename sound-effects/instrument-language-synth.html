@@ -1869,6 +1869,7 @@
             noteDuration: 400,  // 音符时长
             reverb: 0.2,        // 混响
             chordDuration: 1.0, // 和弦播放长度比例
+            mappingMode: 'dialogue-fixed', // 映射模式: dialogue-fixed | legacy-tone-region
             // 乐器音频偏移 (毫秒)
             instrumentOffsets: {
                 piano: 0,
@@ -4776,7 +4777,41 @@
             return events;
         }
 
-        // 字符转音符（五声音阶 + 声调映射版 - 区间内随机）
+        function createLegacyToneRegionNoteEvent(char, tone, pentatonicFreqs) {
+            const region = getToneRegion(tone);
+
+            // 轻声 = rest/pause
+            if (region.rest) {
+                return {
+                    type: 'pause',
+                    char: char,
+                    pauseMs: params.noteDuration * 1.2,
+                    isRest: true,
+                    tone: tone
+                };
+            }
+
+            // 从区间内使用稳定 hash 选择一个音符
+            // hash = char.charCodeAt(0) + tone * 31，保证实时播放和导出一致
+            const availableNotes = region.notes;
+            const hash = (char.charCodeAt(0) + tone * 31) % availableNotes.length;
+            const selectedNote = availableNotes[hash];
+            const frequency = pentatonicFreqs[selectedNote];
+
+            return {
+                type: 'note',
+                char: char,
+                note: selectedNote,
+                frequency: frequency,
+                duration: params.noteDuration,
+                velocity: 0.5 + ((hash * 7) % 100) / 200, // 稳定 0.5~0.99
+                sampleNote: findNearestSample(selectedNote),
+                hasGlide: false,
+                tone: tone
+            };
+        }
+
+        // 字符转音符（根据 mappingMode 选择映射方式）
         function charToNote(char, index) {
             // 五声音阶频率表
             const pentatonicFreqs = {
@@ -4792,7 +4827,7 @@
             // 获取声调
             const tone = getCharTone(char);
 
-            // ===== 对白模式：固定 5 音映射 =====
+            // ===== 对白模式：固定 5 音映射（不受 mappingMode 影响）=====
             if (dialogueVoiceMode) {
                 let dialogueTone = tone;
                 if (dialogueLightChars.has(char)) {
@@ -4801,6 +4836,12 @@
                 return createDialogueNoteEvent(char, dialogueTone, params.noteDuration);
             }
 
+            // ===== 根据 mappingMode 选择映射方式 =====
+            if (params.mappingMode === 'legacy-tone-region') {
+                return createLegacyToneRegionNoteEvent(char, tone, pentatonicFreqs);
+            }
+
+            // 默认 dialogue-fixed
             const region = getToneRegion(tone);
 
             // 轻声处理（播放和弦）
