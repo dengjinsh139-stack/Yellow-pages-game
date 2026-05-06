@@ -1295,7 +1295,7 @@
         <a href="sound-effects-hub.html" class="back-link">← 返回音效中心</a>
         <div class="workbench">
             <!-- 左侧面板：乐器选择与基础演奏 -->
-            <div class="panel">
+            <div class="panel left-panel">
                 <div class="panel-scroll">
                     <div class="panel-title">选择乐器</div>
 
@@ -1496,7 +1496,7 @@
                 </div>
             </div>
             <!-- 中央面板：演奏输入主工作区 -->
-            <div class="panel">
+            <div class="panel center-panel">
                 <div class="panel-scroll">
                 <div class="panel-title">演奏输入</div>
 
@@ -1625,6 +1625,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -8134,6 +8138,36 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 页面初始化开始');
+
+            // ===== Layout Sanity Check =====
+            (function layoutGuard() {
+                const wb = document.querySelector('.workbench');
+                if (!wb) {
+                    console.error('[LayoutGuard] .workbench not found');
+                    return;
+                }
+                const issues = [];
+                if (getComputedStyle(wb).display !== 'grid') {
+                    issues.push('workbench display is not grid');
+                }
+                if (wb.children.length !== 3) {
+                    issues.push(`workbench.children.length = ${wb.children.length}, expected 3`);
+                }
+                const rightPanel = document.querySelector('.right-panel');
+                if (!rightPanel) {
+                    issues.push('.right-panel not found');
+                } else if (rightPanel.parentElement !== wb) {
+                    issues.push(`right-panel.parentElement is ${rightPanel.parentElement?.className || rightPanel.parentElement?.tagName}, expected .workbench`);
+                }
+                if (wb.children.length >= 3 && !wb.children[2].classList.contains('right-panel')) {
+                    issues.push('workbench.children[2] is not .right-panel');
+                }
+                if (issues.length > 0) {
+                    console.error('[LayoutGuard] workbench skeleton broken:', issues.join('; '));
+                } else {
+                    console.log('[LayoutGuard] ✓ workbench layout OK');
+                }
+            })();
 
             // 关键函数可用性检查
             console.log('关键函数检查:', {
