@@ -818,97 +818,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Center Tabs - Expression Segments */
-        .center-tabs-wrapper {
-            margin-top: 15px;
-            max-height: 280px;
-            display: flex;
-            flex-direction: column;
-        }
-        .center-tabs-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-bottom: 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 6px;
-            flex-shrink: 0;
-        }
-        .center-tab {
-            padding: 6px 12px;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            background: rgba(255,255,255,0.03);
-            border: 1px solid transparent;
-            border-bottom: none;
-            transition: all 0.2s;
-            user-select: none;
-        }
-        .center-tab:hover {
-            background: rgba(255,255,255,0.08);
-            color: var(--text);
-        }
-        .center-tab.active {
-            background: rgba(255,255,255,0.08);
-            color: var(--primary);
-            border-color: rgba(255,255,255,0.15);
-            border-bottom: 2px solid var(--primary);
-        }
-        .center-tab-panels {
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-        }
-        .center-tab-panel {
-            display: none;
-        }
-        .center-tab-panel.active {
-            display: block;
-        }
-        .expression-segments {
-            max-height: 200px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-        .segment-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            padding: 8px;
-            margin-bottom: 6px;
-        }
-        .segment-text {
-            font-size: 0.8rem;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-        .segment-controls {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-        }
-        .segment-control {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .segment-control label {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-        }
-        .segment-control input[type="range"],
-        .segment-control select {
-            width: 100%;
-            font-size: 0.7rem;
-        }
-        .segment-value {
-            font-size: 0.7rem;
-            color: var(--secondary);
-            text-align: right;
-        }
-
         .start-overlay p {
             color: var(--text-dim);
             margin-bottom: 25px;
@@ -1580,51 +1489,48 @@
                 </div>
 
                 <!-- 中栏底部 Tabs -->
-                <div class="center-tabs-wrapper">
-                    <div class="center-tabs-bar">
-                        <div class="center-tab active" data-tab="notes" onclick="switchCenterTab('notes')">🎵 音符序列</div>
-                        <div class="center-tab" data-tab="expression" onclick="switchCenterTab('expression')">📐 表达段</div>
-                        <div class="center-tab" data-tab="character" onclick="switchCenterTab('character')">🎭 角色声纹</div>
-                        <div class="center-tab" data-tab="semantic" onclick="switchCenterTab('semantic')">🎯 语义触发</div>
+                <div class="center-tabs-bar">
+                    <div class="center-tab active" data-tab="notes" onclick="switchCenterTab('notes')">🎵 音符序列</div>
+                    <div class="center-tab" data-tab="expression" onclick="switchCenterTab('expression')">📐 表达段</div>
+                    <div class="center-tab" data-tab="character" onclick="switchCenterTab('character')">🎭 角色声纹</div>
+                    <div class="center-tab" data-tab="semantic" onclick="switchCenterTab('semantic')">🎯 语义触发</div>
+                </div>
+
+                <div class="center-tab-panel active" id="tab-panel-notes">
+                    <div class="panel-title" style="margin-top: 10px;">音符序列</div>
+                    <div class="notes-display" id="notesDisplay">
+                        <span style="opacity: 0.5;">等待输入...</span>
                     </div>
-
-                    <div class="center-tab-panels">
-                        <div class="center-tab-panel active" id="tab-panel-notes">
-                            <div class="panel-title" style="margin-top: 4px;">音符序列</div>
-                            <div class="notes-display" id="notesDisplay">
-                                <span style="opacity: 0.5;">等待输入...</span>
-                            </div>
-                            <!-- 频谱显示 -->
-                            <div class="spectrum-display" id="spectrum">
-                                <!-- 动态生成频谱条 -->
-                            </div>
-                        </div>
-
-                        <div class="center-tab-panel" id="tab-panel-expression">
-                            <div class="panel-title" style="margin-top: 4px;">📐 表达段 / Expression Segments</div>
-                            <div class="expression-toolbar">
-                                <button class="btn btn-small" onclick="generateExpressionSegments()">✨ 自动生成</button>
-                                <button class="btn btn-small btn-secondary" onclick="resetExpressionSegments()">↺ 重置</button>
-                            </div>
-                            <div class="expression-segments" id="expressionSegments">
-                                <span style="opacity: 0.5; font-size: 0.8rem;">输入文字后点击「自动生成」</span>
-                            </div>
-                        </div>
-
-                        <div class="center-tab-panel" id="tab-panel-character">
-                            <div class="panel-title" style="margin-top: 4px;">🎭 角色声纹</div>
-                            <div id="tabCharacterContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
-                                输入文字后自动检测角色声纹
-                            </div>
-                        </div>
-
-                        <div class="center-tab-panel" id="tab-panel-semantic">
-                            <div class="panel-title" style="margin-top: 4px;">🎯 语义触发</div>
-                            <div id="tabSemanticContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
-                                输入文字后自动检测语义分类
-                            </div>
-                        </div>
+                    <!-- 频谱显示 -->
+                    <div class="spectrum-display" id="spectrum">
+                        <!-- 动态生成频谱条 -->
                     </div>
+                </div>
+
+                <div class="center-tab-panel" id="tab-panel-expression">
+                    <div class="panel-title" style="margin-top: 10px;">📐 表达段 / Expression Segments</div>
+                    <div class="expression-toolbar">
+                        <button class="btn btn-small" onclick="generateExpressionSegments()">✨ 自动生成</button>
+                        <button class="btn btn-small btn-secondary" onclick="resetExpressionSegments()">↺ 重置</button>
+                    </div>
+                    <div class="expression-segments" id="expressionSegments">
+                        <span style="opacity: 0.5; font-size: 0.8rem;">输入文字后点击「自动生成」</span>
+                    </div>
+                </div>
+
+                <div class="center-tab-panel" id="tab-panel-character">
+                    <div class="panel-title" style="margin-top: 10px;">🎭 角色声纹</div>
+                    <div id="tabCharacterContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
+                        输入文字后自动检测角色声纹
+                    </div>
+                </div>
+
+                <div class="center-tab-panel" id="tab-panel-semantic">
+                    <div class="panel-title" style="margin-top: 10px;">🎯 语义触发</div>
+                    <div id="tabSemanticContent" style="font-size: 0.8rem; color: var(--text-dim); padding: 8px;">
+                        输入文字后自动检测语义分类
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -1743,8 +1649,12 @@
                     </div>
                     <div id="exportStatus" style="margin-top: 6px; font-size: 0.75rem; color: var(--text-dim);"></div>
                 </div>
-            </div>
+
+            
+                </div>
+</div>
         </div>
+            </div>
         <!-- 底部全宽辅助区 -->
         <div class="bottom-section">
             <div class="bottom-card">
@@ -5552,12 +5462,6 @@
                         noteDuration *= note.durationMultiplier;
                     }
 
-                    // ===== Expression Segment：应用表达段速度倍率 =====
-                    const expressionTempo = (note.expressionTempoScale || 1) * (note.expressionCurveFactor || 1);
-                    if (expressionTempo !== 1) {
-                        noteDuration = noteDuration / expressionTempo;
-                    }
-
                     // ===== 最短可听下限保护（BPM 动态计算）=====
                     const minAudibleMs = (60000 / params.bpm) * 0.23; // 约 0.23 拍
                     noteDuration = Math.max(noteDuration, minAudibleMs);
@@ -5570,15 +5474,12 @@
                     const eventVelocityScale = note.velocityScale || 1;
                     velocityWithMaster *= eventVelocityScale;
 
-                    // ===== Expression Segment：应用表达段力度倍率 =====
-                    velocityWithMaster *= note.expressionVelocityScale || 1;
-
                     // 应用后音轻起修饰（仅对足够长的音生效，避免过短音被吞）
                     if (note.velocityMultiplier && noteDuration >= 160) {
                         velocityWithMaster *= note.velocityMultiplier;
                     }
 
-                    console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}, expressionTempo=${expressionTempo.toFixed(2)}x`);
+                    console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}`);
 
                     // 播放单音（使用节奏引擎计算的时长）
                     playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
@@ -5588,13 +5489,7 @@
 
                     // ===== 字间连接：overlapMs 让下一个音符提前进入 =====
                     const overlap = params.voiceShaping.overlapMs;
-                    let waitMs = Math.max(0, noteDuration - overlap);
-
-                    // ===== Expression Segment：停顿后等待 =====
-                    if (note.expressionPauseAfterMs > 0) {
-                        waitMs += note.expressionPauseAfterMs;
-                    }
-
+                    const waitMs = Math.max(0, noteDuration - overlap);
                     await sleep(waitMs);
                 }
             } catch (err) {
@@ -5634,8 +5529,10 @@
 
         // 显示音符
 
-        // 应用表达段参数到音符事件（使用 expression* 前缀字段，不覆盖原对白字段）
+        // 应用表达段参数到音符事件
         function applyExpressionSegments(events, segments) {
+            let segIndex = 0;
+            let charCount = 0;
             const text = document.getElementById('textInput')?.value || '';
 
             // 建立字符→segment 映射
@@ -5648,66 +5545,18 @@
                 segIdx++;
             }
 
-            // 记录每个 segment 映射到哪些 event 索引
-            const segEventMap = new Map(); // segId -> [eventIndices]
-
             let charPos = 0;
-            for (let i = 0; i < events.length; i++) {
-                const evt = events[i];
+            for (const evt of events) {
                 if (evt.type === 'note' && evt.char) {
                     const sIdx = charToSeg[charPos] ?? 0;
                     const seg = segments[sIdx];
                     if (seg) {
-                        evt.expressionTempoScale = seg.tempoScale;
-                        evt.expressionVelocityScale = seg.velocityScale;
-                        evt.expressionPauseAfterMs = seg.pauseAfterMs;
-                        evt.expressionCurveType = seg.curveType;
-                        evt.expressionSegmentId = seg.id;
-                        // 曲线：计算段内逐字比例
-                        const noteIndicesInSeg = segEventMap.get(seg.id) || [];
-                        noteIndicesInSeg.push(i);
-                        segEventMap.set(seg.id, noteIndicesInSeg);
+                        evt.tempoScale = seg.tempoScale;
+                        evt.velocityScale = seg.velocityScale;
+                        evt.pauseAfterMs = seg.pauseAfterMs;
+                        evt.curveType = seg.curveType;
                     }
                     charPos++;
-                }
-            }
-
-            // 应用曲线计算
-            for (const [segId, indices] of segEventMap) {
-                const seg = segments[segId];
-                if (!seg || !indices.length) continue;
-                const curveType = seg.curveType;
-                const baseTempo = seg.tempoScale;
-                const n = indices.length;
-                for (let j = 0; j < n; j++) {
-                    const evt = events[indices[j]];
-                    let factor = 1.0;
-                    switch (curveType) {
-                        case 'flat':
-                            factor = 1.0;
-                            break;
-                        case 'accelerate':
-                            // 从 0.9 到 1.15
-                            factor = 0.9 + (1.15 - 0.9) * (j / Math.max(1, n - 1));
-                            break;
-                        case 'decelerate':
-                            // 从 1.15 到 0.85
-                            factor = 1.15 - (1.15 - 0.85) * (j / Math.max(1, n - 1));
-                            break;
-                        case 'hesitate':
-                            factor = 0.75;
-                            break;
-                        case 'easeInOut':
-                            // 两头慢，中间快：sin 曲线 0.85 -> 1.15 -> 0.85
-                            {
-                                const t = j / Math.max(1, n - 1);
-                                factor = 0.85 + 0.3 * Math.sin(t * Math.PI);
-                            }
-                            break;
-                        default:
-                            factor = 1.0;
-                    }
-                    evt.expressionCurveFactor = factor;
                 }
             }
         }
@@ -6869,13 +6718,7 @@
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
                 const duration = timing.duration / 1000;
                 const overlapSec = params.voiceShaping.overlapMs / 1000;
-                let advance = Math.max(0, duration - overlapSec);
-
-                // ===== Expression Segment：停顿计入时间线 =====
-                const pauseAfterSec = (evt.expressionPauseAfterMs || 0) / 1000;
-                if (pauseAfterSec > 0) {
-                    advance += pauseAfterSec;
-                }
+                const advance = Math.max(0, duration - overlapSec);
 
                 // 更新最后一个音频结束时间
                 const noteEnd = currentTime + duration;
@@ -6883,7 +6726,7 @@
                     lastAudioEndTime = noteEnd;
                 }
 
-                // 时间线前进（考虑 overlap + 停顿）
+                // 时间线前进（考虑 overlap）
                 currentTime += advance;
             }
 
@@ -6948,12 +6791,6 @@
                 noteDuration *= note.durationMultiplier;
             }
 
-            // ===== Expression Segment：应用表达段速度倍率 =====
-            const expressionTempo = (note.expressionTempoScale || 1) * (note.expressionCurveFactor || 1);
-            if (expressionTempo !== 1) {
-                noteDuration = noteDuration / expressionTempo;
-            }
-
             // 最短可听下限保护
             const minAudibleMs = (60000 / bpm) * 0.23;
             noteDuration = Math.max(noteDuration, minAudibleMs);
@@ -6965,9 +6802,6 @@
             // 应用 velocityScale（对白模式力度缩放）
             const eventVelocityScale = note.velocityScale || 1;
             velocityWithMaster *= eventVelocityScale;
-
-            // ===== Expression Segment：应用表达段力度倍率 =====
-            velocityWithMaster *= note.expressionVelocityScale || 1;
 
             // 应用后音轻起修饰（仅对足够长的音生效）
             if (note.velocityMultiplier && noteDuration >= 160) {
@@ -7245,13 +7079,7 @@
                     synthNotesRendered++;
                 }
 
-                currentTime += Math.max(0, noteDuration - (params.voiceShaping.overlapMs / 1000));
-
-                // ===== Expression Segment：停顿计入导出时间线 =====
-                if (note.expressionPauseAfterMs > 0) {
-                    currentTime += note.expressionPauseAfterMs / 1000;
-                }
-
+                currentTime += Math.max(0, noteDuration - (params.voiceShaping.overlapMs / 1000)); // overlapMs让音符提前进入，增大重叠
                 notesRendered++;
             }
 
@@ -8130,36 +7958,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 页面初始化开始');
-
-            // ===== Layout Sanity Check =====
-            (function layoutGuard() {
-                const wb = document.querySelector('.workbench');
-                if (!wb) {
-                    console.error('[LayoutGuard] .workbench not found');
-                    return;
-                }
-                const issues = [];
-                if (getComputedStyle(wb).display !== 'grid') {
-                    issues.push('workbench display is not grid');
-                }
-                if (wb.children.length !== 3) {
-                    issues.push(`workbench.children.length = ${wb.children.length}, expected 3`);
-                }
-                const rightPanel = document.querySelector('.right-panel');
-                if (!rightPanel) {
-                    issues.push('.right-panel not found');
-                } else if (rightPanel.parentElement !== wb) {
-                    issues.push(`right-panel.parentElement is ${rightPanel.parentElement?.className || rightPanel.parentElement?.tagName}, expected .workbench`);
-                }
-                if (wb.children.length >= 3 && !wb.children[2].classList.contains('right-panel')) {
-                    issues.push('workbench.children[2] is not .right-panel');
-                }
-                if (issues.length > 0) {
-                    console.error('[LayoutGuard] workbench skeleton broken:', issues.join('; '));
-                } else {
-                    console.log('[LayoutGuard] ✓ workbench layout OK');
-                }
-            })();
 
             // 关键函数可用性检查
             console.log('关键函数检查:', {
