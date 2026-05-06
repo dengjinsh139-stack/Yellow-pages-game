@@ -4827,16 +4827,15 @@
             // 获取声调
             const tone = getCharTone(char);
 
-            // ===== 对白模式：固定 5 音映射（不受 mappingMode 影响）=====
-            if (dialogueVoiceMode) {
+            // ===== 根据 mappingMode 选择映射方式 =====
+            if (params.mappingMode === 'dialogue-fixed') {
                 let dialogueTone = tone;
-                if (dialogueLightChars.has(char)) {
+                if (dialogueVoiceMode && dialogueLightChars.has(char)) {
                     dialogueTone = 0;
                 }
                 return createDialogueNoteEvent(char, dialogueTone, params.noteDuration);
             }
 
-            // ===== 根据 mappingMode 选择映射方式 =====
             if (params.mappingMode === 'legacy-tone-region') {
                 return createLegacyToneRegionNoteEvent(char, tone, pentatonicFreqs);
             }
