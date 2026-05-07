@@ -34,6 +34,9 @@
             --waterdrop: #00b4d8;
             --synth: #9b5de5;
             --mouthtrumpet: #ffc107;
+            --kalimba: #d4a574;
+            --smallrobot: #00e676;
+            --bigrobot: #ff1744;
         }
 
         * {
@@ -1326,6 +1329,18 @@
                             <span class="icon">🎺</span>
                             <span class="name">嘴巴小号</span>
                         </div>
+                        <div class="instrument-btn" data-instrument="kalimba">
+                            <span class="icon">🎹</span>
+                            <span class="name">卡林巴</span>
+                        </div>
+                        <div class="instrument-btn" data-instrument="smallrobot">
+                            <span class="icon">🤖</span>
+                            <span class="name">Small机器人</span>
+                        </div>
+                        <div class="instrument-btn" data-instrument="bigrobot">
+                            <span class="icon">🦾</span>
+                            <span class="name">Big机器人</span>
+                        </div>
                     </div>
 
                     <div class="panel-title">基础演奏</div>
@@ -1898,7 +1913,10 @@
                 saxophone: 0,
                 synth: 0,
                 train: 0,
-                mouthtrumpet: 0
+                mouthtrumpet: 0,
+                kalimba: 0,
+                smallrobot: 0,
+                bigrobot: 0
             },
             // 节奏引擎参数
             bpm: 120,           // BPM速度
@@ -1932,6 +1950,9 @@
             xylophone:{ id: 'xylophone', label: '木琴', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             waterdrop: { id: 'waterdrop', label: '水滴合成器',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             mouthtrumpet: { id: 'mouthtrumpet', label: '嘴巴小号', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
+            kalimba:      { id: 'kalimba',      label: '卡林巴',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
+            smallrobot:   { id: 'smallrobot',   label: 'Small机器人', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
+            bigrobot:     { id: 'bigrobot',     label: 'Big机器人',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             saxophone:{ id: 'saxophone', label: '萨克斯', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             synth:   { id: 'synth',   label: '合成器', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             train:   { id: 'train',   label: '火车',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } }
@@ -2300,6 +2321,9 @@
             xylophone:  { id: 'xylophone',  name: '木琴',     emoji: '🎹', type: 'sample', sampleConfigKey: 'xylophone',  readyKey: 'xylophone_F4',uiLabel: '真实木琴采样 🎹' },
             waterdrop:  { id: 'waterdrop',  name: '水滴合成器', emoji: '💧', type: 'sample', sampleConfigKey: 'waterdrop',  readyKey: 'waterdrop_D4',uiLabel: '真实水滴合成器采样 💧' },
             mouthtrumpet: { id: 'mouthtrumpet', name: '嘴巴小号', emoji: '🎺', type: 'sample', sampleConfigKey: 'mouthtrumpet', readyKey: 'mouthtrumpet_D4', uiLabel: '真实嘴巴小号采样 🎺' },
+            kalimba:      { id: 'kalimba',      name: '卡林巴',   emoji: '🎹', type: 'sample', sampleConfigKey: 'kalimba',      readyKey: 'kalimba_D4',      uiLabel: '真实卡林巴采样 🎹' },
+            smallrobot:   { id: 'smallrobot',   name: 'Small机器人', emoji: '🤖', type: 'sample', sampleConfigKey: 'smallrobot',   readyKey: 'smallrobot_D4',   uiLabel: '真实Small机器人采样 🤖' },
+            bigrobot:     { id: 'bigrobot',     name: 'Big机器人',   emoji: '🦾', type: 'sample', sampleConfigKey: 'bigrobot',     readyKey: 'bigrobot_D4',     uiLabel: '真实Big机器人采样 🦾' },
             saxophone:  { id: 'saxophone',  name: '萨克斯',   emoji: '🎷', type: 'sample', sampleConfigKey: 'saxophone',  readyKey: 'saxophone_D4',uiLabel: '真实萨克斯采样 🎷' },
             synth:      { id: 'synth',      name: '合成器',   emoji: '🎛️', type: 'sample', sampleConfigKey: 'synth',      readyKey: 'synth_D4',    uiLabel: '真实合成器采样 🎛️' },
             train:      { id: 'train',      name: '火车',     emoji: '🚂', type: 'sample', sampleConfigKey: 'train',      readyKey: 'train_D4',    uiLabel: '真实火车采样 🚂' }
@@ -2426,6 +2450,45 @@
                 tempoRandom: true,      // 启用随机波动: 开启
                 noteDuration: 400,      // 音符时长: 中等偏短（小号类 decay 快）
                 reverb: 15,             // 混响效果: 15%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 120,               // BPM速度: 120
+                notesPerBeat: 2,        // 每拍音符数: 2个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            kalimba: {
+                masterVolume: 100,      // 全局音量: 100%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 100,          // 播放间隔最小: 100ms
+                tempoMax: 200,          // 播放间隔最大: 200ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 600,      // 音符时长: 中等（卡林巴 sustain 较长）
+                reverb: 20,             // 混响效果: 20%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 120,               // BPM速度: 120
+                notesPerBeat: 2,        // 每拍音符数: 2个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            smallrobot: {
+                masterVolume: 100,      // 全局音量: 100%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 80,           // 播放间隔最小: 80ms（机器人节奏快）
+                tempoMax: 150,          // 播放间隔最大: 150ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 250,      // 音符时长: 短（电子音 sharp）
+                reverb: 10,             // 混响效果: 10%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 120,               // BPM速度: 120
+                notesPerBeat: 2,        // 每拍音符数: 2个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            bigrobot: {
+                masterVolume: 100,      // 全局音量: 100%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 120,          // 播放间隔最小: 120ms（大机器人沉重）
+                tempoMax: 250,          // 播放间隔最大: 250ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 800,      // 音符时长: 长（沉重低音）
+                reverb: 30,             // 混响效果: 30%
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 120,               // BPM速度: 120
                 notesPerBeat: 2,        // 每拍音符数: 2个
@@ -2747,6 +2810,9 @@
             flute:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             waterdrop:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             mouthtrumpet: { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            kalimba:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            smallrobot:   { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            bigrobot:     { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             saxophone:  { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             synth:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             train:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 }
@@ -2756,7 +2822,7 @@
         const chordVolumes = {
             piano: 1.0, xylophone: 1.0, guitar: 1.0, flute: 1.0,
             waterdrop: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0,
-            mouthtrumpet: 1.0
+            mouthtrumpet: 1.0, kalimba: 1.0, smallrobot: 1.0, bigrobot: 1.0
         };
 
         // 音符频率表
@@ -3520,6 +3586,9 @@
                 'guitar': loadVocalSamples,
                 'waterdrop': loadWaterdropSamples,
                 'mouthtrumpet': loadMouthtrumpetSamples,
+                'kalimba': loadKalimbaSamples,
+                'smallrobot': loadSmallrobotSamples,
+                'bigrobot': loadBigrobotSamples,
             };
             const loader = loaders[instrument];
             if (loader) {
@@ -3536,7 +3605,7 @@
                     const names = {
                         'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
                         'synth': '合成器', 'train': '火车', 'xylophone': '木琴',
-                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'mouthtrumpet': '嘴巴小号'
+                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '卡林巴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人'
                     };
                     document.getElementById('statusText').textContent = `正在加载 ${names[instrument] || instrument} 采样，请稍候...`;
                     await loadInstrumentSamples(instrument);
@@ -3888,6 +3957,21 @@
             await Promise.all(loadPromises);
         }
 
+        // 加载卡林巴采样（占位）
+        async function loadKalimbaSamples() {
+            console.log('[Kalimba] 采样尚未入库，使用合成器 fallback');
+        }
+
+        // 加载 Small机器人采样（占位）
+        async function loadSmallrobotSamples() {
+            console.log('[SmallRobot] 采样尚未入库，使用合成器 fallback');
+        }
+
+        // 加载 Big机器人采样（占位）
+        async function loadBigrobotSamples() {
+            console.log('[BigRobot] 采样尚未入库，使用合成器 fallback');
+        }
+
         // 加载木琴采样（只加载真实采样文件，其他音符用合成）
         async function loadXylophoneSamples() {
             if (audioBuffers['xylophone_A5']) return; // 已加载
@@ -3943,6 +4027,9 @@
                     'xylophone': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
                     'waterdrop': 'rgba(0, 180, 216, 0.15)', // 水滴蓝
                     'mouthtrumpet': 'rgba(255, 193, 7, 0.15)', // 嘴巴小号琥珀色
+                    'kalimba': 'rgba(212, 165, 116, 0.15)',    // 卡林巴木质色
+                    'smallrobot': 'rgba(0, 230, 118, 0.15)',    // Small机器人科技绿
+                    'bigrobot': 'rgba(255, 23, 68, 0.15)',     // Big机器人红色
                     'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
                     'synth': 'rgba(155, 93, 229, 0.15)',    // 紫色
                     'train': 'rgba(100, 149, 237, 0.15)'    // 钢蓝色
@@ -3954,6 +4041,9 @@
                     'xylophone': 'rgba(231, 111, 81, 0.4)',
                     'waterdrop': 'rgba(0, 180, 216, 0.4)',
                     'mouthtrumpet': 'rgba(255, 193, 7, 0.4)',
+                    'kalimba': 'rgba(212, 165, 116, 0.4)',
+                    'smallrobot': 'rgba(0, 230, 118, 0.4)',
+                    'bigrobot': 'rgba(255, 23, 68, 0.4)',
                     'saxophone': 'rgba(255, 107, 107, 0.4)',
                     'synth': 'rgba(155, 93, 229, 0.4)',
                     'train': 'rgba(100, 149, 237, 0.4)'     // 钢蓝色
@@ -4198,6 +4288,15 @@
                 return true;
             }
             if (instrument === 'mouthtrumpet' && audioBuffers['mouthtrumpet_D4']) {
+                return true;
+            }
+            if (instrument === 'kalimba' && audioBuffers['kalimba_D4']) {
+                return true;
+            }
+            if (instrument === 'smallrobot' && audioBuffers['smallrobot_D4']) {
+                return true;
+            }
+            if (instrument === 'bigrobot' && audioBuffers['bigrobot_D4']) {
                 return true;
             }
             return false;
@@ -5387,10 +5486,15 @@
                 return playSampleTone(frequency, noteName, duration / 1000, velocity);
             }
 
+            // 新乐器：采样未到位前使用合成器 fallback
+            if (['kalimba', 'smallrobot', 'bigrobot'].includes(currentInstrument)) {
+                return playSynthTone(frequency, duration / 1000, velocity);
+            }
+
             // 采样未就绪，不 silent fallback
             console.warn(`[${currentInstrument}] 采样未就绪，跳过`);
             const names = { 'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
-                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号' };
+                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '卡林巴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人' };
             document.getElementById('statusText').textContent = '正在加载 ' + (names[currentInstrument] || currentInstrument) + ' 采样，请稍候...';
             return;
         }
@@ -5634,6 +5738,9 @@
                 'xylophone': '真实木琴',
                 'waterdrop': '水滴合成器',
                 'mouthtrumpet': '嘴巴小号',
+                'kalimba': '卡林巴',
+                'smallrobot': 'Small机器人',
+                'bigrobot': 'Big机器人',
                 'synth': '合成器',
                 'train': '火车'
             };
@@ -6239,6 +6346,9 @@
             'xylophone': '真实木琴',
             'waterdrop': '水滴合成器',
             'mouthtrumpet': '嘴巴小号',
+            'kalimba': '卡林巴',
+            'smallrobot': 'Small机器人',
+            'bigrobot': 'Big机器人',
             'synth': '合成器',
             'train': '火车'
         };
@@ -7469,7 +7579,7 @@
 
                         // 乐器分支判断（与实时播放一致）
                         const isPiano = currentInstrument === 'piano';
-                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet'].includes(currentInstrument);
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot'].includes(currentInstrument);
                         const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                         const hasSample = noteObj.sampleNote && samplesLoaded;
 
@@ -7506,7 +7616,7 @@
 
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet'].includes(currentInstrument);
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot'].includes(currentInstrument);
                 const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                 const hasSample = note.sampleNote && samplesLoaded;
 
@@ -7718,6 +7828,9 @@
                 'xylophone': 'triangle',
                 'waterdrop': 'square',
                 'mouthtrumpet': 'square',
+                'kalimba': 'triangle',
+                'smallrobot': 'square',
+                'bigrobot': 'sawtooth',
                 'synth': 'sawtooth'
             };
             oscillator.type = waveforms[currentInstrument] || 'sine';
