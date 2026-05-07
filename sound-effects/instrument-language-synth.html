@@ -31,7 +31,7 @@
             --guitar: #f4a261;
             --flute: #2a9d8f;
             --xylophone: #e76f51;
-            --trumpet: #e9c46a;
+            --waterdrop: #00b4d8;
             --synth: #9b5de5;
         }
 
@@ -1305,9 +1305,9 @@
                             <span class="icon">🎹</span>
                             <span class="name">木琴</span>
                         </div>
-                        <div class="instrument-btn" data-instrument="trumpet">
-                            <span class="icon">🎺</span>
-                            <span class="name">小号</span>
+                        <div class="instrument-btn" data-instrument="waterdrop">
+                            <span class="icon">💧</span>
+                            <span class="name">水滴合成器</span>
                         </div>
                         <div class="instrument-btn" data-instrument="saxophone">
                             <span class="icon">🎷</span>
@@ -1889,7 +1889,7 @@
                 guitar: 0,
                 flute: 0,
                 xylophone: 0,
-                trumpet: 0,
+                waterdrop: 0,
                 saxophone: 0,
                 synth: 0,
                 train: 0
@@ -1924,7 +1924,7 @@
             guitar:  { id: 'guitar',  label: '虚拟人声', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             flute:   { id: 'flute',   label: '长笛',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             xylophone:{ id: 'xylophone', label: '木琴', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
-            trumpet: { id: 'trumpet', label: '小号',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
+            waterdrop: { id: 'waterdrop', label: '水滴合成器',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             saxophone:{ id: 'saxophone', label: '萨克斯', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             synth:   { id: 'synth',   label: '合成器', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             train:   { id: 'train',   label: '火车',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } }
@@ -2284,6 +2284,27 @@
         }
 
         // 乐器默认参数配置
+        // ==================== 乐器注册表 ====================
+        // 所有乐器唯一 canonical id 注册处，禁止在其他地方手写 instrument id
+        const INSTRUMENT_REGISTRY = {
+            piano:      { id: 'piano',      name: '钢琴',     emoji: '🎹', type: 'sample', sampleConfigKey: 'piano',      readyKey: 'D4',          uiLabel: '真实钢琴采样 🎹' },
+            guitar:     { id: 'guitar',     name: '虚拟人声', emoji: '🎙️', type: 'sample', sampleConfigKey: 'vocal',      readyKey: 'vocal_D4_01', uiLabel: '虚拟人声 (采样音色)' },
+            flute:      { id: 'flute',      name: '长笛',     emoji: '🪈', type: 'sample', sampleConfigKey: 'flute',      readyKey: 'flute_D4',    uiLabel: '真实长笛采样 🪈' },
+            xylophone:  { id: 'xylophone',  name: '木琴',     emoji: '🎹', type: 'sample', sampleConfigKey: 'xylophone',  readyKey: 'xylophone_F4',uiLabel: '真实木琴采样 🎹' },
+            waterdrop:  { id: 'waterdrop',  name: '水滴合成器', emoji: '💧', type: 'sample', sampleConfigKey: 'waterdrop',  readyKey: 'waterdrop_D4',uiLabel: '真实水滴合成器采样 💧' },
+            saxophone:  { id: 'saxophone',  name: '萨克斯',   emoji: '🎷', type: 'sample', sampleConfigKey: 'saxophone',  readyKey: 'saxophone_D4',uiLabel: '真实萨克斯采样 🎷' },
+            synth:      { id: 'synth',      name: '合成器',   emoji: '🎛️', type: 'sample', sampleConfigKey: 'synth',      readyKey: 'synth_D4',    uiLabel: '真实合成器采样 🎛️' },
+            train:      { id: 'train',      name: '火车',     emoji: '🚂', type: 'sample', sampleConfigKey: 'train',      readyKey: 'train_D4',    uiLabel: '真实火车采样 🚂' }
+        };
+
+        // 向后兼容：旧存档中可能出现 'trumpet'，映射到 waterdrop
+        function normalizeInstrumentId(id) {
+            if (id === 'trumpet') return 'waterdrop';
+            return id;
+        }
+
+        // ==================== 乐器注册表 END ====================
+
         const instrumentDefaults = {
             piano: {
                 masterVolume: 100,      // 全局音量: 100%
@@ -2374,6 +2395,19 @@
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 120,               // BPM速度: 120
                 notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            waterdrop: {
+                masterVolume: 100,      // 全局音量: 100%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 100,          // 播放间隔最小: 100ms
+                tempoMax: 200,          // 播放间隔最大: 200ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 500,      // 音符时长: 中等偏短（水滴音 decay 快）
+                reverb: 25,             // 混响效果: 25%（水滴适合空间感）
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 120,               // BPM速度: 120
+                notesPerBeat: 2,        // 每拍音符数: 2个
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             }
         };
@@ -2604,6 +2638,26 @@
                 attack: 0.02,
                 release: 0.3
             },
+            waterdrop: {
+                name: '水滴合成器',
+                emoji: '💧',
+                basePath: '../assets/audio/samples/waterdrop/',
+                samples: {
+                    // 水滴合成器五声音阶采样
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                },
+                attack: 0.01,
+                release: 0.3
+            },
             vocal: {
                 name: '虚拟人声',
                 emoji: '🎙️',
@@ -2650,7 +2704,7 @@
             xylophone:  { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             guitar:     { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             flute:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            trumpet:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            waterdrop:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             saxophone:  { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             synth:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             train:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 }
@@ -2659,7 +2713,7 @@
         // 每个乐器的 Chord 按钮独立音量 (默认1.0)
         const chordVolumes = {
             piano: 1.0, xylophone: 1.0, guitar: 1.0, flute: 1.0,
-            trumpet: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0
+            waterdrop: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0
         };
 
         // 音符频率表
@@ -3421,6 +3475,7 @@
                 'train': loadTrainSamples,
                 'xylophone': loadXylophoneSamples,
                 'guitar': loadVocalSamples,
+                'waterdrop': loadWaterdropSamples,
             };
             const loader = loaders[instrument];
             if (loader) {
@@ -3437,7 +3492,7 @@
                     const names = {
                         'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
                         'synth': '合成器', 'train': '火车', 'xylophone': '木琴',
-                        'guitar': '虚拟人声'
+                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器'
                     };
                     document.getElementById('statusText').textContent = `正在加载 ${names[instrument] || instrument} 采样，请稍候...`;
                     await loadInstrumentSamples(instrument);
@@ -3477,7 +3532,7 @@
                 'train': '真实火车采样 🚂',
                 'guitar': '虚拟人声 (采样音色)',
                 'xylophone': '真实木琴采样 🎹',
-                'trumpet': '小号 (合成音色)'
+                'waterdrop': '真实水滴合成器采样 💧'
             };
             const waveInfo = document.getElementById('waveInfo');
             if (waveInfo) {
@@ -3742,6 +3797,29 @@
             await Promise.all(loadPromises);
         }
 
+        // 加载水滴合成器采样
+        async function loadWaterdropSamples() {
+            if (audioBuffers['waterdrop_D4']) return; // 已加载
+
+            const config = sampleConfig.waterdrop;
+            const loadPromises = [];
+
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['waterdrop_' + note] = audioBuffer;
+                        console.log(`Loaded waterdrop: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load waterdrop ${note}:`, err));
+
+                loadPromises.push(promise);
+            }
+
+            await Promise.all(loadPromises);
+        }
+
         // 加载木琴采样（只加载真实采样文件，其他音符用合成）
         async function loadXylophoneSamples() {
             if (audioBuffers['xylophone_A5']) return; // 已加载
@@ -3795,7 +3873,7 @@
                     'guitar': 'rgba(244, 162, 97, 0.15)',  // 橙色
                     'flute': 'rgba(42, 157, 143, 0.15)',   // 青绿色
                     'xylophone': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
-                    'trumpet': 'rgba(233, 196, 106, 0.15)', // 金色
+                    'waterdrop': 'rgba(0, 180, 216, 0.15)', // 水滴蓝
                     'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
                     'synth': 'rgba(155, 93, 229, 0.15)',    // 紫色
                     'train': 'rgba(100, 149, 237, 0.15)'    // 钢蓝色
@@ -3805,7 +3883,7 @@
                     'guitar': 'rgba(244, 162, 97, 0.4)',
                     'flute': 'rgba(42, 157, 143, 0.4)',
                     'xylophone': 'rgba(231, 111, 81, 0.4)',
-                    'trumpet': 'rgba(233, 196, 106, 0.4)',
+                    'waterdrop': 'rgba(0, 180, 216, 0.4)',
                     'saxophone': 'rgba(255, 107, 107, 0.4)',
                     'synth': 'rgba(155, 93, 229, 0.4)',
                     'train': 'rgba(100, 149, 237, 0.4)'     // 钢蓝色
@@ -4046,6 +4124,9 @@
             if (instrument === 'guitar' && audioBuffers['vocal_D4_01']) {
                 return true;
             }
+            if (instrument === 'waterdrop' && audioBuffers['waterdrop_D4']) {
+                return true;
+            }
             return false;
         }
 
@@ -4271,7 +4352,7 @@
                 guitar: '虚拟人声',
                 flute: '长笛',
                 xylophone: '木琴',
-                trumpet: '小号',
+                waterdrop: '水滴合成器',
                 saxophone: '萨克斯',
                 synth: '合成器',
                 train: '火车'
@@ -5026,7 +5107,8 @@
 
             if (!buffer) {
                 console.warn('[playSampleTone] 采样未加载:', bufferKey, '乐器:', currentInstrument);
-                document.getElementById('statusText').textContent = '正在加载 ' + (currentInstrument === 'guitar' ? '虚拟人声' : currentInstrument) + ' 采样，请稍候...';
+                const displayName = currentInstrument === 'guitar' ? '虚拟人声' : currentInstrument;
+                document.getElementById('statusText').textContent = '正在加载 ' + displayName + ' 采样，请稍候...';
                 return; // 不允许 silent fallback
             }
 
@@ -5206,11 +5288,6 @@
             const hasSamples = hasInstrumentSamples(currentInstrument);
             console.log(`[playTone] instrument=${currentInstrument}, hasSamples=${hasSamples}, note=${noteName}`);
 
-            // 小号始终使用合成器
-            if (currentInstrument === 'trumpet') {
-                return playSynthTone(frequency, duration / 1000, velocity);
-            }
-
             // 木琴是混合模式：检查是否有该具体音符的采样
             if (currentInstrument === 'xylophone') {
                 const config = sampleConfig.xylophone;
@@ -5245,7 +5322,7 @@
                 // 采样未就绪，不 silent fallback
                 console.warn(`[${currentInstrument}] 采样未就绪，跳过`);
                 const names = { 'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
-                    'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声' };
+                    'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器' };
                 document.getElementById('statusText').textContent = '正在加载 ' + (names[currentInstrument] || currentInstrument) + ' 采样，请稍候...';
                 return;
             }
@@ -5488,7 +5565,7 @@
                 'guitar': '虚拟人声',
                 'flute': '长笛',
                 'xylophone': '真实木琴',
-                'trumpet': '小号',
+                'waterdrop': '水滴合成器',
                 'synth': '合成器',
                 'train': '火车'
             };
@@ -6092,7 +6169,7 @@
             'guitar': '虚拟人声',
             'flute': '长笛',
             'xylophone': '真实木琴',
-            'trumpet': '小号',
+            'waterdrop': '水滴合成器',
             'synth': '合成器',
             'train': '火车'
         };
@@ -7570,7 +7647,7 @@
             const waveforms = {
                 'guitar': 'sawtooth',
                 'xylophone': 'triangle',
-                'trumpet': 'square',
+                'waterdrop': 'square',
                 'synth': 'sawtooth'
             };
             oscillator.type = waveforms[currentInstrument] || 'sine';
