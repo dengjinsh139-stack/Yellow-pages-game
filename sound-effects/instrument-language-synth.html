@@ -2679,6 +2679,26 @@
                 attack: 0.01,
                 release: 0.3
             },
+            mouthtrumpet: {
+                name: '嘴巴小号',
+                emoji: '🎺',
+                basePath: '../assets/audio/samples/mouthtrumpet/',
+                samples: {
+                    // 嘴巴小号五声音阶采样
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                },
+                attack: 0.02,
+                release: 0.3
+            },
             vocal: {
                 name: '虚拟人声',
                 emoji: '🎙️',
@@ -3845,11 +3865,27 @@
             await Promise.all(loadPromises);
         }
 
-        // 加载嘴巴小号采样（占位：采样将在后续入库）
+        // 加载嘴巴小号采样
         async function loadMouthtrumpetSamples() {
-            // 占位：嘴巴小号采样将在后续入库
-            // 当前使用合成器 fallback，见 playTone() 中的 mouthtrumpet 分支
-            console.log('[Mouthtrumpet] 采样尚未入库，使用合成器 fallback');
+            if (audioBuffers['mouthtrumpet_D4']) return; // 已加载
+
+            const config = sampleConfig.mouthtrumpet;
+            const loadPromises = [];
+
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['mouthtrumpet_' + note] = audioBuffer;
+                        console.log(`Loaded mouthtrumpet: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load mouthtrumpet ${note}:`, err));
+
+                loadPromises.push(promise);
+            }
+
+            await Promise.all(loadPromises);
         }
 
         // 加载木琴采样（只加载真实采样文件，其他音符用合成）
@@ -4159,6 +4195,9 @@
                 return true;
             }
             if (instrument === 'waterdrop' && audioBuffers['waterdrop_D4']) {
+                return true;
+            }
+            if (instrument === 'mouthtrumpet' && audioBuffers['mouthtrumpet_D4']) {
                 return true;
             }
             return false;
@@ -5346,11 +5385,6 @@
             if (hasSamples) {
                 console.log(`[${currentInstrument}] 使用采样音色`);
                 return playSampleTone(frequency, noteName, duration / 1000, velocity);
-            }
-
-            // 嘴巴小号：采样未到位前使用合成器 fallback
-            if (currentInstrument === 'mouthtrumpet') {
-                return playSynthTone(frequency, duration / 1000, velocity);
             }
 
             // 采样未就绪，不 silent fallback
@@ -7435,7 +7469,7 @@
 
                         // 乐器分支判断（与实时播放一致）
                         const isPiano = currentInstrument === 'piano';
-                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop'].includes(currentInstrument);
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet'].includes(currentInstrument);
                         const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                         const hasSample = noteObj.sampleNote && samplesLoaded;
 
@@ -7472,7 +7506,7 @@
 
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop'].includes(currentInstrument);
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet'].includes(currentInstrument);
                 const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                 const hasSample = note.sampleNote && samplesLoaded;
 
