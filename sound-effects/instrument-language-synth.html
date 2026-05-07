@@ -31,7 +31,7 @@
             --guitar: #f4a261;
             --flute: #2a9d8f;
             --xylophone: #e76f51;
-            --trumpet: #e9c46a;
+            --trumpet: #00b4d8;
             --synth: #9b5de5;
         }
 
@@ -1306,8 +1306,8 @@
                             <span class="name">木琴</span>
                         </div>
                         <div class="instrument-btn" data-instrument="trumpet">
-                            <span class="icon">🎺</span>
-                            <span class="name">小号</span>
+                            <span class="icon">💧</span>
+                            <span class="name">水滴合成器</span>
                         </div>
                         <div class="instrument-btn" data-instrument="saxophone">
                             <span class="icon">🎷</span>
@@ -1924,7 +1924,7 @@
             guitar:  { id: 'guitar',  label: '虚拟人声', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             flute:   { id: 'flute',   label: '长笛',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             xylophone:{ id: 'xylophone', label: '木琴', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
-            trumpet: { id: 'trumpet', label: '小号',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
+            trumpet: { id: 'trumpet', label: '水滴合成器',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             saxophone:{ id: 'saxophone', label: '萨克斯', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             synth:   { id: 'synth',   label: '合成器', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             train:   { id: 'train',   label: '火车',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } }
@@ -3477,7 +3477,7 @@
                 'train': '真实火车采样 🚂',
                 'guitar': '虚拟人声 (采样音色)',
                 'xylophone': '真实木琴采样 🎹',
-                'trumpet': '小号 (合成音色)'
+                'trumpet': '水滴合成器'
             };
             const waveInfo = document.getElementById('waveInfo');
             if (waveInfo) {
@@ -3795,7 +3795,7 @@
                     'guitar': 'rgba(244, 162, 97, 0.15)',  // 橙色
                     'flute': 'rgba(42, 157, 143, 0.15)',   // 青绿色
                     'xylophone': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
-                    'trumpet': 'rgba(233, 196, 106, 0.15)', // 金色
+                    'trumpet': 'rgba(0, 180, 216, 0.15)', // 水滴蓝
                     'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
                     'synth': 'rgba(155, 93, 229, 0.15)',    // 紫色
                     'train': 'rgba(100, 149, 237, 0.15)'    // 钢蓝色
@@ -3805,7 +3805,7 @@
                     'guitar': 'rgba(244, 162, 97, 0.4)',
                     'flute': 'rgba(42, 157, 143, 0.4)',
                     'xylophone': 'rgba(231, 111, 81, 0.4)',
-                    'trumpet': 'rgba(233, 196, 106, 0.4)',
+                    'trumpet': 'rgba(0, 180, 216, 0.4)',
                     'saxophone': 'rgba(255, 107, 107, 0.4)',
                     'synth': 'rgba(155, 93, 229, 0.4)',
                     'train': 'rgba(100, 149, 237, 0.4)'     // 钢蓝色
@@ -4271,7 +4271,7 @@
                 guitar: '虚拟人声',
                 flute: '长笛',
                 xylophone: '木琴',
-                trumpet: '小号',
+                trumpet: '水滴合成器',
                 saxophone: '萨克斯',
                 synth: '合成器',
                 train: '火车'
@@ -5206,7 +5206,7 @@
             const hasSamples = hasInstrumentSamples(currentInstrument);
             console.log(`[playTone] instrument=${currentInstrument}, hasSamples=${hasSamples}, note=${noteName}`);
 
-            // 小号始终使用合成器
+            // 水滴合成器始终使用合成器
             if (currentInstrument === 'trumpet') {
                 return playSynthTone(frequency, duration / 1000, velocity);
             }
@@ -5488,7 +5488,7 @@
                 'guitar': '虚拟人声',
                 'flute': '长笛',
                 'xylophone': '真实木琴',
-                'trumpet': '小号',
+                'trumpet': '水滴合成器',
                 'synth': '合成器',
                 'train': '火车'
             };
@@ -6092,7 +6092,7 @@
             'guitar': '虚拟人声',
             'flute': '长笛',
             'xylophone': '真实木琴',
-            'trumpet': '小号',
+            'trumpet': '水滴合成器',
             'synth': '合成器',
             'train': '火车'
         };
