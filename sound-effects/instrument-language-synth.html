@@ -4879,38 +4879,32 @@
             return events;
         }
 
-        function createLegacyToneRegionNoteEvent(char, tone, pentatonicFreqs) {
-            const region = getToneRegion(tone);
-
-            // 轻声 = rest/pause
-            if (region.rest) {
-                return {
-                    type: 'pause',
-                    char: char,
-                    pauseMs: params.noteDuration * 1.2,
-                    isRest: true,
-                    tone: tone
-                };
+        function createLegacyToneRegionNoteEvent(char, tone, pentatonicFreqs, baseDuration = params.noteDuration) {
+            // ===== 先创建对白 note 事件（保持 duration/velocity/char 等支撑字段一致）=====
+            let dialogueTone = tone;
+            if (dialogueVoiceMode && dialogueLightChars.has(char)) {
+                dialogueTone = 0;
             }
+            const evt = createDialogueNoteEvent(char, dialogueTone, baseDuration);
 
-            // 从区间内使用稳定 hash 选择一个音符
-            // hash = char.charCodeAt(0) + tone * 31，保证实时播放和导出一致
-            const availableNotes = region.notes;
+            // ===== 再替换为 legacy-tone-region 音高 =====
+            const legacyRegion = getToneRegion(tone);
+            // 轻声 fallback：不用 pause，选 D4/E4/F4
+            const availableNotes = legacyRegion.rest
+                ? ['D4', 'E4', 'F4']
+                : legacyRegion.notes;
+            // 稳定 hash：实时和导出一致
             const hash = (char.charCodeAt(0) + tone * 31) % availableNotes.length;
             const selectedNote = availableNotes[hash];
-            const frequency = pentatonicFreqs[selectedNote];
-
-            return {
-                type: 'note',
-                char: char,
-                note: selectedNote,
-                frequency: frequency,
-                duration: params.noteDuration,
-                velocity: 0.5 + ((hash * 7) % 100) / 200, // 稳定 0.5~0.99
-                sampleNote: findNearestSample(selectedNote),
-                hasGlide: false,
-                tone: tone
-            };
+            evt.note = selectedNote;
+            evt.frequency = pentatonicFreqs[selectedNote];
+            evt.sampleNote = findNearestSample(selectedNote);
+            evt.region = availableNotes;
+            evt.mappingMode = 'legacy-tone-region';
+            // 移除对白标记，因为这是 legacy 模式
+            delete evt.isDialogueVoice;
+            delete evt.degree;
+            return evt;
         }
 
         // 字符转音符（根据 mappingMode 选择映射方式）
@@ -4939,7 +4933,7 @@
             }
 
             if (params.mappingMode === 'legacy-tone-region') {
-                return createLegacyToneRegionNoteEvent(char, tone, pentatonicFreqs);
+                return createLegacyToneRegionNoteEvent(char, tone, pentatonicFreqs, params.noteDuration);
             }
 
             // 默认 dialogue-fixed
@@ -7400,7 +7394,7 @@
 
                         // 乐器分支判断（与实时播放一致）
                         const isPiano = currentInstrument === 'piano';
-                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop'].includes(currentInstrument);
                         const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                         const hasSample = noteObj.sampleNote && samplesLoaded;
 
@@ -7437,7 +7431,7 @@
 
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone'].includes(currentInstrument);
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop'].includes(currentInstrument);
                 const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                 const hasSample = note.sampleNote && samplesLoaded;
 
