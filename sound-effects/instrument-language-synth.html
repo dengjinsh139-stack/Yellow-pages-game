@@ -4590,7 +4590,7 @@
                     const symbol = token.symbol;
 
                     // ===== 对白模式：标点改为呼吸 pause，不再生成和弦 =====
-                    if (dialogueVoiceMode && dialoguePunctuationPauses[symbol]) {
+                    if (dialoguePunctuationPauses[symbol]) {
                         if (symbol === '？' || symbol === '?') {
                             applyDialogueQuestionRise(events);
                         }
@@ -4766,11 +4766,13 @@
                 const event = events[i];
 
                 if (event && event.type === 'note' && event.frequency > 0 && event.note !== 'Chord') {
-                    const target = dialogueVoiceScale[4]; // E5
-
-                    event.note = target.note;
-                    event.frequency = target.frequency;
-                    event.degree = 4;
+                    // 对白模式：强制上扬到 E5；早期音区模式：保持原音高，只调时值和力度
+                    if (dialogueVoiceMode) {
+                        const target = dialogueVoiceScale[4]; // E5
+                        event.note = target.note;
+                        event.frequency = target.frequency;
+                        event.degree = 4;
+                    }
                     event.duration = Math.round((event.duration || 220) * 1.08);
                     event.velocityScale = Math.max(event.velocityScale || 0.8, 0.86);
                     event.dialogueQuestionRise = true;
