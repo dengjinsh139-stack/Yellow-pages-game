@@ -1,5 +1,39 @@
 # MEMORY.md
 
+## 乐器语言合成器 - 乐器入库规则
+
+新增乐器必须遵守的标准（2026-05-07 用户制定）：
+
+### 核心原则
+1. **不破坏三栏骨架**：workbench 必须保持 grid、3子元素、left-panel/center-panel/right-panel
+2. **不破坏现有功能**：文字演奏、MIDI、语义触发、角色声纹、两种映射模式、Expression Segment、实时/WAV导出
+3. **不要随机不稳定**：legacy-tone-region 禁止 Math.random()，必须稳定映射
+
+### 新乐器配置标准
+- 必备字段：id, name, englishName, type, category, basePath, defaultVolume, attack, release
+- dialogueCoreNotes: ['A4','B4','D5','E5']
+- legacyRequiredNotes: D4,E4,F4,A4,B4,D5,E5,F5,A5,B5
+- fallbackPolicy: 'nearest-sample-preferred'（缺采样优先 nearest sample 变调，不直接切 synth）
+
+### 必须接入的播放路径
+1. 文字演奏：playText() → textToEvents() → charToNote() → playTone()
+2. WAV导出：renderAudioToBuffer() → exportWav()（实时和导出用同一逻辑）
+3. 歌曲MIDI
+4. 语义触发MIDI
+5. 角色声纹：characterVoiceConfig / characterVoiceRegistry / playCharacterVoice()
+
+### Race Condition 防护（P0历史问题）
+- 切乐器时立即记录 pendingInstrument / selectedInstrument
+- 播放前检查 core notes 是否 ready
+- 未 ready 禁用按钮或 await ensureInstrumentCoreReady()
+- 不能只做 await loadInstrumentSamples(); currentInstrument = instrument;
+
+### 交付时必须按格式汇报
+新增乐器列表 → 采样覆盖情况 → 已验证功能 → LayoutGuard结果 → 已知限制
+
+详细规则见 memory/2026-05-07.md
+
+---
 ## Yellow-pages-game (我的工作站)
 
 **GitHub 仓库**: `dengjinsh139-stack/Yellow-pages-game`
