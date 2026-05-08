@@ -3575,6 +3575,12 @@
                 document.getElementById('statusText').textContent = '就绪 (真实钢琴音色)';
                 addToHistory('真实钢琴音色已加载');
 
+                // P0修复：启动后自动加载之前选中的 pendingInstrument
+                if (pendingInstrument && pendingInstrument !== 'piano') {
+                    console.log(`[initAudio] 启动后自动加载 pendingInstrument=${pendingInstrument}`);
+                    await selectInstrument(pendingInstrument);
+                }
+
                 console.log('音频引擎启动成功，状态:', audioContext.state);
             } catch (err) {
                 console.error('音频引擎启动失败:', err);
@@ -3668,16 +3674,58 @@
                         'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '卡林巴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人'
                     };
                     document.getElementById('statusText').textContent = `正在加载 ${names[instrument] || instrument} 采样，请稍候...`;
-                    await loadInstrumentSamples(instrument);
+                    try {
+                        await loadInstrumentSamples(instrument);
+                    } catch (err) {
+                        console.error(`[ensureInstrumentReady] ${instrument} 采样加载失败:`, err);
+                        document.getElementById('statusText').textContent = `${names[instrument] || instrument} 采样加载失败`;
+                        instrumentLoading = false;
+                        delete instrumentLoadPromises[instrument];
+                        return false;
+                    }
                     instrumentLoading = false;
-                    document.getElementById('statusText').textContent = `${names[instrument] || instrument} 采样已就绪`;
-                    return hasInstrumentSamples(instrument);
+                    const ok = hasInstrumentSamples(instrument);
+                    if (ok) {
+                        document.getElementById('statusText').textContent = `${names[instrument] || instrument} 采样已就绪`;
+                    } else {
+                        document.getElementById('statusText').textContent = `${names[instrument] || instrument} 采样加载失败 (无有效采样)`;
+                    }
+                    return ok;
                 })();
             }
             return await instrumentLoadPromises[instrument];
         }
 
         async function selectInstrument(instrument) {
+            // P0修复：音频引擎未初始化时，阻止进入 loadInstrumentSamples()
+            if (!audioContext) {
+                pendingInstrument = instrument;
+
+                // 更新 UI active 状态（让用户知道选中了）
+                document.querySelectorAll('.instrument-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const targetBtn = document.querySelector(`[data-instrument="${instrument}"]`);
+                if (targetBtn) targetBtn.classList.add('active');
+
+                // 应用默认参数、更新滑块、生成键盘（让用户提前看到乐器参数）
+                applyInstrumentDefaults(instrument);
+                const currentOffset = params.instrumentOffsets[instrument] || 0;
+                const offsetEl = document.getElementById('audioOffset');
+                if (offsetEl) offsetEl.value = currentOffset;
+                updateParams();
+                generateNoteKeyboard();
+
+                document.getElementById('statusText').textContent = `已选中 ${({
+                    'piano':'钢琴','saxophone':'萨克斯','flute':'长笛','synth':'合成器',
+                    'train':'火车','xylophone':'木琴','guitar':'虚拟人声',
+                    'waterdrop':'水滴合成器','mouthtrumpet':'嘴巴小号',
+                    'kalimba':'卡林巴','smallrobot':'Small机器人','bigrobot':'Big机器人'
+                })[instrument] || instrument}，请先启动音频引擎`;
+                console.log(`[selectInstrument] audioContext 未初始化，延迟加载 ${instrument}`);
+                return;
+            }
+
             // 1. 立即记录 pending，禁用播放控件
             pendingInstrument = instrument;
             disablePlaybackControls();
@@ -3690,11 +3738,18 @@
             if (targetBtn) targetBtn.classList.add('active');
 
             // 3. 加载采样（期间 currentInstrument 仍是旧的，播放被禁用）
-            await ensureInstrumentReady(instrument);
+            const ok = await ensureInstrumentReady(instrument);
 
             // 4. 采样就绪后，更新 currentInstrument
-            currentInstrument = instrument;
-            pendingInstrument = null;
+            if (ok) {
+                currentInstrument = instrument;
+                pendingInstrument = null;
+            } else {
+                // 加载失败：保持 currentInstrument 不变，pending 清掉
+                pendingInstrument = null;
+                enablePlaybackControls();
+                return;
+            }
 
             // 5. 更新 info 文字
             const instrumentNames = {
