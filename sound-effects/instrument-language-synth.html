@@ -2034,6 +2034,9 @@
             '—': 320
         };
 
+        // ===== 角色声纹：基准 BPM（V1 playbackRate 变速）=====
+        const CHARACTER_VOICE_BASE_BPM = 120;
+
         // ===== 角色声纹配置 =====
         const characterVoiceConfig = {
             '小牧': {
@@ -2115,10 +2118,11 @@
             const config = characterVoiceConfig[characterName];
             if (!config) return;
 
-            // ===== Expression Segment：计算 playbackRate =====
+            // ===== Expression Segment：计算 playbackRate（含 BPM 缩放）=====
+            const bpmScale = (params.bpm || 120) / CHARACTER_VOICE_BASE_BPM;
             const exprTempo = event?.expressionTempoScale || 1;
             const curve = event?.expressionCurveFactor || 1;
-            const playbackRate = Math.max(0.25, Math.min(4, exprTempo * curve));
+            const finalPlaybackRate = Math.max(0.5, Math.min(2.0, bpmScale * exprTempo * curve));
             const exprVelocity = event?.expressionVelocityScale || 1;
 
             // 尝试播放音频文件
@@ -2126,7 +2130,7 @@
             if (audioBuffer) {
                 const source = audioContext.createBufferSource();
                 source.buffer = audioBuffer;
-                source.playbackRate.value = playbackRate;
+                source.playbackRate.value = finalPlaybackRate;
                 const gainNode = audioContext.createGain();
                 gainNode.gain.value = params.masterVolume * exprVelocity;
 
@@ -2138,8 +2142,8 @@
                 const releaseTime = Math.max(0.05, vs.releaseMs / 1000);
                 gainNode.gain.setValueAtTime(0, now);
                 gainNode.gain.linearRampToValueAtTime(params.masterVolume * exprVelocity, now + attackTime);
-                gainNode.gain.setValueAtTime(params.masterVolume * exprVelocity, now + (audioBuffer.duration / playbackRate) - Math.min(releaseTime * 0.3, (audioBuffer.duration / playbackRate) * 0.2));
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + (audioBuffer.duration / playbackRate) + releaseTime);
+                gainNode.gain.setValueAtTime(params.masterVolume * exprVelocity, now + (audioBuffer.duration / finalPlaybackRate) - Math.min(releaseTime * 0.3, (audioBuffer.duration / finalPlaybackRate) * 0.2));
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + (audioBuffer.duration / finalPlaybackRate) + releaseTime);
 
                 // ===== Voice Shaping：EQ 链 =====
                 let eqChainEnd = gainNode;
@@ -2173,8 +2177,8 @@
                 analyser.connect(audioContext.destination);
                 source.start();
                 updateSpectrum();
-                const actualDuration = audioBuffer.duration / playbackRate;
-                console.log(`[CharacterVoice] 播放音频: ${characterName}, playbackRate=${playbackRate.toFixed(2)}x, duration=${actualDuration.toFixed(2)}s`);
+                const actualDuration = audioBuffer.duration / finalPlaybackRate;
+                console.log(`[CharacterVoice] 播放音频: ${characterName}, bpm=${params.bpm}, bpmScale=${bpmScale.toFixed(2)}, finalPlaybackRate=${finalPlaybackRate.toFixed(2)}x, duration=${actualDuration.toFixed(2)}s`);
 
                 // ===== 等待音频播放完成，确保顺序执行 =====
                 await new Promise(resolve => {
@@ -2190,7 +2194,7 @@
                 console.log(`[CharacterVoice] 音频播放完成: ${characterName}`);
             } else {
                 // 无音频时使用乐器演奏主题音
-                console.log(`[CharacterVoice] 使用合成音色: ${characterName}, playbackRate=${playbackRate.toFixed(2)}x`);
+                console.log(`[CharacterVoice] 使用合成音色: ${characterName}, bpm=${params.bpm}, bpmScale=${bpmScale.toFixed(2)}, finalPlaybackRate=${finalPlaybackRate.toFixed(2)}x`);
                 const originalInstrument = currentInstrument;
                 currentInstrument = config.instrument;
 
@@ -2200,10 +2204,10 @@
                         'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77
                     }[note.note];
                     if (freq) {
-                        const noteDur = note.durationMs / playbackRate;
+                        const noteDur = note.durationMs / finalPlaybackRate;
                         const noteVel = note.velocity * params.masterVolume * exprVelocity;
                         playTone(freq, note.note, noteDur, noteVel);
-                        await sleep(noteDur + 50 / playbackRate);
+                        await sleep(noteDur + 50 / finalPlaybackRate);
                     }
                 }
 
@@ -7536,28 +7540,30 @@
                     const config = characterVoiceConfig[evt.character];
                     if (!config) continue;
 
-                    // ===== Expression Segment：计算 playbackRate =====
+                    // ===== Expression Segment：计算 playbackRate（含 BPM 缩放）=====
+                    const bpmScale = (params.bpm || 120) / CHARACTER_VOICE_BASE_BPM;
                     const exprTempo = evt.expressionTempoScale || 1;
                     const curve = evt.expressionCurveFactor || 1;
-                    const playbackRate = Math.max(0.25, Math.min(4, exprTempo * curve));
+                    const finalPlaybackRate = Math.max(0.5, Math.min(2.0, bpmScale * exprTempo * curve));
 
                     let voiceDuration = 0;
                     const audioBuffer = characterAudioBuffers[evt.character];
                     if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
-                        voiceDuration = audioBuffer.duration / playbackRate;
+                        voiceDuration = audioBuffer.duration / finalPlaybackRate;
                     } else {
                         for (const note of config.motifNotes) {
-                            voiceDuration += (note.durationMs / playbackRate) / 1000 + 0.05;
+                            voiceDuration += (note.durationMs / finalPlaybackRate) / 1000 + 0.05;
                         }
                     }
+
+                    // ===== Expression Segment：段后停顿计入时长 =====
+                    if (evt.expressionPauseAfterMs > 0) {
+                        voiceDuration += evt.expressionPauseAfterMs / 1000;
+                    }
+
                     const advance = Math.max(0, voiceDuration - (params.voiceShaping.overlapMs / 1000));
                     currentTime += advance;
                     lastAudioEndTime = Math.max(lastAudioEndTime, currentTime + (params.voiceShaping.overlapMs / 1000));
-
-                    // ===== Expression Segment：段后停顿 =====
-                    if (evt.expressionPauseAfterMs > 0) {
-                        currentTime += evt.expressionPauseAfterMs / 1000;
-                    }
                     continue;
                 }
 
@@ -7737,10 +7743,11 @@
                     const config = characterVoiceConfig[characterName];
                     if (!config) continue;
 
-                    // ===== Expression Segment：计算 playbackRate =====
+                    // ===== Expression Segment：计算 playbackRate（含 BPM 缩放）=====
+                    const bpmScale = (params.bpm || 120) / CHARACTER_VOICE_BASE_BPM;
                     const exprTempo = evt.expressionTempoScale || 1;
                     const curve = evt.expressionCurveFactor || 1;
-                    const playbackRate = Math.max(0.25, Math.min(4, exprTempo * curve));
+                    const finalPlaybackRate = Math.max(0.5, Math.min(2.0, bpmScale * exprTempo * curve));
                     const exprVelocity = evt.expressionVelocityScale || 1;
 
                     // 优先加载真实角色音频（如果尚未缓存）
@@ -7754,7 +7761,7 @@
                     if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
                         const source = offlineContext.createBufferSource();
                         source.buffer = audioBuffer;
-                        source.playbackRate.value = playbackRate;
+                        source.playbackRate.value = finalPlaybackRate;
                         const gainNode = offlineContext.createGain();
                         gainNode.gain.value = params.masterVolume * exprVelocity;
 
@@ -7762,7 +7769,7 @@
                         const vs = resolveVoiceShaping(characterName);
                         const attackTime = Math.max(0.001, vs.attackMs / 1000);
                         const releaseTime = Math.max(0.05, vs.releaseMs / 1000);
-                        const scaledDuration = audioBuffer.duration / playbackRate;
+                        const scaledDuration = audioBuffer.duration / finalPlaybackRate;
                         gainNode.gain.setValueAtTime(0, currentTime);
                         gainNode.gain.linearRampToValueAtTime(params.masterVolume * exprVelocity, currentTime + attackTime);
                         gainNode.gain.setValueAtTime(params.masterVolume * exprVelocity, currentTime + scaledDuration - Math.min(releaseTime * 0.3, scaledDuration * 0.2));
@@ -7799,7 +7806,7 @@
                         eqChainEnd.connect(destination);
                         source.start(currentTime);
                         currentTime += scaledDuration;
-                        console.log(`[RENDER] Character voice (audio): ${characterName}, playbackRate=${playbackRate.toFixed(2)}x, duration=${scaledDuration.toFixed(2)}s`);
+                        console.log(`[RENDER] Character voice (audio): ${characterName}, bpm=${params.bpm}, bpmScale=${bpmScale.toFixed(2)}, finalPlaybackRate=${finalPlaybackRate.toFixed(2)}x, duration=${scaledDuration.toFixed(2)}s`);
                     } else {
                         // 音频加载失败，fallback 用乐器合成主题音
                         const originalInstrument = currentInstrument;
@@ -7812,7 +7819,7 @@
                         for (const note of config.motifNotes) {
                             const freq = freqMap[note.note];
                             if (freq) {
-                                const noteDur = (note.durationMs / playbackRate) / 1000;
+                                const noteDur = (note.durationMs / finalPlaybackRate) / 1000;
                                 const noteVel = note.velocity * params.masterVolume * exprVelocity;
                                 // 使用合成音色渲染（不受采样加载状态影响）
                                 const oscillator = offlineContext.createOscillator();
@@ -7826,12 +7833,12 @@
                                 noteGain.connect(destination);
                                 oscillator.start(currentTime + motifDuration);
                                 oscillator.stop(currentTime + motifDuration + noteDur + 0.5);
-                                motifDuration += noteDur + (0.05 / playbackRate);
+                                motifDuration += noteDur + (0.05 / finalPlaybackRate);
                             }
                         }
                         currentInstrument = originalInstrument;
                         currentTime += motifDuration;
-                        console.log(`[RENDER] Character voice (synth fallback): ${characterName}, playbackRate=${playbackRate.toFixed(2)}x, duration=${motifDuration.toFixed(2)}s`);
+                        console.log(`[RENDER] Character voice (synth fallback): ${characterName}, bpm=${params.bpm}, bpmScale=${bpmScale.toFixed(2)}, finalPlaybackRate=${finalPlaybackRate.toFixed(2)}x, duration=${motifDuration.toFixed(2)}s`);
                     }
 
                     // ===== Expression Segment：段后停顿 =====
