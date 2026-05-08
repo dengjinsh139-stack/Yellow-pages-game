@@ -2782,6 +2782,26 @@
                 attack: 0.02,
                 release: 0.3
             },
+            smallrobot: {
+                name: 'Small机器人',
+                emoji: '🤖',
+                basePath: '../assets/audio/samples/smallrobot/',
+                samples: {
+                    // Small机器人五声音阶采样
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                },
+                attack: 0.02,
+                release: 0.3
+            },
             vocal: {
                 name: '虚拟人声',
                 emoji: '🎙️',
@@ -4001,9 +4021,27 @@
             await Promise.all(loadPromises);
         }
 
-        // 加载 Small机器人采样（占位）
+        // 加载 Small机器人采样
         async function loadSmallrobotSamples() {
-            console.log('[SmallRobot] 采样尚未入库，使用合成器 fallback');
+            if (audioBuffers['smallrobot_D4']) return; // 已加载
+
+            const config = sampleConfig.smallrobot;
+            const loadPromises = [];
+
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['smallrobot_' + note] = audioBuffer;
+                        console.log(`Loaded smallrobot: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load smallrobot ${note}:`, err));
+
+                loadPromises.push(promise);
+            }
+
+            await Promise.all(loadPromises);
         }
 
         // 加载 Big机器人采样（占位）
