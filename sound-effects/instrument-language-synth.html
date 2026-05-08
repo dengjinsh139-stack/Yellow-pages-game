@@ -4446,18 +4446,159 @@
             }
 
             // 按标点切分
-            const segments = splitTextIntoSegments(text);
-            expressionSegments = segments.map((seg, i) => ({
-                id: i,
-                text: seg.text,
-                tempoScale: seg.type === 'punctuation' ? 0.6 : 1.0,
-                velocityScale: seg.type === 'question' ? 1.2 : (seg.type === 'exclamation' ? 1.3 : 1.0),
-                pauseAfterMs: seg.type === 'ellipsis' ? 600 : (seg.type === 'question' ? 400 : (seg.type === 'comma' ? 200 : 0)),
-                curveType: seg.type === 'question' ? 'hesitate' : (seg.type === 'exclamation' ? 'accelerate' : 'flat')
-            }));
+            const rawSegments = splitTextIntoSegments(text);
+
+            // V1 Auto Curve: 自动分配表达参数（关键词/标点/重复字/句长）
+            expressionSegments = autoCurveExpressionSegments(rawSegments);
 
             renderExpressionSegments();
             updateTabCharacterAndSemantic(text);
+        }
+
+        // ===== Expression Segment Auto Curve V1 =====
+        // 关键词库（保守 V1）
+        const AUTO_CURVE_KEYWORDS = {
+            command:   ['来', '去', '快', '上', '下', '走', '跑', '冲', '杀', '打', '接', '放', '按', '开', '关'],
+            danger:      ['小心', '危险', '警报', '警告', '逃', '死', '伤', '火', '爆炸', '毒', '凶', '杀'],
+            comfort:     ['安心', '放心', '别怕', '没事', '好', '暖', '柔', '轻', '静', '安'],
+            hesitate:    ['嗯', '呃', '啊', '那个', '可能', '也许', '大概', '好像', '似乎', '犹豫', '纠结', '想'],
+        };
+
+        function autoCurveExpressionSegments(segments) {
+            // 收集全文用于重复字检测
+            const fullText = segments.map(s => s.text).join('');
+
+            return segments.map((seg, i) => {
+                const txt = seg.text;
+                const len = txt.length;
+
+                // 基础值（中性）
+                let tempoScale = 1.0;
+                let velocityScale = 1.0;
+                let pauseAfterMs = 0;
+                let curveType = 'flat';
+
+                // 1. 标点驱动（最优先）
+                if (seg.type === 'question') {
+                    // 疑问句：迟疑+尾音上扬
+                    tempoScale = 0.88;
+                    velocityScale = 1.05;
+                    pauseAfterMs = 350;
+                    curveType = 'hesitate';
+                } else if (seg.type === 'exclamation') {
+                    // 惊叹句：加速+力度提升
+                    tempoScale = 1.08;
+                    velocityScale = 1.18;
+                    pauseAfterMs = 420;
+                    curveType = 'accelerate';
+                } else if (seg.type === 'ellipsis') {
+                    // 省略号：大幅减速迟疑
+                    tempoScale = 0.78;
+                    velocityScale = 0.85;
+                    pauseAfterMs = 650;
+                    curveType = 'hesitate';
+                } else if (seg.type === 'comma') {
+                    // 逗号：轻微减速，小停顿
+                    tempoScale = 0.95;
+                    velocityScale = 0.95;
+                    pauseAfterMs = 180;
+                    curveType = 'decelerate';
+                } else if (seg.type === 'semicolon') {
+                    // 分号：中等停顿
+                    tempoScale = 0.92;
+                    velocityScale = 0.98;
+                    pauseAfterMs = 280;
+                    curveType = 'easeInOut';
+                } else if (seg.type === 'period') {
+                    // 句号：收束
+                    tempoScale = 0.92;
+                    velocityScale = 0.88;
+                    pauseAfterMs = 300;
+                    curveType = 'decelerate';
+                }
+
+                // 2. 关键词叠加（normal 段才检测文本内容）
+                if (seg.type === 'normal') {
+                    // 命令/催促
+                    if (AUTO_CURVE_KEYWORDS.command.some(k => txt.includes(k))) {
+                        tempoScale = Math.max(tempoScale, 1.12);
+                        velocityScale = Math.max(velocityScale, 1.15);
+                        curveType = 'accelerate';
+                    }
+                    // 危险/紧张
+                    if (AUTO_CURVE_KEYWORDS.danger.some(k => txt.includes(k))) {
+                        tempoScale = Math.min(tempoScale, 0.85);
+                        velocityScale = Math.max(velocityScale, 1.22);
+                        pauseAfterMs = Math.max(pauseAfterMs, 250);
+                        curveType = 'hesitate';
+                    }
+                    // 安慰/柔和
+                    if (AUTO_CURVE_KEYWORDS.comfort.some(k => txt.includes(k))) {
+                        tempoScale = Math.min(tempoScale, 0.90);
+                        velocityScale = Math.min(velocityScale, 0.88);
+                        curveType = 'easeInOut';
+                    }
+                    // 犹豫/迟疑
+                    if (AUTO_CURVE_KEYWORDS.hesitate.some(k => txt.includes(k))) {
+                        tempoScale = Math.min(tempoScale, 0.88);
+                        velocityScale = Math.max(velocityScale, 0.82);
+                        curveType = 'hesitate';
+                    }
+
+                    // 3. 重复字检测（连续重复≥3字）
+                    let repeatCount = 0;
+                    for (let c = 0; c < txt.length - 2; c++) {
+                        if (txt[c] === txt[c+1] && txt[c] === txt[c+2]) {
+                            repeatCount++;
+                        }
+                    }
+                    if (repeatCount > 0) {
+                        // 重复字：机械感，匀速或渐快
+                        tempoScale = Math.max(tempoScale, 1.08);
+                        velocityScale = Math.max(velocityScale, 1.05);
+                        if (curveType === 'flat') curveType = 'accelerate';
+                    }
+
+                    // 4. 段长度影响（长句自然减速）
+                    if (len >= 12) {
+                        tempoScale = Math.min(tempoScale, 0.95);
+                    }
+                    if (len <= 3) {
+                        tempoScale = Math.max(tempoScale, 1.05);
+                    }
+                }
+
+                // 5. 保守钳制（V1 边界）
+                tempoScale = Math.max(0.75, Math.min(1.25, tempoScale));
+                velocityScale = Math.max(0.75, Math.min(1.30, velocityScale));
+                pauseAfterMs = Math.max(0, Math.min(800, pauseAfterMs));
+
+                // 保留用户手动覆盖值（如果有）
+                const existing = expressionSegments && expressionSegments[i];
+                if (existing && existing._manual) {
+                    return {
+                        id: i,
+                        text: seg.text,
+                        tempoScale: existing.tempoScale,
+                        velocityScale: existing.velocityScale,
+                        pauseAfterMs: existing.pauseAfterMs,
+                        curveType: existing.curveType,
+                        _auto: false,
+                        _manual: true
+                    };
+                }
+
+                return {
+                    id: i,
+                    text: seg.text,
+                    tempoScale: parseFloat(tempoScale.toFixed(2)),
+                    velocityScale: parseFloat(velocityScale.toFixed(2)),
+                    pauseAfterMs: Math.round(pauseAfterMs),
+                    curveType,
+                    _auto: true,
+                    _manual: false
+                };
+            });
         }
 
         function splitTextIntoSegments(text) {
@@ -4497,7 +4638,10 @@
 
             container.innerHTML = expressionSegments.map((seg, i) => `
                 <div class="segment-card" data-segment-id="${seg.id}">
-                    <div class="segment-text">${i+1}. 「${seg.text}」</div>
+                    <div class="segment-text">
+                        ${i+1}. 「${seg.text}」
+                        ${seg._manual ? '<span style="font-size:0.7rem;color:var(--accent);margin-left:6px;">✏️手动</span>' : (seg._auto ? '<span style="font-size:0.7rem;color:var(--secondary);margin-left:6px;">⚡自动</span>' : '')}
+                    </div>
                     <div class="segment-controls">
                         <div class="segment-control">
                             <label>速度倍率</label>
@@ -4538,6 +4682,9 @@
             } else {
                 expressionSegments[index][field] = value;
             }
+            // 标记为手动覆盖，Auto Curve 下次会保留
+            expressionSegments[index]._manual = true;
+            expressionSegments[index]._auto = false;
             renderExpressionSegments();
         }
 
@@ -4547,7 +4694,9 @@
                 tempoScale: 1.0,
                 velocityScale: 1.0,
                 pauseAfterMs: 0,
-                curveType: 'flat'
+                curveType: 'flat',
+                _manual: false,
+                _auto: false
             }));
             renderExpressionSegments();
         }
