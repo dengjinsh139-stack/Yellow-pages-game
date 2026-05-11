@@ -3317,18 +3317,18 @@
             // 扫描受保护短语位置
             const protectedRanges = scanProtectedPhrases(originalText);
 
-            // 将事件按句切分：由 pause / phraseMidi / characterVoice 事件切分
+            // 将事件按片段切分：由 pause / phraseMidi / characterVoice 事件切分
             const sentences = [];
             let currentSentence = [];
             let currentHasPunctuation = false;
 
             for (const evt of events) {
-                // phraseMidi 和 characterVoice 是独立句的边界
+                // phraseMidi 和 characterVoice 是独立片段的边界
                 if (evt.type === 'phraseMidi' || evt.type === 'characterVoice') {
                     if (currentSentence.length > 0) {
                         sentences.push({ events: currentSentence, hasPunctuation: currentHasPunctuation });
                     }
-                    // 语义触发词和角色名本身作为独立句，100%保留，不做压缩
+                    // 语义触发词和角色名本身作为独立片段，100%保留，不做压缩
                     sentences.push({ events: [evt], hasPunctuation: false, preserveAll: true });
                     currentSentence = [];
                     currentHasPunctuation = false;
@@ -3336,7 +3336,13 @@
                 }
 
                 if (evt.type === 'pause') {
+                    // 标点/pause 作为片段边界：保留在当前片段末尾，然后结束片段
+                    currentSentence.push(evt);
                     currentHasPunctuation = true;
+                    sentences.push({ events: currentSentence, hasPunctuation: currentHasPunctuation });
+                    currentSentence = [];
+                    currentHasPunctuation = false;
+                    continue;
                 }
 
                 currentSentence.push(evt);
@@ -3361,9 +3367,8 @@
                 // 获取目标 note 数
                 const targetCount = getNoteDensityTargetCount(effectiveCount, mode);
 
-                // 短句（<=10）或已有标点的句，或目标数等于原数，不处理
+                // 短句（<=10）或目标数等于原数，不处理
                 if (effectiveCount <= NOTE_DENSITY_REDUCER.maxEffectiveCharsPerSentence ||
-                    sentence.hasPunctuation ||
                     targetCount >= effectiveCount) {
                     result.push(...sentence.events);
                     continue;
