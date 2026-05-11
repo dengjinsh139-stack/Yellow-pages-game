@@ -3161,7 +3161,8 @@
             }
 
             if (matches.length === 0) {
-                return textToNotes(text);
+                const events = textToNotes(text);
+                return applyNoteDensityReduction(events, text);
             }
 
             // 按位置排序，优先位置靠前，位置相同取长度长的
@@ -3212,7 +3213,199 @@
                 }
             }
 
-            return events;
+            return applyNoteDensityReduction(events, text);
+        }
+
+        // ===== Note Density Reducer =====
+        // 当单句超过 maxEffectiveCharsPerSentence 个有效字符且无标点时，
+        // 自动减少乐器实际发音数量；短句和已有标点句不处理。
+        // 不修改用户原文，只修改 performance events。
+        function applyNoteDensityReduction(events, originalText) {
+            if (!NOTE_DENSITY_REDUCER.enabled || !events || events.length === 0) {
+                return events;
+            }
+
+            // 将事件按句切分：由 pause / phraseMidi / characterVoice 事件切分
+            const sentences = [];
+            let currentSentence = [];
+            let currentHasPunctuation = false;
+
+            for (const evt of events) {
+                // phraseMidi 和 characterVoice 是独立句的边界
+                if (evt.type === 'phraseMidi' || evt.type === 'characterVoice') {
+                    if (currentSentence.length > 0) {
+                        sentences.push({ events: currentSentence, hasPunctuation: currentHasPunctuation });
+                    }
+                    // 语义触发词和角色名本身作为独立句，100%保留，不做压缩
+                    sentences.push({ events: [evt], hasPunctuation: false, preserveAll: true });
+                    currentSentence = [];
+                    currentHasPunctuation = false;
+                    continue;
+                }
+
+                if (evt.type === 'pause') {
+                    currentHasPunctuation = true;
+                }
+
+                currentSentence.push(evt);
+            }
+
+            if (currentSentence.length > 0) {
+                sentences.push({ events: currentSentence, hasPunctuation: currentHasPunctuation });
+            }
+
+            // 处理每个句
+            const result = [];
+            for (const sentence of sentences) {
+                if (sentence.preserveAll) {
+                    result.push(...sentence.events);
+                    continue;
+                }
+
+                // 统计有效字符：note 事件且 char 是中/英/数字
+                const noteEvents = sentence.events.filter(e => e.type === 'note' && isEffectiveChar(e.char));
+                const effectiveCount = noteEvents.length;
+
+                // 短句（<=10）或已有标点的句，不处理
+                if (effectiveCount <= NOTE_DENSITY_REDUCER.maxEffectiveCharsPerSentence || sentence.hasPunctuation) {
+                    result.push(...sentence.events);
+                    continue;
+                }
+
+                // 长句且无标点：需要压缩（拟声对白逻辑）
+                const targetCount = NOTE_DENSITY_REDUCER.maxEffectiveCharsPerSentence;
+
+                // ==== 拟声对白切分：前段 + 中段 + 后段 ====
+                const headCount = 2;   // 句首保留数量
+                const tailCount = 2;   // 句尾保留数量
+                const headEvents = noteEvents.slice(0, headCount);
+                const tailEvents = noteEvents.slice(-tailCount);
+                const midEvents = noteEvents.slice(headCount, -tailCount);
+
+                // 句首句尾直接保留
+                const keepSet = new Set([...headEvents, ...tailEvents]);
+
+                // 中段需要进一步压缩
+                const midTarget = Math.max(0, targetCount - keepSet.size);
+
+                if (midTarget > 0 && midEvents.length > midTarget) {
+                    // 为中段事件计算语义优先级
+                    const scoredMid = midEvents.map(evt => {
+                        const char = evt.char || '';
+                        let score = 0;
+                        let category = 'normal';
+
+                        // 情绪关键词匹配（检查 surrounding context）
+                        const pos = evt.sourceCharIndex ?? 0;
+                        const contextWindow = 5;
+                        const context = originalText.substring(
+                            Math.max(0, pos - contextWindow),
+                            Math.min(originalText.length, pos + contextWindow + 1)
+                        ).toLowerCase();
+
+                        for (const [, keywords] of Object.entries(emotionKeywords)) {
+                            for (const kw of keywords) {
+                                if (context.includes(kw.toLowerCase())) {
+                                    score += 100;
+                                    category = 'emotion';
+                                    break;
+                                }
+                            }
+                            if (category === 'emotion') break;
+                        }
+
+                        // 否定词
+                        if (NOTE_DENSITY_REDUCER.negationWords.has(char) ||
+                            NOTE_DENSITY_REDUCER.negationWords.has(context.substring(contextWindow, contextWindow + 2))) {
+                            score = Math.max(score, 80);
+                            if (category === 'normal') category = 'negation';
+                        }
+
+                        // 动作词
+                        if (NOTE_DENSITY_REDUCER.actionWords.has(char)) {
+                            score = Math.max(score, 60);
+                            if (category === 'normal') category = 'action';
+                        }
+
+                        return { evt, score, category };
+                    });
+
+                    // 分层保留策略：中段内优先语义关键词，再均匀采样
+                    const midKeep = new Set();
+                    const quotas = {
+                        emotion: Math.ceil(midTarget * 0.5),
+                        negation: Math.ceil(midTarget * 0.3),
+                        action: Math.ceil(midTarget * 0.3),
+                        normal: midTarget
+                    };
+
+                    scoredMid.sort((a, b) => b.score - a.score);
+
+                    const catCounts = { emotion: 0, negation: 0, action: 0, normal: 0 };
+                    for (const item of scoredMid) {
+                        const cat = item.category;
+                        if (catCounts[cat] < quotas[cat]) {
+                            midKeep.add(item.evt);
+                            catCounts[cat]++;
+                        }
+                        if (midKeep.size >= midTarget) break;
+                    }
+
+                    // 配额未满时，按分数补充
+                    if (midKeep.size < midTarget) {
+                        for (const item of scoredMid) {
+                            if (!midKeep.has(item.evt)) {
+                                midKeep.add(item.evt);
+                                if (midKeep.size >= midTarget) break;
+                            }
+                        }
+                    }
+
+                    // 仍然未满时，均匀采样兜底
+                    if (midKeep.size < midTarget) {
+                        const remaining = midEvents.filter(e => !midKeep.has(e));
+                        const interval = Math.ceil(remaining.length / (midTarget - midKeep.size));
+                        let slot = 0;
+                        for (let i = 0; i < remaining.length && slot < (midTarget - midKeep.size); i += interval) {
+                            midKeep.add(remaining[i]);
+                            slot++;
+                        }
+                    }
+
+                    for (const e of midKeep) keepSet.add(e);
+                } else if (midTarget > 0) {
+                    // 中段本身就不够 target，全部保留
+                    for (const e of midEvents) keepSet.add(e);
+                }
+
+                // 重构句内事件，保持原始顺序，只保留 note 事件中的 keepSet
+                // 非 note 事件（pause）全部保留
+                for (const evt of sentence.events) {
+                    if (evt.type === 'note' && isEffectiveChar(evt.char)) {
+                        if (keepSet.has(evt)) {
+                            result.push(evt);
+                        }
+                        // 被丢弃的 note 不加入结果
+                    } else {
+                        result.push(evt);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        // 判断字符是否为有效字符（中文字符 / 英文字母 / 数字）
+        function isEffectiveChar(char) {
+            if (!char || typeof char !== 'string') return false;
+            const code = char.charCodeAt(0);
+            // 中文字符
+            if (code >= 0x4E00 && code <= 0x9FA5) return true;
+            // 英文字母
+            if ((code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A)) return true;
+            // 数字
+            if (code >= 0x30 && code <= 0x39) return true;
+            return false;
         }
 
         // ==================== 情绪专属文件系统 ====================
@@ -3522,6 +3715,43 @@
             calm: ['静', '宁', '平', 'calm', 'peace', 'quiet', 'relax', '安静', '平静'],
             mysterious: ['神', '秘', '奇', 'mystery', 'magic', 'wonder', '神秘'],
             comfort: ['安慰', '抱抱', '没事', '别怕', '放心', '我在', '陪你', '好了好了', '没事的', '别担心', '抱抱你', '心疼', '没事没事', '没关系', '会好的', '不要难过', '别伤心', '我在呢', '不怕', '乖', '摸摸头', '给你抱抱', '加油', '坚持住', '一切都会好', '别担心了', '有我在', '我陪着你', '放松', '深呼吸', '平静下来', 'comfort', 'hug', 'dont worry', 'its okay', 'there there', 'calm down', 'take it easy']
+        };
+
+        // ===== Note Density Reducer 配置 =====
+        const NOTE_DENSITY_REDUCER = {
+            enabled: true,
+            maxEffectiveCharsPerSentence: 10,
+            // 否定词 - 语义权重高，压缩时优先保留
+            negationWords: new Set([
+                '不', '没', '无', '非', '否', '别', '未', '莫', '勿', '休',
+                '难', '岂', '怎', '哪', '没有', '不是', '不能', '不会',
+                '不要', '不行', '不对', '不好', '不可能', '禁止', '拒绝',
+                '否认', '反对', '放弃', '避免', '防止', '阻止', '不许',
+                '不准', '不可', '不得', '不该', '不必', '无须', '无需',
+                'no', 'not', 'never', 'none', 'deny', 'reject', 'refuse',
+                'prevent', 'avoid', 'stop', 'forbid', 'prohibit'
+            ]),
+            // 动作词 - 语义权重中高，压缩时次优先保留
+            actionWords: new Set([
+                '来', '去', '走', '跑', '跳', '看', '听', '说', '想', '做',
+                '吃', '喝', '睡', '打', '写', '读', '画', '唱', '飞', '爬',
+                '游', '推', '拉', '抱', '亲', '摸', '拍', '踢', '扔', '接',
+                '送', '拿', '放', '开', '关', '上', '下', '进', '出', '回',
+                '过', '到', '在', '有', '是', '要', '能', '会', '可', '该',
+                '得', '让', '叫', '使', '令', '派', '请', '求', '望', '盼',
+                '等', '待', '留', '守', '护', '救', '帮', '助', '扶', '撑',
+                '爱', '恨', '喜', '怒', '哀', '乐', '怕', '吓', '惊', '感',
+                '知', '觉', '认', '识', '道', '懂', '明', '白', '学', '习',
+                '练', '训', '研', '究', '探', '索', '寻', '找', '发', '现',
+                '明', '创', '造', '建', '设', '制', '作', '生', '产', '加',
+                '工', '处', '理', 'go', 'come', 'run', 'walk', 'jump', 'fly',
+                'swim', 'look', 'see', 'watch', 'hear', 'listen', 'speak', 'say',
+                'talk', 'think', 'do', 'make', 'take', 'get', 'give', 'put',
+                'set', 'keep', 'hold', 'catch', 'throw', 'kick', 'hit', 'fight',
+                'play', 'work', 'study', 'learn', 'teach', 'help', 'save',
+                'love', 'like', 'hate', 'want', 'need', 'wish', 'hope',
+                'try', 'start', 'stop', 'begin', 'end', 'finish', 'complete'
+            ])
         };
 
         // 初始化
