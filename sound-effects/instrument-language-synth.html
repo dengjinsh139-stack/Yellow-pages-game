@@ -3306,132 +3306,60 @@
                 }
 
                 // 长句且无标点：需要压缩（拟声对白逻辑）
+                // ==== 新版：全局评分排序，确保 protected / 否定词不被挤掉 ====
 
-                // ==== 拟声对白切分：前段 + 中段 + 后段 ====
-                const headCount = 2;   // 句首保留数量
-                const tailCount = 2;   // 句尾保留数量
-                const headEvents = noteEvents.slice(0, headCount);
-                const tailEvents = noteEvents.slice(-tailCount);
-                const midEvents = noteEvents.slice(headCount, -tailCount);
+                // 为所有 note 事件统一评分
+                const scoredNotes = noteEvents.map((evt, idx) => {
+                    const char = evt.char || '';
+                    const pos = evt.sourceCharIndex ?? 0;
+                    let score = 0;
 
-                // 句首句尾直接保留
-                const keepSet = new Set([...headEvents, ...tailEvents]);
+                    // 1. 受保护短语：最高优先级（10000 分）
+                    for (const range of protectedRanges) {
+                        if (pos >= range.start && pos < range.end) {
+                            score += 10000;
+                            break;
+                        }
+                    }
 
-                // 中段需要进一步压缩
-                const midTarget = Math.max(0, targetCount - keepSet.size);
+                    // 2. 否定词：高优先级（1000 分）
+                    if (NOTE_DENSITY_REDUCER.negationWords.has(char)) {
+                        score += 1000;
+                    }
 
-                if (midTarget > 0 && midEvents.length > midTarget) {
-                    // 为中段事件计算语义优先级（含受保护短语标记）
-                    const scoredMid = midEvents.map(evt => {
-                        const char = evt.char || '';
-                        let score = 0;
-                        let category = 'normal';
-                        let isProtected = false;
+                    // 3. 句首/句尾锚点：中等优先级（100 分）
+                    const totalNotes = noteEvents.length;
+                    if (idx < 2) score += 100;                    // 前2字
+                    if (idx >= totalNotes - 2) score += 100;      // 后2字
 
-                        const pos = evt.sourceCharIndex ?? 0;
-                        const contextWindow = 5;
-                        const context = originalText.substring(
-                            Math.max(0, pos - contextWindow),
-                            Math.min(originalText.length, pos + contextWindow + 1)
-                        ).toLowerCase();
-
-                        // 受保护短语检查：如果该 note 落在保护范围内，标记 protected
-                        for (const range of protectedRanges) {
-                            if (pos >= range.start && pos < range.end) {
-                                isProtected = true;
-                                score += 150; // 最高优先级
-                                category = 'protected';
+                    // 4. 情绪关键词上下文（100 分）
+                    const contextWindow = 5;
+                    const context = originalText.substring(
+                        Math.max(0, pos - contextWindow),
+                        Math.min(originalText.length, pos + contextWindow + 1)
+                    ).toLowerCase();
+                    for (const [, keywords] of Object.entries(emotionKeywords)) {
+                        for (const kw of keywords) {
+                            if (context.includes(kw.toLowerCase())) {
+                                score += 100;
                                 break;
                             }
                         }
-
-                        // 情绪关键词匹配
-                        if (!isProtected) {
-                            for (const [, keywords] of Object.entries(emotionKeywords)) {
-                                for (const kw of keywords) {
-                                    if (context.includes(kw.toLowerCase())) {
-                                        score += 100;
-                                        category = 'emotion';
-                                        break;
-                                    }
-                                }
-                                if (category === 'emotion') break;
-                            }
-
-                            // 否定词
-                            if (NOTE_DENSITY_REDUCER.negationWords.has(char) ||
-                                NOTE_DENSITY_REDUCER.negationWords.has(context.substring(contextWindow, contextWindow + 2))) {
-                                score = Math.max(score, 80);
-                                if (category === 'normal') category = 'negation';
-                            }
-
-                            // 动作词
-                            if (NOTE_DENSITY_REDUCER.actionWords.has(char)) {
-                                score = Math.max(score, 60);
-                                if (category === 'normal') category = 'action';
-                            }
-                        }
-
-                        return { evt, score, category, isProtected };
-                    });
-
-                    // 分层保留策略：中段内优先语义关键词，再均匀采样
-                    const midKeep = new Set();
-
-                    // 第一阶段：强制保留所有 protected note
-                    for (const item of scoredMid) {
-                        if (item.isProtected) {
-                            midKeep.add(item.evt);
-                        }
+                        if (score >= 100 && score < 1000) break; // 已有情绪分且不到否定级
                     }
 
-                    // 第二阶段：按类别配额补充
-                    const quotas = {
-                        emotion: Math.ceil(midTarget * 0.5),
-                        negation: Math.ceil(midTarget * 0.3),
-                        action: Math.ceil(midTarget * 0.3),
-                        normal: midTarget
-                    };
-
-                    scoredMid.sort((a, b) => b.score - a.score);
-
-                    const catCounts = { emotion: 0, negation: 0, action: 0, normal: 0 };
-                    for (const item of scoredMid) {
-                        if (midKeep.has(item.evt)) continue; // 已保留
-                        const cat = item.category === 'protected' ? 'emotion' : item.category;
-                        if (catCounts[cat] < quotas[cat]) {
-                            midKeep.add(item.evt);
-                            catCounts[cat]++;
-                        }
-                        if (midKeep.size >= midTarget) break;
+                    // 5. 动作词（60 分）
+                    if (NOTE_DENSITY_REDUCER.actionWords.has(char)) {
+                        score += 60;
                     }
 
-                    // 配额未满时，按分数补充
-                    if (midKeep.size < midTarget) {
-                        for (const item of scoredMid) {
-                            if (!midKeep.has(item.evt)) {
-                                midKeep.add(item.evt);
-                                if (midKeep.size >= midTarget) break;
-                            }
-                        }
-                    }
+                    return { evt, score };
+                });
 
-                    // 仍然未满时，均匀采样兜底
-                    if (midKeep.size < midTarget) {
-                        const remaining = midEvents.filter(e => !midKeep.has(e));
-                        const interval = Math.ceil(remaining.length / (midTarget - midKeep.size));
-                        let slot = 0;
-                        for (let i = 0; i < remaining.length && slot < (midTarget - midKeep.size); i += interval) {
-                            midKeep.add(remaining[i]);
-                            slot++;
-                        }
-                    }
-
-                    for (const e of midKeep) keepSet.add(e);
-                } else if (midTarget > 0) {
-                    // 中段本身就不够 target，全部保留
-                    for (const e of midEvents) keepSet.add(e);
-                }
+                // 按分数降序排列，取前 targetCount 个
+                scoredNotes.sort((a, b) => b.score - a.score);
+                const keepNotes = scoredNotes.slice(0, targetCount).map(s => s.evt);
+                const keepSet = new Set(keepNotes);
 
                 // 重构句内事件，保持原始顺序，只保留 note 事件中的 keepSet
                 // 非 note 事件（pause）全部保留
