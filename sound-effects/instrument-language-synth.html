@@ -1374,6 +1374,20 @@
                         <input type="range" id="notesPerBeat" min="1" max="4" value="1" oninput="updateParams()">
                     </div>
 
+                    <!-- Note Density Mode -->
+                    <div class="control-group" style="margin-top:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);">
+                        <div class="control-label">
+                            <span>🎶 发音密度模式</span>
+                            <span class="control-value" id="noteDensityModeValue">自然</span>
+                        </div>
+                        <select id="noteDensityMode" onchange="updateParams(); refreshNoteDisplay();" style="width:100%;padding:6px 8px;border-radius:6px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:var(--text);font-size:0.75rem;">
+                            <option value="full">完整 - 尽量保留全部发音</option>
+                            <option value="natural" selected>自然 - 默认压缩（约10音）</option>
+                            <option value="compact">简洁 - 明显减少（约7音）</option>
+                            <option value="minimal">极简 - 只保留锚点（约4音）</option>
+                        </select>
+                        <small style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;display:block;">控制乐器实际发出的音符数量，不改变文字内容</small>
+                    </div>
                     <!-- masterVolume -->
                     <div class="control-group">
                         <div class="control-label">
@@ -1922,6 +1936,9 @@
             bpm: 120,           // BPM速度
             notesPerBeat: 1,    // 每拍音符数
             rhythmRandom: false,// 节奏随机模式
+            // Note Density Reducer 参数
+            noteDensityMode: 'natural',  // 发音密度模式：full/natural/compact/minimal
+            noteDensityReducerEnabled: true,
             toneNoteValues: {   // 声调时值映射
                 1: '8',         // 一声 = 8分音符
                 2: '16',        // 二声 = 16分音符
@@ -3217,13 +3234,24 @@
         }
 
         // ===== Note Density Reducer =====
-        // 当单句超过 maxEffectiveCharsPerSentence 个有效字符且无标点时，
+        // 当单句超过阈值个有效字符且无标点时，
         // 自动减少乐器实际发音数量；短句和已有标点句不处理。
         // 不修改用户原文，只修改 performance events。
-        function applyNoteDensityReduction(events, originalText) {
+        // options.mode 可覆盖 params.noteDensityMode
+        function applyNoteDensityReduction(events, originalText, options = {}) {
+            const mode = options.mode || params.noteDensityMode || 'natural';
+
+            // full 模式直接返回，不做压缩
+            if (mode === 'full') {
+                return events;
+            }
+
             if (!NOTE_DENSITY_REDUCER.enabled || !events || events.length === 0) {
                 return events;
             }
+
+            // 扫描受保护短语位置
+            const protectedRanges = scanProtectedPhrases(originalText);
 
             // 将事件按句切分：由 pause / phraseMidi / characterVoice 事件切分
             const sentences = [];
@@ -3266,14 +3294,18 @@
                 const noteEvents = sentence.events.filter(e => e.type === 'note' && isEffectiveChar(e.char));
                 const effectiveCount = noteEvents.length;
 
-                // 短句（<=10）或已有标点的句，不处理
-                if (effectiveCount <= NOTE_DENSITY_REDUCER.maxEffectiveCharsPerSentence || sentence.hasPunctuation) {
+                // 获取目标 note 数
+                const targetCount = getNoteDensityTargetCount(effectiveCount, mode);
+
+                // 短句（<=10）或已有标点的句，或目标数等于原数，不处理
+                if (effectiveCount <= NOTE_DENSITY_REDUCER.maxEffectiveCharsPerSentence ||
+                    sentence.hasPunctuation ||
+                    targetCount >= effectiveCount) {
                     result.push(...sentence.events);
                     continue;
                 }
 
                 // 长句且无标点：需要压缩（拟声对白逻辑）
-                const targetCount = NOTE_DENSITY_REDUCER.maxEffectiveCharsPerSentence;
 
                 // ==== 拟声对白切分：前段 + 中段 + 后段 ====
                 const headCount = 2;   // 句首保留数量
@@ -3289,13 +3321,13 @@
                 const midTarget = Math.max(0, targetCount - keepSet.size);
 
                 if (midTarget > 0 && midEvents.length > midTarget) {
-                    // 为中段事件计算语义优先级
+                    // 为中段事件计算语义优先级（含受保护短语标记）
                     const scoredMid = midEvents.map(evt => {
                         const char = evt.char || '';
                         let score = 0;
                         let category = 'normal';
+                        let isProtected = false;
 
-                        // 情绪关键词匹配（检查 surrounding context）
                         const pos = evt.sourceCharIndex ?? 0;
                         const contextWindow = 5;
                         const context = originalText.substring(
@@ -3303,35 +3335,57 @@
                             Math.min(originalText.length, pos + contextWindow + 1)
                         ).toLowerCase();
 
-                        for (const [, keywords] of Object.entries(emotionKeywords)) {
-                            for (const kw of keywords) {
-                                if (context.includes(kw.toLowerCase())) {
-                                    score += 100;
-                                    category = 'emotion';
-                                    break;
-                                }
+                        // 受保护短语检查：如果该 note 落在保护范围内，标记 protected
+                        for (const range of protectedRanges) {
+                            if (pos >= range.start && pos < range.end) {
+                                isProtected = true;
+                                score += 150; // 最高优先级
+                                category = 'protected';
+                                break;
                             }
-                            if (category === 'emotion') break;
                         }
 
-                        // 否定词
-                        if (NOTE_DENSITY_REDUCER.negationWords.has(char) ||
-                            NOTE_DENSITY_REDUCER.negationWords.has(context.substring(contextWindow, contextWindow + 2))) {
-                            score = Math.max(score, 80);
-                            if (category === 'normal') category = 'negation';
+                        // 情绪关键词匹配
+                        if (!isProtected) {
+                            for (const [, keywords] of Object.entries(emotionKeywords)) {
+                                for (const kw of keywords) {
+                                    if (context.includes(kw.toLowerCase())) {
+                                        score += 100;
+                                        category = 'emotion';
+                                        break;
+                                    }
+                                }
+                                if (category === 'emotion') break;
+                            }
+
+                            // 否定词
+                            if (NOTE_DENSITY_REDUCER.negationWords.has(char) ||
+                                NOTE_DENSITY_REDUCER.negationWords.has(context.substring(contextWindow, contextWindow + 2))) {
+                                score = Math.max(score, 80);
+                                if (category === 'normal') category = 'negation';
+                            }
+
+                            // 动作词
+                            if (NOTE_DENSITY_REDUCER.actionWords.has(char)) {
+                                score = Math.max(score, 60);
+                                if (category === 'normal') category = 'action';
+                            }
                         }
 
-                        // 动作词
-                        if (NOTE_DENSITY_REDUCER.actionWords.has(char)) {
-                            score = Math.max(score, 60);
-                            if (category === 'normal') category = 'action';
-                        }
-
-                        return { evt, score, category };
+                        return { evt, score, category, isProtected };
                     });
 
                     // 分层保留策略：中段内优先语义关键词，再均匀采样
                     const midKeep = new Set();
+
+                    // 第一阶段：强制保留所有 protected note
+                    for (const item of scoredMid) {
+                        if (item.isProtected) {
+                            midKeep.add(item.evt);
+                        }
+                    }
+
+                    // 第二阶段：按类别配额补充
                     const quotas = {
                         emotion: Math.ceil(midTarget * 0.5),
                         negation: Math.ceil(midTarget * 0.3),
@@ -3343,7 +3397,8 @@
 
                     const catCounts = { emotion: 0, negation: 0, action: 0, normal: 0 };
                     for (const item of scoredMid) {
-                        const cat = item.category;
+                        if (midKeep.has(item.evt)) continue; // 已保留
+                        const cat = item.category === 'protected' ? 'emotion' : item.category;
                         if (catCounts[cat] < quotas[cat]) {
                             midKeep.add(item.evt);
                             catCounts[cat]++;
@@ -3390,6 +3445,20 @@
                         result.push(evt);
                     }
                 }
+            }
+
+            // 只在实际发生压缩时输出一次日志
+            const reducedNoteCount = result.filter(e => e.type === 'note').length;
+            const originalNoteCount = events.filter(e => e.type === 'note').length;
+            if (reducedNoteCount < originalNoteCount) {
+                console.log('[NoteDensityReducer]', {
+                    mode,
+                    originalText,
+                    effectiveCount: originalNoteCount,
+                    targetCount: getNoteDensityTargetCount(originalNoteCount, mode),
+                    beforeNotes: originalNoteCount,
+                    afterNotes: reducedNoteCount
+                });
             }
 
             return result;
@@ -3716,6 +3785,68 @@
             mysterious: ['神', '秘', '奇', 'mystery', 'magic', 'wonder', '神秘'],
             comfort: ['安慰', '抱抱', '没事', '别怕', '放心', '我在', '陪你', '好了好了', '没事的', '别担心', '抱抱你', '心疼', '没事没事', '没关系', '会好的', '不要难过', '别伤心', '我在呢', '不怕', '乖', '摸摸头', '给你抱抱', '加油', '坚持住', '一切都会好', '别担心了', '有我在', '我陪着你', '放松', '深呼吸', '平静下来', 'comfort', 'hug', 'dont worry', 'its okay', 'there there', 'calm down', 'take it easy']
         };
+
+        // ===== Note Density Reducer v2: 模式配置 =====
+        const NOTE_DENSITY_MODE_CONFIG = {
+            full: {
+                label: '完整',
+                maxNotes: Infinity,
+                ratio: 1.0,
+                description: '尽量保留全部有效字符发音'
+            },
+            natural: {
+                label: '自然',
+                maxNotes: 10,
+                ratio: 0.65,
+                description: '默认压缩，保留自然说话感'
+            },
+            compact: {
+                label: '简洁',
+                maxNotes: 7,
+                ratio: 0.45,
+                description: '明显减少发音数量'
+            },
+            minimal: {
+                label: '极简',
+                maxNotes: 4,
+                ratio: 0.25,
+                description: '只保留少量锚点音'
+            }
+        };
+
+        // 受保护短语：压缩时优先保留，禁止语义反转
+        const NOTE_DENSITY_PROTECTED_PHRASES = [
+            '不对劲', '不太对劲', '不安全', '不能去', '不要过去',
+            '别过去', '别靠近', '有危险', '太危险', '快回来',
+            '快走', '快跑', '停下', '等等', '别动', '不要动',
+            '不要说', '不能说', '我不能说', '我不该告诉你',
+            '忘掉', '快忘掉'
+        ];
+
+        // 计算目标 note 数
+        function getNoteDensityTargetCount(effectiveCount, mode) {
+            const config = NOTE_DENSITY_MODE_CONFIG[mode] || NOTE_DENSITY_MODE_CONFIG.natural;
+            if (mode === 'full') {
+                return effectiveCount;
+            }
+            const ratioTarget = Math.ceil(effectiveCount * config.ratio);
+            return Math.min(config.maxNotes, ratioTarget, effectiveCount);
+        }
+
+        // 扫描受保护短语在原文中的位置
+        function scanProtectedPhrases(originalText) {
+            const protectedRanges = [];
+            const lowerText = originalText.toLowerCase();
+            for (const phrase of NOTE_DENSITY_PROTECTED_PHRASES) {
+                const lowerPhrase = phrase.toLowerCase();
+                let idx = lowerText.indexOf(lowerPhrase);
+                while (idx !== -1) {
+                    protectedRanges.push({ start: idx, end: idx + phrase.length, phrase });
+                    idx = lowerText.indexOf(lowerPhrase, idx + 1);
+                }
+            }
+            return protectedRanges;
+        }
 
         // ===== Note Density Reducer 配置 =====
         const NOTE_DENSITY_REDUCER = {
@@ -5126,6 +5257,17 @@
             params.toneNoteValues[2] = document.getElementById('tone2NoteValue').value;
             params.toneNoteValues[3] = document.getElementById('tone3NoteValue').value;
             params.toneNoteValues[4] = document.getElementById('tone4NoteValue').value;
+
+            // ===== Note Density Reducer 模式 =====
+            const densityModeEl = document.getElementById('noteDensityMode');
+            if (densityModeEl) {
+                params.noteDensityMode = densityModeEl.value || 'natural';
+            }
+            const densityModeValueEl = document.getElementById('noteDensityModeValue');
+            if (densityModeValueEl) {
+                const cfg = NOTE_DENSITY_MODE_CONFIG[params.noteDensityMode] || NOTE_DENSITY_MODE_CONFIG.natural;
+                densityModeValueEl.textContent = cfg.label;
+            }
 
             // 更新显示
             const bpmValueEl = document.getElementById('bpmValue');
