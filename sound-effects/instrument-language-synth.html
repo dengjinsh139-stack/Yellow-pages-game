@@ -3451,7 +3451,7 @@
                 // 获取目标 note 数
                 const targetCount = getNoteDensityTargetCount(effectiveCount, mode);
 
-                // 短句（<=10）或目标数等于原数，不处理
+                // 短句（<=9）或目标数等于原数，不处理
                 if (effectiveCount <= NOTE_DENSITY_REDUCER.maxEffectiveCharsPerSentence ||
                     targetCount >= effectiveCount) {
                     result.push(...sentence.events);
@@ -3932,7 +3932,7 @@
         // ===== Note Density Reducer 配置 =====
         const NOTE_DENSITY_REDUCER = {
             enabled: true,
-            maxEffectiveCharsPerSentence: 10,
+            maxEffectiveCharsPerSentence: 9,
             // 否定词 - 语义权重高，压缩时优先保留
             negationWords: new Set([
                 '不', '没', '无', '非', '否', '别', '未', '莫', '勿', '休',
