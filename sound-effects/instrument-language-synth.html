@@ -39,6 +39,7 @@
             --bigrobot: #ff1744;
             --cuckoo: #22c55e;
             --cowbell: #ffa500;
+            --nylon_guitar: #8B7355;
         }
 
         * {
@@ -1415,6 +1416,10 @@
                             <span class="icon">🔔</span>
                             <span class="name">牛铃</span>
                         </div>
+                        <div class="instrument-btn" data-instrument="nylon_guitar">
+                            <span class="icon">🎸</span>
+                            <span class="name">尼龙Gitar</span>
+                        </div>
                     </div>
 
                     <div class="panel-title">基础演奏</div>
@@ -2006,7 +2011,8 @@
                 smallrobot: 0,
                 bigrobot: 0,
                 cuckoo: 0,
-                cowbell: 0
+                cowbell: 0,
+                nylon_guitar: 0
             },
             // 节奏引擎参数
             bpm: 135,           // BPM速度
@@ -2050,7 +2056,8 @@
             synth:   { id: 'synth',   label: '合成器', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             train:   { id: 'train',   label: '火车',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             cuckoo:  { id: 'cuckoo',  label: '布谷鸟', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
-            cowbell: { id: 'cowbell', label: '牛铃',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } }
+            cowbell: { id: 'cowbell', label: '牛铃',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
+            nylon_guitar: { id: 'nylon_guitar', label: '尼龙Gitar', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } }
         };
 
         // 角色引用 voiceId + 可选 shaping override
@@ -2427,7 +2434,8 @@
             synth:      { id: 'synth',      name: '合成器',   emoji: '🎛️', type: 'sample', sampleConfigKey: 'synth',      readyKey: 'synth_D4',    uiLabel: '真实合成器采样 🎛️' },
             train:      { id: 'train',      name: '火车',     emoji: '🚂', type: 'sample', sampleConfigKey: 'train',      readyKey: 'train_D4',    uiLabel: '真实火车采样 🚂' },
             cuckoo:     { id: 'cuckoo',     name: '布谷鸟',   emoji: '🐦', type: 'sample', sampleConfigKey: 'cuckoo',     readyKey: 'cuckoo_D4',   uiLabel: '真实布谷鸟采样 🐦' },
-            cowbell:    { id: 'cowbell',    name: '牛铃',     emoji: '🔔', type: 'sample', sampleConfigKey: 'cowbell',    readyKey: 'cowbell_D4',  uiLabel: '真实牛铃采样 🔔' }
+            cowbell:    { id: 'cowbell',    name: '牛铃',     emoji: '🔔', type: 'sample', sampleConfigKey: 'cowbell',    readyKey: 'cowbell_D4',  uiLabel: '真实牛铃采样 🔔' },
+            nylon_guitar: { id: 'nylon_guitar', name: '尼龙Gitar', emoji: '🎸', type: 'sample', sampleConfigKey: 'nylon_guitar', readyKey: 'nylon_guitar_D4', uiLabel: '真实尼龙吉他采样 🎸' }
         };
 
         // 向后兼容：旧存档中可能出现 'trumpet'，映射到 waterdrop
@@ -2615,6 +2623,19 @@
                 tempoMax: 300,          // 播放间隔最大: 300ms
                 tempoRandom: true,      // 启用随机波动: 开启
                 noteDuration: 400,      // 音符时长: 中等偏短（铃铛 decay 快）
+                reverb: 0,             // 混响效果: 0%
+                chordDuration: 0,       // 和弦长度: 静音(0%)
+                bpm: 135,               // BPM速度: 120
+                notesPerBeat: 1,        // 每拍音符数: 1个
+                rhythmRandom: false     // 启用节奏随机: 未勾选
+            },
+            nylon_guitar: {
+                masterVolume: 100,      // 全局音量: 100%
+                audioOffset: 0,         // 音频偏移: 0ms
+                tempoMin: 180,          // 播放间隔最小: 180ms（尼龙吉他温暖节奏）
+                tempoMax: 350,          // 播放间隔最大: 350ms
+                tempoRandom: true,      // 启用随机波动: 开启
+                noteDuration: 500,      // 音符时长: 中等（吉他 sustain 温暖）
                 reverb: 0,             // 混响效果: 0%
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 135,               // BPM速度: 120
@@ -3009,6 +3030,26 @@
                 },
                 attack: 0.02,
                 release: 0.3
+            },
+            nylon_guitar: {
+                name: '尼龙Gitar',
+                emoji: '🎸',
+                basePath: '../assets/audio/samples/nylon_guitar/',
+                samples: {
+                    // 尼龙吉他五声音阶采样
+                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.8 },
+                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.8 },
+                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.8 },
+                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.8 },
+                    'B4': { file: 'B4.wav', freq: 493.88, gain: 2.0 },
+                    'D5': { file: 'D5.wav', freq: 587.33, gain: 2.0 },
+                    'E5': { file: 'E5.wav', freq: 659.25, gain: 2.2 },
+                    'F5': { file: 'F5.wav', freq: 698.46, gain: 2.0 },
+                    'A5': { file: 'A5.wav', freq: 880.00, gain: 2.2 },
+                    'B5': { file: 'B5.wav', freq: 987.77, gain: 2.0 }
+                },
+                attack: 0.02,
+                release: 0.3
             }
         };
 
@@ -3044,14 +3085,15 @@
             synth:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             train:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             cuckoo:     { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            cowbell:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 }
+            cowbell:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
+            nylon_guitar: { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 }
         };
 
         // 每个乐器的 Chord 按钮独立音量 (默认1.0)
         const chordVolumes = {
             piano: 1.0, xylophone: 1.0, guitar: 1.0, flute: 1.0,
             waterdrop: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0,
-            mouthtrumpet: 1.0, kalimba: 1.0, smallrobot: 1.0, bigrobot: 1.0, cuckoo: 1.0, cowbell: 1.0
+            mouthtrumpet: 1.0, kalimba: 1.0, smallrobot: 1.0, bigrobot: 1.0, cuckoo: 1.0, cowbell: 1.0, nylon_guitar: 1.0
         };
 
         // 音符频率表
@@ -4103,6 +4145,7 @@
                 'bigrobot': loadBigrobotSamples,
                 'cuckoo': loadCuckooSamples,
                 'cowbell': loadCowbellSamples,
+                'nylon_guitar': loadNylonGuitarSamples,
             };
             const loader = loaders[instrument];
             if (loader) {
@@ -4168,7 +4211,7 @@
                     'piano':'钢琴','saxophone':'萨克斯','flute':'长笛','synth':'合成器',
                     'train':'火车','xylophone':'木琴','guitar':'虚拟人声',
                     'waterdrop':'水滴合成器','mouthtrumpet':'嘴巴小号',
-                    'kalimba':'钢片琴','smallrobot':'Small机器人','bigrobot':'Big机器人','cuckoo':'布谷鸟','cowbell':'牛铃'
+                    'kalimba':'钢片琴','smallrobot':'Small机器人','bigrobot':'Big机器人','cuckoo':'布谷鸟','cowbell':'牛铃','nylon_guitar':'尼龙Gitar'
                 })[instrument] || instrument}，请先启动音频引擎`;
                 console.log(`[selectInstrument] audioContext 未初始化，延迟加载 ${instrument}`);
                 return;
@@ -4211,6 +4254,7 @@
                 'waterdrop': '真实水滴合成器采样 💧',
                 'mouthtrumpet': '真实嘴巴小号采样 🎺',
                 'cuckoo': '真实布谷鸟采样 🐦',
+                'nylon_guitar': '真实尼龙吉他采样 🎸',
                 'cowbell': '真实牛铃采样 🔔'
             };
             const waveInfo = document.getElementById('waveInfo');
@@ -4638,6 +4682,29 @@
             await Promise.all(loadPromises);
         }
 
+        // 加载尼龙吉他采样
+        async function loadNylonGuitarSamples() {
+            if (audioBuffers['nylon_guitar_D4']) return; // 已加载
+
+            const config = sampleConfig.nylon_guitar;
+            const loadPromises = [];
+
+            for (const [note, info] of Object.entries(config.samples)) {
+                const promise = fetch(config.basePath + info.file)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        audioBuffers['nylon_guitar_' + note] = audioBuffer;
+                        console.log(`Loaded nylon_guitar: ${note}`);
+                    })
+                    .catch(err => console.error(`Failed to load nylon_guitar ${note}:`, err));
+
+                loadPromises.push(promise);
+            }
+
+            await Promise.all(loadPromises);
+        }
+
         // 加载木琴采样（只加载真实采样文件，其他音符用合成）
         async function loadXylophoneSamples() {
             if (audioBuffers['xylophone_A5']) return; // 已加载
@@ -4701,6 +4768,7 @@
                     'train': 'rgba(100, 149, 237, 0.15)',   // 钢蓝色
                     'cuckoo': 'rgba(34, 197, 94, 0.15)'     // 布谷鸟绿色
                     , 'cowbell': 'rgba(255, 165, 0, 0.15)'   // 牛铃橙色
+                    , 'nylon_guitar': 'rgba(139, 115, 85, 0.15)' // 尼龙吉他木色
                 };
                 const activeColors = {
                     'piano': 'rgba(255, 107, 107, 0.4)',
@@ -4717,6 +4785,7 @@
                     'train': 'rgba(100, 149, 237, 0.4)',
                     'cuckoo': 'rgba(34, 197, 94, 0.4)'     // 布谷鸟绿色
                     , 'cowbell': 'rgba(255, 165, 0, 0.4)'    // 牛铃橙色
+                    , 'nylon_guitar': 'rgba(139, 115, 85, 0.4)'  // 尼龙吉他木色
                 };
                 key.style.background = `linear-gradient(145deg, ${instrumentColors[currentInstrument] || 'rgba(255, 107, 107, 0.15)'}, rgba(0, 0, 0, 0.2))`;
                 key.style.borderColor = activeColors[currentInstrument] || 'rgba(255, 107, 107, 0.4)';
@@ -4973,6 +5042,9 @@
                 return true;
             }
             if (instrument === 'cowbell' && audioBuffers['cowbell_D4']) {
+                return true;
+            }
+            if (instrument === 'nylon_guitar' && audioBuffers['nylon_guitar_D4']) {
                 return true;
             }
             return false;
@@ -6329,7 +6401,7 @@
             }
 
             // 新乐器：采样未到位前使用合成器 fallback
-            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell'].includes(currentInstrument)) {
+            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar'].includes(currentInstrument)) {
                 return playSynthTone(frequency, duration / 1000, velocity);
             }
 
@@ -6586,7 +6658,8 @@
                 'synth': '合成器',
                 'train': '火车',
                 'cuckoo': '布谷鸟',
-                'cowbell': '牛铃'
+                'cowbell': '牛铃',
+                'nylon_guitar': '尼龙Gitar'
             };
             const instrumentName = instrumentDisplayNames[currentInstrument] || currentInstrument;
             document.getElementById('statusText').textContent = hasSamples ? `演奏中 (${instrumentName})...` : '演奏中...';
@@ -8428,7 +8501,7 @@
 
                         // 乐器分支判断（与实时播放一致）
                         const isPiano = currentInstrument === 'piano';
-                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell'].includes(currentInstrument);
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar'].includes(currentInstrument);
                         const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                         const hasSample = noteObj.sampleNote && samplesLoaded;
 
@@ -8465,7 +8538,7 @@
 
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell'].includes(currentInstrument);
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar'].includes(currentInstrument);
                 const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                 const hasSample = note.sampleNote && samplesLoaded;
 
@@ -8682,6 +8755,7 @@
                 'bigrobot': 'sawtooth',
                 'cuckoo': 'triangle',
                 'cowbell': 'square',
+                'nylon_guitar': 'triangle',
                 'synth': 'sawtooth'
             };
             oscillator.type = waveforms[currentInstrument] || 'sine';
