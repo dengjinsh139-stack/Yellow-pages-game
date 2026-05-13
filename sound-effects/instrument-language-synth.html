@@ -34,7 +34,7 @@
             --waterdrop: #00b4d8;
             --synth: #9b5de5;
             --mouthtrumpet: #ffc107;
-            --kalimba: #d4a574;
+            --kalimba: #C0C0C0;
             --smallrobot: #00e676;
             --bigrobot: #ff1744;
             --cuckoo: #22c55e;
@@ -1396,8 +1396,8 @@
                             <span class="name">嘴巴小号</span>
                         </div>
                         <div class="instrument-btn" data-instrument="kalimba">
-                            <span class="icon">🎹</span>
-                            <span class="name">卡林巴</span>
+                            <span class="icon">🎵</span>
+                            <span class="name">钢片琴</span>
                         </div>
                         <div class="instrument-btn" data-instrument="smallrobot">
                             <span class="icon">🤖</span>
@@ -2043,7 +2043,7 @@
             xylophone:{ id: 'xylophone', label: '木琴', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             waterdrop: { id: 'waterdrop', label: '水滴合成器',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             mouthtrumpet: { id: 'mouthtrumpet', label: '嘴巴小号', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
-            kalimba:      { id: 'kalimba',      label: '卡林巴',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
+            kalimba:      { id: 'kalimba',      label: '钢片琴',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             smallrobot:   { id: 'smallrobot',   label: 'Small机器人', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             bigrobot:     { id: 'bigrobot',     label: 'Big机器人',   defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
             saxophone:{ id: 'saxophone', label: '萨克斯', defaultShaping: { hpfFreq: 100, mudCutFreq: 250, mudCutGain: -2, highCutFreq: 10000, highCutGain: -1, attackMs: 5,  releaseMs: 100, overlapMs: 10, semanticGap: 100 } },
@@ -2420,7 +2420,7 @@
             xylophone:  { id: 'xylophone',  name: '木琴',     emoji: '🎹', type: 'sample', sampleConfigKey: 'xylophone',  readyKey: 'xylophone_F4',uiLabel: '真实木琴采样 🎹' },
             waterdrop:  { id: 'waterdrop',  name: '水滴合成器', emoji: '💧', type: 'sample', sampleConfigKey: 'waterdrop',  readyKey: 'waterdrop_D4',uiLabel: '真实水滴合成器采样 💧' },
             mouthtrumpet: { id: 'mouthtrumpet', name: '嘴巴小号', emoji: '🎺', type: 'sample', sampleConfigKey: 'mouthtrumpet', readyKey: 'mouthtrumpet_D4', uiLabel: '真实嘴巴小号采样 🎺' },
-            kalimba:      { id: 'kalimba',      name: '卡林巴',   emoji: '🎹', type: 'sample', sampleConfigKey: 'kalimba',      readyKey: 'kalimba_D4',      uiLabel: '真实卡林巴采样 🎹' },
+            kalimba:      { id: 'kalimba',      name: '钢片琴',   emoji: '🎵', type: 'sample', sampleConfigKey: 'kalimba',      readyKey: 'kalimba_D4',      uiLabel: '真实钢片琴采样 🎵' },
             smallrobot:   { id: 'smallrobot',   name: 'Small机器人', emoji: '🤖', type: 'sample', sampleConfigKey: 'smallrobot',   readyKey: 'smallrobot_D4',   uiLabel: '真实Small机器人采样 🤖' },
             bigrobot:     { id: 'bigrobot',     name: 'Big机器人',   emoji: '🦾', type: 'sample', sampleConfigKey: 'bigrobot',     readyKey: 'bigrobot_D4',     uiLabel: '真实Big机器人采样 🦾' },
             saxophone:  { id: 'saxophone',  name: '萨克斯',   emoji: '🎷', type: 'sample', sampleConfigKey: 'saxophone',  readyKey: 'saxophone_D4',uiLabel: '真实萨克斯采样 🎷' },
@@ -2562,7 +2562,7 @@
                 tempoMin: 100,          // 播放间隔最小: 100ms
                 tempoMax: 200,          // 播放间隔最大: 200ms
                 tempoRandom: true,      // 启用随机波动: 开启
-                noteDuration: 600,      // 音符时长: 中等（卡林巴 sustain 较长）
+                noteDuration: 600,      // 音符时长: 中等（钢片琴 sustain 较长）
                 reverb: 0,             // 混响效果: 0%
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 135,               // BPM速度: 120
@@ -2890,11 +2890,11 @@
                 release: 0.3
             },
             kalimba: {
-                name: '卡林巴',
-                emoji: '🎹',
+                name: '钢片琴',
+                emoji: '🎵',
                 basePath: '../assets/audio/samples/kalimba/',
                 samples: {
-                    // 卡林巴五声音阶采样
+                    // 钢片琴五声音阶采样
                     'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
                     'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
                     'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
@@ -4119,7 +4119,7 @@
                     const names = {
                         'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
                         'synth': '合成器', 'train': '火车', 'xylophone': '木琴',
-                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '卡林巴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人'
+                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人'
                     };
                     document.getElementById('statusText').textContent = `正在加载 ${names[instrument] || instrument} 采样，请稍候...`;
                     try {
@@ -4168,7 +4168,7 @@
                     'piano':'钢琴','saxophone':'萨克斯','flute':'长笛','synth':'合成器',
                     'train':'火车','xylophone':'木琴','guitar':'虚拟人声',
                     'waterdrop':'水滴合成器','mouthtrumpet':'嘴巴小号',
-                    'kalimba':'卡林巴','smallrobot':'Small机器人','bigrobot':'Big机器人','cuckoo':'布谷鸟','cowbell':'牛铃'
+                    'kalimba':'钢片琴','smallrobot':'Small机器人','bigrobot':'Big机器人','cuckoo':'布谷鸟','cowbell':'牛铃'
                 })[instrument] || instrument}，请先启动音频引擎`;
                 console.log(`[selectInstrument] audioContext 未初始化，延迟加载 ${instrument}`);
                 return;
@@ -4522,8 +4522,8 @@
             await Promise.all(loadPromises);
         }
 
-        // 加载卡林巴采样（占位）
-        // 加载卡林巴采样
+        // 加载钢片琴采样（占位）
+        // 加载钢片琴采样
         async function loadKalimbaSamples() {
             if (audioBuffers['kalimba_D4']) return; // 已加载
 
@@ -4693,7 +4693,7 @@
                     'xylophone': 'rgba(231, 111, 81, 0.15)',  // 珊瑚色
                     'waterdrop': 'rgba(0, 180, 216, 0.15)', // 水滴蓝
                     'mouthtrumpet': 'rgba(255, 193, 7, 0.15)', // 嘴巴小号琥珀色
-                    'kalimba': 'rgba(212, 165, 116, 0.15)',    // 卡林巴木质色
+                    'kalimba': 'rgba(192, 192, 192, 0.15)',    // 钢片琴金属色
                     'smallrobot': 'rgba(0, 230, 118, 0.15)',    // Small机器人科技绿
                     'bigrobot': 'rgba(255, 23, 68, 0.15)',     // Big机器人红色
                     'saxophone': 'rgba(255, 107, 107, 0.15)', // 红色（同钢琴）
@@ -4709,7 +4709,7 @@
                     'xylophone': 'rgba(231, 111, 81, 0.4)',
                     'waterdrop': 'rgba(0, 180, 216, 0.4)',
                     'mouthtrumpet': 'rgba(255, 193, 7, 0.4)',
-                    'kalimba': 'rgba(212, 165, 116, 0.4)',
+                    'kalimba': 'rgba(192, 192, 192, 0.4)',     // 钢片琴金属色
                     'smallrobot': 'rgba(0, 230, 118, 0.4)',
                     'bigrobot': 'rgba(255, 23, 68, 0.4)',
                     'saxophone': 'rgba(255, 107, 107, 0.4)',
@@ -5354,7 +5354,7 @@
                 synth: '合成器',
                 train: '火车',
                 mouthtrumpet: '嘴巴小号',
-                kalimba: '卡林巴',
+                kalimba: '钢片琴',
                 smallrobot: 'Small机器人',
                 bigrobot: 'Big机器人',
                 cuckoo: '布谷鸟',
@@ -6336,7 +6336,7 @@
             // 采样未就绪，不 silent fallback
             console.warn(`[${currentInstrument}] 采样未就绪，跳过`);
             const names = { 'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
-                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '卡林巴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'cuckoo': '布谷鸟', 'cowbell': '牛铃' };
+                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'cuckoo': '布谷鸟', 'cowbell': '牛铃' };
             document.getElementById('statusText').textContent = '正在加载 ' + (names[currentInstrument] || currentInstrument) + ' 采样，请稍候...';
             return;
         }
@@ -6580,7 +6580,7 @@
                 'xylophone': '真实木琴',
                 'waterdrop': '水滴合成器',
                 'mouthtrumpet': '嘴巴小号',
-                'kalimba': '卡林巴',
+                'kalimba': '钢片琴',
                 'smallrobot': 'Small机器人',
                 'bigrobot': 'Big机器人',
                 'synth': '合成器',
@@ -7190,7 +7190,7 @@
             'xylophone': '真实木琴',
             'waterdrop': '水滴合成器',
             'mouthtrumpet': '嘴巴小号',
-            'kalimba': '卡林巴',
+            'kalimba': '钢片琴',
             'smallrobot': 'Small机器人',
             'bigrobot': 'Big机器人',
             'synth': '合成器',
