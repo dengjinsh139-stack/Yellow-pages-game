@@ -3390,7 +3390,7 @@
 
             if (matches.length === 0) {
                 const events = textToNotes(text);
-                return applyNoteDensityReduction(events, text);
+                return finalizePerformanceEvents(events, text);
             }
 
             // 按位置排序，优先位置靠前，位置相同取长度长的
@@ -3441,7 +3441,7 @@
                 }
             }
 
-            return applyPhraseArticulation(applyNoteDensityReduction(events, text), text);
+            return finalizePerformanceEvents(events, text);
         }
 
         // ===== Note Density Reducer =====
@@ -3656,6 +3656,12 @@
             flushSegment();
 
             return result;
+        }
+
+        // ===== 统一事件出口：Note Density Reducer → Phrase Articulation =====
+        function finalizePerformanceEvents(events, originalText) {
+            const reduced = applyNoteDensityReduction(events, originalText);
+            return applyPhraseArticulation(reduced, params.phraseArticulationMode || 'natural');
         }
 
         // 判断字符是否为有效字符（中文字符 / 英文字母 / 数字）
