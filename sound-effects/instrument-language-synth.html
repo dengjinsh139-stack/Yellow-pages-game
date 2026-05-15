@@ -617,6 +617,11 @@
             font-size: 0.8rem;
         }
 
+        /* Phrase Articulation Shaper - 句内发音颗粒塑形 */
+        .note-item.articulation-head { opacity: 1; }
+        .note-item.articulation-body { opacity: 0.65; }
+        .note-item.articulation-tail { opacity: 0.85; }
+
         /* 音符键盘 */
         .note-keyboard {
             display: grid;
@@ -1467,6 +1472,19 @@
                         </select>
                         <small style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;display:block;">控制乐器实际发出的音符数量，不改变文字内容</small>
                     </div>
+                    <!-- Phrase Articulation Shaper -->
+                    <div class="control-group" style="margin-top:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);">
+                        <div class="control-label">
+                            <span>🎙️ 发音颗粒</span>
+                            <span class="control-value" id="phraseArticulationValue">自然</span>
+                        </div>
+                        <select id="phraseArticulationMode" onchange="updateParams(); refreshNoteDisplay();" style="width:100%;padding:6px 8px;border-radius:6px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:var(--text);font-size:0.75rem;">
+                            <option value="clear">清晰 - 每个音更明确</option>
+                            <option value="natural" selected>自然 - 句首清楚，中段轻微弱化</option>
+                            <option value="soft">柔和 - 中段明显弱化和软化</option>
+                        </select>
+                        <small style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;display:block;">控制一句话内部每个音的清晰度，不改变文字内容</small>
+                    </div>
                     <!-- masterVolume -->
                     <div class="control-group">
                         <div class="control-label">
@@ -2021,6 +2039,9 @@
             // Note Density Reducer 参数
             noteDensityMode: 'natural',  // 发音密度模式：full/natural/compact/minimal
             noteDensityReducerEnabled: true,
+            // ===== Phrase Articulation Shaper =====
+            phraseArticulationMode: 'natural',  // 句内发音颗粒模式：clear/natural/soft
+            phraseArticulationEnabled: true,
             toneNoteValues: {   // 声调时值映射
                 1: '8',         // 一声 = 8分音符
                 2: '16',        // 二声 = 16分音符
@@ -3420,7 +3441,7 @@
                 }
             }
 
-            return applyNoteDensityReduction(events, text);
+            return applyPhraseArticulation(applyNoteDensityReduction(events, text), text);
         }
 
         // ===== Note Density Reducer =====
@@ -3583,6 +3604,56 @@
                     afterNotes: reducedNoteCount
                 });
             }
+
+            return result;
+        }
+
+        // ===== Phrase Articulation Shaper =====
+        // 句内发音颗粒塑形：让一句话内部的 note 有不同清晰度和重要性
+        function applyPhraseArticulation(events, mode = params.phraseArticulationMode || 'natural') {
+            if (!params.phraseArticulationEnabled) return events;
+
+            const preset = PHRASE_ARTICULATION_PRESETS[mode] || PHRASE_ARTICULATION_PRESETS.natural;
+            const result = [];
+            let segment = [];
+
+            function flushSegment() {
+                if (segment.length === 0) return;
+
+                const noteEvents = segment.filter(e => e.type === 'note');
+                const noteCount = noteEvents.length;
+
+                noteEvents.forEach((evt, idx) => {
+                    let role = 'body';
+
+                    if (idx < 2) {
+                        role = 'head';
+                    } else if (idx >= noteCount - 2) {
+                        role = 'tail';
+                    }
+
+                    const cfg = preset[role];
+
+                    evt.articulationRole = role;
+                    evt.articulationVelocityScale = cfg.velocityScale;
+                    evt.articulationAttackMs = cfg.attackMs;
+                    evt.articulationDurationScale = cfg.durationScale;
+                });
+
+                result.push(...segment);
+                segment = [];
+            }
+
+            for (const evt of events) {
+                if (evt.type === 'pause' || evt.type === 'phraseMidi' || evt.type === 'characterVoice') {
+                    flushSegment();
+                    result.push(evt);
+                } else {
+                    segment.push(evt);
+                }
+            }
+
+            flushSegment();
 
             return result;
         }
@@ -4006,6 +4077,29 @@
                 'love', 'like', 'hate', 'want', 'need', 'wish', 'hope',
                 'try', 'start', 'stop', 'begin', 'end', 'finish', 'complete'
             ])
+        };
+
+        // ===== Phrase Articulation Shaper =====
+        // 句内发音颗粒塑形：让一句话内部的 note 有不同清晰度和重要性
+        const PHRASE_ARTICULATION_PRESETS = {
+            clear: {
+                label: '清晰',
+                head: { velocityScale: 1.0, attackMs: 0, durationScale: 1.0 },
+                body: { velocityScale: 0.9, attackMs: 5, durationScale: 0.95 },
+                tail: { velocityScale: 0.95, attackMs: 5, durationScale: 1.0 }
+            },
+            natural: {
+                label: '自然',
+                head: { velocityScale: 1.0, attackMs: 0, durationScale: 1.0 },
+                body: { velocityScale: 0.68, attackMs: 18, durationScale: 0.88 },
+                tail: { velocityScale: 0.85, attackMs: 8, durationScale: 1.05 }
+            },
+            soft: {
+                label: '柔和',
+                head: { velocityScale: 0.95, attackMs: 5, durationScale: 1.0 },
+                body: { velocityScale: 0.52, attackMs: 30, durationScale: 0.82 },
+                tail: { velocityScale: 0.78, attackMs: 15, durationScale: 1.08 }
+            }
         };
 
         // 初始化
@@ -5488,6 +5582,17 @@
                 densityModeValueEl.textContent = cfg.label;
             }
 
+            // ===== Phrase Articulation Shaper 模式 =====
+            const articulationModeEl = document.getElementById('phraseArticulationMode');
+            if (articulationModeEl) {
+                params.phraseArticulationMode = articulationModeEl.value || 'natural';
+            }
+            const articulationValueEl = document.getElementById('phraseArticulationValue');
+            if (articulationValueEl) {
+                const preset = PHRASE_ARTICULATION_PRESETS[params.phraseArticulationMode] || PHRASE_ARTICULATION_PRESETS.natural;
+                articulationValueEl.textContent = preset.label;
+            }
+
             // 更新显示
             const bpmValueEl = document.getElementById('bpmValue');
             if (bpmValueEl) bpmValueEl.textContent = params.bpm;
@@ -6141,7 +6246,7 @@
         }
 
         // 使用真实采样播放音符
-        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5) {
+        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5, attackMsOverride) {
             if (!audioContext) return;
 
             // 根据当前乐器选择配置（虚拟人声使用 vocal 配置）
@@ -6158,7 +6263,7 @@
                 if (randomSample) {
                     const buffer = audioBuffers[randomSample.bufferKey];
                     if (buffer) {
-                        return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, randomSample.sampleNote, config);
+                        return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, randomSample.sampleNote, config, attackMsOverride);
                     }
                 }
             }
@@ -6192,11 +6297,11 @@
                 return; // 不允许 silent fallback
             }
 
-            return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config);
+            return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride);
         }
 
         // 内部采样播放函数（与实时播放 playSampleTone() 严格对齐）
-        function playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config) {
+        function playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride) {
             // 创建音频源
             const source = audioContext.createBufferSource();
             source.buffer = buffer;
@@ -6225,8 +6330,8 @@
             // ===== 声音塑形：包络（Attack / Release）=====
             const now = audioContext.currentTime;
             const vs = params.voiceShaping;
-            // Attack 柔化：配置值 + voiceShaping 叠加（ms 转秒）
-            const attackTime = Math.min((config.attack || 0.005) + (vs.attackMs / 1000), Math.max(0.001, duration * 0.2));
+            // Attack 柔化：配置值 + voiceShaping 叠加 + articulation attack offset（ms 转秒）
+            const attackTime = Math.min((config.attack || 0.005) + (vs.attackMs / 1000) + ((attackMsOverride || 0) / 1000), Math.max(0.001, duration * 0.2));
             // 短音符需要更长的保持时间，确保音量饱满
             const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
             // Release 受 voiceShaping 控制（ms 转秒），确保声音连贯度
@@ -6309,7 +6414,7 @@
         }
 
         // 合成器音色（其他乐器用）
-        function playSynthTone(frequency, duration, velocity = 0.5) {
+        function playSynthTone(frequency, duration, velocity = 0.5, attackMsOverride) {
             if (!audioContext) return;
 
             const vs = params.voiceShaping;
@@ -6320,7 +6425,7 @@
             osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
 
             const now = audioContext.currentTime;
-            const attackTime = Math.max(0.001, vs.attackMs / 1000);
+            const attackTime = Math.max(0.001, (vs.attackMs + (attackMsOverride || 0)) / 1000);
             const releaseTime = Math.max(0.05, vs.releaseMs / 1000);
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.linearRampToValueAtTime(velocity * 0.3, now + attackTime);
@@ -6363,7 +6468,7 @@
             updateSpectrum();
         }
 
-        function playTone(frequency, noteName, duration, velocity = 0.5) {
+        function playTone(frequency, noteName, duration, velocity = 0.5, attackMsOverride) {
             // 检查当前乐器是否有采样可用
             const hasSamples = hasInstrumentSamples(currentInstrument);
             console.log(`[playTone] instrument=${currentInstrument}, hasSamples=${hasSamples}, note=${noteName}`);
@@ -6378,14 +6483,14 @@
                 // 如果有精确匹配的真实采样，直接使用
                 if (hasThisSample) {
                     console.log(`[木琴] 使用精确采样: ${bufferKey}`);
-                    return playSampleTone(frequency, noteName, duration / 1000, velocity);
+                    return playSampleTone(frequency, noteName, duration / 1000, velocity, attackMsOverride);
                 }
 
                 // 没有精确匹配（如 G4/G5），使用最近的采样 + playbackRate 调整
                 const nearestSample = findNearestSample(noteName);
                 if (nearestSample && nearestSample !== noteName && audioBuffers['xylophone_' + nearestSample]) {
                     console.log(`[木琴] ${noteName} 无精确采样，使用 ${nearestSample} + playbackRate`);
-                    return playSampleTone(frequency, nearestSample, duration / 1000, velocity);
+                    return playSampleTone(frequency, nearestSample, duration / 1000, velocity, attackMsOverride);
                 }
 
                 // 采样未就绪，不 silent fallback
@@ -6397,12 +6502,12 @@
             // 其他 sample-based 乐器
             if (hasSamples) {
                 console.log(`[${currentInstrument}] 使用采样音色`);
-                return playSampleTone(frequency, noteName, duration / 1000, velocity);
+                return playSampleTone(frequency, noteName, duration / 1000, velocity, attackMsOverride);
             }
 
             // 新乐器：采样未到位前使用合成器 fallback
             if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar'].includes(currentInstrument)) {
-                return playSynthTone(frequency, duration / 1000, velocity);
+                return playSynthTone(frequency, duration / 1000, velocity, attackMsOverride);
             }
 
             // 采样未就绪，不 silent fallback
@@ -6804,6 +6909,12 @@
                         noteDuration *= note.durationMultiplier;
                     }
 
+                    // ===== Phrase Articulation：应用时值缩放 =====
+                    const articulationDurationScale = note.articulationDurationScale || 1;
+                    if (articulationDurationScale !== 1) {
+                        noteDuration *= articulationDurationScale;
+                    }
+
                     // ===== 最短可听下限保护（BPM 动态计算）=====
                     const minAudibleMs = (60000 / params.bpm) * 0.23; // 约 0.23 拍
                     noteDuration = Math.max(noteDuration, minAudibleMs);
@@ -6825,6 +6936,9 @@
                     // ===== Expression Segment：应用表达段力度倍率 =====
                     velocityWithMaster *= note.expressionVelocityScale || 1;
 
+                    // ===== Phrase Articulation：应用力度缩放 =====
+                    velocityWithMaster *= note.articulationVelocityScale || 1;
+
                     // 应用后音轻起修饰（仅对足够长的音生效，避免过短音被吞）
                     if (note.velocityMultiplier && noteDuration >= 160) {
                         velocityWithMaster *= note.velocityMultiplier;
@@ -6833,7 +6947,9 @@
                     console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}, expressionTempo=${expressionTempo.toFixed(2)}x`);
 
                     // 播放单音（使用节奏引擎计算的时长）
-                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster);
+                    // 叠加 articulation attack offset
+                    const finalAttackMs = params.voiceShaping.attackMs + (note.articulationAttackMs || 0);
+                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster, finalAttackMs);
 
                     // 高亮当前事件（使用真实事件索引 i）
                     highlightNote(i);
@@ -7073,7 +7189,7 @@
                 const userVol = noteVolumes[currentInstrument][n.note] || 1.0;
                 const volIndicator = userVol !== 1.0 ? `<span style="font-size: 0.55rem; color: ${userVol > 1.0 ? '#ff6b9d' : '#4ecdc4'};">${Math.round(userVol*100)}%</span>` : '';
                 const volStyle = userVol !== 1.0 ? `border: 1px solid ${userVol > 1.0 ? 'rgba(255,107,107,0.4)' : 'rgba(78,205,196,0.4)'};` : '';
-                return `<span class="note-item" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo} 音量:${Math.round(userVol*100)}%"
+                return `<span class="note-item ${n.articulationRole ? 'articulation-' + n.articulationRole : ''}" id="note-${i}" title="${n.char || ''} ${toneNames[n.tone] || ''} ${regionInfo} 音量:${Math.round(userVol*100)}%"
                     style="display: inline-flex; flex-direction: column; align-items: center; padding: 4px 8px; ${volStyle}">
                     <span style="font-size: 0.9rem;">${displayText}</span>
                     <span style="font-size: 0.6rem; opacity: 0.7;">${rhythmInfo}</span>
@@ -8165,8 +8281,14 @@
 
                 // 普通 note 事件
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
-                const duration = timing.duration / 1000;
+                let duration = timing.duration / 1000;
                 const overlapSec = params.voiceShaping.overlapMs / 1000;
+
+                // ===== Phrase Articulation：如果 _timing 缓存未包含 articulation，手动叠加 =====
+                if (evt._timing && evt.articulationDurationScale !== undefined) {
+                    duration *= evt.articulationDurationScale;
+                }
+
                 let advance = Math.max(0, duration - overlapSec);
 
                 // ===== Expression Segment：停顿计入时间线 =====
@@ -8246,6 +8368,12 @@
                 noteDuration *= note.durationMultiplier;
             }
 
+            // ===== Phrase Articulation：应用时值缩放 =====
+            const articulationDurationScale = note.articulationDurationScale || 1;
+            if (articulationDurationScale !== 1) {
+                noteDuration *= articulationDurationScale;
+            }
+
             // ===== Expression Segment：应用表达段速度倍率 =====
             const expressionTempo = (note.expressionTempoScale || 1) * (note.expressionCurveFactor || 1);
             if (expressionTempo !== 1) {
@@ -8267,10 +8395,16 @@
             // ===== Expression Segment：应用表达段力度倍率 =====
             velocityWithMaster *= note.expressionVelocityScale || 1;
 
+            // ===== Phrase Articulation：应用力度缩放 =====
+            velocityWithMaster *= note.articulationVelocityScale || 1;
+
             // 应用后音轻起修饰（仅对足够长的音生效）
             if (note.velocityMultiplier && noteDuration >= 160) {
                 velocityWithMaster *= note.velocityMultiplier;
             }
+
+            // ===== Phrase Articulation：计算 attack offset =====
+            const articulationAttackMs = note.articulationAttackMs || 0;
 
             // ===== 防御：确保返回值都是有限值 =====
             if (!isFinite(noteDuration) || noteDuration <= 0) {
@@ -8282,7 +8416,7 @@
                 velocityWithMaster = 0.5;
             }
 
-            return { duration: noteDuration, velocity: velocityWithMaster };
+            return { duration: noteDuration, velocity: velocityWithMaster, attackMs: articulationAttackMs };
         }
 
         // 获取采样 buffer key（与实时播放保持一致）
@@ -8525,8 +8659,16 @@
                 const note = evt;
                 // 使用预计算的timing（如果存在），避免随机模式导致不一致
                 const timing = evt._timing || computeEventTiming(evt, beatDuration, params.bpm);
-                const noteDuration = timing.duration / 1000;
-                const velocity = timing.velocity;
+                let noteDuration = timing.duration / 1000;
+                let velocity = timing.velocity;
+
+                // ===== Phrase Articulation：如果 _timing 缓存未包含 articulation，手动叠加 =====
+                if (evt._timing && evt.articulationDurationScale !== undefined) {
+                    noteDuration *= evt.articulationDurationScale;
+                }
+                if (evt._timing && evt.articulationVelocityScale !== undefined) {
+                    velocity *= evt.articulationVelocityScale;
+                }
 
                 // ===== 防御：跳过无效参数的事件 =====
                 if (!isFinite(noteDuration) || noteDuration <= 0 || !isFinite(velocity)) {
@@ -8550,11 +8692,11 @@
                     chordNotesRendered++;
                 } else if ((isPiano || isSampleInstrument || isVirtualVoice) && (hasSample || isVirtualVoice)) {
                     console.log(`[renderAudioToBuffer]   → renderSampleToBuffer (sampleNote=${note.sampleNote}, virtualVoice=${isVirtualVoice})`);
-                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, timing.attackMs);
                     sampleNotesRendered++;
                 } else {
                     console.log(`[renderAudioToBuffer]   → renderSynthToBuffer`);
-                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity);
+                    await renderSynthToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, timing.attackMs);
                     synthNotesRendered++;
                 }
 
@@ -8581,7 +8723,7 @@
         }
 
         // 渲染采样到 buffer（与实时播放 playSampleTone() 严格对齐）
-        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
+        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, attackMsOverride) {
             // ===== 防御：跳过无效参数 =====
             if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(overrideVelocity)) {
                 console.warn('[renderSampleToBuffer] Invalid params, skipping:', { startTime, duration, overrideVelocity });
@@ -8636,7 +8778,7 @@
             if (!buffer) {
                 console.warn('🎵 [RENDER] Sample not found for', bufferKey, '- falling back to synth');
                 // 采样找不到时fallback到合成音色，而不是直接跳过
-                await renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity);
+                await renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, attackMsOverride);
                 return;
             }
 
@@ -8660,8 +8802,8 @@
             const gainNode = offlineContext.createGain();
             const vs = params.voiceShaping;
 
-            // ===== 包络：与 playSampleTone() 严格对齐 + Voice Shaping =====
-            const attackTime = Math.min((config.attack || 0.005) + (vs.attackMs / 1000), Math.max(0.001, duration * 0.2));
+            // ===== 包络：与 playSampleTone() 严格对齐 + Voice Shaping + articulation attack offset =====
+            const attackTime = Math.min((config.attack || 0.005) + (vs.attackMs / 1000) + ((attackMsOverride || 0) / 1000), Math.max(0.001, duration * 0.2));
             const holdTime = Math.max(Math.min(duration * 0.4, 0.15), duration * 0.2);
             const releaseTime = Math.max(vs.releaseMs / 1000, 0.05);
 
@@ -8734,7 +8876,7 @@
         }
 
         // 渲染合成音色到 buffer
-        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity) {
+        async function renderSynthToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, attackMsOverride) {
             // ===== 防御：跳过无效参数 =====
             if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(overrideVelocity)) {
                 console.warn('[renderSynthToBuffer] Invalid params, skipping:', { startTime, duration, overrideVelocity });
@@ -8761,11 +8903,11 @@
             oscillator.type = waveforms[currentInstrument] || 'sine';
             oscillator.frequency.value = note.frequency;
 
-            // 包络（与实时版本一致 + Voice Shaping）
+            // 包络（与实时版本一致 + Voice Shaping + articulation attack offset）
             const baseVelocity = overrideVelocity !== undefined ? overrideVelocity : (note.velocity || 0.5);
             const velocity = baseVelocity * params.masterVolume;
             const vs = params.voiceShaping;
-            const attack = Math.max(0.001, vs.attackMs / 1000);
+            const attack = Math.max(0.001, (vs.attackMs + (attackMsOverride || 0)) / 1000);
             const release = Math.max(0.05, vs.releaseMs / 1000);
 
             gainNode.gain.setValueAtTime(0, startTime);
