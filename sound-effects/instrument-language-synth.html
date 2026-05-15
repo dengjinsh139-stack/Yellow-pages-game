@@ -1482,6 +1482,7 @@
                             <option value="clear">清晰 - 每个音更明确</option>
                             <option value="natural" selected>自然 - 句首清楚，中段轻微弱化</option>
                             <option value="soft">柔和 - 中段明显弱化和软化</option>
+                            <option value="rolling">滑轮 - 中段滚动连奏，弱化音头</option>
                         </select>
                         <small style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;display:block;">控制一句话内部每个音的清晰度，不改变文字内容</small>
                     </div>
@@ -3634,10 +3635,20 @@
 
                     const cfg = preset[role];
 
+                    let velocityScale = cfg.velocityScale;
+                    if (role === 'body' && cfg.velocityWaveDepth) {
+                        const wave = 1 + Math.sin(idx * Math.PI * (cfg.velocityWaveRate || 0.75)) * cfg.velocityWaveDepth;
+                        velocityScale *= wave;
+                    }
+
                     evt.articulationRole = role;
-                    evt.articulationVelocityScale = cfg.velocityScale;
+                    evt.articulationVelocityScale = velocityScale;
                     evt.articulationAttackMs = cfg.attackMs;
                     evt.articulationDurationScale = cfg.durationScale;
+                    evt.articulationSampleOffsetMs = cfg.sampleOffsetMs || 0;
+                    evt.articulationOverlapMs = cfg.overlapMs || 0;
+                    evt.articulationGlide = false;
+                    evt.articulationGlideMs = 0;
                 });
 
                 result.push(...segment);
@@ -4090,21 +4101,35 @@
         const PHRASE_ARTICULATION_PRESETS = {
             clear: {
                 label: '清晰',
-                head: { velocityScale: 1.0, attackMs: 0, durationScale: 1.0 },
-                body: { velocityScale: 0.9, attackMs: 5, durationScale: 0.95 },
-                tail: { velocityScale: 0.95, attackMs: 5, durationScale: 1.0 }
+                head: { velocityScale: 1.0, attackMs: 0, durationScale: 1.0, sampleOffsetMs: 0, overlapMs: 0 },
+                body: { velocityScale: 0.9, attackMs: 5, durationScale: 0.95, sampleOffsetMs: 0, overlapMs: 0 },
+                tail: { velocityScale: 0.95, attackMs: 5, durationScale: 1.0, sampleOffsetMs: 0, overlapMs: 0 }
             },
             natural: {
                 label: '自然',
-                head: { velocityScale: 1.0, attackMs: 0, durationScale: 1.0 },
-                body: { velocityScale: 0.68, attackMs: 18, durationScale: 0.88 },
-                tail: { velocityScale: 0.85, attackMs: 8, durationScale: 1.05 }
+                head: { velocityScale: 1.0, attackMs: 0, durationScale: 1.0, sampleOffsetMs: 0, overlapMs: 5 },
+                body: { velocityScale: 0.68, attackMs: 18, durationScale: 0.88, sampleOffsetMs: 25, overlapMs: 12 },
+                tail: { velocityScale: 0.85, attackMs: 8, durationScale: 1.05, sampleOffsetMs: 8, overlapMs: 8 }
             },
             soft: {
                 label: '柔和',
-                head: { velocityScale: 0.95, attackMs: 5, durationScale: 1.0 },
-                body: { velocityScale: 0.52, attackMs: 30, durationScale: 0.82 },
-                tail: { velocityScale: 0.78, attackMs: 15, durationScale: 1.08 }
+                head: { velocityScale: 0.95, attackMs: 5, durationScale: 1.0, sampleOffsetMs: 0, overlapMs: 8 },
+                body: { velocityScale: 0.52, attackMs: 30, durationScale: 0.82, sampleOffsetMs: 50, overlapMs: 28 },
+                tail: { velocityScale: 0.78, attackMs: 15, durationScale: 1.08, sampleOffsetMs: 12, overlapMs: 15 }
+            },
+            rolling: {
+                label: '滑轮',
+                head: { velocityScale: 1.0, attackMs: 0, durationScale: 1.0, sampleOffsetMs: 0, overlapMs: 5 },
+                body: {
+                    velocityScale: 0.48,
+                    attackMs: 35,
+                    durationScale: 0.9,
+                    sampleOffsetMs: 60,
+                    overlapMs: 45,
+                    velocityWaveDepth: 0.12,
+                    velocityWaveRate: 0.75
+                },
+                tail: { velocityScale: 0.78, attackMs: 12, durationScale: 1.08, sampleOffsetMs: 15, overlapMs: 20 }
             }
         };
 
@@ -6252,7 +6277,7 @@
         }
 
         // 使用真实采样播放音符
-        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5, attackMsOverride) {
+        function playSampleTone(targetFrequency, targetNoteName, duration, velocity = 0.5, attackMsOverride, sampleOffsetMsOverride) {
             if (!audioContext) return;
 
             // 根据当前乐器选择配置（虚拟人声使用 vocal 配置）
@@ -6269,7 +6294,7 @@
                 if (randomSample) {
                     const buffer = audioBuffers[randomSample.bufferKey];
                     if (buffer) {
-                        return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, randomSample.sampleNote, config, attackMsOverride);
+                        return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, randomSample.sampleNote, config, attackMsOverride, sampleOffsetMsOverride);
                     }
                 }
             }
@@ -6303,11 +6328,11 @@
                 return; // 不允许 silent fallback
             }
 
-            return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride);
+            return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride, sampleOffsetMsOverride);
         }
 
         // 内部采样播放函数（与实时播放 playSampleTone() 严格对齐）
-        function playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride) {
+        function playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride, sampleOffsetMs) {
             // 创建音频源
             const source = audioContext.createBufferSource();
             source.buffer = buffer;
@@ -6406,9 +6431,12 @@
                 reverbGain.connect(audioContext.destination);
             }
 
-            // 播放 - 使用当前乐器的音频偏移设置（毫秒转秒）
+            // 播放 - 使用当前乐器的音频偏移设置（毫秒转秒）+ articulation sampleOffset
             const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
-            const startOffsetSec = offsetMs / 1000;
+            const articulationOffsetSec = (sampleOffsetMs || 0) / 1000;
+            const maxOffsetSec = buffer.duration * 0.25;
+            const safeOffsetSec = Math.min(articulationOffsetSec, maxOffsetSec);
+            const startOffsetSec = (offsetMs / 1000) + safeOffsetSec;
             source.start(now, startOffsetSec);
             // 尾音受 releaseMs 影响
             source.stop(now + duration + Math.max(releaseTime, 0.5));
@@ -6474,7 +6502,7 @@
             updateSpectrum();
         }
 
-        function playTone(frequency, noteName, duration, velocity = 0.5, attackMsOverride) {
+        function playTone(frequency, noteName, duration, velocity = 0.5, attackMsOverride, sampleOffsetMsOverride) {
             // 检查当前乐器是否有采样可用
             const hasSamples = hasInstrumentSamples(currentInstrument);
             console.log(`[playTone] instrument=${currentInstrument}, hasSamples=${hasSamples}, note=${noteName}`);
@@ -6489,14 +6517,14 @@
                 // 如果有精确匹配的真实采样，直接使用
                 if (hasThisSample) {
                     console.log(`[木琴] 使用精确采样: ${bufferKey}`);
-                    return playSampleTone(frequency, noteName, duration / 1000, velocity, attackMsOverride);
+                    return playSampleTone(frequency, noteName, duration / 1000, velocity, attackMsOverride, sampleOffsetMsOverride);
                 }
 
                 // 没有精确匹配（如 G4/G5），使用最近的采样 + playbackRate 调整
                 const nearestSample = findNearestSample(noteName);
                 if (nearestSample && nearestSample !== noteName && audioBuffers['xylophone_' + nearestSample]) {
                     console.log(`[木琴] ${noteName} 无精确采样，使用 ${nearestSample} + playbackRate`);
-                    return playSampleTone(frequency, nearestSample, duration / 1000, velocity, attackMsOverride);
+                    return playSampleTone(frequency, nearestSample, duration / 1000, velocity, attackMsOverride, sampleOffsetMsOverride);
                 }
 
                 // 采样未就绪，不 silent fallback
@@ -6508,7 +6536,7 @@
             // 其他 sample-based 乐器
             if (hasSamples) {
                 console.log(`[${currentInstrument}] 使用采样音色`);
-                return playSampleTone(frequency, noteName, duration / 1000, velocity, attackMsOverride);
+                return playSampleTone(frequency, noteName, duration / 1000, velocity, attackMsOverride, sampleOffsetMsOverride);
             }
 
             // 新乐器：采样未到位前使用合成器 fallback
@@ -6955,14 +6983,17 @@
                     // 播放单音（使用节奏引擎计算的时长）
                     // 叠加 articulation attack offset
                     const finalAttackMs = params.voiceShaping.attackMs + (note.articulationAttackMs || 0);
-                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster, finalAttackMs);
+                    const sampleOffsetMs = note.articulationSampleOffsetMs || 0;
+                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster, finalAttackMs, sampleOffsetMs);
 
                     // 高亮当前事件（使用真实事件索引 i）
                     highlightNote(i);
 
                     // ===== 字间连接：overlapMs 让下一个音符提前进入 =====
-                    const overlap = params.voiceShaping.overlapMs;
-                    let waitMs = Math.max(0, noteDuration - overlap);
+                    const globalOverlap = params.voiceShaping?.overlapMs || 0;
+                    const articulationOverlap = note.articulationOverlapMs || 0;
+                    const finalOverlap = Math.min(80, globalOverlap + articulationOverlap);
+                    let waitMs = Math.max(0, noteDuration - finalOverlap);
 
                     // ===== Expression Segment：停顿后等待 =====
                     if (note.expressionPauseAfterMs > 0) {
@@ -8422,7 +8453,15 @@
                 velocityWithMaster = 0.5;
             }
 
-            return { duration: noteDuration, velocity: velocityWithMaster, attackMs: articulationAttackMs };
+            return {
+                duration: noteDuration,
+                velocity: velocityWithMaster,
+                attackMs: articulationAttackMs,
+                sampleOffsetMs: note.articulationSampleOffsetMs || 0,
+                overlapMs: note.articulationOverlapMs || 0,
+                glide: note.articulationGlide || false,
+                glideMs: note.articulationGlideMs || 0
+            };
         }
 
         // 获取采样 buffer key（与实时播放保持一致）
@@ -8698,7 +8737,7 @@
                     chordNotesRendered++;
                 } else if ((isPiano || isSampleInstrument || isVirtualVoice) && (hasSample || isVirtualVoice)) {
                     console.log(`[renderAudioToBuffer]   → renderSampleToBuffer (sampleNote=${note.sampleNote}, virtualVoice=${isVirtualVoice})`);
-                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, timing.attackMs);
+                    await renderSampleToBuffer(offlineContext, destination, note, currentTime, noteDuration, velocity, timing.attackMs, timing.sampleOffsetMs);
                     sampleNotesRendered++;
                 } else {
                     console.log(`[renderAudioToBuffer]   → renderSynthToBuffer`);
@@ -8706,7 +8745,11 @@
                     synthNotesRendered++;
                 }
 
-                currentTime += Math.max(0, noteDuration - (params.voiceShaping.overlapMs / 1000));
+                // ===== overlap 推进时间线：global + articulation =====
+                const globalOverlap = params.voiceShaping?.overlapMs || 0;
+                const articulationOverlap = timing.overlapMs || 0;
+                const finalOverlap = Math.min(80, globalOverlap + articulationOverlap);
+                currentTime += Math.max(0, noteDuration - (finalOverlap / 1000));
 
                 // ===== Expression Segment：停顿计入导出时间线 =====
                 if (note.expressionPauseAfterMs > 0) {
@@ -8729,7 +8772,7 @@
         }
 
         // 渲染采样到 buffer（与实时播放 playSampleTone() 严格对齐）
-        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, attackMsOverride) {
+        async function renderSampleToBuffer(offlineContext, destination, note, startTime, duration, overrideVelocity, attackMsOverride, sampleOffsetMs) {
             // ===== 防御：跳过无效参数 =====
             if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(overrideVelocity)) {
                 console.warn('[renderSampleToBuffer] Invalid params, skipping:', { startTime, duration, overrideVelocity });
@@ -8872,9 +8915,12 @@
             source.connect(gainNode);
             eqChainEnd.connect(destination);
 
-            // ===== 采样起点：应用 instrument offset =====
+            // ===== 采样起点：应用 instrument offset + articulation sampleOffset =====
             const offsetMs = params.instrumentOffsets[currentInstrument] || 0;
-            const startOffsetSec = offsetMs / 1000;
+            const articulationOffsetSec = (sampleOffsetMs || 0) / 1000;
+            const maxOffsetSec = buffer.duration * 0.25;
+            const safeOffsetSec = Math.min(articulationOffsetSec, maxOffsetSec);
+            const startOffsetSec = (offsetMs / 1000) + safeOffsetSec;
 
             // ===== stop 尾部余量：受 releaseMs 影响 =====
             source.start(startTime, startOffsetSec);
