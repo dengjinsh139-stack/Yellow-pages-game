@@ -569,6 +569,7 @@
         .batch-2 { background: rgba(0, 168, 232, 0.15); color: var(--primary-blue); }
         .batch-3 { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
         .batch-2-5 { background: rgba(156, 39, 176, 0.15); color: #9c27b0; }
+        .batch-3-5 { background: rgba(233, 30, 99, 0.15); color: #e91e63; }
         
         /* 类型标签 */
         .type-tag {
@@ -963,6 +964,7 @@
                             <option value="第二批">第二批</option>
                             <option value="第2.5批">第2.5批</option>
                             <option value="第三批">第三批</option>
+                            <option value="第3.5批">第3.5批</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -1010,6 +1012,7 @@
                     <button onclick="quickFilter('batch', '第二批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(33,150,243,0.1); border: 1px solid rgba(33,150,243,0.3); border-radius: 4px; color: #2196f3; font-size: 0.85rem; cursor: pointer;">第二批</button>
                     <button onclick="quickFilter('batch', '第2.5批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(156,39,176,0.1); border: 1px solid rgba(156,39,176,0.3); border-radius: 4px; color: #9c27b0; font-size: 0.85rem; cursor: pointer;">第2.5批</button>
                     <button onclick="quickFilter('batch', '第三批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3); border-radius: 4px; color: var(--primary); font-size: 0.85rem; cursor: pointer;">第三批</button>
+                    <button onclick="quickFilter('batch', '第3.5批')" style="margin-right: 8px; padding: 6px 12px; background: rgba(233,30,99,0.1); border: 1px solid rgba(233,30,99,0.3); border-radius: 4px; color: #e91e63; font-size: 0.85rem; cursor: pointer;">第3.5批</button>
                     <button onclick="quickFilter('status', '待录制')" style="margin-right: 8px; padding: 6px 12px; background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); border-radius: 4px; color: #ff9800; font-size: 0.85rem; cursor: pointer;">待录制</button>
                     <button onclick="quickFilter('status', '已录完')" style="padding: 6px 12px; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); border-radius: 4px; color: #00c853; font-size: 0.85rem; cursor: pointer;">已录完</button>
                 </div>
@@ -1144,7 +1147,7 @@
 
         // 获取批次样式类
         function getBatchClass(batch) {
-            const map = { '第一批': 'batch-1', '第二批': 'batch-2', '第三批': 'batch-3', '第2.5批': 'batch-2-5' };
+            const map = { '第一批': 'batch-1', '第二批': 'batch-2', '第三批': 'batch-3', '第2.5批': 'batch-2-5', '第3.5批': 'batch-3-5' };
             return map[batch] || 'batch-1';
         }
 
