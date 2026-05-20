@@ -1865,6 +1865,7 @@
                     <div style="font-size: 0.85rem; color: var(--secondary); margin-bottom: 6px; font-weight: 600;">📥 音频导出</div>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
+                        <button id="btn-export-midi" class="btn" onclick="exportMIDI()" style="flex: 1; background: linear-gradient(135deg, #9b5de5, #ff6b6b);">🎹 导出 MIDI</button>
                         <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
                             <option value="44100">44.1kHz</option>
                             <option value="48000" selected>48kHz</option>
@@ -8476,8 +8477,427 @@
             return config ? config.duration : 0.5;
         }
 
-        // 渲染音频到 AudioBuffer（统一事件模型 + 统一节奏引擎）
-        async function renderAudioToBuffer(events, offlineContext) {
+        // ==================== MIDI 导出系统 ====================
+
+        // 将音名字符串转换为 MIDI note number
+        function noteNameToMidi(noteName) {
+            if (typeof noteName === 'number') return Math.round(noteName);
+            if (!noteName || typeof noteName !== 'string') return 60;
+            if (noteName === 'Chord') return null;
+
+            const match = noteName.match(/^([A-G])(#|b)?(\d+)$/);
+            if (!match) return 60;
+
+            const noteLetter = match[1];
+            const accidental = match[2] || '';
+            const octave = parseInt(match[3]);
+
+            const semitoneMap = {
+                'C': 0, 'C#': 1, 'Db': 1,
+                'D': 2, 'D#': 3, 'Eb': 3,
+                'E': 4,
+                'F': 5, 'F#': 6, 'Gb': 6,
+                'G': 7, 'G#': 8, 'Ab': 8,
+                'A': 9, 'A#': 10, 'Bb': 10,
+                'B': 11
+            };
+
+            const key = noteLetter + accidental;
+            const semitone = semitoneMap[key] !== undefined ? semitoneMap[key] : semitoneMap[noteLetter];
+
+            return (octave + 1) * 12 + semitone;
+        }
+
+        function clampMidiVelocity(v) {
+            return Math.max(1, Math.min(127, Math.round(v * 127)));
+        }
+
+        function msToTicks(ms, bpm, ppq) {
+            return Math.round((ms / 1000) * (bpm / 60) * ppq);
+        }
+
+        function secondsToTicks(seconds, bpm, ppq) {
+            return Math.round(seconds * (bpm / 60) * ppq);
+        }
+
+        // Variable Length Quantity 编码
+        function writeMidiVLQ(value) {
+            if (value === 0) return [0];
+            const bytes = [];
+            let v = value;
+            do {
+                bytes.unshift((v & 0x7F) | 0x80);
+                v >>= 7;
+            } while (v > 0);
+            bytes[bytes.length - 1] &= 0x7F;
+            return bytes;
+        }
+
+        function writeMidiString(str) {
+            const bytes = [];
+            for (let i = 0; i < str.length; i++) {
+                bytes.push(str.charCodeAt(i));
+            }
+            return bytes;
+        }
+
+        function writeMidiUint32(value) {
+            return [
+                (value >> 24) & 0xFF,
+                (value >> 16) & 0xFF,
+                (value >> 8) & 0xFF,
+                value & 0xFF
+            ];
+        }
+
+        function writeMidiUint16(value) {
+            return [(value >> 8) & 0xFF, value & 0xFF];
+        }
+
+        // 计算 MIDI timeline：将 events 转为 absolute tick 事件列表
+        function computeMidiTimeline(events, options) {
+            const bpm = options.bpm || 120;
+            const ppq = options.ppq || 480;
+            const beatDuration = 60000 / bpm;
+
+            const timeline = [];
+            let currentTick = 0;
+
+            for (const evt of events) {
+                if (evt.type === 'pause') {
+                    const pauseMs = evt.pauseMs || evt.duration || 0;
+                    currentTick += msToTicks(pauseMs, bpm, ppq);
+                } else if (evt.type === 'note') {
+                    const note = evt;
+
+                    // 跳过和弦和休止符
+                    if (note.isChord || note.isRest || note.note === 'Chord') {
+                        continue;
+                    }
+
+                    const midiNote = noteNameToMidi(note.note);
+                    if (midiNote === null || midiNote === undefined) continue;
+
+                    // 使用 computeEventTiming 计算 timing（复用实时播放逻辑）
+                    const timing = evt._timing || computeEventTiming(evt, beatDuration, bpm);
+
+                    const noteDurationMs = timing.duration || 200;
+                    const noteVelocity = timing.velocity || 0.5;
+
+                    const startTick = currentTick;
+                    const durationTicks = msToTicks(noteDurationMs, bpm, ppq);
+
+                    // Note On
+                    timeline.push({
+                        tick: startTick,
+                        type: 'noteOn',
+                        channel: 0,
+                        note: midiNote,
+                        velocity: clampMidiVelocity(noteVelocity)
+                    });
+
+                    // Note Off
+                    timeline.push({
+                        tick: startTick + Math.max(durationTicks, 1),
+                        type: 'noteOff',
+                        channel: 0,
+                        note: midiNote,
+                        velocity: 0
+                    });
+
+                    // 下一个 note 的开始位置（考虑 overlap）
+                    const overlapMs = timing.overlapMs || 0;
+                    const overlapTicks = msToTicks(Math.max(0, overlapMs), bpm, ppq);
+                    currentTick += Math.max(durationTicks - overlapTicks, Math.round(ppq / 8));
+                }
+                // characterVoice 和 phraseMidi 不生成 MIDI note
+            }
+
+            return timeline;
+        }
+
+        // 从 timeline 构建 Standard MIDI File bytes
+        function buildMidiFromEvents(events, options) {
+            const bpm = options.bpm || 120;
+            const ppq = options.ppq || 480;
+            const trackName = options.trackName || 'Instrument Dialogue';
+
+            const timeline = computeMidiTimeline(events, { bpm, ppq });
+
+            // 构建 track events
+            const trackEvents = [];
+
+            // Set Tempo
+            const tempoMicroseconds = Math.round(60000000 / bpm);
+            trackEvents.push({
+                tick: 0,
+                type: 'metaTempo',
+                data: [0x51, 0x03, (tempoMicroseconds >> 16) & 0xFF, (tempoMicroseconds >> 8) & 0xFF, tempoMicroseconds & 0xFF]
+            });
+
+            // Track Name
+            const nameBytes = [];
+            for (let i = 0; i < Math.min(trackName.length, 127); i++) {
+                nameBytes.push(trackName.charCodeAt(i));
+            }
+            trackEvents.push({
+                tick: 0,
+                type: 'trackName',
+                data: [0x03, nameBytes.length, ...nameBytes]
+            });
+
+            // Note events
+            for (const evt of timeline) {
+                if (evt.type === 'noteOn') {
+                    trackEvents.push({
+                        tick: evt.tick,
+                        type: 'noteOn',
+                        channel: evt.channel,
+                        note: evt.note,
+                        velocity: evt.velocity
+                    });
+                } else if (evt.type === 'noteOff') {
+                    trackEvents.push({
+                        tick: evt.tick,
+                        type: 'noteOff',
+                        channel: evt.channel,
+                        note: evt.note,
+                        velocity: 0
+                    });
+                }
+            }
+
+            // End of Track
+            const lastTick = timeline.length > 0 ? timeline[timeline.length - 1].tick : 0;
+            trackEvents.push({
+                tick: lastTick + ppq,
+                type: 'endOfTrack',
+                data: [0x2F, 0x00]
+            });
+
+            // 排序：同 tick 先 meta，然后 noteOff before noteOn
+            const typeOrder = { metaTempo: 0, trackName: 1, endOfTrack: 2, noteOff: 3, noteOn: 4 };
+            trackEvents.sort((a, b) => {
+                if (a.tick !== b.tick) return a.tick - b.tick;
+                return (typeOrder[a.type] || 5) - (typeOrder[b.type] || 5);
+            });
+
+            // 计算 delta times 并序列化
+            let lastTick = 0;
+            const trackData = [];
+
+            for (const evt of trackEvents) {
+                const delta = evt.tick - lastTick;
+                trackData.push(...writeMidiVLQ(delta));
+                lastTick = evt.tick;
+
+                if (evt.type === 'metaTempo') {
+                    trackData.push(0xFF, ...evt.data);
+                } else if (evt.type === 'trackName') {
+                    trackData.push(0xFF, ...evt.data);
+                } else if (evt.type === 'endOfTrack') {
+                    trackData.push(0xFF, ...evt.data);
+                } else if (evt.type === 'noteOn') {
+                    trackData.push(0x90 | evt.channel, evt.note, evt.velocity);
+                } else if (evt.type === 'noteOff') {
+                    trackData.push(0x80 | evt.channel, evt.note, 0);
+                }
+            }
+
+            // 构建文件
+            const header = [
+                ...writeMidiString('MThd'),
+                ...writeMidiUint32(6),
+                ...writeMidiUint16(0),  // format 0
+                ...writeMidiUint16(1),  // 1 track
+                ...writeMidiUint16(ppq)
+            ];
+
+            const trackChunk = [
+                ...writeMidiString('MTrk'),
+                ...writeMidiUint32(trackData.length),
+                ...trackData
+            ];
+
+            const totalLength = header.length + trackChunk.length;
+            const result = new Uint8Array(totalLength);
+            let offset = 0;
+
+            for (const byte of header) result[offset++] = byte;
+            for (const byte of trackChunk) result[offset++] = byte;
+
+            return result;
+        }
+
+        // 构建 JSON sidecar
+        function buildMidiSidecarJson(events, text, options) {
+            const bpm = options.bpm || 120;
+
+            const noteEvents = [];
+            const markers = [];
+            let currentTimeMs = 0;
+
+            for (const evt of events) {
+                if (evt.type === 'pause') {
+                    const pauseMs = evt.pauseMs || evt.duration || 0;
+                    currentTimeMs += pauseMs;
+                } else if (evt.type === 'note') {
+                    const note = evt;
+                    if (note.isChord || note.isRest || note.note === 'Chord') continue;
+
+                    const timing = evt._timing || { duration: 200, velocity: 0.5 };
+
+                    noteEvents.push({
+                        type: 'note',
+                        char: note.char,
+                        midiNote: noteNameToMidi(note.note),
+                        startMs: currentTimeMs,
+                        durationMs: timing.duration || 200,
+                        velocity: timing.velocity || 0.5,
+                        articulationRole: note.articulationRole || 'body',
+                        articulationSampleOffsetMs: timing.sampleOffsetMs || 0,
+                        articulationAttackMs: timing.attackMs || 0,
+                        articulationOverlapMs: timing.overlapMs || 0
+                    });
+
+                    currentTimeMs += timing.duration || 200;
+                } else if (evt.type === 'characterVoice') {
+                    markers.push({
+                        type: 'characterVoice',
+                        character: evt.character,
+                        timeMs: currentTimeMs
+                    });
+                } else if (evt.type === 'phraseMidi') {
+                    markers.push({
+                        type: 'phraseMidi',
+                        category: evt.category,
+                        keyword: evt.keyword,
+                        timeMs: currentTimeMs
+                    });
+                }
+            }
+
+            return {
+                text: text,
+                bpm: bpm,
+                mappingMode: params.mappingMode || 'dialogue-fixed',
+                noteDensityMode: params.noteDensityMode || 'natural',
+                phraseArticulationMode: params.phraseArticulationMode || 'natural',
+                currentInstrument: currentInstrument,
+                durationMs: currentTimeMs,
+                events: noteEvents,
+                markers: markers
+            };
+        }
+
+        // 生成文件名
+        function makeMidiFilename() {
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+            return `instrument-dialogue_${timestamp}`;
+        }
+
+        // 下载 Blob
+        function downloadBlob(blob, filename, mimeType) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // 导出 MIDI 主函数
+        function exportMIDI() {
+            updateParams();
+
+            const textInput = document.getElementById('textInput');
+            const text = textInput ? textInput.value : '';
+
+            if (!text.trim()) {
+                alert('请先输入要导出的文字');
+                return;
+            }
+
+            const midiBtn = document.getElementById('btn-export-midi');
+            const exportStatus = document.getElementById('exportStatus');
+
+            if (midiBtn) {
+                midiBtn.disabled = true;
+                midiBtn.textContent = '🎹 生成中...';
+            }
+            if (exportStatus) exportStatus.textContent = '正在生成 MIDI...';
+
+            try {
+                console.log('🎹 [MIDI EXPORT] Step 1: textToEvents...');
+                let events = textToEvents(text);
+
+                // 应用 Expression Segment
+                if (typeof expressionSegments !== 'undefined' && expressionSegments.length > 0) {
+                    applyExpressionSegments(events, expressionSegments);
+                }
+
+                console.log(`🎹 [MIDI EXPORT] events: ${events.length}, notes: ${events.filter(e => e.type === 'note').length}`);
+
+                const bpm = params.bpm || 120;
+
+                // 预计算 timing（与 WAV 导出一致）
+                const beatDuration = 60000 / bpm;
+                events = events.map(evt => {
+                    if (evt.type === 'pause') {
+                        return { ...evt, _timing: { duration: evt.pauseMs || 0, velocity: 0 } };
+                    }
+                    return { ...evt, _timing: computeEventTiming(evt, beatDuration, bpm) };
+                });
+
+                console.log('🎹 [MIDI EXPORT] Step 2: build MIDI...');
+                const midiBytes = buildMidiFromEvents(events, {
+                    bpm,
+                    ppq: 480,
+                    trackName: 'Instrument Dialogue'
+                });
+
+                const filename = makeMidiFilename();
+
+                console.log('🎹 [MIDI EXPORT] Step 3: download MIDI...');
+                downloadBlob(
+                    new Blob([midiBytes], { type: 'audio/midi' }),
+                    filename + '.mid',
+                    'audio/midi'
+                );
+
+                console.log('🎹 [MIDI EXPORT] Step 4: build JSON sidecar...');
+                const sidecar = buildMidiSidecarJson(events, text, { bpm });
+                downloadBlob(
+                    new Blob([JSON.stringify(sidecar, null, 2)], { type: 'application/json' }),
+                    filename + '.json',
+                    'application/json'
+                );
+
+                console.log('🎹 [MIDI EXPORT] ✅ Complete!');
+                if (exportStatus) exportStatus.textContent = `✅ MIDI + JSON 导出成功! (${events.filter(e => e.type === 'note').length} notes)`;
+                setTimeout(() => {
+                    if (exportStatus) exportStatus.textContent = '';
+                }, 3000);
+
+            } catch (error) {
+                console.error('❌ [MIDI EXPORT] Export failed:', error);
+                if (exportStatus) exportStatus.textContent = '❌ MIDI 导出失败: ' + error.message;
+            } finally {
+                if (midiBtn) {
+                    midiBtn.disabled = false;
+                    midiBtn.textContent = '🎹 导出 MIDI';
+                }
+            }
+        }
+
+        // 暴露到全局（供 inline onclick 调用）
+        window.exportMIDI = exportMIDI;
+
+        // ==================== 原有 renderAudioToBuffer 继续 ====================
             console.log('🎵 [RENDER] renderAudioToBuffer() called');
 
             console.log(`🎵 [RENDER] events count: ${events.length}`);
