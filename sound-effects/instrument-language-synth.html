@@ -8668,9 +8668,9 @@
             }
 
             // End of Track
-            const lastTick = timeline.length > 0 ? timeline[timeline.length - 1].tick : 0;
+            const endTick = timeline.length > 0 ? timeline[timeline.length - 1].tick : 0;
             trackEvents.push({
-                tick: lastTick + ppq,
+                tick: endTick + ppq,
                 type: 'endOfTrack',
                 data: [0x2F, 0x00]
             });
@@ -8898,6 +8898,7 @@
         window.exportMIDI = exportMIDI;
 
         // ==================== 原有 renderAudioToBuffer 继续 ====================
+        async function renderAudioToBuffer(events, offlineContext) {
             console.log('🎵 [RENDER] renderAudioToBuffer() called');
 
             console.log(`🎵 [RENDER] events count: ${events.length}`);
