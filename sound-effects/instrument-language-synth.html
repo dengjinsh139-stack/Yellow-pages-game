@@ -3369,10 +3369,10 @@
 
         // 将文本转换为事件序列（支持语义分类局部插入）
         function textToEvents(text) {
-            // 第一步：找出所有有 MIDI 的语义分类匹配
+            // 第一步：找出所有有 keywords 的语义分类匹配
             const matches = [];
             for (const [key, category] of Object.entries(phraseTriggerCategories)) {
-                if (!category.parsedMidi) continue; // 只匹配有 MIDI 的分类
+                if (!category.keywords || category.keywords.length === 0) continue;
                 for (const keyword of category.keywords) {
                     const lowerText = text.toLowerCase();
                     const lowerKeyword = keyword.toLowerCase();
@@ -8609,8 +8609,80 @@
                     const overlapMs = timing.overlapMs || 0;
                     const overlapTicks = msToTicks(Math.max(0, overlapMs), bpm, ppq);
                     currentTick += Math.max(durationTicks - overlapTicks, Math.round(ppq / 8));
+                } else if (evt.type === 'characterVoice') {
+                    // ===== Marker: characterVoice =====
+                    const config = characterVoiceConfig[evt.character];
+                    let voiceDurationMs = 0;
+
+                    if (config) {
+                        const bpmScale = bpm / CHARACTER_VOICE_BASE_BPM;
+                        const exprTempo = evt.expressionTempoScale || 1;
+                        const curve = evt.expressionCurveFactor || 1;
+                        const finalPlaybackRate = Math.max(0.5, Math.min(2.0, bpmScale * exprTempo * curve));
+
+                        const audioBuffer = characterAudioBuffers[evt.character];
+                        if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
+                            voiceDurationMs = (audioBuffer.duration / finalPlaybackRate) * 1000;
+                        } else {
+                            for (const note of config.motifNotes) {
+                                voiceDurationMs += (note.durationMs / finalPlaybackRate) + 50;
+                            }
+                        }
+                        // 段后停顿
+                        voiceDurationMs += (evt.expressionPauseAfterMs || 0);
+                    }
+
+                    const overlapMs = params.voiceShaping?.overlapMs || 0;
+                    const advanceMs = Math.max(0, voiceDurationMs - overlapMs);
+
+                    timeline.push({
+                        tick: currentTick,
+                        type: 'marker',
+                        markerType: 'characterVoice',
+                        character: evt.character
+                    });
+
+                    currentTick += Math.max(msToTicks(advanceMs, bpm, ppq), Math.round(ppq / 8));
+                } else if (evt.type === 'phraseMidi') {
+                    // ===== Marker: phraseMidi =====
+                    let blockDurationMs = 0;
+                    const category = phraseTriggerCategories[evt.category];
+
+                    if (category && category.parsedMidi) {
+                        const midiData = category.parsedMidi;
+                        const allNotes = [];
+                        for (const track of midiData.tracks || []) {
+                            for (const event of track) {
+                                if (event.type === 'noteOn') allNotes.push(event);
+                            }
+                        }
+                        if (allNotes.length > 0) {
+                            allNotes.sort((a, b) => a.time - b.time);
+                            const msPerTick = 60000 / (bpm * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
+                            let lastNoteEndMs = 0;
+                            for (const mnote of allNotes) {
+                                const noteDurMs = computeMidiNoteDurationMs(mnote, midiData);
+                                const noteEndMs = (mnote.time * msPerTick) + noteDurMs;
+                                if (noteEndMs > lastNoteEndMs) lastNoteEndMs = noteEndMs;
+                            }
+                            blockDurationMs = lastNoteEndMs + 120 + params.voiceShaping.semanticGap;
+                        } else {
+                            blockDurationMs = params.voiceShaping.semanticGap;
+                        }
+                    } else {
+                        blockDurationMs = params.voiceShaping.semanticGap;
+                    }
+
+                    timeline.push({
+                        tick: currentTick,
+                        type: 'marker',
+                        markerType: 'phraseMidi',
+                        category: evt.category,
+                        keyword: evt.keyword
+                    });
+
+                    currentTick += Math.max(msToTicks(blockDurationMs, bpm, ppq), Math.round(ppq / 8));
                 }
-                // characterVoice 和 phraseMidi 不生成 MIDI note
             }
 
             return timeline;
@@ -8646,7 +8718,7 @@
                 data: [0x03, nameBytes.length, ...nameBytes]
             });
 
-            // Note events
+            // Note & Marker events
             for (const evt of timeline) {
                 if (evt.type === 'noteOn') {
                     trackEvents.push({
@@ -8664,6 +8736,36 @@
                         note: evt.note,
                         velocity: 0
                     });
+                } else if (evt.type === 'marker') {
+                    const timeMs = Math.round((evt.tick / ppq) * (60000 / bpm));
+                    const markerLabel = evt.markerType === 'characterVoice'
+                        ? `characterVoice:${evt.character}`
+                        : `phraseMidi:${evt.category}:${evt.keyword}`;
+                    const jsonText = evt.markerType === 'characterVoice'
+                        ? JSON.stringify({ type: 'characterVoice', character: evt.character, timeMs })
+                        : JSON.stringify({ type: 'phraseMidi', category: evt.category, keyword: evt.keyword, timeMs });
+
+                    // Meta Marker (0xFF 0x06)
+                    const markerBytes = [];
+                    for (let i = 0; i < Math.min(markerLabel.length, 127); i++) {
+                        markerBytes.push(markerLabel.charCodeAt(i));
+                    }
+                    trackEvents.push({
+                        tick: evt.tick,
+                        type: 'metaMarker',
+                        data: [0x06, markerBytes.length, ...markerBytes]
+                    });
+
+                    // Meta Text (0xFF 0x01)
+                    const textBytes = [];
+                    for (let i = 0; i < Math.min(jsonText.length, 255); i++) {
+                        textBytes.push(jsonText.charCodeAt(i));
+                    }
+                    trackEvents.push({
+                        tick: evt.tick,
+                        type: 'metaText',
+                        data: [0x01, textBytes.length, ...textBytes]
+                    });
                 }
             }
 
@@ -8675,11 +8777,11 @@
                 data: [0x2F, 0x00]
             });
 
-            // 排序：同 tick 先 meta，然后 noteOff before noteOn
-            const typeOrder = { metaTempo: 0, trackName: 1, endOfTrack: 2, noteOff: 3, noteOn: 4 };
+            // 排序：同 tick 先 meta（tempo → trackName → marker → text → endOfTrack），然后 noteOff before noteOn
+            const typeOrder = { metaTempo: 0, trackName: 1, metaMarker: 2, metaText: 3, endOfTrack: 4, noteOff: 5, noteOn: 6 };
             trackEvents.sort((a, b) => {
                 if (a.tick !== b.tick) return a.tick - b.tick;
-                return (typeOrder[a.type] || 5) - (typeOrder[b.type] || 5);
+                return (typeOrder[a.type] || 7) - (typeOrder[b.type] || 7);
             });
 
             // 计算 delta times 并序列化
@@ -8694,6 +8796,10 @@
                 if (evt.type === 'metaTempo') {
                     trackData.push(0xFF, ...evt.data);
                 } else if (evt.type === 'trackName') {
+                    trackData.push(0xFF, ...evt.data);
+                } else if (evt.type === 'metaMarker') {
+                    trackData.push(0xFF, ...evt.data);
+                } else if (evt.type === 'metaText') {
                     trackData.push(0xFF, ...evt.data);
                 } else if (evt.type === 'endOfTrack') {
                     trackData.push(0xFF, ...evt.data);
@@ -8767,6 +8873,28 @@
                         character: evt.character,
                         timeMs: currentTimeMs
                     });
+                    // 推进时间线（保守估计，与 MIDI 本体 tick 推进对齐）
+                    const config = characterVoiceConfig[evt.character];
+                    if (config) {
+                        const bpmScale = bpm / CHARACTER_VOICE_BASE_BPM;
+                        const exprTempo = evt.expressionTempoScale || 1;
+                        const curve = evt.expressionCurveFactor || 1;
+                        const finalPlaybackRate = Math.max(0.5, Math.min(2.0, bpmScale * exprTempo * curve));
+                        let voiceDurationMs = 0;
+                        const audioBuffer = characterAudioBuffers[evt.character];
+                        if (audioBuffer && isFinite(audioBuffer.duration) && audioBuffer.duration > 0) {
+                            voiceDurationMs = (audioBuffer.duration / finalPlaybackRate) * 1000;
+                        } else {
+                            for (const note of config.motifNotes) {
+                                voiceDurationMs += (note.durationMs / finalPlaybackRate) + 50;
+                            }
+                        }
+                        voiceDurationMs += (evt.expressionPauseAfterMs || 0);
+                        const overlapMs = params.voiceShaping?.overlapMs || 0;
+                        currentTimeMs += Math.max(0, voiceDurationMs - overlapMs);
+                    } else {
+                        currentTimeMs += 500;
+                    }
                 } else if (evt.type === 'phraseMidi') {
                     markers.push({
                         type: 'phraseMidi',
@@ -8774,6 +8902,32 @@
                         keyword: evt.keyword,
                         timeMs: currentTimeMs
                     });
+                    // 推进时间线（与 MIDI 本体 tick 推进对齐）
+                    const category = phraseTriggerCategories[evt.category];
+                    if (category && category.parsedMidi) {
+                        const midiData = category.parsedMidi;
+                        const allNotes = [];
+                        for (const track of midiData.tracks || []) {
+                            for (const event of track) {
+                                if (event.type === 'noteOn') allNotes.push(event);
+                            }
+                        }
+                        if (allNotes.length > 0) {
+                            allNotes.sort((a, b) => a.time - b.time);
+                            const msPerTick = 60000 / (bpm * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
+                            let lastNoteEndMs = 0;
+                            for (const mnote of allNotes) {
+                                const noteDurMs = computeMidiNoteDurationMs(mnote, midiData);
+                                const noteEndMs = (mnote.time * msPerTick) + noteDurMs;
+                                if (noteEndMs > lastNoteEndMs) lastNoteEndMs = noteEndMs;
+                            }
+                            currentTimeMs += lastNoteEndMs + 120 + params.voiceShaping.semanticGap;
+                        } else {
+                            currentTimeMs += params.voiceShaping.semanticGap;
+                        }
+                    } else {
+                        currentTimeMs += params.voiceShaping.semanticGap;
+                    }
                 }
             }
 
