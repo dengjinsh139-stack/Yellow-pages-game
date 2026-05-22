@@ -3907,7 +3907,7 @@
 
         // 计算单个 MIDI 音符时长（实时与导出共用）
         function computeMidiNoteDurationMs(mnote, midiData) {
-            const msPerTick = 60000 / (params.bpm * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
+            const msPerTick = 60000 / (getMidiPlaybackBpm(midiData) * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
             if (mnote.durationTicks && mnote.durationTicks > 0) {
                 return mnote.durationTicks * msPerTick;
             } else if (mnote.duration && mnote.duration > 0) {
@@ -3938,7 +3938,7 @@
                 allNotes.sort((a, b) => a.time - b.time);
 
                 // 计算时间比例（将 MIDI tick 转换为毫秒）
-                const msPerTick = 60000 / (params.bpm * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
+                const msPerTick = 60000 / (getMidiPlaybackBpm(midiData) * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
 
                 // 计算最后一个音符的真实结束时间
                 let lastNoteEndTimeMs = 0;
@@ -7440,6 +7440,32 @@
             83: 987.77   // B5
         };
 
+        // MIDI tempo helpers：歌曲 MIDI 模式优先尊重文件自身 BPM，避免 120 BPM MIDI 被页面默认 135 BPM 重定时
+        function microsecondsPerQuarterToBpm(usPerQuarter) {
+            const value = Number(usPerQuarter);
+            if (!isFinite(value) || value <= 0) return null;
+            return 60000000 / value;
+        }
+
+        function normalizeBpmValue(bpm) {
+            const value = Number(bpm);
+            if (!isFinite(value) || value <= 0) return null;
+            return Math.max(20, Math.min(300, value));
+        }
+
+        function getMidiPlaybackBpm(midiData) {
+            return normalizeBpmValue(midiData?.sourceBpm)
+                || normalizeBpmValue(midiData?.tempos?.[0]?.bpm)
+                || normalizeBpmValue(params.bpm)
+                || 120;
+        }
+
+        function getMidiTempoLabel(midiData) {
+            const sourceBpm = normalizeBpmValue(midiData?.sourceBpm);
+            if (sourceBpm) return `${sourceBpm.toFixed(1).replace(/\.0$/, '')} BPM（MIDI 文件）`;
+            return `${getMidiPlaybackBpm(midiData).toFixed(1).replace(/\.0$/, '')} BPM（页面）`;
+        }
+
         // 将任意 MIDI 音符映射到最近的五声音阶音符
         function mapToPentatonic(midiNote) {
             const pentatonicNotes = [62, 64, 67, 69, 71, 74, 76, 79, 81, 83]; // D4-B5
@@ -7508,6 +7534,13 @@
                     }
 
                     const tq = midi.header.ticksPerQuarter || midi.header.timeDivision || 480;
+                    const tempos = (midi.header.tempos || [])
+                        .map(t => ({
+                            ticks: t.ticks || 0,
+                            bpm: normalizeBpmValue(t.bpm)
+                        }))
+                        .filter(t => t.bpm)
+                        .sort((a, b) => a.ticks - b.ticks);
                     return {
                         format: midi.header.format || 1,
                         numTracks: midi.tracks.length,
@@ -7516,7 +7549,9 @@
                         tracks: tracks,
                         notes: tracks.flat(),
                         totalTicks: totalTicks,
-                        duration: midi.duration || 0
+                        duration: midi.duration || 0,
+                        tempos,
+                        sourceBpm: tempos[0]?.bpm || null
                     };
                 } catch (toneErr) {
                     console.warn('[MIDI] Tone.js 解析失败，回退到自写解析器:', toneErr.message);
@@ -7544,6 +7579,7 @@
             const timeDivision = (headerChunk.data[4] << 8) | headerChunk.data[5];
 
             const tracks = [];
+            const tempos = [];
 
             // 读取所有音轨
             for (let i = 0; i < numTracks; i++) {
@@ -7556,9 +7592,11 @@
                 }
                 pos = trackChunk.end;
 
-                const events = parseTrackEvents(trackChunk.data, timeDivision);
+                const events = parseTrackEvents(trackChunk.data, timeDivision, tempos);
                 tracks.push(events);
             }
+
+            tempos.sort((a, b) => a.ticks - b.ticks);
 
             const flatNotes = tracks.flat();
             let totalTicks = 0;
@@ -7574,7 +7612,9 @@
                 tracks,
                 notes: flatNotes,
                 totalTicks,
-                duration: 0
+                duration: 0,
+                tempos,
+                sourceBpm: tempos[0]?.bpm || null
             };
         }
 
@@ -7595,7 +7635,7 @@
         }
 
         // 解析音轨事件（修复版）
-        function parseTrackEvents(trackData, timeDivision) {
+        function parseTrackEvents(trackData, timeDivision, tempos = []) {
             const events = [];
             let pos = 0;
             let runningStatus = 0;
@@ -7634,6 +7674,12 @@
                     let length = readVLQ();
                     if (pos + length > trackData.length) {
                         throw new Error(`元事件 ${metaType} 数据越界: 需要 ${length} 字节, 剩余 ${trackData.length - pos}`);
+                    }
+                    // 0x51 Set Tempo: 3 bytes, microseconds per quarter note
+                    if (metaType === 0x51 && length === 3) {
+                        const usPerQuarter = (trackData[pos] << 16) | (trackData[pos + 1] << 8) | trackData[pos + 2];
+                        const bpm = normalizeBpmValue(microsecondsPerQuarterToBpm(usPerQuarter));
+                        if (bpm) tempos.push({ ticks: absoluteTime, bpm, usPerQuarter });
                     }
                     pos += length;
                     continue;
@@ -7768,7 +7814,7 @@
             allNotes.sort((a, b) => a.time - b.time);
 
             // 计算时间比例（将 MIDI tick 转换为毫秒）
-            const msPerTick = 60000 / (params.bpm * (midiData.ticksPerQuarter || midiData.timeDivision || 480)); // 使用合成器BPM
+            const msPerTick = 60000 / (getMidiPlaybackBpm(midiData) * (midiData.ticksPerQuarter || midiData.timeDivision || 480)); // 优先使用 MIDI 文件 BPM，缺失时回退页面 BPM
 
             // 显示 MIDI 音符序列
             displayMidiNotes(allNotes);
@@ -8130,7 +8176,7 @@
             if (!midiData) return 0;
 
             const ticksPerQuarter = midiData.ticksPerQuarter || midiData.timeDivision || 480;
-            const msPerTick = 60000 / (params.bpm * ticksPerQuarter);
+            const msPerTick = 60000 / (getMidiPlaybackBpm(midiData) * ticksPerQuarter);
 
             let maxTick = 0;
 
@@ -8151,7 +8197,7 @@
             const destination = offlineContext.destination;
 
             const ticksPerQuarter = midiData.ticksPerQuarter || midiData.timeDivision || 480;
-            const msPerTick = 60000 / (params.bpm * ticksPerQuarter);
+            const msPerTick = 60000 / (getMidiPlaybackBpm(midiData) * ticksPerQuarter);
 
             const allNotes = [];
 
@@ -8263,7 +8309,7 @@
                     if (allNotes.length === 0) continue;
 
                     allNotes.sort((a, b) => a.time - b.time);
-                    const msPerTick = 60000 / (params.bpm * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
+                    const msPerTick = 60000 / (getMidiPlaybackBpm(midiData) * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
 
                     // 计算最后一个音符的真实结束时间
                     let lastNoteEndTimeMs = 0;
@@ -9216,7 +9262,7 @@
                     }
                     allNotes.sort((a, b) => a.time - b.time);
 
-                    const msPerTick = 60000 / (params.bpm * midiData.timeDivision);
+                    const msPerTick = 60000 / (getMidiPlaybackBpm(midiData) * (midiData.ticksPerQuarter || midiData.timeDivision || 480));
                     let midiCurrentTime = currentTime;
                     let lastNoteTime = 0;
                     let lastNoteEndTimeSec = currentTime;
@@ -9801,7 +9847,7 @@
                 try {
                     songMidi = parseMidi(e.target.result);
                     updateSongInfo();
-                    document.getElementById('statusText').textContent = `已加载: ${file.name}`;
+                    document.getElementById('statusText').textContent = `已加载: ${file.name} · ${getMidiTempoLabel(songMidi)}`;
                     // 卡片内容会在 updateSongInfo() 中更新
                 } catch (err) {
                     console.error('[SongMIDI] MIDI 解析失败:', file.name, err);
@@ -9828,8 +9874,8 @@
         // 计算当前 BPM 下的总时长
         function getSongDurationAtBPM() {
             if (!songMidi) return 0;
-            const bpm = params.bpm;
-            const msPerTick = 60000 / (bpm * songMidi.timeDivision);
+            const bpm = getMidiPlaybackBpm(songMidi);
+            const msPerTick = 60000 / (bpm * (songMidi.ticksPerQuarter || songMidi.timeDivision || 480));
 
             let maxTick = 0;
             for (const track of songMidi.tracks) {
@@ -9860,7 +9906,7 @@
                             ${songMidi.numTracks} 音轨 · ${noteCount} 音符 · ${durationStr}
                         </div>
                         <div style="font-size: 0.7rem; color: var(--primary); margin-top: 2px;">
-                            🎸 ${instrumentNames[currentInstrument] || currentInstrument} · ⏱️ ${params.bpm} BPM
+                            🎸 ${instrumentNames[currentInstrument] || currentInstrument} · ⏱️ ${getMidiTempoLabel(songMidi)}
                         </div>
                     </div>
                     <div style="font-size: 0.7rem; color: var(--text-dim);">点击更换</div>
@@ -9885,8 +9931,8 @@
 
             if (!songMidi) return;
 
-            const bpm = params.bpm;
-            const msPerTick = 60000 / (bpm * songMidi.timeDivision);
+            const bpm = getMidiPlaybackBpm(songMidi);
+            const msPerTick = 60000 / (bpm * (songMidi.ticksPerQuarter || songMidi.timeDivision || 480));
 
             const allNotes = [];
             for (const track of songMidi.tracks) {
@@ -9934,7 +9980,7 @@
             if (btnMainPlay) btnMainPlay.textContent = '⏸ 播放中...';
             document.getElementById('statusText').textContent = '播放中...';
 
-            const bpm = params.bpm;
+            const bpm = getMidiPlaybackBpm(songMidi);
             const msPerTick = 60000 / (bpm * (songMidi.ticksPerQuarter || songMidi.timeDivision || 480));
 
             const allNotes = [];
