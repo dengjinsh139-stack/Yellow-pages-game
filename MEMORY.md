@@ -28,6 +28,38 @@
 - 未 ready 禁用按钮或 await ensureInstrumentCoreReady()
 - 不能只做 await loadInstrumentSamples(); currentInstrument = instrument;
 
+### 🆕 新增乐器入库流程（2026-05-25 制定）
+**按顺序执行，避免先传音频后代码不匹配的问题：**
+
+1. **我先做代码骨架**（你们不需要提前传文件）
+   - UI 添加 `instrument-btn` 按钮 + CSS 变量
+   - `instrumentDefaults` 添加默认参数
+   - `instrumentRegistry` 注册乐器
+   - `sampleConfig` 添加占位配置（走 synth fallback，确保有声）
+   - `loadInstrumentSamples` 添加占位函数
+   - `hasInstrumentSamples` 适配检查
+   - `playTone` 分支逻辑适配
+   - `renderAudioToBuffer` 适配
+   - 角色声纹如需新增 → 同步配置
+
+2. **推送 GitHub**
+   - 更新 `nav-config.js` 版本号
+   - `git push origin main`
+   - **立即报出版本号**
+
+3. **你们发音频文件**
+   - 直接发群里（mp3/wav 都行）
+   - 或上传到 GitHub `assets/audio/samples/[乐器ID]/`
+   - 命名：`D4.mp3`, `E4.mp3`, `F4.mp3`, `A4.mp3`, `B4.mp3`, `D5.mp3`, `E5.mp3`, `F5.mp3`, `A5.mp3`, `B5.mp3`
+
+4. **我接入采样**
+   - 替换占位 `loadXXXSamples()` 为真实采样加载
+   - 补全 `sampleConfig` 里的 `basePath` + `samples{}`
+   - 移除 synth fallback 兜底
+   - 跑 QA checklist
+   - 再次推送 + 报版本号 + 交付报告
+
+**⚠️ 禁止反向操作：** 不要先发音频文件给我，等我先做好代码骨架。
 ### 交付时必须按格式汇报
 新增乐器列表 → 采样覆盖情况 → 已验证功能 → LayoutGuard结果 → 已知限制
 
@@ -44,9 +76,10 @@
 - Token 已移至环境变量 `GITHUB_TOKEN` 中管理
 - 推送命令: `git push origin main`
 
-### 当前版本: v3.15.0
+### 当前版本: v3.24.5
 
 **版本历史:**
+- **v3.24.5** (2026-05-25) - 同步仓库当前版本号
 - **v3.16.3** (2026-05-05) - UI/布局重构：右栏紧凑化（移除 overflow-y 滚动隐藏、压缩 Voice Shaping 高度、A/B 紧凑布局），左栏合并四个高级入口为单一「高级设置」，Effects 和 Export 首屏可见
 - **v3.15.0** (2026-05-04) - 角色声纹WAV导出脱离实时audioContext依赖；findNearestSample防御性类型检查
 - **v3.7.0** (2026-04-22) - 去掉 G4/G5 保持10键对齐，版本号统一动态读取 nav-config.js
@@ -98,4 +131,4 @@
 用户需要知道推送后的确切版本。推送后立即回复版本号，不要等用户问。
 
 ---
-*Last updated: 2026-05-04 12:53*
+*Last updated: 2026-05-25 14:21*
