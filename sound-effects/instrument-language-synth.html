@@ -3954,10 +3954,10 @@
                     }
                     lastTime = note.time;
 
-                    // 映射到五声音阶
-                    const pentatonicNote = mapToPentatonic(note.note);
-                    const freq = midiToFreq[pentatonicNote];
-                    const noteName = noteNumberToName(pentatonicNote);
+                    // 与歌曲 MIDI WAV 导出共用同一音高映射，避免实时播放/导出走不同调
+                    const resolved = resolveSongMidiPlaybackNote(note.note, currentInstrument);
+                    const freq = resolved.frequency;
+                    const noteName = resolved.noteName;
 
                     // 使用共享函数计算音符时长
                     const noteDuration = computeMidiNoteDurationMs(note, midiData);
@@ -7426,16 +7426,16 @@
             'cowbell': '牛铃'
         };
 
-        // MIDI 音符到频率的映射（五声音阶）
+        // MIDI 音符到频率的映射（与 10 键音符键盘保持一致：D/E/F/A/B × 两个八度）
         const midiToFreq = {
             62: 293.66,  // D4
             64: 329.63,  // E4
-            67: 392.00,  // G4
+            65: 349.23,  // F4
             69: 440.00,  // A4
             71: 493.88,  // B4
             74: 587.33,  // D5
             76: 659.25,  // E5
-            79: 783.99,  // G5
+            77: 698.46,  // F5
             81: 880.00,  // A5
             83: 987.77   // B5
         };
@@ -7466,9 +7466,9 @@
             return `${getMidiPlaybackBpm(midiData).toFixed(1).replace(/\.0$/, '')} BPM（页面）`;
         }
 
-        // 将任意 MIDI 音符映射到最近的五声音阶音符
+        // 将任意 MIDI 音符映射到音符键盘的 10 个可演奏采样槽
         function mapToPentatonic(midiNote) {
-            const pentatonicNotes = [62, 64, 67, 69, 71, 74, 76, 79, 81, 83]; // D4-B5
+            const pentatonicNotes = [62, 64, 65, 69, 71, 74, 76, 77, 81, 83]; // D4/E4/F4/A4/B4/D5/E5/F5/A5/B5
             let nearest = pentatonicNotes[0];
             let minDiff = Math.abs(midiNote - nearest);
 
@@ -7832,10 +7832,10 @@
                 }
                 lastTime = note.time;
 
-                // 映射到五声音阶
-                const pentatonicNote = mapToPentatonic(note.note);
-                const freq = midiToFreq[pentatonicNote];
-                const noteName = noteNumberToName(pentatonicNote);
+                // 与歌曲 MIDI WAV 导出共用同一音高映射，避免实时播放/导出走不同调
+                const resolved = resolveSongMidiPlaybackNote(note.note, currentInstrument);
+                const freq = resolved.frequency;
+                const noteName = resolved.noteName;
 
                 if (freq) {
                     const velocity = (note.velocity / 127) * params.masterVolume;
@@ -7849,11 +7849,11 @@
             addToHistory('🎹 MIDI 文件');
         }
 
-        // MIDI 音符编号转音符名称
+        // MIDI 音符编号转音符名称（必须与 MIDI 映射表/音符键盘一致）
         function noteNumberToName(noteNumber) {
             const names = {
-                62: 'D4', 64: 'E4', 67: 'G4', 69: 'A4', 71: 'B4',
-                74: 'D5', 76: 'E5', 79: 'G5', 81: 'A5', 83: 'B5'
+                62: 'D4', 64: 'E4', 65: 'F4', 69: 'A4', 71: 'B4',
+                74: 'D5', 76: 'E5', 77: 'F5', 81: 'A5', 83: 'B5'
             };
             return names[noteNumber] || 'A4';
         }
@@ -7861,10 +7861,9 @@
         // 显示 MIDI 音符
         function displayMidiNotes(notes) {
             const display = document.getElementById('notesDisplay');
-            display.innerHTML = events.map((n, i) => {
-                const mapped = mapToPentatonic(n.note);
-                const name = noteNumberToName(mapped);
-                return `<span class="note-item" id="note-${i}" title="原音符: ${n.note} → ${name}">${name}</span>`;
+            display.innerHTML = notes.map((n, i) => {
+                const resolved = resolveSongMidiPlaybackNote(n.note, currentInstrument);
+                return `<span class="note-item" id="note-${i}" title="原音符: ${n.note} → ${resolved.noteName}">${resolved.displayName || resolved.noteName}</span>`;
             }).join('');
         }
 
@@ -8171,6 +8170,33 @@
             }
         }
 
+        // 歌曲 MIDI 音高映射：实时播放、WAV 导出、列表显示共用同一入口，避免某一路径跑到隐藏 G4/G5 或原始 MIDI 音高
+        function resolveSongMidiPlaybackNote(rawMidiNote, instrument = currentInstrument) {
+            if (isVirtualVoiceInstrument(instrument)) {
+                const mapped = mapMidiToVirtualVoiceScale(rawMidiNote);
+                return {
+                    rawMidiNote,
+                    mappedMidiNote: mapped.inputMidi,
+                    frequency: mapped.sampleFreq,
+                    noteName: mapped.sampleNote,
+                    sampleNote: mapped.sampleNote,
+                    displayName: `${mapped.inputName}→${mapped.sampleNote}`,
+                    degree: mapped.degree
+                };
+            }
+
+            const mappedMidiNote = mapToPentatonic(rawMidiNote);
+            const noteName = noteNumberToName(mappedMidiNote);
+            return {
+                rawMidiNote,
+                mappedMidiNote,
+                frequency: midiToFreq[mappedMidiNote] || (440 * Math.pow(2, (mappedMidiNote - 69) / 12)),
+                noteName,
+                sampleNote: noteName,
+                displayName: noteName
+            };
+        }
+
         // 计算歌曲 MIDI 在当前 BPM 下的总时长
         function calculateSongMidiDurationAtCurrentBPM(midiData) {
             if (!midiData) return 0;
@@ -8227,25 +8253,18 @@
 
                 const velocity = (note.velocity / 127) * params.masterVolume;
 
-                let frequency;
-                let noteName;
-
-                if (isVirtualVoiceInstrument(currentInstrument)) {
-                    const mapped = mapMidiToVirtualVoiceScale(note.note);
-                    frequency = mapped.sampleFreq;
-                    noteName = mapped.sampleNote;
-                } else {
-                    const mappedNote = mapToPentatonic(note.note);
-                    frequency = midiToFreq[mappedNote] || (440 * Math.pow(2, (note.note - 69) / 12));
-                    noteName = noteNumberToName(mappedNote);
-                }
+                const resolved = resolveSongMidiPlaybackNote(note.note, currentInstrument);
+                const frequency = resolved.frequency;
+                const noteName = resolved.noteName;
 
                 const noteObj = {
                     type: 'note',
                     note: noteName,
                     frequency,
                     velocity,
-                    sampleNote: noteName
+                    sampleNote: resolved.sampleNote || noteName,
+                    rawMidiNote: note.note,
+                    mappedMidiNote: resolved.mappedMidiNote
                 };
 
                 if (!isFinite(startTime) || !isFinite(duration) || duration <= 0 || !isFinite(frequency)) {
@@ -9948,13 +9967,19 @@
                 const seconds = Math.floor(time % 60);
                 const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
+                const resolved = resolveSongMidiPlaybackNote(note.note, currentInstrument);
+                const rawName = `${noteNames[note.note % 12]}${Math.floor(note.note/12)-1}`;
+                const mappedLabel = resolved.displayName || resolved.noteName;
                 const item = document.createElement('div');
                 item.className = 'song-note-item';
                 item.dataset.index = index;
+                item.dataset.rawMidi = note.note;
+                item.dataset.mappedNote = resolved.noteName;
                 item.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem;';
                 item.innerHTML = `
                     <span style="color: var(--text-dim); min-width: 40px;">${timeStr}</span>
-                    <span style="font-weight: 600; min-width: 35px;">${noteNames[note.note % 12]}${Math.floor(note.note/12)-1}</span>
+                    <span style="font-weight: 600; min-width: 66px;" title="原始 MIDI: ${rawName}">${mappedLabel}</span>
+                    <span style="color: var(--text-dim); font-size: 0.7rem; min-width: 54px;">原 ${rawName}</span>
                     <div style="flex: 1; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px;">
                         <div style="width: ${(note.velocity/127)*100}%; height: 100%; background: var(--primary); border-radius: 2px;"></div>
                     </div>
@@ -10006,20 +10031,10 @@
 
                 if (!isSongPlaying) break;
 
-                // ===== 音高映射 =====
-                let mapped;
-                let frequency;
-                let noteName;
-
-                if (isVirtualVoiceInstrument(currentInstrument)) {
-                    mapped = mapMidiToVirtualVoiceScale(note.note);
-                    frequency = mapped.sampleFreq;
-                    noteName = mapped.sampleNote;
-                } else {
-                    const mappedNote = mapToPentatonic(note.note);
-                    frequency = midiToFreq[mappedNote] || (440 * Math.pow(2, (note.note - 69) / 12));
-                    noteName = noteNumberToName(mappedNote);
-                }
+                // ===== 音高映射：与 WAV 导出和列表显示共用同一入口 =====
+                const resolved = resolveSongMidiPlaybackNote(note.note, currentInstrument);
+                const frequency = resolved.frequency;
+                const noteName = resolved.noteName;
 
                 const velocity = (note.velocity / 127) * params.masterVolume;
                 const durationMs = note.durationTicks ? note.durationTicks * msPerTick : 500;
