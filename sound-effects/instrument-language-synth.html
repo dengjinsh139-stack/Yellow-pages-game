@@ -3074,7 +3074,7 @@
                 emoji: '🎸',
                 basePath: '../assets/audio/samples/wahguitar/',
                 samples: {
-                    // Wah吉他五声音阶采样 (placeholder)
+                    // Wah吉他五声音阶采样
                     'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
                     'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
                     'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
@@ -3087,8 +3087,7 @@
                     'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
                 },
                 attack: 0.02,
-                release: 0.3,
-                isPlaceholder: true
+                release: 0.3
             }
         };
 
@@ -6583,7 +6582,7 @@
             }
 
             // 新乐器：采样未到位前使用合成器 fallback
-            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar'].includes(currentInstrument)) {
+            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar'].includes(currentInstrument)) {
                 return playSynthTone(frequency, duration / 1000, velocity, attackMsOverride);
             }
 
