@@ -4,7 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>乐器语言合成器 | Instrument Language Synth</title>
-    <script src="../nav-config.js?v=373"></script>
+    <script>
+        /**
+         * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
+         */
+        const APP_VERSION = 'v3.37.5';
+        const NAV_CONFIG = {
+            version: APP_VERSION,
+            items: [
+                { id: 'home', label: '🏠 首页', href: 'index.html', active: false },
+                { id: 'games', label: '🎮 游戏中心', href: 'index.html#games', active: false },
+                { 
+                    id: 'game-world', 
+                    label: '🎮 游戏世界', 
+                    href: 'game-world.html', 
+                    active: false,
+                    children: [
+                        { id: 'rpg', label: '🎭 RPG', href: 'game-world.html#rpg' },
+                        { id: 'fps', label: '🎯 FPS', href: 'game-world.html#fps' },
+                        { id: 'slg', label: '⚔️ SLG', href: 'game-world.html#slg' },
+                        { id: 'moba', label: '⚡ MOBA', href: 'game-world.html#moba' }
+                    ]
+                },
+                { 
+                    id: 'audio', 
+                    label: '🎵 音频应用', 
+                    href: 'audio-hub.html', 
+                    active: false,
+                    children: [
+                        { id: 'sound', label: '🔊 音效相关', href: 'sound-effects/sound-effects-hub.html' },
+                        { id: 'music', label: '🎵 音乐百科', href: 'music/music-genres.html' },
+                        { id: 'wwise', label: '🎮 Wwise', href: 'wwise/wwise.html' }
+                    ]
+                },
+                { id: 'task', label: '📈 任务管理器', href: 'task-manager.html', active: false }
+            ]
+        };
+        function initVersion() {
+            const versionElements = document.querySelectorAll('.nav-version, [data-version]');
+            versionElements.forEach(el => {
+                const text = el.textContent;
+                if (text.match(/^v?\d+\.\d+\.\d+$/)) {
+                    el.textContent = APP_VERSION;
+                } else {
+                    el.textContent = text.replace(/v?\d+\.\d+\.\d+/g, APP_VERSION);
+                }
+            });
+        }
+        function initNav() {
+            const currentPath = window.location.pathname;
+            const navContainer = document.getElementById('nav-links');
+            if (!navContainer) return;
+            let html = '';
+            NAV_CONFIG.items.forEach(item => {
+                const isActive = currentPath.includes(item.href.replace('.html', '')) || 
+                                (item.id === 'home' && (currentPath.endsWith('/') || currentPath.endsWith('/index.html')));
+                let isChildActive = false;
+                if (item.children) {
+                    isChildActive = item.children.some(child => currentPath.includes(child.href.replace('.html', '')));
+                }
+                const activeClass = (isActive || isChildActive) ? 'active' : '';
+                let href = item.href;
+                if (currentPath.includes('/music/') || currentPath.includes('/wwise/') || currentPath.includes('/sound-effects/')) {
+                    href = '../' + item.href;
+                }
+                html += `<a href="${href}" class="nav-link ${activeClass}">${item.label}</a>`;
+            });
+            navContainer.innerHTML = html;
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            initVersion();
+            initNav();
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
