@@ -3133,7 +3133,6 @@
                 emoji: '🎶',
                 basePath: '../assets/audio/samples/otamatone/',
                 samples: {
-                    // 电音蝌蚪五声音阶采样 - 占位配置，采样到位后替换
                     'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
                     'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
                     'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
@@ -6678,7 +6677,7 @@
             }
 
             // 新乐器：采样未到位前使用合成器 fallback
-            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'otamatone'].includes(currentInstrument)) {
+            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell'].includes(currentInstrument)) {
                 return playSynthTone(frequency, duration / 1000, velocity, attackMsOverride);
             }
 
