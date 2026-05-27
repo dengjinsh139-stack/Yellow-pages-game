@@ -1,0 +1,700 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-27T02:15:30.984Z",
+  "entries": {
+    "memory:memory/2026-05-12.md:1:10": {
+      "key": "memory:memory/2026-05-12.md:1:10",
+      "path": "memory/2026-05-12.md",
+      "startLine": 1,
+      "endLine": 10,
+      "source": "memory",
+      "snippet": "# 2026-05-12 ## 布谷鸟乐器添加完成 - 在 `sound-effects/instrument-language-synth.html` 中添加了新乐器 `cuckoo` - 完成 17 个配置点接入：CSS 颜色、sampleConfig、instrumentDefaults、instrumentOffsets、noteVolumes、chordVolumes、instrumentPresetConfig、instrumentMetadata、instrumentNames、instrumentColors、hasInstrumentSamples、instrument-grid 按钮、loaders + loadCuckooSamples、playTone fallback、renderAudioToBuffer WAV 导出、waveforms 合成器波形、updateOffsetDisplay 名称映射 - 采样路径：`../assets/audio/samples/cuckoo/`，10 键 `.mp3` 占位（D4 E4 F4 A4 B4 D5 E5 F5 A5 B5） - 🎨 键盘主题色：绿色 `#22c55e` - 🔊 fallback 波形：`triangle` - **状态：等待用户提供十个真实采样文件**",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1.2612174928188322,
+      "maxScore": 0.45235153734683986,
+      "firstRecalledAt": "2026-05-27T02:14:36.577Z",
+      "lastRecalledAt": "2026-05-27T02:15:30.984Z",
+      "queryHashes": [
+        "246907819e8d",
+        "e47c3e497228",
+        "46197e179ce4"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "instrument-grid",
+        "assets/audio/samples/cuckoo",
+        "布谷",
+        "乐器",
+        "添加",
+        "完成",
+        "sound",
+        "effects"
+      ]
+    },
+    "memory:memory/2026-05-26.md:1:40": {
+      "key": "memory:memory/2026-05-26.md:1:40",
+      "path": "memory/2026-05-26.md",
+      "startLine": 1,
+      "endLine": 40,
+      "source": "memory",
+      "snippet": "# 2026-05-26 工作日志 ## 哇音吉他 (Wah Guitar) 乐器入库 **乐器信息：** - 名称：哇音吉他 - ID：`wahguitar` - Emoji：🎸 - 仓库：`dengjinsh139-stack/Yellow-pages-game` - 主文件：`sound-effects/instrument-language-synth.html` **版本迭代：** - `v3.36.6` → `v3.36.7`（代码骨架搭建，synth fallback）→ `v3.36.8`（真实采样接入） **采样文件（10个）：** ``` D4.mp3, E4.mp3, F4.mp3, A4.mp3, B4.mp3, D5.mp3, E5.mp3, F5.mp3, A5.mp3, B5.mp3 ``` - 路径：`assets/audio/samples/wahguitar/` **代码修改位置（instrument-language-synth.html）：** 1. `:root` CSS 变量 `--wahguitar` 2. UI 乐器选择按钮区 `.instrument-btn` 3. `instrumentDefaults` 默认参数 4. `instrumentRegistry` 乐器注册（type: sample, readyKey: wahguitar_D4） 5. `sampleConfig` 采样配置（basePath, samples, attack, release） 6. `instrumentOffsets` 偏移量",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.7523662894964218,
+      "maxScore": 0.39769973158836364,
+      "firstRecalledAt": "2026-05-27T02:14:36.577Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.403Z",
+      "queryHashes": [
+        "246907819e8d",
+        "a0b8f2212ce3"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.36.6",
+        "v3.36.7",
+        "v3.36.8",
+        "d4.mp3",
+        "e4.mp3",
+        "f4.mp3",
+        "a4.mp3",
+        "b4.mp3"
+      ]
+    },
+    "memory:memory/2026-05-05.md:239:269": {
+      "key": "memory:memory/2026-05-05.md:239:269",
+      "path": "memory/2026-05-05.md",
+      "startLine": 239,
+      "endLine": 269,
+      "source": "memory",
+      "snippet": "- 加载过程中用户点击了其他乐器按钮 → 多个并行的 `ensureInstrumentReady` 可能乱序完成 - 最后赋值给 `currentInstrument` 的不一定是用户最后点击的那个 2. `playText()` 直接引用 `currentInstrument`，不检查 `targetInstrument` ### 修复措施（v3.20.0） 1. 新增全局变量 `let pendingInstrument = null;` 2. `instrument-grid` 点击事件：`pendingInstrument = instrument; await selectInstrument(instrument);` 3. `selectInstrument()` 内部：加载完成后 `currentInstrument = targetInstrument || instrument;` 4. `playText()` / `playSongMidi()` / `playNoteKey()` 开头引用 `targetInstrument = currentInstrument;` 5. 新增 `disablePlaybackControls()` / `enablePlaybackControls()`： - 乐器加载期间禁用「演奏文字」「清空」「停止」「导出」按钮 - 加载完成后恢复 6. 自检列表更新：`btn-play-text` → `btn-main-play`，`status` → `statusText` ### 推送",
+      "recallCount": 5,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1.995319616794586,
+      "maxScore": 0.43814001381397244,
+      "firstRecalledAt": "2026-05-27T02:14:36.577Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.176Z",
+      "queryHashes": [
+        "246907819e8d",
+        "9843c96d5194",
+        "a0b8f2212ce3",
+        "43312cd65cf7",
+        "6696cc1bf31a"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.20.0",
+        "instrument-grid",
+        "btn-play-text",
+        "btn-main-play",
+        "过程",
+        "用户",
+        "其他",
+        "乐器"
+      ]
+    },
+    "memory:memory/2026-05-15.md:1:27": {
+      "key": "memory:memory/2026-05-15.md:1:27",
+      "path": "memory/2026-05-15.md",
+      "startLine": 1,
+      "endLine": 27,
+      "source": "memory",
+      "snippet": "# Memory Flush - 2026-05-15 ## Session Summary - **Time**: 2026-05-15 21:50 GMT+8 - **Project**: Yellow-pages-game / 乐器语音合成器 - **Current Version**: v3.29.3 --- ## Completed Work - 布谷鸟乐器：10/10 采样全部到位，格式 `.wav`，配置已改，已推送 v3.29.3 - 已读取完整 `instrument-language-synth.html` 代码结构，了解 playText / computeEventTiming / renderAudioToBuffer / playTone / playSampleTone / playSynthTone / renderSampleToBuffer / renderSynthToBuffer 等核心函数的当前实现 --- ## Phrase Articulation Shaper 施工单 **状态**: 施工单已交付给用户，用户将转交另一AI执行。 **文件**: `/root/.openclaw/workspace/sound-effects/instrument-language-synth.html`（单一文件修改） **核心施工步骤（17步）**: 1. UI 插入：左栏\"发音密度模式\"和\"输出音量\"之间插入 `<select id=\"phraseArticulationMode\">` 2. params 参数初始化：`phra",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.38565329015254973,
+      "maxScore": 0.38565329015254973,
+      "firstRecalledAt": "2026-05-27T02:14:36.577Z",
+      "lastRecalledAt": "2026-05-27T02:14:36.577Z",
+      "queryHashes": [
+        "246907819e8d"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "yellow-pages-game",
+        "v3.29.3",
+        "10/10",
+        "instrument-language-synth.html",
+        "flush",
+        "summary",
+        "time",
+        "gmt"
+      ]
+    },
+    "memory:memory/2026-05-15.md:38:69": {
+      "key": "memory:memory/2026-05-15.md:38:69",
+      "path": "memory/2026-05-15.md",
+      "startLine": 38,
+      "endLine": 69,
+      "source": "memory",
+      "snippet": "17. QA 验证：console 运行 `textToEvents('你不要过去那里好像有点不太对劲')` 检查 articulationRole/articulationVelocityScale/articulationAttackMs/articulationDurationScale **禁止事项**: - 不要修改用户输入文本 - 不要影响字幕内容 - 不要删除 note events - 不要替代 Note Density Reducer - 不要覆盖 Expression Segment - 不要覆盖 Voice Shaping - 实时和导出必须一致 - 不要破坏三栏布局 - 不要新增 console error --- ## Pending Tasks ### 1. 牛铃乐器集成（Cowbell） - **状态**: 等待用户发送 10 个 `.wav` 采样文件 - **目标目录**: `/root/.openclaw/workspace/assets/audio/samples/cowbell/` - **采样音符**: D4, E4, F4, A4, B4, D5, E5, F5, A5, B5 - **后续工作**: 收到采样后需在 `instrument-language-synth.html` 中插入 cowbell 乐器定义及所有相关配置项 ### 2. Phrase Articulation Shaper 施工 - **状态**: 施工单已交付，由另一AI执行 - **预期结果**: 17步完成后，UI有\"发音颗粒\"控制，实时播放和",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.7694204598665237,
+      "maxScore": 0.3915068328380584,
+      "firstRecalledAt": "2026-05-27T02:14:36.577Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.391Z",
+      "queryHashes": [
+        "246907819e8d",
+        "e47c3e497228"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "instrument-language-synth.html",
+        "验证",
+        "console",
+        "运行",
+        "texttoevents",
+        "不要",
+        "过去",
+        "那里"
+      ]
+    },
+    "memory:memory/2026-05-05.md:158:187": {
+      "key": "memory:memory/2026-05-05.md:158:187",
+      "path": "memory/2026-05-05.md",
+      "startLine": 158,
+      "endLine": 187,
+      "source": "memory",
+      "snippet": "- 左栏三个手风琴面板：🎹 乐器选择（默认展开）、🎭 角色声纹（折叠）、🎯 语义分类（折叠） - 基础演奏参数（BPM/发音密度/音量）和高级设置从左栏移到右栏 - 导出按钮从右栏移到中间操作区，与演奏/清空/停止并排（4 按钮） ### v3.18.3 回退 用户反馈\"破坏了我们最开始的结构\"，立即回退到 `.bak` 备份。 **教训**：结构性改动必须等用户确认后再推进，不能自行决定。 --- ## 2026-05-05 21:14 ~ 22:00（第五轮：钢琴音色诊断） ### 问题现象 选择钢琴后，音符键盘播放的是默认合成器音色，而非钢琴真实采样。 ### 诊断过程 - Console 日志显示 `[playNoteKey] samplesLoaded=false` - 状态栏显示\"就绪 (真实钢琴音色)\"，说明 `initAudio()` 已成功执行 - 但 `playText()` 的自动初始化路径（`if (!audioContext)`）里只创建了 audioContext，**没有调用 `loadSamples()`** - 结果：用户点击音符键盘时走的是自动初始化路径，`samplesLoaded` 永远是 false ### 修复 - 在 `playText()` 的 `if (!audioContext)` 自动初始化块中加入 `await loadSamples()` - 版本：**v3.19.7** --- ## 2026-05-05 22:06 ~ 22:32（第六轮：三项修复 + Race Condition 全面修复）",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.7709701657295227,
+      "maxScore": 0.39558876454830166,
+      "firstRecalledAt": "2026-05-27T02:14:36.577Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.147Z",
+      "queryHashes": [
+        "246907819e8d",
+        "43312cd65cf7"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "备份",
+        "bpm/发音密度/音量",
+        "与演奏/清空/停止并排",
+        "v3.18.3",
+        "v3.19.7",
+        "手风琴",
+        "面板",
+        "乐器"
+      ]
+    },
+    "memory:memory/2026-05-05.md:261:294": {
+      "key": "memory:memory/2026-05-05.md:261:294",
+      "path": "memory/2026-05-05.md",
+      "startLine": 261,
+      "endLine": 294,
+      "source": "memory",
+      "snippet": "### 问题现象 用户确认 race condition \"基本通过\"，但发现虚拟人声（guitar）没有默认参数。 ### 根因 `instrumentDefaults` 对象中缺少 `guitar` 键，导致 `applyInstrumentDefaults('guitar')` 无效果。 ### 修复 补全 `guitar` 默认参数： - masterVolume: 100, audioOffset: 0, tempoMin: 119, tempoMax: 218 - tempoRandom: true, noteDuration: 900, reverb: 12, chordDuration: 0 - bpm: 120, notesPerBeat: 1, rhythmRandom: false ### 推送 - 版本：**v3.20.1** - Commit：`v3.20.0: 为 guitar/虚拟人声补 instrumentDefaults` --- ## 2026-05-05 23:05 ~ 23:37（第八轮：三栏布局优化尝试 - 失败回退） ### 用户要求 - 左栏减负：只保留选择乐器、当前乐器、基础演奏、高级设置入口 - 角色声纹 + 语义分类触发 + 辅助信息 → 移入中栏内部（`.center-panel`），或默认折叠显示摘要入口 - 中栏新增 `secondary-workspace`（Tab 切换：角色声纹 / 语义触发 / 辅助信息） - 绝对禁止： - 重写 `.workbench`、删除其 3 个子元素 - 把 `.",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1.2429698079824447,
+      "maxScore": 0.4247739285230636,
+      "firstRecalledAt": "2026-05-27T02:15:00.387Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.176Z",
+      "queryHashes": [
+        "9843c96d5194",
+        "43312cd65cf7",
+        "6696cc1bf31a"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.20.1",
+        "v3.20.0",
+        "guitar/虚拟人声补",
+        "center-panel",
+        "secondary-workspace",
+        "问题",
+        "现象",
+        "用户"
+      ]
+    },
+    "memory:memory/2026-05-07.md:1:28": {
+      "key": "memory:memory/2026-05-07.md:1:28",
+      "path": "memory/2026-05-07.md",
+      "startLine": 1,
+      "endLine": 28,
+      "source": "memory",
+      "snippet": "# 2026-05-07 ## 乐器入库规则（instrument-language-synth.html） 用户邓锦盛制定了详细的乐器入库标准，用于 sound-effects/instrument-language-synth.html 新增乐器时遵循。 ### 核心原则 1. **不破坏三栏骨架**：`.workbench` 必须保持 grid、3个子元素、`left-panel`/`center-panel`/`right-panel` 2. **不破坏现有功能**：文字演奏、歌曲MIDI、语义触发、角色声纹、两种映射模式、Expression Segment、实时播放、WAV导出都必须继续可用 3. **不要随机不稳定**：legacy-tone-region 必须用稳定映射，禁止 Math.random() ### 新乐器入库标准配置 每个新乐器至少提供： - id, name, englishName, type, category, basePath - defaultVolume, attack, release - usableRange: {min, max} - dialogueCoreNotes: ['A4','B4','D5','E5']（对白固定必备） - legacyRequiredNotes: D4,E4,F4,F4,A4,B4,D5,E5,F5,F5,A5,B5 - fallbackPolicy: 'nearest-sample-preferred' ### 采样覆盖要求 - dialogue-fixed 必备音：A4, B4, D",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.39416224658489224,
+      "maxScore": 0.39416224658489224,
+      "firstRecalledAt": "2026-05-27T02:15:00.387Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.387Z",
+      "queryHashes": [
+        "9843c96d5194"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "instrument-language-synth.html",
+        "left-panel",
+        "center-panel",
+        "right-panel",
+        "legacy-tone-region",
+        "math.random",
+        "nearest-sample-preferred",
+        "dialogue-fixed"
+      ]
+    },
+    "memory:memory/2026-05-08.md:44:75": {
+      "key": "memory:memory/2026-05-08.md:44:75",
+      "path": "memory/2026-05-08.md",
+      "startLine": 44,
+      "endLine": 75,
+      "source": "memory",
+      "snippet": "- **教训：ID 必须统一！** ### v3.24.1：P0 修复 - canonical ID 统一为 waterdrop - 所有 trumpet 统一为 waterdrop（22处替换） - playSampleTone / renderSampleToBuffer 移除特殊 case - hasInstrumentSamples('waterdrop') 检查 waterdrop_D4 - instrumentDefaults.waterdrop 默认参数 - **新增 INSTRUMENT_REGISTRY** - 所有乐器唯一 canonical ID 注册表 - normalizeInstrumentId('trumpet') → 'waterdrop'（向后兼容旧存档） ### 正确的乐器入库步骤（以后必须按此执行）： 1. UI data-instrument=\"instrument_id\" 2. INSTRUMENT_REGISTRY 注册 3. instrumentDefaults[instrument_id] 默认参数 4. sampleConfig[instrument_id] 采样配置（到位后） 5. loadInstrumentSamples 注册 loader 6. hasInstrumentSamples(instrument_id) 检查 7. instrumentOffsets / voiceRegistry / noteVolumes / chordVolumes 注册 8. instrumentColors / activeCo",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3934070974588394,
+      "maxScore": 0.3934070974588394,
+      "firstRecalledAt": "2026-05-27T02:15:00.387Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.387Z",
+      "queryHashes": [
+        "9843c96d5194"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.24.1",
+        "waterdrop-d4",
+        "instrumentdefaults.waterdrop",
+        "instrument-registry",
+        "data-instrument",
+        "instrument-id",
+        "教训",
+        "必须"
+      ]
+    },
+    "memory:memory/2026-05-08.md:1:27": {
+      "key": "memory:memory/2026-05-08.md:1:27",
+      "path": "memory/2026-05-08.md",
+      "startLine": 1,
+      "endLine": 27,
+      "source": "memory",
+      "snippet": "# 2026-05-08 ## 乐器语言合成器 - 乐器入库规则（完整版） 用户邓锦盛制定了详细的乐器入库标准，用于 sound-effects/instrument-language-synth.html 新增乐器时遵循。 ### 核心原则 1. **不破坏三栏骨架**：`.workbench` 必须保持 grid、3个子元素、`left-panel`/`center-panel`/`right-panel` 2. **不破坏现有功能**：文字演奏、MIDI、语义触发、角色声纹、两种映射模式、Expression Segment、实时/WAV导出 3. **不要随机不稳定**：legacy-tone-region 禁止 Math.random()，必须稳定映射 ### 新乐器配置标准 - 必备字段：id, name, englishName, type, category, basePath, defaultVolume, attack, release - dialogueCoreNotes: ['A4','B4','D5','E5'] - legacyRequiredNotes: D4,E4,F4,A4,B4,D5,E5,F5,A5,B5 - fallbackPolicy: 'nearest-sample-preferred'（缺采样优先 nearest sample 变调，不直接切 synth） ### 必须接入的播放路径 1. 文字演奏：playText() → textToEvents() → charToNote() → playTone() 2. WA",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.38730071187019344,
+      "maxScore": 0.38730071187019344,
+      "firstRecalledAt": "2026-05-27T02:15:00.387Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.387Z",
+      "queryHashes": [
+        "9843c96d5194"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "left-panel",
+        "center-panel",
+        "right-panel",
+        "实时/wav导出",
+        "legacy-tone-region",
+        "math.random",
+        "nearest-sample-preferred",
+        "乐器"
+      ]
+    },
+    "memory:memory/2026-05-05.md:205:224": {
+      "key": "memory:memory/2026-05-05.md:205:224",
+      "path": "memory/2026-05-05.md",
+      "startLine": 205,
+      "endLine": 224,
+      "source": "memory",
+      "snippet": "2. 新增 `instrumentLoadPromises = {}` 缓存，避免重复加载 3. 新增 `ensureInstrumentReady(instrument)`： - 已加载 → 返回 true - 未加载 → 启动加载，设置 `instrumentLoading = true`，显示\"正在加载 XX 采样，请稍候...\" 4. `selectInstrument()` 开头 `await ensureInstrumentReady(instrument)` 5. `playText()` / `playSongMidi()` / `playNoteKey()` 入口处都 `await ensureInstrumentReady(currentInstrument)` 6. `playSampleTone()` / `playTone()` 中：采样未就绪时不 silent fallback，显示 loading 提示并 return 7. `playNoteKey()` 统一走 `playTone()`，不再直接调用 `playSampleTone/playSynthTone` 8. 虚拟人声试听修复：`selectInstrument()` 底部添加 `instrument === 'guitar' && audioBuffers['vocal_D4_01']` 判断 **验收标准**： - fresh reload → 启动音频引擎 - 第一次选择长笛/木琴/虚拟人声后立刻点演奏 - 第一颗音必须走对应 sample - console 不得出",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.37995679378509517,
+      "maxScore": 0.37995679378509517,
+      "firstRecalledAt": "2026-05-27T02:15:00.387Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.387Z",
+      "queryHashes": [
+        "9843c96d5194"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "playsampletone/playsynthtone",
+        "vocal-d4-01",
+        "第一次选择长笛/木琴/虚拟人声后立刻点演奏",
+        "新增",
+        "instrumentloadpromises",
+        "避免",
+        "重复",
+        "ensureinstrumentready"
+      ]
+    },
+    "memory:memory/2026-05-08.md:96:127": {
+      "key": "memory:memory/2026-05-08.md:96:127",
+      "path": "memory/2026-05-08.md",
+      "startLine": 96,
+      "endLine": 127,
+      "source": "memory",
+      "snippet": "- UI 添加 💧 嘴巴小号按钮 (data-instrument='mouthtrumpet') - INSTRUMENT_REGISTRY 注册 mouthtrumpet - 所有映射、颜色、音量、waveform 已注册 - playTone 中暂时走 playSynthTone（等采样到位后切换为采样） - **等待用户发送 10 个采样文件（D4~B5）** ## 关键教训 1. **永远不要 UI 用一个 ID，config 用另一个 ID** — 这是 P0 2. **INSTRUMENT_REGISTRY 是唯一真理来源** — 禁止手写 instrument id 3. **isSampleInstrument 列表必须同步更新** — 否则导出变 synth 4. **legacy-tone-region 不能返回 pause** — 必须和 fixed 数量一致 5. **每次新增乐器后必须跑完整 QA 清单** --- ## 下午 session：三大乐器采样入库 + 参数调整 + Auto Curve V1 ### 卡林巴(Kalimba)采样入库 — v3.24.8 - 10个真实采样：D4/E4/F4/A4/B4/D5/E5/F5/A5/B5 - 补全 sampleConfig.kalimba + loadKalimbaSamples() 真实加载逻辑 - 原占位函数已替换 ### Small机器人采样入库 — v3.24.10 - 10个真实采样同上 - 补全 sampleConfig.smallrobot + loadSmallro",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3643316864967346,
+      "maxScore": 0.3643316864967346,
+      "firstRecalledAt": "2026-05-27T02:15:00.391Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.391Z",
+      "queryHashes": [
+        "e47c3e497228"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "data-instrument",
+        "instrument-registry",
+        "legacy-tone-region",
+        "v3.24.8",
+        "d4/e4/f4/a4/b4/d5/e5/f5/a5/b5",
+        "sampleconfig.kalimba",
+        "v3.24.10",
+        "sampleconfig.smallrobot"
+      ]
+    },
+    "memory:memory/2026-04-10.md:1:42": {
+      "key": "memory:memory/2026-04-10.md:1:42",
+      "path": "memory/2026-04-10.md",
+      "startLine": 1,
+      "endLine": 42,
+      "source": "memory",
+      "snippet": "## 2026-04-10 乐器语言合成器开发 ### 上午会话 (11:00-11:24) **项目**: 乐器语言合成器 (Instrument Language Synth) **版本**: v1.2 #### 完成的功能 1. **真实钢琴采样集成** - 接收并处理了用户提供的10个WAV采样文件 - 采样范围: D4, E4, F4, A4, B4, D5, E5, F5, A5, B5 - 存储位置: `assets/audio/samples/piano/` 2. **五声音阶设计** - 采用中国传统五声音阶 (宫商角徵羽) - 对应音符: D(1)、E(2)、G(3)、A(5)、B(6) - 不包含4和7，旋律更和谐流畅 3. **10键音符键盘** - 5×2 网格布局 - 固定UI，切换乐器时布局不变 - 支持鼠标点击和触摸操作 - 视觉反馈: 按下时缩放和发光效果 4. **多乐器支持架构** - 钢琴: 使用真实采样 (playbackRate音高调整) - 其他乐器: Web Audio API合成音色 - `getCurrentInstrumentNotes()` 函数管理10个音符数据 - 切换乐器自动切换音色，UI布局保持不变 #### 技术实现要点 - 采样预加载机制 - 最近采样匹配 + playbackRate音高微调 - 情感分析调整演奏参数 - 实时波形可视化 #### 文件位置 - 主文件: `sound-effects/in",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3622927963733673,
+      "maxScore": 0.3622927963733673,
+      "firstRecalledAt": "2026-05-27T02:15:00.403Z",
+      "lastRecalledAt": "2026-05-27T02:15:00.403Z",
+      "queryHashes": [
+        "a0b8f2212ce3"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "00-11",
+        "v1.2",
+        "assets/audio/samples/piano",
+        "sound-effects/in",
+        "乐器",
+        "语言",
+        "合成",
+        "开发"
+      ]
+    },
+    "memory:memory/2026-05-05.md:136:161": {
+      "key": "memory:memory/2026-05-05.md:136:161",
+      "path": "memory/2026-05-05.md",
+      "startLine": 136,
+      "endLine": 161,
+      "source": "memory",
+      "snippet": "- 但 `animationId` 只在 `visualize()` 函数内部被赋值（`animationId = requestAnimationFrame(draw)`），**从未在全局作用域 `let` 声明** - 浏览器严格模式下抛出 `ReferenceError: animationId is not defined`，整个 `playText()` 在第一行检查就中断 - 修复：在全局作用域添加 `let animationId = null;` ### 全局乐器路径验证 - 放开 `canPlayNormalNotes = true`，所有乐器都能进入音符事件循环 - 采样未加载时 `playTone()` 内部自动回退到 `playSynthTone()` - 8 种乐器全部验证通过：piano/xylophone/guitar(s vocal)/saxophone/flute/synth/train/trumpet ### v3.17.6 追加修复 - `updateParams()` 中引用已删除的 DOM ID（`currentInstrumentForOffset`、`currentOffsetMs`）导致 `TypeError` - 修复：全部 `getElementById + textContent` 操作加防御性 `if (el) el.textContent = ...` ### 修复后状态 - 用户最终确认：演奏文字有声音了 ✅ - 版本号最终状态：**v3.17.6** --- ## 2026-05-05 16:00 ~ 17",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.42031978368759154,
+      "maxScore": 0.42031978368759154,
+      "firstRecalledAt": "2026-05-27T02:15:12.147Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.147Z",
+      "queryHashes": [
+        "43312cd65cf7"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "piano/xylophone/guitar",
+        "v3.17.6",
+        "el.textcontent",
+        "animationid",
+        "只在",
+        "visualize",
+        "函数",
+        "内部"
+      ]
+    },
+    "memory:memory/2026-05-05.md:102:124": {
+      "key": "memory:memory/2026-05-05.md:102:124",
+      "path": "memory/2026-05-05.md",
+      "startLine": 102,
+      "endLine": 124,
+      "source": "memory",
+      "snippet": "修复方法：在 `character-voice-grid` 结束后补 `</div>`，语义分类区独立为一个兄弟区块。 ### 作用域教训 `phraseTriggerCategories` 在第 2454 行定义，缩进 16 空格。通过 brace balance 分析确认它不在任何未闭合函数内部（全局作用域）。 `generatePhraseTriggerCards()` 在第 2670 行定义，同样在全局作用域。 卡片为空的真实原因是：`generatePhraseTriggerCards()` 只在 `initAudio()` 成功后被调用。如果用户未点击启动音频引擎，或 `initAudio()` 中途失败（如采样加载异常），卡片永远不会生成。 正确修复：DOMContentLoaded 时即调用 `generatePhraseTriggerCards()`，与音频引擎启动解耦。 --- ## 2026-05-05 13:06 ~ 13:28（第三轮 QA：演奏文字无声音） ### 问题现象 用户输入文字点击\"演奏文字\"完全没有声音，音符序列区域也没有显示音符。 ### 根因链（按发现顺序） **1. v3.16.8 — audioContext 未自动初始化** - `playText()` 开始时如果 `audioContext` 不存在直接返回，提示用户先启动音频引擎 - 修复：在 `playText()` 开头自动创建 `audioContext`、`analyser`、`masterGain` **2. v3.16.10 / v3.17.0 —",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.41130691468715663,
+      "maxScore": 0.41130691468715663,
+      "firstRecalledAt": "2026-05-27T02:15:12.147Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.147Z",
+      "queryHashes": [
+        "43312cd65cf7"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "character-voice-grid",
+        "v3.16.8",
+        "v3.16.10",
+        "v3.17.0",
+        "修复",
+        "方法",
+        "character",
+        "voice"
+      ]
+    },
+    "memory:memory/2026-05-07.md:23:52": {
+      "key": "memory:memory/2026-05-07.md:23:52",
+      "path": "memory/2026-05-07.md",
+      "startLine": 23,
+      "endLine": 52,
+      "source": "memory",
+      "snippet": "- legacy-tone-region 建议覆盖：D4,E4,F4,A4,B4,D5,E5,F5,A5,B5 - 缺采样时不直接切 synth fallback，优先 nearest sample 变调播放 ### 必须接入的播放路径 1. 文字演奏：`playText() → textToEvents() → charToNote() → playTone()` 2. WAV 导出：`renderAudioToBuffer() → exportWav()`（实时和导出用同一逻辑） 3. 歌曲 MIDI：MIDI note → 当前选中乐器 → 实时/导出 4. 语义触发 MIDI（如\"你好\"触发 greeting MIDI） 5. 角色声纹：`characterVoiceConfig` / `characterVoiceRegistry` / `playCharacterVoice()` ### Race Condition 防护（P0 历史问题） - 切乐器时立即记录 `pendingInstrument` / `selectedInstrument` - 播放前检查 core notes 是否 ready - 未 ready 时禁用按钮或 `await ensureInstrumentCoreReady()` - 第一颗音必须来自目标乐器采样 - 不能只做 `await loadInstrumentSamples(); currentInstrument = instrument;` ### Expression Segment 兼容 必须支持：tempoScal",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4003632605075836,
+      "maxScore": 0.4003632605075836,
+      "firstRecalledAt": "2026-05-27T02:15:12.147Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.147Z",
+      "queryHashes": [
+        "43312cd65cf7"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "legacy-tone-region",
+        "实时/导出",
+        "legacy",
+        "tone",
+        "region",
+        "建议",
+        "覆盖",
+        "采样"
+      ]
+    },
+    "memory:memory/2026-05-05.md:177:209": {
+      "key": "memory:memory/2026-05-05.md:177:209",
+      "path": "memory/2026-05-05.md",
+      "startLine": 177,
+      "endLine": 209,
+      "source": "memory",
+      "snippet": "- 结果：用户点击音符键盘时走的是自动初始化路径，`samplesLoaded` 永远是 false ### 修复 - 在 `playText()` 的 `if (!audioContext)` 自动初始化块中加入 `await loadSamples()` - 版本：**v3.19.7** --- ## 2026-05-05 22:06 ~ 22:32（第六轮：三项修复 + Race Condition 全面修复） ### 1. 角色声纹映射修正（v3.19.8） UI、characterVoiceConfig、characterVoiceRegistry 三处统一： - 小牧 = xylophone / 木琴 - 艾米 = piano / 钢琴 - 芙洛芙 = flute / 长笛 ### 2. pause undefined 修复（v3.19.8） `displayNotes()` 中 `evt.symbol` 可能为 undefined，改为 `evt.symbol || evt.char || ''`，回退到 `'·'`。 ### 3. 轻量版本号显示（v3.19.8） 顶部 toolbar：`🎵 乐器语言合成器 · v3.xx.x` 运行态可查：`window.APP_VERSION` ### 4. Race Condition 全面修复（v3.19.9 ~ v3.19.10） **问题**：选择乐器后立刻点演奏，采样还没加载完成，直接 fallback 到合成器。 **修复措施**： 1. `instrument-grid` 点击事件改为 `as",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3991561859846115,
+      "maxScore": 0.3991561859846115,
+      "firstRecalledAt": "2026-05-27T02:15:12.176Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.176Z",
+      "queryHashes": [
+        "6696cc1bf31a"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.19.7",
+        "v3.19.8",
+        "evt.symbol",
+        "evt.char",
+        "v3.xx.x",
+        "window.app-version",
+        "v3.19.9",
+        "v3.19.10"
+      ]
+    },
+    "memory:memory/2026-05-05.md:222:244": {
+      "key": "memory:memory/2026-05-05.md:222:244",
+      "path": "memory/2026-05-05.md",
+      "startLine": 222,
+      "endLine": 244,
+      "source": "memory",
+      "snippet": "1. **异步加载必须用 Promise 缓存**：否则重复点击乐器按钮会启动多个并行加载请求，状态混乱。 2. **silent fallback 是 Bug**：用户明确要求采样乐器在未就绪时提示 loading，而不是悄悄播合成器。 3. **事件监听器也要 async**：`addEventListener('click', async (e) => { await ... })` 不要忘记 `async`。 4. **自动初始化 ≠ 完整初始化**：`audioContext = new AudioContext()` 只是第一步，后续 `loadSamples()` 必须同步跟进。 --- ## 2026-05-05 22:43 ~ 22:56（第七轮：Race Condition 最终修复 v3.20.0） ### 问题现象 v3.19.10 仍未通过 race condition QA。复现： - fresh reload → 启动音频引擎 → 输入\"天气好\" → 选长笛 → 立刻点演奏 - 第一颗音走钢琴采样，后续才是长笛 ### 根因分析 1. `selectInstrument()` 内部：`await ensureInstrumentReady(instrument)` 之后才 `currentInstrument = instrument` - 但 `ensureInstrumentReady` 内部 `hasInstrumentSamples()` 检查的是传入的 `instrument` 参数 - 加载过程中用户点击了其他乐器按",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.39601217210292816,
+      "maxScore": 0.39601217210292816,
+      "firstRecalledAt": "2026-05-27T02:15:12.176Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.176Z",
+      "queryHashes": [
+        "6696cc1bf31a"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.20.0",
+        "v3.19.10",
+        "异步",
+        "必须",
+        "promise",
+        "否则",
+        "重复",
+        "乐器"
+      ]
+    },
+    "memory:memory/2026-04-10.md:67:107": {
+      "key": "memory:memory/2026-04-10.md:67:107",
+      "path": "memory/2026-04-10.md",
+      "startLine": 67,
+      "endLine": 107,
+      "source": "memory",
+      "snippet": "3. 在 sampleConfig 中为每个采样添加 gain 属性 4. 播放时应用补偿：`velocity * baseGain * highFreqCompensation` #### 关键代码变更 - 添加 A5.wav 到采样目录 - 修改 sampleConfig.piano.samples 结构，增加 gain 字段 - 更新 playSampleTone 函数使用精确增益补偿 #### 版本号规则确认 - 两位数进位：3.3.16 → 3.4.0 --- ### 下午会话 (14:30-14:50) - 独立音量控制与Bug修复 #### 新增功能: 每个音符独立音量控制 - 为10个音符键（D4, E4, F4, A4, B4, D5, E5, F5, A5, B5）添加独立音量滑块 - 滑块范围: 0-200% - 默认音量: 100% - 实时显示百分比 #### 音量补偿策略迭代 最终确定的增益结构（基于RMS测量）： ```javascript D4: 1.08x, E4: 1.03x, F4: 1.03x, A4: 1.01x, B4: 1.29x D5: 1.35x, E5: 1.04x, F5: 1.00x, A5: 1.61x, B5: 1.24x ``` #### Bug: 音符键盘无声音 **现象**: 点击音符键盘没有声音 **排查过程**: 1. 浏览器测试发现 `samplesLoaded=true` 但 `audioBuffers` 为空 2. 控制台无JavaScript错误 3. 发现 `playSampleTo",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3915453642606735,
+      "maxScore": 0.3915453642606735,
+      "firstRecalledAt": "2026-05-27T02:15:12.176Z",
+      "lastRecalledAt": "2026-05-27T02:15:12.176Z",
+      "queryHashes": [
+        "6696cc1bf31a"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "a5.wav",
+        "sampleconfig.piano.samples",
+        "3.3.16",
+        "3.4.0",
+        "30-14",
+        "0-200",
+        "1.08x",
+        "1.03x"
+      ]
+    },
+    "memory:memory/2026-05-08.md:120:146": {
+      "key": "memory:memory/2026-05-08.md:120:146",
+      "path": "memory/2026-05-08.md",
+      "startLine": 120,
+      "endLine": 146,
+      "source": "memory",
+      "snippet": "- 补全 sampleConfig.smallrobot + loadSmallrobotSamples() 真实加载逻辑 ### Big机器人采样入库 — v3.25.0 - 10个真实采样同上 - 补全 sampleConfig.bigrobot + loadBigrobotSamples() 真实加载逻辑 - PATCH ≥ 40 触发 MINOR 进位 (v3.24.x → v3.25.0) ### 默认参数统一调整 - **发音密度** (v3.25.1)：所有乐器 notesPerBeat: 2 → 1（synth 保持 8） - **混响** (v3.25.2)：全局 0.2 → 0，所有乐器默认混响全部归零 ### Expression Segment Auto Curve V1 — v3.25.3 - 新增 `autoCurveExpressionSegments()` 函数 - 分析维度：标点(疑问/惊叹/省略/逗号/分号/句号)、关键词(命令/危险/安慰/犹豫)、重复字、段长度 - V1 保守边界：tempoScale 0.75~1.25 / velocityScale 0.75~1.30 / pauseAfterMs 0~800 - 手动覆盖机制：`updateSegment()` 标记 `_manual=true`，再次自动生成时保留手动值 - UI 增加 ⚡自动 / ✏️手动 标识 - 复用现有 `applyExpressionSegments` 链路（实时播放 + WAV 导出） ### 已知问题（未修复） - `handleMidiFil",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.815654370188713,
+      "maxScore": 0.42750433981418606,
+      "firstRecalledAt": "2026-05-27T02:15:12.176Z",
+      "lastRecalledAt": "2026-05-27T02:15:30.984Z",
+      "queryHashes": [
+        "6696cc1bf31a",
+        "46197e179ce4"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "sampleconfig.smallrobot",
+        "v3.25.0",
+        "sampleconfig.bigrobot",
+        "v3.24.x",
+        "v3.25.1",
+        "v3.25.2",
+        "0.2",
+        "v3.25.3"
+      ]
+    },
+    "memory:memory/2026-04-20.md:26:57": {
+      "key": "memory:memory/2026-04-20.md:26:57",
+      "path": "memory/2026-04-20.md",
+      "startLine": 26,
+      "endLine": 57,
+      "source": "memory",
+      "snippet": "#### v3.6.8 - 最短可听下限 BPM 动态 - minAudibleMs = (60000 / bpm) * 0.23 #### v3.6.9 - WAV 导出修复（钢琴静音） - 修复钢琴导出 buffer key 错误（piano_D4 → D4） - 统一节奏引擎：computeEventTiming() 共用 - calculateAudioDuration() 和 renderAudioToBuffer() 共用同一函数 - checkBufferIsSilent() 静音检测 #### v3.6.10 - WAV 导出采样响度修复 - renderSampleToBuffer() 对齐实时播放 - 应用 sampleInfo.gain - 完整 envelope（attack/hold/decay） - 应用 instrumentOffsets - source.stop() 留 0.5s 尾部余量 #### v3.6.12 - 木琴导出采样分支 - xylophone 加入 renderSampleToBuffer 导出路径 #### v3.6.13 - 导出混响修复 - 所有导出路径添加 wet 混响链（delay + feedback + wet gain） - calculateAudioDuration() 为混响尾巴增加 1.5s ### 版本号问题 - 发现 pre-commit hook 自动递增版本号（nav-config.js） - 手动写的版本号（VERSION.md/MEMORY.md）与实际不一致 - 已统一按 hoo",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4425684362649917,
+      "maxScore": 0.4425684362649917,
+      "firstRecalledAt": "2026-05-27T02:15:30.984Z",
+      "lastRecalledAt": "2026-05-27T02:15:30.984Z",
+      "queryHashes": [
+        "46197e179ce4"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.6.8",
+        "0.23",
+        "v3.6.9",
+        "piano-d4",
+        "v3.6.10",
+        "sampleinfo.gain",
+        "attack/hold/decay",
+        "source.stop"
+      ]
+    },
+    "memory:memory/2026-04-13.md:35:60": {
+      "key": "memory:memory/2026-04-13.md:35:60",
+      "path": "memory/2026-04-13.md",
+      "startLine": 35,
+      "endLine": 60,
+      "source": "memory",
+      "snippet": "- Can theoretically play unlimited simultaneous notes - Only gain limit exists: max 3x gain to prevent clipping ### Bug Fixes - Fixed duplicate code in updateParams() function causing syntax error - Version: v3.4.29 ### Flute Samples Addition (In Progress) - Added 10 flute samples: D4, E4, F4, A4, B4, D5, E5, F5, A5, B5 - Location: assets/audio/samples/flute/ - Two versions of samples exist: - Version 1 (14KB each, 18:23) - Currently deployed - Version 2 (43KB each, 14:54) - Higher quality, awaiting confirmation - Updated instrument-language-synth.html with flute sampleConfig - Added loadFluteSamples() function - Added hasInstrumentSamples() check for flute - Note keyboard now shows di",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.41895443201065063,
+      "maxScore": 0.41895443201065063,
+      "firstRecalledAt": "2026-05-27T02:15:30.984Z",
+      "lastRecalledAt": "2026-05-27T02:15:30.984Z",
+      "queryHashes": [
+        "46197e179ce4"
+      ],
+      "recallDays": [
+        "2026-05-27"
+      ],
+      "conceptTags": [
+        "v3.4.29",
+        "assets/audio/samples/flute",
+        "instrument-language-synth.html",
+        "can",
+        "theoretically",
+        "play",
+        "unlimited",
+        "simultaneous"
+      ]
+    }
+  }
+}
