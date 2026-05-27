@@ -5,7 +5,7 @@
  */
 
 // 全局版本号 - 修改这里即可同步全站
-const APP_VERSION = 'v3.36.14';
+const APP_VERSION = 'v3.37.2';
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
@@ -83,7 +83,7 @@ function initNav() {
             href = '../' + item.href;
         }
         
-        html += `\u003ca href="${href}" class="nav-link ${activeClass}"\u003e${item.label}\u003c/a\u003e`;
+        html += `<a href="${href}" class="nav-link ${activeClass}">${item.label}</a>`;
     });
     
     navContainer.innerHTML = html;
