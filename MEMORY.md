@@ -28,24 +28,31 @@
 - 未 ready 禁用按钮或 await ensureInstrumentCoreReady()
 - 不能只做 await loadInstrumentSamples(); currentInstrument = instrument;
 
-### 🆕 新增乐器入库流程（2026-05-25 制定）
+### 🆕 新增乐器入库流程（2026-05-25 制定，2026-05-27 验证完善）
 **按顺序执行，避免先传音频后代码不匹配的问题：**
 
 1. **我先做代码骨架**（你们不需要提前传文件）
    - UI 添加 `instrument-btn` 按钮 + CSS 变量
    - `instrumentDefaults` 添加默认参数
-   - `instrumentRegistry` 注册乐器
+   - `instrumentRegistry` / `instrumentMetadata` 注册乐器
    - `sampleConfig` 添加占位配置（走 synth fallback，确保有声）
-   - `loadInstrumentSamples` 添加占位函数
+   - `noteVolumes` 添加 10键音量映射（最容易漏！）
+   - `chordVolumes` 添加和弦音量（容易漏！）
+   - `loadInstrumentSamples` 添加 loader 映射
+   - `loadXXXSamples` 添加占位函数
    - `hasInstrumentSamples` 适配检查
-   - `playTone` 分支逻辑适配
-   - `renderAudioToBuffer` 适配
+   - `playTone` 分支逻辑适配（synth fallback 列表）
+   - `renderAudioToBuffer` isSampleInstrument 列表适配
+   - `waveforms` 添加波形映射
    - 角色声纹如需新增 → 同步配置
+   - **中文名称映射**（所有引用点统一检查：selectInstrument, ensureInstrumentReady, instrumentNames 等）
+   - **instrumentColors / activeColors** 颜色主题
 
 2. **推送 GitHub**
    - 更新 `nav-config.js` 版本号
    - `git push origin main`
    - **立即报出版本号**
+   - **创建空采样目录 + .gitkeep**（让用户知道放哪）
 
 3. **你们发音频文件**
    - 直接发群里（mp3/wav 都行）
@@ -55,13 +62,41 @@
 4. **我接入采样**
    - 替换占位 `loadXXXSamples()` 为真实采样加载
    - 补全 `sampleConfig` 里的 `basePath` + `samples{}`
-   - 移除 synth fallback 兜底
-   - 跑 QA checklist
+   - **移除 synth fallback 兜底**（从 playTone fallback 列表删除该乐器）
+   - **删除 .gitkeep**（目录已有真实文件）
+   - 跑 QA checklist（见下方）
    - 再次推送 + 报版本号 + 交付报告
 
 **⚠️ 禁止反向操作：** 不要先发音频文件给我，等我先做好代码骨架。
-### 交付时必须按格式汇报
-新增乐器列表 → 采样覆盖情况 → 已验证功能 → LayoutGuard结果 → 已知限制
+
+### 新增乐器 QA Checklist（14项，逐条勾选）
+每次新增乐器后，必须确认以下14项全部到位：
+
+| # | 检查项 | 说明 | 常见遗漏 |
+|---|--------|------|----------|
+| 1 | CSS 变量 | `--instrument_id: #颜色` | |
+| 2 | UI 按钮 | `instrument-btn` DOM | |
+| 3 | instrumentDefaults | 默认参数（tempo/音量等） | |
+| 4 | instrumentMetadata shaping | Voice Shaping 默认配置 | |
+| 5 | sampleConfig | 采样路径 + gain 配置 | **高频遗漏！** |
+| 6 | noteVolumes | 10键音量映射 | **高频遗漏！** |
+| 7 | chordVolumes | 和弦音量 | |
+| 8 | loadInstrumentSamples loader | 映射到 loadXXXSamples | |
+| 9 | instrumentColors / activeColors | 颜色主题 | |
+| 10 | hasInstrumentSamples | 检查 ready buffer | |
+| 11 | playTone synth fallback | 采样未到位前兜底 | 采样到位后**移除** |
+| 12 | ensureInstrumentReady names | 加载状态中文名 | |
+| 13 | renderAudioToBuffer isSampleInstrument | WAV导出采样分支 | |
+| 14 | waveforms | synth fallback 波形类型 | |
+| 15 | loadXXXSamples 函数 | 实际采样加载逻辑 | |
+| 16 | 中文名称映射 | selectInstrument, playTone, names 等所有引用点 | |
+
+**交付时必须按格式汇报**：
+- 新增乐器列表
+- 采样覆盖情况
+- 已验证功能
+- LayoutGuard结果
+- 已知限制
 
 详细规则见 memory/2026-05-07.md
 
