@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔊 Soundminer 完全指南 | 我的工作站</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --pro: #f59e0b;
+            --plus: #10b981;
+            --bg-dark: #0f0f23;
+            --bg-card: #1a1a2e;
+            --bg-hover: #252542;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .back-btn {
+            padding: 8px 16px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        /* 搜索区域 */
+        .search-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1b4b);
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .search-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .search-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            padding-left: 50px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            background: var(--bg-dark);
+            color: var(--text);
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        
+        .search-tips {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .tip-tag {
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tip-tag:hover {
+            background: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* 内容区域 */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        /* 版本标识 */
+        .version-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .badge-plus {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .badge-pro {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        /* 快速导航 */
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+        
+        .quick-nav a {
+            padding: 8px 16px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .quick-nav a:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 功能卡片网格 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+        }
+        
+        .feature-card.hidden {
+            display: none;
+        }
+        
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        
+        .feature-title-wrap {
+            flex: 1;
+        }
+        
+        .feature-title {
+            font-size: 1.15rem;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .feature-steps {
+            list-style: none;
+            padding: 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+        
+        .feature-steps li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .feature-steps li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-steps li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 15px;
+        }
+        
+        .feature-tag {
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #818cf8;
+        }
+        
+        /* 提示框 */
+        .tips-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .tips-title {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tips-list {
+            list-style: none;
+        }
+        
+        .tips-list li {
+            padding: 6px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .tips-list li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+        }
+        
+        /* 快捷键表格 */
+        .shortcut-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .shortcut-table th,
+        .shortcut-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .shortcut-table th {
+            background: rgba(99, 102, 241, 0.2);
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .shortcut-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .shortcut-table tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        .key {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+        
+        /* 搜索结果提示 */
+        .search-results-info {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .search-results-info span {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* 版本对比表格 */
+        .version-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .version-table th,
+        .version-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .version-table th {
+            background: rgba(99, 102, 241, 0.2);
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .check {
+            color: #10b981;
+        }
+        
+        .cross {
+            color: #64748b;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-title {
+                font-size: 1.4rem;
+            }
+            
+            .shortcut-table {
+                font-size: 0.85rem;
+            }
+            
+            .shortcut-table th,
+            .shortcut-table td {
+                padding: 10px;
+            }
+            
+            .quick-nav {
+                justify-content: center;
+            }
+        }
+    </style>
+
+<script>
+// 登录验证
+(function() {
+    const CONFIG = {
+        sessionKey: 'sfx_access_granted',
+        loginPage: 'sound-effects-login.html',
+        sessionDuration: 24 * 60 * 60 * 1000
+    };
+    
+    const session = localStorage.getItem(CONFIG.sessionKey);
+    if (!session) {
+        window.location.href = CONFIG.loginPage;
+        return;
+    }
+    
+    const data = JSON.parse(session);
+    if (Date.now() - data.timestamp > CONFIG.sessionDuration) {
+        localStorage.removeItem(CONFIG.sessionKey);
+        window.location.href = CONFIG.loginPage;
+    }
+})();
+</script>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站</span>
+            </a>
+            <div class="nav-links" id="nav-links"></div>
+        </div>
+    </nav>
+
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-content">
+            <span class="logo">🔊 Soundminer 完全指南</span>
+        </div>
+    </header>
+    <!-- 子目录导航 -->
+    <div style="background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 15px;">
+        <div style="max-width: 1400px; margin: 0 auto; display: flex; gap: 20px; align-items: center;">
+            <span style="color: var(--text-muted); font-size: 0.9rem;">📂 音效相关：</span>
+            <a href="soundminer-guide.html" style="padding: 8px 16px; background: var(--primary); color: #fff; border-radius: 6px; text-decoration: none; font-size: 0.9rem;">🔊 Soundminer指南</a>
+            <a href="sfx-glossary.html" style="padding: 8px 16px; background: var(--bg-hover); border: 1px solid var(--border); color: var(--text); border-radius: 6px; text-decoration: none; font-size: 0.9rem;">🎵 国际音效名词表</a>
+        </div>
+    </div>
+
+    
+    <!-- 搜索区域 -->
+    <section class="search-section">
+        <div class="search-container">
+            <h1 class="search-title">🤔 怎么用大白话找功能？</h1>
+            <p class="search-subtitle">输入你想做的事，支持自然语言搜索</p>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="试试：怎么导入音效、拖到Pro Tools里、X射线波形...">
+            </div>
+            
+            <div class="search-tips">
+                <span class="tip-tag" onclick="quickSearch('导入')">📥 导入音效</span>
+                <span class="tip-tag" onclick="quickSearch('拖到')">🎯 拖到DAW</span>
+                <span class="tip-tag" onclick="quickSearch('变速')">⚡ 变速变调</span>
+                <span class="tip-tag" onclick="quickSearch('截取')">✂️ 截取片段</span>
+                <span class="tip-tag" onclick="quickSearch('X射线')">🔬 X射线波形</span>
+                <span class="tip-tag" onclick="quickSearch('标签页')">📑 多标签搜索</span>
+                <span class="tip-tag" onclick="quickSearch('锁定')">🔒 锁定搜索</span>
+                <span class="tip-tag" onclick="quickSearch('Radium')">🎹 Radium采样器</span>
+            </div>
+            
+            <div class="search-results-info" id="resultsInfo"></div>
+        </div>
+    </section>
+    
+    <!-- 内容区域 -->
+    <main class="content">
+        
+        <!-- 版本说明 -->
+        <div class="tips-box">
+            <div class="tips-title">📋 版本说明</div>
+            <ul class="tips-list">
+                <li><span class="version-badge badge-plus">PLUS</span> 表示 Plus 版及以上功能</li>
+                <li><span class="version-badge badge-pro">PRO</span> 表示 Pro/ProPack 专属功能</li>
+                <li>无标记为 Basic 版基础功能</li>
+            </ul>
+        </div>
+        
+        <!-- 快速导航 -->
+        <div class="quick-nav">
+            <a href="#basic">基础操作</a>
+            <a href="#search">高级搜索</a>
+            <a href="#daw">DAW集成</a>
+            <a href="#edit">音频处理</a>
+            <a href="#meta">元数据管理</a>
+            <a href="#advanced">高级功能</a>
+            <a href="#shortcuts">快捷键</a>
+        </div>
+        
+        <!-- 基础操作 -->
+        <section class="section" id="basic">
+            <h2 class="section-title">📚 基础操作</h2>
+            
+            <div class="feature-grid">
+                
+                <div class="feature-card" data-keywords="导入 添加 加载 文件夹 数据库 音效库 建库">
+                    <div class="feature-header">
+                        <div class="feature-icon">📥</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">导入音效库</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把电脑里的音效文件导入到Soundminer里管理。第一次使用必须先创建数据库。</p>
+                    <ul class="feature-steps">
+                        <li>菜单栏「文件」→「新建数据库」(Create a New Database)</li>
+                        <li>输入数据库名称，Template选"Music and FX"</li>
+                        <li>把音效文件夹直接拖进Soundminer窗口</li>
+                        <li>等待扫描完成即可</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="标签页 tabs 多标签 新标签 搜索">
+                    <div class="feature-header">
+                        <div class="feature-icon">📑</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">多标签搜索 (Tabs)</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">像浏览器一样开多个标签页，每个标签可以搜不同的关键词，方便对比和整理。</p>
+                    <ul class="feature-steps">
+                        <li>点击「+」按钮新建搜索标签</li>
+                        <li>在不同标签里搜索不同关键词</li>
+                        <li>可以在标签之间拖拽音效</li>
+                        <li>支持跨数据库搜索</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="显示全部 查看所有 Find All 所有音效">
+                    <div class="feature-header">
+                        <div class="feature-icon">📋</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">显示所有音效 (Find All)</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">一键显示当前数据库里的所有音效，解决导入后看不见的问题。</p>
+                    <ul class="feature-steps">
+                        <li>点击顶部工具栏的「Find All」按钮</li>
+                        <li>或者直接按快捷键</li>
+                        <li>浏览器会显示当前数据库所有音效</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="搜索 查找 找音效 关键词 筛选 过滤">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">搜索音效</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">用关键词快速找到想要的音效，支持全文搜索和字段搜索。</p>
+                    <ul class="feature-steps">
+                        <li>在顶部搜索栏输入关键词，如"爆炸"</li>
+                        <li>按回车，结果实时显示</li>
+                        <li>可以用多个词组合，比如"爆炸 金属"</li>
+                        <li>在字段里搜索格式：Description:门</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="播放 试听 预览 波形 点击 听 空格">
+                    <div class="feature-header">
+                        <div class="feature-icon">▶️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">预览播放</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">点击波形任意位置就能从那里开始播放，特别适合听长音效的后半部分。</p>
+                    <ul class="feature-steps">
+                        <li>在波形显示区点击任意位置</li>
+                        <li>音频从点击处开始播放</li>
+                        <li>空格键暂停/继续</li>
+                        <li>双击音效名称直接播放</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="波形 放大 缩小 缩放 查看 滚轮">
+                    <div class="feature-header">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">波形缩放</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">放大波形看细节，缩小看整体，方便精确选取音频片段。</p>
+                    <ul class="feature-steps">
+                        <li>鼠标滚轮：横向放大/缩小波形</li>
+                        <li>Ctrl+滚轮：纵向放大/缩小</li>
+                        <li>按 / 键快速还原视图</li>
+                        <li>右侧有缩放按钮可以适应/放大</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="同文件夹 Same Folder 同一目录 相关">
+                    <div class="feature-header">
+                        <div class="feature-icon">📂</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">查看同文件夹 (Same Folder)</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">找到一个音效后，一键查看它所在文件夹的所有其他音效。</p>
+                    <ul class="feature-steps">
+                        <li>选中一个音效</li>
+                        <li>点击「Same Folder」按钮</li>
+                        <li>浏览器会显示该文件夹内所有音效</li>
+                        <li>方便找同一个系列的其他变体</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 高级搜索 -->
+        <section class="section" id="search">
+            <h2 class="section-title">🔎 高级搜索技巧</h2>
+            
+            <div class="feature-grid">
+                
+                <div class="feature-card" data-keywords="锁定搜索 Lock 叠加 筛选 精确">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">锁定搜索 (Search Lock)</div>
+                        </div╬>
+                    </div>
+                    <p class="feature-desc">在当前搜索结果里继续筛选，比如先搜"门"，锁定后再搜"木头"，就只显示木门。</p>
+                    <ul class="feature-steps">
+                        <li>先搜索一个关键词，比如"door"</li>
+                        <li>点击锁定按钮（锁图标）或按 Cmd/Ctrl+L</li>
+                        <li>再搜索"wood"，结果只在门里找木头</li>
+                        <li>点击Back按钮返回上一级搜索</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="左侧面板 过滤器 筛选 Filter 分类">
+                    <div class="feature-header">
+                        <div class="feature-icon">🎛️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">左侧面板筛选</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">通过左侧面板按分类、厂牌、文件夹等条件快速筛选。</p>
+                    <ul class="feature-steps">
+                        <li>展开左侧面板的过滤器</li>
+                        <li>Category: 按UCS分类筛选</li>
+                        <li>Subcategory: 按子分类筛选</li>
+                        <li>Library: 按厂牌/音效库筛选</li>
+                        <li>Pathname: 按文件夹路径筛选</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="保存搜索 Saved Searches 常用 快捷">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔖</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">保存常用搜索</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把常用的搜索条件保存起来，下次一键调用。</p>
+                    <ul class="feature-steps">
+                        <li>设置好搜索条件</li>
+                        <li>点击「Save Current Search」</li>
+                        <li>输入搜索名称保存</li>
+                        <li>在左侧面板「Saved Searches」中快速调用</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- DAW集成 -->
+        <section class="section" id="daw">
+            <h2 class="section-title">🎵 DAW集成</h2>
+            
+            <div class="feature-grid">
+                
+                <div class="feature-card" data-keywords="拖到 Pro Tools Logic 宿主 DAW 传输 导入 发送">
+                    <div class="feature-header">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">直接拖到DAW</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">直接把音效拖到Pro Tools、Logic等宿主软件的时间线或素材池。</p>
+                    <ul class="feature-steps">
+                        <li>选中想要的音效</li>
+                        <li>直接拖拽到DAW的时间线上</li>
+                        <li>或者拖到播放器上的小手图标</li>
+                        <li>拖的时候会生成一个新文件（按当前采样率）</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Bring Into 素材池 片段列表 导入">
+                    <div class="feature-header">
+                        <div class="feature-icon">📥</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">一键导入素材池 (Bring Into DAW)</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把音效一键传输到宿主软件的素材池/片段列表，不直接上时间线。</p>
+                    <ul class="feature-steps">
+                        <li>选中音效</li>
+                        <li>点击「Bring Into DAW」按钮</li>
+                        <li>音效自动进入DAW的素材池</li>
+                        <li>适合先收集素材再慢慢挑的场景</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Spot 定位 时间点 插入 时间线 精准">
+                    <div class="feature-header">
+                        <div class="feature-icon">📍</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Spot精准定位</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把音效精确放到DAW的指定时间点（播放头位置）。</p>
+                    <ul class="feature-steps">
+                        <li>在DAW里把播放头放到想要的位置</li>
+                        <li>在Soundminer里选中音效</li>
+                        <li>点击「Spot to DAW」按钮</li>
+                        <li>音效自动插入到时间线的对应位置</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Monitor Plugin AAX 插件 监听 替代 ReWire">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔌</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Monitor Plugin 监听</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">V6新版用AAX插件替代了ReWire，让Soundminer的声音通过DAW播放。</p>
+                    <ul class="feature-steps">
+                        <li>先打开DAW，创建Aux轨</li>
+                        <li>加载 Soundminer Monitor 插件（支持Stereo到7.1）</li>
+                        <li>Soundminer里点击耳机图标连接</li>
+                        <li>所有播放都会通过DAW输出</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 音频处理 -->
+        <section class="section" id="edit">
+            <h2 class="section-title">🎛️ 音频处理</h2>
+            
+            <div class="feature-grid">
+                
+                <div class="feature-card" data-keywords="截取 片段 选区 裁剪 区域 拖动">
+                    <div class="feature-header">
+                        <div class="feature-icon">✂️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">截取片段</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">只导出音频的某一部分，不是整个文件。拖动小手图标导出选中部分。</p>
+                    <ul class="feature-steps">
+                        <li>在波形上拖动鼠标，选中想要的区域</li>
+                        <li>区域会高亮显示</li>
+                        <li>拖拽播放器上的小手图标到DAW或文件夹</li>
+                        <li>只导出选中部分，生成新文件</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="变速 变调 速度 音调 升降 调性 采样率 推子">
+                    <div class="feature-header">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">变速变调</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">改变音频的播放速度和音调。播放器上方的小推子就是采样控制器。</p>
+                    <ul class="feature-steps">
+                        <li>播放器上方有个小推子（采样控制器）</li>
+                        <li>左右拖动改变速度</li>
+                        <li>点击钢琴图标可以按音高调整</li>
+                        <li>C3是原采样率，其他键是升降调</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="循环 Loop 重复 播放">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔄</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">循环播放</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">让选中的片段重复播放，方便仔细听细节。</p>
+                    <ul class="feature-steps">
+                        <li>选中一段区域</li>
+                        <li>点击循环按钮开启loop模式</li>
+                        <li>选中区域会循环播放</li>
+                        <li>再次点击关闭循环</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="反向 倒放 Reverse 反转">
+                    <div class="feature-header">
+                        <div class="feature-icon">⏪</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">反向播放 (Reverse)</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把音效倒过来播放，适合制作特殊效果或检查音频。</p>
+                    <ul class="feature-steps">
+                        <li>选中音效</li>
+                        <li>点击界面上的「Reverse」按钮</li>
+                        <li>实时倒放预览</li>
+                        <li>拖到DAW时也可以选择倒放导出</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 元数据管理 -->
+        <section class="section" id="meta">
+            <h2 class="section-title">🏷️ 元数据管理</h2>
+            
+            <div class="feature-grid">
+                
+                <div class="feature-card" data-keywords="改名 修改 编辑 元数据 标签 信息 BWF 描述">
+                    <div class="feature-header">
+                        <div class="feature-icon">✏️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">修改元数据</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">编辑音效的名称、描述、分类等信息，让搜索更准确。</p>
+                    <ul class="feature-steps">
+                        <li>选中要修改的音效</li>
+                        <li>在右侧信息面板编辑各个字段</li>
+                        <li>右键选择「Embed Selected Records」把修改写进文件</li>
+                        <li>「Show Dirty Records」查看哪些还没保存</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="UCS 分类 类别 标准 统一 音效分类 CatID">
+                    <div class="feature-header">
+                        <div class="feature-icon">📂</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">UCS分类标准</div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">使用国际通用的音效分类系统，方便和其他人协作，统一命名规范。</p>
+                    <ul class="feature-steps">
+                        <li>UCS = Universal Category System</li>
+                        <li>选择 Category（大类）如 WEAPONS、DOORS</li>
+                        <li>选择 Subcategory（小类）如 Gun、Wood</li>
+                        <li>CatID 会自动生成，如 GUNAuto</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="批量修改 批量编辑 多选 一起改 Workflow">
+                    <div class="feature-header">
+                        <div class="feature-icon">📋</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">批量修改</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">一次性修改多个文件的元数据，不用一个个改。</p>
+                    <ul class="feature-steps">
+                        <li>选中多个音效文件</li>
+                        <li>打开 Workflow 工作流窗口</li>
+                        <li>使用「批量编辑」功能统一修改</li>
+                        <li>可以用"查找替换"批量改文字</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="收藏 playlist 播放列表 常用 快捷 保存搜索">
+                    <div class="feature-header">
+                        <div class="feature-icon">⭐</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">收藏夹和播放列表</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把常用的音效或搜索条件存起来，下次直接用。</p>
+                    <ul class="feature-steps">
+                        <li>Playlist：拖拽音效到自定义文件夹</li>
+                        <li>Saved Searches：保存常用搜索关键词</li>
+                        <li>在左侧面板快速访问</li>
+                        <li>Playlist支持导入导出</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 高级功能 -->
+        <section class="section" id="advanced">
+            <h2 class="section-title">🚀 高级功能</h2>
+            
+            <div class="feature-grid">
+                
+                <div class="feature-card" data-keywords="X射线 XRay 波形 频率 频谱 可视化">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔬</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">X射线波形 (XRay Waveforms)</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">波形按频率着色，显示低/中/高频内容分布，一眼看出音效的频率特征。</p>
+                    <ul class="feature-steps">
+                        <li>Preferences → Waveforms → View XRAY Waveform</li>
+                        <li>波形会按频率内容着色</li>
+                        <li>低频显示一种颜色，高频显示另一种</li>
+                        <li>方便快速识别音色的频率特征</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="RadFX FX 效果器 机架 内置">
+                    <div class="feature-header">
+                        <div class="feature-icon">🎚️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">RadFX 效果器机架</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">内置20种效果器，可以直接在主界面处理音效，带动态表和频谱分析。</p>
+                    <ul class="feature-steps">
+                        <li>点击左侧「FX」图标打开效果器机架</li>
+                        <li>选择20种内置效果器（EQ、压缩、失真等）</li>
+                        <li>可以拖拽调整效果器顺序</li>
+                        <li>效果可以保存和调用</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Radium 采样器 采样 播放 乐器">
+                    <div class="feature-header">
+                        <div class="feature-icon">🎹</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Radium 采样器</span><span class="version-badge badge-pro">PRO</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">行业领先的采样器，可以把音效变成乐器，支持4个slot、全局效果、粒子合成。</p>
+                    <ul class="feature-steps">
+                        <li>打开Radium窗口</li>
+                        <li>把音效拖到4个slot之一</li>
+                        <li>用MIDI键盘触发播放</li>
+                        <li>支持AAX插件在Pro Tools中使用</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Grain 粒子 合成 颗粒">
+                    <div class="feature-header">
+                        <div class="feature-icon">✨</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">粒子合成 (Grain Engine)</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把采样变成颗粒状播放，适合做魔法、科幻音效。</p>
+                    <ul class="feature-steps">
+                        <li>在Radium里把slot设为Grain模式</li>
+                        <li>调整颗粒大小、随机声像、音高、速度</li>
+                        <li>结合TSE Doppler做运动效果</li>
+                        <li>适合做氛围层和魔法效果</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="DSP Rack VST 插件 效果器 64">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔧</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">DSP Rack 64</span><span class="version-badge badge-pro">PRO</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">加载你自己的VST/VST3/AU插件，支持Waves等第三方效果器。</p>
+                    <ul class="feature-steps">
+                        <li>打开DSP Rack窗口</li>
+                        <li>加载VST/VST3/AU插件</li>
+                        <li>实时预览效果</li>
+                        <li>可以录制处理后的结果</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Leg Picker 多通道 声道 选择 多轨">
+                    <div class="feature-header">
+                        <div class="feature-icon">🎛️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Leg Picker 多通道选择</span><span class="version-badge badge-pro">PRO</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">多轨录音文件可以选择导出哪些声道，比如只导出其中一轨。</p>
+                    <ul class="feature-steps">
+                        <li>选中多通道文件</li>
+                        <li>打开Leg Picker</li>
+                        <li>选择要导出的声道</li>
+                        <li>支持单独导出、组合导出</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Fold Down 下混 多通道 折叠 立体声">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔽</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Fold Down 多通道下混</span><span class="version-badge badge-pro">PRO</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把多轨录音折叠成立体声或LCR，可以平衡各声道、调整声像。</p>
+                    <ul class="feature-steps">
+                        <li>在DSP Rack里加载Fold Down插件</li>
+                        <li>调整各声道的电平和声像</li>
+                        <li>支持M/S处理</li>
+                        <li>设置可以保存为元数据</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Mirror 镜像 传输 同步">
+                    <div class="feature-header">
+                        <div class="feature-icon">🪞</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Mirror 镜像传输</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把音效同时传输到多个位置，比如既拖到DAW又存到文件夹。</p>
+                    <ul class="feature-steps">
+                        <li>设置Mirror目标路径</li>
+                        <li>拖音效时自动复制到多个位置</li>
+                        <li>可以设置转换格式</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Spotting Panel 项目面板 定位 管理">
+                    <div class="feature-header">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Spotting Panel 项目定位</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">管理整个项目的音效定位记录，查看哪些音效用在了哪里。</p>
+                    <ul class="feature-steps">
+                        <li>打开Spotting Panel</li>
+                        <li>记录每个音效的定位信息</li>
+                        <li>支持导入导出定位报告</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="时间码 Timecode TC 标记 Marker">
+                    <div class="feature-header">
+                        <div class="feature-icon">⏱️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">时间码和标记</span><span class="version-badge badge-pro">PRO</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">支持时间码显示和输入，可以在指定时间码位置设置标记。</p>
+                    <ul class="feature-steps">
+                        <li>显示时间码格式</li>
+                        <li>按时间码跳转位置</li>
+                        <li>设置In/Out点</li>
+                        <li>支持多种时间码格式</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Combine 合并 混合 叠加">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔀</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Combine 音频合并</span><span class="version-badge badge-pro">PRO</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把多个音效合并成一个文件导出，适合做复合音效。</p>
+                    <ul class="feature-steps">
+                        <li>选中多个音效</li>
+                        <li>选择Combine功能</li>
+                        <li>设置叠加方式</li>
+                        <li>导出合并后的文件</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="Tag to Database 发送到数据库 转移">
+                    <div class="feature-header">
+                        <div class="feature-icon">🏷️</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Tag to Database</span><span class="version-badge badge-plus">PLUS</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">把选中的音效发送到指定的数据库，方便整理分类。</p>
+                    <ul class="feature-steps">
+                        <li>选中音效</li>
+                        <li>选择目标数据库</li>
+                        <li>音效会被复制到另一个库</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card" data-keywords="服务器 Server 团队协作 共享">
+                    <div class="feature-header">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-title-wrap">
+                            <div class="feature-title">Server 服务器协作</span><span class="version-badge badge-pro">PRO</span></div>
+                        </div>
+                    </div>
+                    <p class="feature-desc">团队共享中央数据库，多人同时访问，权限管理。</p>
+                    <ul class="feature-steps">
+                        <li>需要Server版和Server客户端</li>
+                        <li>设置用户组和权限</li>
+                        <li>所有人访问同一个数据库</li>
+                        <li>V6大幅提升了远程访问速度</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- 快捷键 -->
+        <section class="section" id="shortcuts">
+            <h2 class="section-title">⌨️ 常用快捷键</h2>
+            
+            <table class="shortcut-table" id="shortcutTable">
+                <thead>
+                    <tr>
+                        <th>快捷键</th>
+                        <th>功能</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="空格 播放 暂停">
+                        <td><span class="key">空格</span></td>
+                        <td>播放/暂停</td>
+                        <td>控制音频播放</td>
+                    </tr>
+                    <tr data-keywords="L 锁定 搜索 筛选">
+                        <td><span class="key">Cmd/Ctrl + L</span></td>
+                        <td>锁定搜索</td>
+                        <td>在当前结果中继续筛选</td>
+                    </tr>
+                    <tr data-keywords="返回 撤销 上一步 后退 Back">
+                        <td><span class="key">Back</span>按钮</td>
+                        <td>返回上一步</td>
+                        <td>回到上次搜索结果</td>
+                    </tr>
+                    <tr data-keywords="波形 放大 缩小 还原 重置">
+                        <td><span class="key">/</span></td>
+                        <td>还原波形视图</td>
+                        <td>快速恢复波形默认大小</td>
+                    </tr>
+                    <tr data-keywords="全选 选择 所有">
+                        <td><span class="key">Cmd/Ctrl + A</span></td>
+                        <td>全选</td>
+                        <td>选中所有搜索结果</td>
+                    </tr>
+                    <tr data-keywords="查找 所有 Find All 显示">
+                        <td><span class="key">Find All</span>按钮</td>
+                        <td>显示所有</td>
+                        <td>显示数据库里所有音效</td>
+                    </tr>
+                    <tr data-keywords="同文件夹 同类 Same Folder">
+                        <td><span class="key">Same Folder</span>按钮</td>
+                        <td>同文件夹</td>
+                        <td>显示选中音效所在文件夹的所有内容</td>
+                    </tr>
+                    <tr data-keywords="保存 嵌入 Embed 元数据">
+                        <td>右键 → <span class="key">Embed</span></td>
+                        <td>保存元数据</td>
+                        <td>把修改写入音频文件</td>
+                    </tr>
+                    <tr data-keywords="脏记录 Dirty 未保存">
+                        <td>菜单 → <span class="key">Show Dirty</span></td>
+                        <td>显示未保存</td>
+                        <td>查看哪些修改还没嵌入文件</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+    </main>
+    
+    <footer class="footer">
+        <p>⚡ 我的工作站 | Soundminer 完全指南</p>
+        <p style="margin-top: 10px; font-size: 0.85rem;">文档基于 Soundminer V6 PRO / PLUS / Basic 整理 | 最后更新：2026-03-17</p>
+    </footer>
+    
+    <script>
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const allCards = document.querySelectorAll('.feature-card, .shortcut-table tbody tr');
+        
+        // 关键词映射表（大白话 → 技术词）
+        const keywordMap = {
+            // 导入相关
+            '导': '导入 添加 加载',
+            '加': '导入 添加 加载',
+            '传': '导入 添加 加载 传输',
+            '建库': '导入 数据库',
+            '新建': '导入 数据库',
+            
+            // 搜索相关
+            '找': '搜索 查找',
+            '搜': '搜索 查找',
+            '查': '搜索 查找',
+            '筛选': '搜索 过滤',
+            '过滤': '搜索',
+            
+            // DAW相关
+            '拖': '拖到 DAW Pro Tools Logic',
+            '拉': '拖到 DAW',
+            '送': '传输 拖到 Spot',
+            '进': '导入 拖到 Bring',
+            'protools': 'Pro Tools DAW',
+            'logic': 'Logic DAW',
+            '宿主': 'DAW',
+            
+            // 编辑相关
+            '改': '修改 编辑 改名',
+            '修': '修改 编辑',
+            '变': '修改 变速 变调',
+            '重命名': '改名 修改',
+            
+            // 处理相关
+            '剪': '截取 裁剪 片段',
+            '裁': '截取 裁剪',
+            '选': '截取 选区',
+            '区': '截取 选区',
+            '段': '截取 片段',
+            '部': '截取 片段',
+            
+            // 变速相关
+            '速': '变速 速度',
+            '调': '变调 音调 调性',
+            '音调': '变调',
+            '快慢': '变速',
+            '升降': '变调',
+            
+            // 播放相关
+            '听': '播放 试听 预览',
+            '播': '播放',
+            '放': '播放',
+            '预览': '播放',
+            
+            // 波形相关
+            '图': '波形 查看',
+            '放大': '波形 缩放',
+            '缩小': '波形 缩放',
+            
+            // 收藏相关
+            '收': '收藏 playlist',
+            '藏': '收藏',
+            '常用': '收藏 playlist',
+            '喜欢': '收藏',
+            
+            // 分类相关
+            '类': '分类 UCS 类别',
+            '分': '分类 UCS',
+            '标准': 'UCS 分类',
+            
+            // 批量相关
+            '批': '批量 多选',
+            '多': '批量 多选 多个',
+            '一起': '批量',
+            '同时': '批量',
+            
+            // 快捷键相关
+            '键': '快捷键',
+            '快捷': '快捷键',
+            '按钮': '快捷键',
+            
+            // 高级功能
+            'X射线': 'XRay 波形 频率',
+            '频谱': 'XRay 频率',
+            '标签页': 'Tabs 多标签',
+            '锁定': 'Lock 叠加',
+            '效果器': 'FX RadFX DSP',
+            '采样器': 'Radium',
+            '粒子': 'Grain 合成',
+            '服务器': 'Server 协作',
+        };
+        
+        function search(query) {
+            if (!query.trim()) {
+                // 显示所有
+                allCards.forEach(card => card.classList.remove('hidden'));
+                resultsInfo.innerHTML = '';
+                return;
+            }
+            
+            // 扩展查询词
+            let expandedQuery = query.toLowerCase();
+            for (let [key, value] of Object.entries(keywordMap)) {
+                if (query.includes(key)) {
+                    expandedQuery += ' ' + value;
+                }
+            }
+            
+            const keywords = expandedQuery.split(/\s+/).filter(k => k.length > 0);
+            let matchCount = 0;
+            
+            allCards.forEach(card => {
+                const cardKeywords = (card.dataset.keywords || '').toLowerCase();
+                const title = card.querySelector('.feature-title, td:nth-child(2)')?.textContent.toLowerCase() || '';
+                const desc = card.querySelector('.feature-desc, td:nth-child(3)')?.textContent.toLowerCase() || '';
+                
+                const content = cardKeywords + ' ' + title + ' ' + desc;
+                
+                // 匹配逻辑：任意一个关键词匹配即可
+                const isMatch = keywords.some(keyword => content.includes(keyword));
+                
+                if (isMatch) {
+                    card.classList.remove('hidden');
+                    matchCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            // 显示结果数量
+            if (matchCount === 0) {
+                resultsInfo.innerHTML = '没有找到相关功能，试试其他关键词 🤔';
+            } else {
+                resultsInfo.innerHTML = `找到 <span>${matchCount}</span> 个相关功能 ✨`;
+            }
+        }
+        
+        // 输入搜索
+        searchInput.addEventListener('input', (e) => {
+            search(e.target.value);
+        });
+        
+        // 快速搜索
+        function quickSearch(term) {
+            searchInput.value = term;
+            search(term);
+            searchInput.focus();
+        }
+        
+        // 回车搜索
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                search(searchInput.value);
+            }
+        });
+    </script>
+    <footer style="text-align: center; padding: 20px; background: var(--bg-card); border-top: 1px solid var(--border); margin-top: 40px;">
+        <p data-version>⚡ 我的工作站 v2.6.0 | 🔊 Soundminer 完全指南</p>
+    </footer>
+    <script src="../nav-config.js"></script>
+  <script src="../assets/js/music-global.js?v=2.8.9"></script>
+</body>
+</html>

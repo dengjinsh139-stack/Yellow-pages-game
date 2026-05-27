@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRISM Web | 物理建模合成器 | ⚡ 我的工作站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+
+        /* 主容器 */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        /* 左侧模型选择 */
+        .model-panel {
+            width: 280px;
+            background: rgba(15, 15, 30, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px 20px;
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            margin-bottom: 30px;
+        }
+
+        .logo-section h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .logo-section .subtitle {
+            color: #666;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+        }
+
+        .logo-section .author {
+            color: #444;
+            font-size: 0.7rem;
+            margin-top: 5px;
+        }
+
+        .section-title {
+            color: #444;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin: 25px 0 15px;
+            text-transform: uppercase;
+        }
+
+        .model-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .model-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .model-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(0, 212, 170, 0.3);
+        }
+
+        .model-item.active {
+            background: rgba(0, 212, 170, 0.1);
+            border-color: rgba(0, 212, 170, 0.5);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.1);
+        }
+
+        .model-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .model-item.active .model-icon {
+            background: rgba(0, 212, 170, 0.2);
+        }
+
+        .model-info {
+            flex: 1;
+        }
+
+        .model-name {
+            font-weight: 600;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .model-item.active .model-name {
+            color: #00d4aa;
+        }
+
+        .model-desc {
+            color: #666;
+            font-size: 0.75rem;
+        }
+
+        /* 底部按钮 */
+        .panel-actions {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 14px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn.primary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .action-btn.primary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .action-btn.accent {
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            color: #fff;
+        }
+
+        .action-btn.accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3);
+        }
+
+        /* 右侧主区域 */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* 可视化区域 */
+        .visualizer-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .play-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            background: rgba(0, 212, 170, 0.2);
+            border-color: rgba(0, 212, 170, 0.5);
+            box-shadow: 0 0 40px rgba(0, 212, 170, 0.3);
+        }
+
+        .play-button.playing {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 170, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 212, 170, 0.5); }
+        }
+
+        #visualizer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+
+        /* 参数控制区 */
+        .controls-section {
+            margin-top: 30px;
+        }
+
+        .control-groups {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            color: #888;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .group-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        .control-item {
+            margin-bottom: 20px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .control-label {
+            font-size: 0.75rem;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .control-value {
+            font-size: 0.75rem;
+            color: #00d4aa;
+            font-family: monospace;
+        }
+
+        .slider-container {
+            position: relative;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .slider-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            cursor: grab;
+            transition: transform 0.1s;
+        }
+
+        .slider-thumb:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .slider-thumb:active {
+            cursor: grabbing;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .control-groups {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .model-panel {
+                width: 100%;
+                height: auto;
+                max-height: 300px;
+            }
+            .control-groups {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 提示 */
+        .hint {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 212, 170, 0.9);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .hint.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 首页</a>
+                <a href="sound-effects-hub.html" class="nav-link">🔊 音效中心</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- 左侧模型面板 -->
+        <div class="model-panel">
+            <div class="logo-section">
+                <h1>🔮 PRISM Web</h1>
+                <div class="subtitle">ORGANIC PHYSICS</div>
+                <div class="author">Physical Modeling Synthesizer</div>
+            </div>
+
+            <div class="section-title">Crystal Models</div>
+            <div class="model-list" id="modelList">
+                <div class="model-item active" data-model="prism">
+                    <div class="model-icon">💎</div>
+                    <div class="model-info">
+                        <div class="model-name">PRISM</div>
+                        <div class="model-desc">Drifting Crystal</div>
+                    </div>
+                </div>
+                <div class="model-item" data-model="chime">
+                    <div class="model-icon">🎐</div>
+                    <div class="model-info">
+                        <div class="model-name">CHIME</div>
+                        <div class="model-desc">Wind Rods</div>
+                    </div>
+                </div>
+                <div class="model-item" data-model="halo">
+                    <div class="model-icon">🌙</div>
+                    <div class="model-info">
+                        <div class="model-name">HALO</div>
+                        <div class="model-desc">Breathing Glass</div>
+                    </div>
+                </div>
+                <div class="model-item" data-model="glint">
+                    <div class="model-icon">✨</div>
+                    <div class="model-info">
+                        <div class="model-name">GLINT</div>
+                        <div class="model-desc">Scattered Light</div>
+                    </div>
+                </div>
+                <div class="model-item" data-model="stella">
+                    <div class="model-icon">⭐</div>
+                    <div class="model-info">
+                        <div class="model-name">STELLA</div>
+                        <div class="model-desc">Kind Stars</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Ethereal Model</div>
+            <div class="model-list">
+                <div class="model-item" data-model="lumen">
+                    <div class="model-icon">💫</div>
+                    <div class="model-info">
+                        <div class="model-name">LUMEN</div>
+                        <div class="model-desc">Flowing Light</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-actions">
+                <button class="action-btn primary" onclick="randomize()">
+                    🔀 RANDOMIZE
+                </button>
+                <button class="action-btn accent" onclick="exportAudio()">
+                    📤 EXPORT WAV
+                </button>
+            </div>
+        </div>
+
+        <!-- 右侧主区域 -->
+        <div class="main-area">
+            <!-- 可视化区域 -->
+            <div class="visualizer-section">
+                <canvas id="visualizer"></canvas>
+                <button class="play-button" id="playBtn" onclick="togglePlay()">
+                    ▶
+                </button>
+            </div>
+
+            <!-- 参数控制 -->
+            <div class="controls-section">
+                <div class="control-groups">
+                    <!-- PHYSICS -->
+                    <div class="control-group">
+                        <div class="group-header">
+                            <svg class="group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 2v20M2 12h20"/>
+                            </svg>
+                            PHYSICS
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">PITCH</span>
+                                <span class="control-value" id="pitchValue">1500Hz</span>
+                            </div>
+                            <div class="slider-container" data-param="pitch" data-min="200" data-max="5000" data-value="1500" data-unit="Hz">
+                                <div class="slider-fill" style="width: 27%"></div>
+                                <div class="slider-thumb" style="left: 27%"></div>
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">DECAY</span>
+                                <span class="control-value" id="decayValue">2.50s</span>
+                            </div>
+                            <div class="slider-container" data-param="decay" data-min="0.1" data-max="10" data-value="2.5" data-unit="s">
+                                <div class="slider-fill" style="width: 24%"></div>
+                                <div class="slider-thumb" style="left: 24%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MATERIAL -->
+                    <div class="control-group">
+                        <div class="group-header">
+                            <svg class="group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            MATERIAL
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">TONE</span>
+                                <span class="control-value" id="toneValue">0%</span>
+                            </div>
+                            <div class="slider-container" data-param="tone" data-min="0" data-max="100" data-value="0" data-unit="%">
+                                <div class="slider-fill" style="width: 0%"></div>
+                                <div class="slider-thumb" style="left: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">IMPACT</span>
+                                <span class="control-value" id="impactValue">50%</span>
+                            </div>
+                            <div class="slider-container" data-param="impact" data-min="0" data-max="100" data-value="50" data-unit="%">
+                                <div class="slider-fill" style="width: 50%"></div>
+                                <div class="slider-thumb" style="left: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ORGANIC -->
+                    <div class="control-group">
+                        <div class="group-header">
+                            <svg class="group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                            ORGANIC
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">DRIFT</span>
+                                <span class="control-value" id="driftValue">40%</span>
+                            </div>
+                            <div class="slider-container" data-param="drift" data-min="0" data-max="100" data-value="40" data-unit="%">
+                                <div class="slider-fill" style="width: 40%"></div>
+                                <div class="slider-thumb" style="left: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">MOVEMENT</span>
+                                <span class="control-value" id="movementValue">50%</span>
+                            </div>
+                            <div class="slider-container" data-param="movement" data-min="0" data-max="100" data-value="50" data-unit="%">
+                                <div class="slider-fill" style="width: 50%"></div>
+                                <div class="slider-thumb" style="left: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ATMOSPHERE -->
+                    <div class="control-group">
+                        <div class="group-header">
+                            <svg class="group-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="5"/>
+                                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                            </svg>
+                            ATMOSPHERE
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">STEREO</span>
+                                <span class="control-value" id="stereoValue">80%</span>
+                            </div>
+                            <div class="slider-container" data-param="stereo" data-min="0" data-max="100" data-value="80" data-unit="%">
+                                <div class="slider-fill" style="width: 80%"></div>
+                                <div class="slider-thumb" style="left: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-header">
+                                <span class="control-label">SHIMMER</span>
+                                <span class="control-value" id="shimmerValue">30%</span>
+                            </div>
+                            <div class="slider-container" data-param="shimmer" data-min="0" data-max="100" data-value="30" data-unit="%">
+                                <div class="slider-fill" style="width: 30%"></div>
+                                <div class="slider-thumb" style="left: 30%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hint" id="hint"></div>
+
+    <script>
+        // 音频上下文
+        let audioContext = null;
+        let isPlaying = false;
+        let currentModel = 'prism';
+        let animationId = null;
+
+        // 参数
+        let params = {
+            pitch: 1500,
+            decay: 2.5,
+            tone: 0,
+            impact: 50,
+            drift: 40,
+            movement: 50,
+            stereo: 80,
+            shimmer: 30
+        };
+
+        // 模型预设
+        const modelPresets = {
+            prism: { pitch: 1500, decay: 3, tone: 20, impact: 40, drift: 60, movement: 40, stereo: 70, shimmer: 50 },
+            chime: { pitch: 2000, decay: 4, tone: 40, impact: 80, drift: 20, movement: 30, stereo: 60, shimmer: 70 },
+            halo: { pitch: 800, decay: 6, tone: 10, impact: 30, drift: 80, movement: 60, stereo: 90, shimmer: 40 },
+            glint: { pitch: 3000, decay: 1.5, tone: 60, impact: 90, drift: 30, movement: 70, stereo: 50, shimmer: 80 },
+            stella: { pitch: 1200, decay: 5, tone: 15, impact: 50, drift: 50, movement: 45, stereo: 85, shimmer: 60 },
+            lumen: { pitch: 600, decay: 8, tone: 5, impact: 20, drift: 90, movement: 80, stereo: 95, shimmer: 30 }
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initSliders();
+            initVisualizer();
+        });
+
+        // 初始化滑块
+        function initSliders() {
+            const sliders = document.querySelectorAll('.slider-container');
+            sliders.forEach(function(slider) {
+                let isDragging = false;
+                const thumb = slider.querySelector('.slider-thumb');
+                const fill = slider.querySelector('.slider-fill');
+                const param = slider.dataset.param;
+                const min = parseFloat(slider.dataset.min);
+                const max = parseFloat(slider.dataset.max);
+                const unit = slider.dataset.unit;
+
+                function updateValue(e) {
+                    const rect = slider.getBoundingClientRect();
+                    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+                    const percent = x / rect.width;
+                    const value = min + (max - min) * percent;
+
+                    thumb.style.left = (percent * 100) + '%';
+                    fill.style.width = (percent * 100) + '%';
+
+                    params[param] = value;
+
+                    // 更新显示
+                    let displayValue = value;
+                    if (unit === 'Hz') displayValue = Math.round(value) + 'Hz';
+                    else if (unit === 's') displayValue = value.toFixed(2) + 's';
+                    else displayValue = Math.round(value) + '%';
+
+                    document.getElementById(param + 'Value').textContent = displayValue;
+                }
+
+                slider.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    updateValue(e);
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) updateValue(e);
+                });
+
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                });
+            });
+        }
+
+        // 模型切换
+        document.querySelectorAll('.model-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.model-item').forEach(function(i) {
+                    i.classList.remove('active');
+                });
+                item.classList.add('active');
+                currentModel = item.dataset.model;
+
+                // 应用预设
+                const preset = modelPresets[currentModel];
+                if (preset) {
+                    Object.keys(preset).forEach(function(key) {
+                        params[key] = preset[key];
+                    });
+                    updateSliders();
+                }
+
+                showHint('已切换至 ' + item.querySelector('.model-name').textContent);
+            });
+        });
+
+        // 更新滑块显示
+        function updateSliders() {
+            document.querySelectorAll('.slider-container').forEach(function(slider) {
+                const param = slider.dataset.param;
+                const min = parseFloat(slider.dataset.min);
+                const max = parseFloat(slider.dataset.max);
+                const unit = slider.dataset.unit;
+                const value = params[param];
+                const percent = (value - min) / (max - min);
+
+                slider.querySelector('.slider-thumb').style.left = (percent * 100) + '%';
+                slider.querySelector('.slider-fill').style.width = (percent * 100) + '%';
+
+                let displayValue = value;
+                if (unit === 'Hz') displayValue = Math.round(value) + 'Hz';
+                else if (unit === 's') displayValue = value.toFixed(2) + 's';
+                else displayValue = Math.round(value) + '%';
+
+                document.getElementById(param + 'Value').textContent = displayValue;
+            });
+        }
+
+        // 播放控制
+        function togglePlay() {
+            const btn = document.getElementById('playBtn');
+
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (isPlaying) {
+                isPlaying = false;
+                btn.textContent = '▶';
+                btn.classList.remove('playing');
+            } else {
+                isPlaying = true;
+                btn.textContent = '⏹';
+                btn.classList.add('playing');
+                playSynth();
+            }
+        }
+
+        // 合成器核心
+        function playSynth() {
+            if (!isPlaying) return;
+
+            const t = audioContext.currentTime;
+
+            // 创建多个振荡器模拟共鸣
+            const oscCount = 4 + Math.floor(params.tone / 20);
+
+            for (let i = 0; i < oscCount; i++) {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                const filter = audioContext.createBiquadFilter();
+
+                // 基础频率 + 泛音
+                const baseFreq = params.pitch;
+                const harmonic = i + 1;
+                const detune = (Math.random() - 0.5) * params.drift * 10;
+                osc.frequency.value = baseFreq * harmonic * (1 + detune / 1000);
+
+                // 波形选择
+                const waveforms = ['sine', 'triangle', 'sawtooth', 'square'];
+                osc.type = waveforms[Math.floor(params.tone / 25)] || 'sine';
+
+                // 滤波器
+                filter.type = 'lowpass';
+                filter.frequency.value = baseFreq * (2 + params.tone / 50);
+                filter.Q.value = 1 + params.shimmer / 20;
+
+                // 包络
+                const attack = 0.01 + (100 - params.impact) / 5000;
+                const decay = params.decay * (0.5 + i * 0.2);
+                const sustain = 0.1 / harmonic;
+
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.3 / harmonic, t + attack);
+                gain.gain.exponentialRampToValueAtTime(sustain, t + attack + decay * 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + decay);
+
+                // 立体声
+                const panner = audioContext.createStereoPanner();
+                const pan = (Math.random() - 0.5) * params.stereo / 50;
+                panner.pan.value = pan;
+
+                // 连接
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(panner);
+                panner.connect(audioContext.destination);
+
+                osc.start(t);
+                osc.stop(t + decay + 1);
+            }
+
+            // 运动效果（LFO）
+            if (params.movement > 20) {
+                const lfo = audioContext.createOscillator();
+                const lfoGain = audioContext.createGain();
+                const masterGain = audioContext.createGain();
+
+                lfo.frequency.value = 0.1 + params.movement / 200;
+                lfoGain.gain.value = params.movement / 500;
+
+                // 这里简化处理，实际应该连接更多参数
+            }
+
+            // 自动停止
+            setTimeout(function() {
+                if (isPlaying) {
+                    togglePlay();
+                }
+            }, params.decay * 1000 + 500);
+        }
+
+        // 随机化
+        function randomize() {
+            params.pitch = 200 + Math.random() * 3000;
+            params.decay = 0.5 + Math.random() * 8;
+            params.tone = Math.random() * 100;
+            params.impact = Math.random() * 100;
+            params.drift = Math.random() * 100;
+            params.movement = Math.random() * 100;
+            params.stereo = Math.random() * 100;
+            params.shimmer = Math.random() * 100;
+
+            updateSliders();
+            showHint('参数已随机化');
+
+            // 自动播放
+            if (!isPlaying) {
+                setTimeout(togglePlay, 100);
+            }
+        }
+
+        // 导出音频
+        function exportAudio() {
+            showHint('准备导出功能（需要更复杂的实现）');
+        }
+
+        // 可视化
+        function initVisualizer() {
+            const canvas = document.getElementById('visualizer');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = canvas.offsetWidth * 2;
+                canvas.height = canvas.offsetHeight * 2;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            let time = 0;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (isPlaying) {
+                    time += 0.02;
+
+                    // 绘制波形
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(0, 212, 170, 0.3)';
+                    ctx.lineWidth = 2;
+
+                    for (let x = 0; x < canvas.width; x += 5) {
+                        const y = canvas.height / 2 +
+                            Math.sin(x * 0.01 + time) * 50 * (params.movement / 50) +
+                            Math.sin(x * 0.02 - time * 1.5) * 30 * (params.drift / 50);
+
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+
+                    // 绘制粒子效果
+                    for (let i = 0; i < 20; i++) {
+                        const px = Math.random() * canvas.width;
+                        const py = Math.random() * canvas.height;
+                        const size = Math.random() * 3;
+                        const alpha = Math.random() * 0.5;
+
+                        ctx.beginPath();
+                        ctx.arc(px, py, size, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(0, 212, 170, ' + alpha + ')';
+                        ctx.fill();
+                    }
+                }
+
+                animationId = requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // 提示
+        function showHint(text) {
+            const hint = document.getElementById('hint');
+            hint.textContent = text;
+            hint.classList.add('show');
+            setTimeout(function() {
+                hint.classList.remove('show');
+            }, 2000);
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            }
+        });
+    </script>
+</body>
+</html>
+/* Cache bust: 1774380000 */

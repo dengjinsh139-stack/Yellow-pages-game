@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 国际音效名词表 | UCS分类标准 | 我的工作站</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --bg-dark: #0f0f23;
+            --bg-card: #1a1a2e;
+            --bg-hover: #252542;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .back-btn {
+            padding: 8px 16px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        /* 搜索区域 */
+        .search-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1b4b);
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .search-container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .search-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .search-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            padding-left: 50px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            background: var(--bg-dark);
+            color: var(--text);
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        
+        .search-tips {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .tip-tag {
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tip-tag:hover {
+            background: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .search-results-info {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .search-results-info span {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* 内容区域 */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        /* 说明书 */
+        .manual-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .manual-title {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .manual-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .manual-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .manual-card h4 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .manual-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .manual-card li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .manual-card li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+        
+        /* 分类导航 */
+        .category-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+        
+        .category-nav a {
+            padding: 8px 14px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        
+        .category-nav a:hover, .category-nav a.active {
+            background: var(--primary);
+            color: #fff;
+        }
+        
+        /* 分类区块 */
+        .category-section {
+            margin-bottom: 50px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .category-title-wrap {
+            flex: 1;
+        }
+        
+        .category-title {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .category-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* 子分类表格 */
+        .subcategory-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .subcategory-table th,
+        .subcategory-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .subcategory-table th {
+            background: rgba(99, 102, 241, 0.2);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .subcategory-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .subcategory-table tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        .subcategory-table tr.hidden {
+            display: none;
+        }
+        
+        .catid {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #818cf8;
+            font-weight: bold;
+        }
+        
+        .subcategory-name {
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .subcategory-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .keyword-tag {
+            padding: 3px 8px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #34d399;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .subcategory-table {
+                font-size: 0.85rem;
+            }
+            
+            .subcategory-table th,
+            .subcategory-table td {
+                padding: 10px;
+            }
+            
+            .manual-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-title {
+                font-size: 1.4rem;
+            }
+        }
+        
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+
+<script>
+// 登录验证
+(function() {
+    const CONFIG = {
+        sessionKey: 'sfx_access_granted',
+        loginPage: 'sound-effects-login.html',
+        sessionDuration: 24 * 60 * 60 * 1000
+    };
+    
+    const session = localStorage.getItem(CONFIG.sessionKey);
+    if (!session) {
+        window.location.href = CONFIG.loginPage;
+        return;
+    }
+    
+    const data = JSON.parse(session);
+    if (Date.now() - data.timestamp > CONFIG.sessionDuration) {
+        localStorage.removeItem(CONFIG.sessionKey);
+        window.location.href = CONFIG.loginPage;
+    }
+})();
+</script>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-logo">
+                <div class="nav-logo-icon">⚡</div>
+                <span>我的工作站</span>
+            </a>
+            <div class="nav-links" id="nav-links"></div>
+        </div>
+    </nav>
+
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-content">
+            <span class="logo">🎵 国际音效名词表 (UCS标准)</span>
+        </div>
+    </header>
+    <!-- 子目录导航 -->
+    <div style="background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 15px;">
+        <div style="max-width: 1400px; margin: 0 auto; display: flex; gap: 20px; align-items: center;">
+            <span style="color: var(--text-muted); font-size: 0.9rem;">📂 音效相关：</span>
+            <a href="soundminer-guide.html" style="padding: 8px 16px; background: var(--bg-hover); border: 1px solid var(--border); color: var(--text); border-radius: 6px; text-decoration: none; font-size: 0.9rem;">🔊 Soundminer指南</a>
+            <a href="sfx-glossary.html" style="padding: 8px 16px; background: var(--primary); color: #fff; border-radius: 6px; text-decoration: none; font-size: 0.9rem;">🎵 国际音效名词表</a>
+        </div>
+    </div>
+
+    
+    <!-- 搜索区域 -->
+    <section class="search-section">
+        <div class="search-container">
+            <h1 class="search-title">🔍 中文搜英文音效关键词</h1>
+            <p class="search-subtitle">基于 UCS (Universal Category System) 8.2 国际标准 | 输入中文即可找到对应的英文音效名词</p>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="试试：枪声、汽车、金属、爆炸、环境音...">
+            </div>
+            
+            <div class="search-tips">
+                <span class="tip-tag" onclick="quickSearch('武器')">🔫 武器</span>
+                <span class="tip-tag" onclick="quickSearch('车辆')">🚗 车辆</span>
+                <span class="tip-tag" onclick="quickSearch('环境')">🌲 环境</span>
+                <span class="tip-tag" onclick="quickSearch('人类')">👤 人类</span>
+                <span class="tip-tag" onclick="quickSearch('动物')">🐕 动物</span>
+                <span class="tip-tag" onclick="quickSearch('机械')">⚙️ 机械</span>
+                <span class="tip-tag" onclick="quickSearch('科幻')">🚀 科幻</span>
+                <span class="tip-tag" onclick="quickSearch('UI')">📱 UI音效</span>
+            </div>
+            
+            <div class="search-results-info" id="resultsInfo"></div>
+        </div>
+    </section>
+    
+    <!-- 内容区域 -->
+    <main class="content">
+        
+        <!-- 使用说明书 -->
+        <section class="manual-section">
+            <h2 class="manual-title">📖 使用说明书（请先阅读）</h2>
+            <div class="manual-grid">
+                <div class="manual-card">
+                    <h4>🎯 如何使用搜索</h4>
+                    <ul>
+                        <li>在搜索框输入中文关键词</li>
+                        <li>支持模糊搜索：如"枪"可找到所有枪械类</li>
+                        <li>支持多关键词：如"金属 碰撞"</li>
+                        <li>搜索结果实时显示，点击条目可跳转</li>
+                    </ul>
+                </div>
+                <div class="manual-card">
+                    <h4>🏷️ CatID 说明</h4>
+                    <ul>
+                        <li>CatID是UCS分类的唯一标识符</li>
+                        <li>格式：大类缩写 + 子类缩写</li>
+                        <li>如 GUNAuto = Guns + Automatic</li>
+                        <li>文件名中必须使用CatID开头</li>
+                    </ul>
+                </div>
+                <div class="manual-card">
+                    <h4>📝 文件名规范</h4>
+                    <ul>
+                        <li>格式：CatID_FXName_CreatorID_SourceID</li>
+                        <li>示例：GUNAuto_Uzi9mmFire_BS_Dory</li>
+                        <li>用下划线分隔各字段</li>
+                        <li>FXName建议小于25字符</li>
+                    </ul>
+                </div>
+                <div class="manual-card">
+                    <h4>💡 音效师使用技巧</h4>
+                    <ul>
+                        <li>搜索时用"大白话"更准</li>
+                        <li>记不住的CatID可以直接搜中文</li>
+                        <li>关键词标签可快速定位同类音效</li>
+                        <li>建议收藏常用分类导航</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 快速导航 -->
+        <div class="category-nav" id="categoryNav">
+            <a href="#air" class="active">空气</a>
+            <a href="#aircraft">飞行器</a>
+            <a href="#alarms">警报</a>
+            <a href="#ambience">环境</a>
+            <a href="#animals">动物</a>
+            <a href="#birds">鸟类</a>
+            <a href="#creatures">生物</a>
+            <a href="#destruction">破坏</a>
+            <a href="#doors">门</a>
+            <a href="#electricity">电力</a>
+            <a href="#explosions">爆炸</a>
+            <a href="#foley">拟音</a>
+            <a href="#footsteps">脚步</a>
+            <a href="#guns">枪械</a>
+            <a href="#human">人类</a>
+            <a href="#machines">机器</a>
+            <a href="#metal">金属</a>
+            <a href="#music">音乐</a>
+            <a href="#vehicles">车辆</a>
+            <a href="#water">水</a>
+            <a href="#weather">天气</a>
+            <a href="#weapons">武器</a>
+            <a href="#wood">木头</a>
+        </div>
+        
+        <!-- 空气类 -->
+        <section class="category-section" id="air">
+            <div class="category-header">
+                <div class="category-icon">💨</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">AIR | 空气类音效</h2>
+                    <p class="category-desc">与空气流动、压力释放相关的声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr>
+                        <th width="120">CatID</th>
+                        <th width="180">中文名称</th>
+                        <th width="280">英文名称</th>
+                        <th>描述/关键词</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="空气 吹 吹风 喷气 风 吹气 喷枪">
+                        <td><span class="catid">AIRBlow</span></td>
+                        <td class="subcategory-name">空气吹拂</td>
+                        <td class="subcategory-desc">Blow / Air Blow</td>
+                        <td><div class="keywords"><span class="keyword-tag">吹风</span><span class="keyword-tag">喷气</span><span class="keyword-tag">压缩空气</span><span class="keyword-tag">喷枪</span><span class="keyword-tag">气球</span></div></td>
+                    </tr>
+                    <tr data-keywords="空气 爆发 爆裂 释放 压力 爆裂声">
+                        <td><span class="catid">AIRBrst</span></td>
+                        <td class="subcategory-name">空气爆发</td>
+                        <td class="subcategory-desc">Burst / Air Burst</td>
+                        <td><div class="keywords"><span class="keyword-tag">爆裂</span><span class="keyword-tag">压力释放</span><span class="keyword-tag">气爆</span><span class="keyword-tag">喷涌</span></div></td>
+                    </tr>
+                    <tr data-keywords="空气 嘶嘶声 漏气 泄漏 泄气 轮胎">
+                        <td><span class="catid">AIRHiss</span></td>
+                        <td class="subcategory-name">嘶嘶声</td>
+                        <td class="subcategory-desc">Hiss / Air Hiss</td>
+                        <td><div class="keywords"><span class="keyword-tag">漏气</span><span class="keyword-tag">泄气</span><span class="keyword-tag">轮胎漏气</span><span class="keyword-tag">管道泄漏</span></div></td>
+                    </tr>
+                    <tr data-keywords="空气 吸力 吸 抽气 真空 吸气">
+                        <td><span class="catid">AIRSuck</span></td>
+                        <td class="subcategory-name">吸力/吸气</td>
+                        <td class="subcategory-desc">Suction / Air Suction</td>
+                        <td><div class="keywords"><span class="keyword-tag">吸气</span><span class="keyword-tag">真空</span><span class="keyword-tag">吸尘器</span><span class="keyword-tag">抽气</span></div></td>
+                    </tr>
+                    <tr data-keywords="空气 其他 杂项 通用">
+                        <td><span class="catid">AIRMisc</span></td>
+                        <td class="subcategory-name">空气-其他</td>
+                        <td class="subcategory-desc">Misc / Air Misc</td>
+                        <td><div class="keywords"><span class="keyword-tag">空气</span><span class="keyword-tag">气流</span><span class="keyword-tag">通风</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- 飞行器 -->
+        <section class="category-section" id="aircraft">
+            <div class="category-header">
+                <div class="category-icon">✈️</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">AIRCRAFT | 飞行器</h2>
+                    <p class="category-desc">飞机、直升机、火箭等航空器音效</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="飞机 客机 民航 喷气式 波音 空客">
+                        <td><span class="catid">AEROJet</span></td>
+                        <td class="subcategory-name">喷气式飞机</td>
+                        <td class="subcategory-desc">Jet Aircraft</td>
+                        <td><div class="keywords"><span class="keyword-tag">客机</span><span class="keyword-tag">波音</span><span class="keyword-tag">空客</span><span class="keyword-tag">喷气</span><span class="keyword-tag">起飞</span><span class="keyword-tag">降落</span></div></td>
+                    </tr>
+                    <tr data-keywords="直升机 直升飞机 螺旋桨">
+                        <td><span class="catid">AEROHeli</span></td>
+                        <td class="subcategory-name">直升机</td>
+                        <td class="subcategory-desc">Helicopter</td>
+                        <td><div class="keywords"><span class="keyword-tag">直升机</span><span class="keyword-tag">螺旋桨</span><span class="keyword-tag">旋翼</span><span class="keyword-tag">救援</span><span class="keyword-tag">警用</span></div></td>
+                    </tr>
+                    <tr data-keywords="螺旋桨飞机 小飞机 私人飞机">
+                        <td><span class="catid">AEROProp</span></td>
+                        <td class="subcategory-name">螺旋桨飞机</td>
+                        <td class="subcategory-desc">Propeller Aircraft</td>
+                        <td><div class="keywords"><span class="keyword-tag">小飞机</span><span class="keyword-tag">私人飞机</span><span class="keyword-tag">塞斯纳</span><span class="keyword-tag">螺旋桨</span></div></td>
+                    </tr>
+                    <tr data-keywords="军用飞机 战斗机 轰炸机 军用">
+                        <td><span class="catid">AEROMil</span></td>
+                        <td class="subcategory-name">军用飞机</td>
+                        <td class="subcategory-desc">Military Aircraft</td>
+                        <td><div class="keywords"><span class="keyword-tag">战斗机</span><span class="keyword-tag">轰炸机</span><span class="keyword-tag">F16</span><span class="keyword-tag">F22</span><span class="keyword-tag">隐形</span></div></td>
+                    </tr>
+                    <tr data-keywords="火箭 航天飞机 发射 太空">
+                        <td><span class="catid">AERORckt</span></td>
+                        <td class="subcategory-name">火箭/航天器</td>
+                        <td class="subcategory-desc">Rocket / Spacecraft</td>
+                        <td><div class="keywords"><span class="keyword-tag">火箭</span><span class="keyword-tag">发射</span><span class="keyword-tag">航天飞机</span><span class="keyword-tag">SpaceX</span><span class="keyword-tag">引擎</span></div></td>
+                    </tr>
+                    <tr data-keywords="飞机内部 机舱 座舱">
+                        <td><span class="catid">AEROInt</span></td>
+                        <td class="subcategory-name">飞机内部</td>
+                        <td class="subcategory-desc">Aircraft Interior</td>
+                        <td><div class="keywords"><span class="keyword-tag">机舱</span><span class="keyword-tag">座舱</span><span class="keyword-tag">驾驶舱</span><span class="keyword-tag">乘客舱</span><span class="keyword-tag">飞行</span></div></td>
+                    </tr>
+                    <tr data-keywords="飞机舱门 舱门 舱口 登机门">
+                        <td><span class="catid">AERODoor</span></td>
+                        <td class="subcategory-name">飞机舱门</td>
+                        <td class="subcategory-desc">Aircraft Door</td>
+                        <td><div class="keywords"><span class="keyword-tag">舱门</span><span class="keyword-tag">登机门</span><span class="keyword-tag">货舱门</span><span class="keyword-tag">紧急出口</span></div></td>
+                    </tr>
+                    <tr data-keywords="无人机 遥控飞机 四轴飞行器">
+                        <td><span class="catid">AERORadio</span></td>
+                        <td class="subcategory-name">无人机/遥控飞机</td>
+                        <td class="subcategory-desc">Radio Controlled / UAV</td>
+                        <td><div class="keywords"><span class="keyword-tag">无人机</span><span class="keyword-tag">四轴</span><span class="keyword-tag">遥控</span><span class="keyword-tag">航拍</span></div></td>
+                    </tr>
+                    <tr data-keywords="飞机机械 起落架 控制面 襟翼">
+                        <td><span class="catid">AEROMech</span></td>
+                        <td class="subcategory-name">飞机机械部件</td>
+                        <td class="subcategory-desc">Aircraft Mechanism</td>
+                        <td><div class="keywords"><span class="keyword-tag">起落架</span><span class="keyword-tag">襟翼</span><span class="keyword-tag">方向舵</span><span class="keyword-tag">控制杆</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- 警报 -->
+        <section class="category-section" id="alarms">
+            <div class="category-header">
+                <div class="category-icon">🚨</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">ALARMS | 警报/警报器</h2>
+                    <p class="category-desc">各类警报声音：火警、汽车警报、医疗设备等</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="火警 火灾警报 烟雾报警器">
+                        <td><span class="catid">ALRMFire</span></td>
+                        <td class="subcategory-name">火警</td>
+                        <td class="subcategory-desc">Fire Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">火警</span><span class="keyword-tag">烟雾报警</span><span class="keyword-tag">火灾</span><span class="keyword-tag">疏散</span></div></td>
+                    </tr>
+                    <tr data-keywords="汽车警报 车辆警报 防盗">
+                        <td><span class="catid">ALRMVeh</span></td>
+                        <td class="subcategory-name">汽车警报</td>
+                        <td class="subcategory-desc">Vehicle Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">汽车警报</span><span class="keyword-tag">防盗</span><span class="keyword-tag">车辆</span><span class="keyword-tag">报警</span></div></td>
+                    </tr>
+                    <tr data-keywords="防盗警报 保安 入侵检测">
+                        <td><span class="catid">ALRMBurg</span></td>
+                        <td class="subcategory-name">防盗警报</td>
+                        <td class="subcategory-desc">Burglar Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">防盗</span><span class="keyword-tag">入侵</span><span class="keyword-tag">保安</span><span class="keyword-tag">警报系统</span></div></td>
+                    </tr>
+                    <tr data-keywords="医疗设备警报 医院 心率 监护仪">
+                        <td><span class="catid">ALRMMed</span></td>
+                        <td class="subcategory-name">医疗设备警报</td>
+                        <td class="subcategory-desc">Medical Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">医院</span><span class="keyword-tag">心率</span><span class="keyword-tag">监护仪</span><span class="keyword-tag">ICU</span></div></td>
+                    </tr>
+                    <tr data-keywords="紧急警报 紧急情况 警告">
+                        <td><span class="catid">ALRMEmer</span></td>
+                        <td class="subcategory-name">紧急警报</td>
+                        <td class="subcategory-desc">Emergency Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">紧急</span><span class="keyword-tag">警告</span><span class="keyword-tag">疏散</span><span class="keyword-tag">灾难</span></div></td>
+                    </tr>
+                    <tr data-keywords="电子警报 电子蜂鸣器 电子报警">
+                        <td><span class="catid">ALRMElec</span></td>
+                        <td class="subcategory-name">电子警报</td>
+                        <td class="subcategory-desc">Electronic Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">电子</span><span class="keyword-tag">蜂鸣器</span><span class="keyword-tag">电子音</span></div></td>
+                    </tr>
+                    <tr data-keywords="时钟闹钟 闹钟 计时器">
+                        <td><span class="catid">ALRMClock</span></td>
+                        <td class="subcategory-name">时钟闹钟</td>
+                        <td class="subcategory-desc">Clock Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">闹钟</span><span class="keyword-tag">计时器</span><span class="keyword-tag">起床</span></div></td>
+                    </tr>
+                    <tr data-keywords="警报 其他 通用">
+                        <td><span class="catid">ALRMMisc</span></td>
+                        <td class="subcategory-name">警报-其他</td>
+                        <td class="subcategory-desc">Misc Alarm</td>
+                        <td><div class="keywords"><span class="keyword-tag">警报</span><span class="keyword-tag">通用</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- 环境音 -->
+        <section class="category-section" id="ambience">
+            <div class="category-header">
+                <div class="category-icon">🌍</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">AMBIENCE | 环境音/氛围</h2>
+                    <p class="category-desc">各种场景的背景环境声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="城市环境 城市 街道 都市 市区">
+                        <td><span class="catid">AMBCity</span></td>
+                        <td class="subcategory-name">城市环境</td>
+                        <td class="subcategory-desc">City / Urban</td>
+                        <td><div class="keywords"><span class="keyword-tag">城市</span><span class="keyword-tag">街道</span><span class="keyword-tag">市中心</span><span class="keyword-tag">都市</span><span class="keyword-tag">车声</span></div></td>
+                    </tr>
+                    <tr data-keywords="乡村环境 乡村 农村 田园 农场">
+                        <td><span class="catid">AMBRurl</span></td>
+                        <td class="subcategory-name">乡村环境</td>
+                        <td class="subcategory-desc">Rural / Countryside</td>
+                        <td><div class="keywords"><span class="keyword-tag">乡村</span><span class="keyword-tag">田园</span><span class="keyword-tag">农场</span><span class="keyword-tag">自然</span><span class="keyword-tag">安静</span></div></td>
+                    </tr>
+                    <tr data-keywords="森林环境 森林 树林 丛林 野外">
+                        <td><span class="catid">AMBForst</span></td>
+                        <td class="subcategory-name">森林环境</td>
+                        <td class="subcategory-desc">Forest / Woods</td>
+                        <td><div class="keywords"><span class="keyword-tag">森林</span><span class="keyword-tag">树林</span><span class="keyword-tag">鸟鸣</span><span class="keyword-tag">野外</span></div></td>
+                    </tr>
+                    <tr data-keywords="室内环境 室内 房间 房屋">
+                        <td><span class="catid">AMBInt</span></td>
+                        <td class="subcategory-name">室内环境</td>
+                        <td class="subcategory-desc">Interior / Indoor</td>
+                        <td><div class="keywords"><span class="keyword-tag">室内</span><span class="keyword-tag">房间</span><span class="keyword-tag">房子</span><span class="keyword-tag">家居</span></div></td>
+                    </tr>
+                    <tr data-keywords="工业环境 工厂 工业 机械车间">
+                        <td><span class="catid">AMBInd</span></td>
+                        <td class="subcategory-name">工业环境</td>
+                        <td class="subcategory-desc">Industrial</td>
+                        <td><div class="keywords"><span class="keyword-tag">工厂</span><span class="keyword-tag">工业</span><span class="keyword-tag">车间</span><span class="keyword-tag">机械</span></div></td>
+                    </tr>
+                    <tr data-keywords="自然环境 自然 野外 户外">
+                        <td><span class="catid">AMBNat</span></td>
+                        <td class="subcategory-name">自然环境</td>
+                        <td class="subcategory-desc">Nature / Natural</td>
+                        <td><div class="keywords"><span class="keyword-tag">自然</span><span class="keyword-tag">野外</span><span class="keyword-tag">户外</span><span class="keyword-tag">原生态</span></div></td>
+                    </tr>
+                    <tr data-keywords="海洋环境 海洋 海边 海浪 海岸">
+                        <td><span class="catid">AMBOcean</span></td>
+                        <td class="subcategory-name">海洋环境</td>
+                        <td class="subcategory-desc">Ocean / Seaside</td>
+                        <td><div class="keywords"><span class="keyword-tag">海洋</span><span class="keyword-tag">海浪</span><span class="keyword-tag">海边</span><span class="keyword-tag">海岸</span><span class="keyword-tag">潮汐</span></div></td>
+                    </tr>
+                    <tr data-keywords="风环境 风声 吹风 微风 大风">
+                        <td><span class="catid">AMBWind</span></td>
+                        <td class="subcategory-name">风环境</td>
+                        <td class="subcategory-desc">Wind</td>
+                        <td><div class="keywords"><span class="keyword-tag">风声</span><span class="keyword-tag">吹风</span><span class="keyword-tag">微风</span><span class="keyword-tag">狂风</span><span class="keyword-tag">呼啸</span></div></td>
+                    </tr>
+                    <tr data-keywords="人群环境 人群 拥挤 嘈杂 人声">
+                        <td><span class="catid">AMBCrowd</span></td>
+                        <td class="subcategory-name">人群环境</td>
+                        <td class="subcategory-desc">Crowd / Public</td>
+                        <td><div class="keywords"><span class="keyword-tag">人群</span><span class="keyword-tag">嘈杂</span><span class="keyword-tag">人声</span><span class="keyword-tag">公共场所</span><span class="keyword-tag">市场</span></div></td>
+                    </tr>
+                    <tr data-keywords="餐厅环境 餐厅 咖啡厅 酒吧 食堂">
+                        <td><span class="catid">AMBRest</span></td>
+                        <td class="subcategory-name">餐厅环境</td>
+                        <td class="subcategory-desc">Restaurant / Cafe</td>
+                        <td><div class="keywords"><span class="keyword-tag">餐厅</span><span class="keyword-tag">咖啡厅</span><span class="keyword-tag">酒吧</span><span class="keyword-tag">食堂</span><span class="keyword-tag">用餐</span></div></td>
+                    </tr>
+                    <tr data-keywords="办公环境 办公室 写字间 商务">
+                        <td><span class="catid">AMBOffice</span></td>
+                        <td class="subcategory-name">办公环境</td>
+                        <td class="subcategory-desc">Office</td>
+                        <td><div class="keywords"><span class="keyword-tag">办公室</span><span class="keyword-tag">写字间</span><span class="keyword-tag">商务</span><span class="keyword-tag">键盘声</span></div></td>
+                    </tr>
+                    <tr data-keywords="地下环境 地铁 隧道 洞穴 地下">
+                        <td><span class="catid">AMBUnder</span></td>
+                        <td class="subcategory-name">地下环境</td>
+                        <td class="subcategory-desc">Underground / Subway</td>
+                        <td><div class="keywords"><span class="keyword-tag">地铁</span><span class="keyword-tag">隧道</span><span class="keyword-tag">洞穴</span><span class="keyword-tag">地下</span></div></td>
+                    </tr>
+                    <tr data-keywords="其他环境 通用">
+                        <td><span class="catid">AMBMisc</span></td>
+                        <td class="subcategory-name">环境-其他</td>
+                        <td class="subcategory-desc">Misc Ambience</td>
+                        <td><div class="keywords"><span class="keyword-tag">环境</span><span class="keyword-tag">通用</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 动物 -->
+        <section class="category-section" id="animals">
+            <div class="category-header">
+                <div class="category-icon">🐕</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">ANIMALS | 动物</h2>
+                    <p class="category-desc">各种动物的声音：狗、猫、马、野生动物等</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="狗 犬 狗叫 汪汪">
+                        <td><span class="catid">ANMLDog</span></td>
+                        <td class="subcategory-name">狗/犬</td>
+                        <td class="subcategory-desc">Dog / Canine</td>
+                        <td><div class="keywords"><span class="keyword-tag">狗叫</span><span class="keyword-tag">汪汪</span><span class="keyword-tag">犬吠</span><span class="keyword-tag">小狗</span><span class="keyword-tag">大狗</span></div></td>
+                    </tr>
+                    <tr data-keywords="猫 猫咪 喵 喵呜">
+                        <td><span class="catid">ANMLCat</span></td>
+                        <td class="subcategory-name">猫</td>
+                        <td class="subcategory-desc">Cat / Feline</td>
+                        <td><div class="keywords"><span class="keyword-tag">猫叫</span><span class="keyword-tag">喵</span><span class="keyword-tag">呼噜</span><span class="keyword-tag">猫咪</span></div></td>
+                    </tr>
+                    <tr data-keywords="马 马叫 嘶鸣 马蹄">
+                        <td><span class="catid">ANMLHorse</span></td>
+                        <td class="subcategory-name">马</td>
+                        <td class="subcategory-desc">Horse / Equine</td>
+                        <td><div class="keywords"><span class="keyword-tag">马叫</span><span class="keyword-tag">嘶鸣</span><span class="keyword-tag">马蹄</span><span class="keyword-tag">奔跑</span></div></td>
+                    </tr>
+                    <tr data-keywords="牛 牛叫 哞 奶牛">
+                        <td><span class="catid">ANMLCattle</span></td>
+                        <td class="subcategory-name">牛/ cattle</td>
+                        <td class="subcategory-desc">Cattle / Cow</td>
+                        <td><div class="keywords"><span class="keyword-tag">牛叫</span><span class="keyword-tag">哞</span><span class="keyword-tag">奶牛</span><span class="keyword-tag">公牛</span></div></td>
+                    </tr>
+                    <tr data-keywords="猪 猪叫 哼哼 猪圈">
+                        <td><span class="catid">ANMLPig</span></td>
+                        <td class="subcategory-name">猪</td>
+                        <td class="subcategory-desc">Pig / Swine</td>
+                        <td><div class="keywords"><span class="keyword-tag">猪叫</span><span class="keyword-tag">哼哼</span><span class="keyword-tag">呼噜</span></div></td>
+                    </tr>
+                    <tr data-keywords="羊 羊叫 咩 绵羊 山羊">
+                        <td><span class="catid">ANMLSheep</span></td>
+                        <td class="subcategory-name">羊</td>
+                        <td class="subcategory-desc">Sheep / Goat</td>
+                        <td><div class="keywords"><span class="keyword-tag">羊叫</span><span class="keyword-tag">咩</span><span class="keyword-tag">绵羊</span><span class="keyword-tag">山羊</span></div></td>
+                    </tr>
+                    <tr data-keywords="啮齿动物 老鼠 仓鼠 松鼠">
+                        <td><span class="catid">ANMLRodnt</span></td>
+                        <td class="subcategory-name">啮齿动物</td>
+                        <td class="subcategory-desc">Rodent</td>
+                        <td><div class="keywords"><span class="keyword-tag">老鼠</span><span class="keyword-tag">仓鼠</span><span class="keyword-tag">松鼠</span><span class="keyword-tag">吱吱</span></div></td>
+                    </tr>
+                    <tr data-keywords="野生动物 野兽 狼 熊 狐狸">
+                        <td><span class="catid">ANMLWild</span></td>
+                        <td class="subcategory-name">野生动物</td>
+                        <td class="subcategory-desc">Wildlife</td>
+                        <td><div class="keywords"><span class="keyword-tag">狼</span><span class="keyword-tag">熊</span><span class="keyword-tag">狐狸</span><span class="keyword-tag">狮子</span><span class="keyword-tag">老虎</span></div></td>
+                    </tr>
+                    <tr data-keywords="灵长类 猴子 猩猩 猿">
+                        <td><span class="catid">ANMLPrimt</span></td>
+                        <td class="subcategory-name">灵长类</td>
+                        <td class="subcategory-desc">Primate / Monkey</td>
+                        <td><div class="keywords"><span class="keyword-tag">猴子</span><span class="keyword-tag">猩猩</span><span class="keyword-tag">猿</span></div></td>
+                    </tr>
+                    <tr data-keywords="昆虫 虫 蜜蜂 蚊子 蟋蟀">
+                        <td><span class="catid">ANMLInsect</span></td>
+                        <td class="subcategory-name">昆虫</td>
+                        <td class="subcategory-desc">Insect / Bug</td>
+                        <td><div class="keywords"><span class="keyword-tag">蜜蜂</span><span class="keyword-tag">蚊子</span><span class="keyword-tag">蟋蟀</span><span class="keyword-tag">嗡嗡</span></div></td>
+                    </tr>
+                    <tr data-keywords="两栖动物 青蛙 蟾蜍 蛤蟆">
+                        <td><span class="catid">ANMLAmph</span></td>
+                        <td class="subcategory-name">两栖动物</td>
+                        <td class="subcategory-desc">Amphibian / Frog</td>
+                        <td><div class="keywords"><span class="keyword-tag">青蛙</span><span class="keyword-tag">蟾蜍</span><span class="keyword-tag">呱呱</span></div></td>
+                    </tr>
+                    <tr data-keywords="爬行动物 蛇 蜥蜴 鳄鱼">
+                        <td><span class="catid">ANMLReptl</span></td>
+                        <td class="subcategory-name">爬行动物</td>
+                        <td class="subcategory-desc">Reptile</td>
+                        <td><div class="keywords"><span class="keyword-tag">蛇</span><span class="keyword-tag">蜥蜴</span><span class="keyword-tag">鳄鱼</span></div></td>
+                    </tr>
+                    <tr data-keywords="水生动物 海豚 鲸鱼 海豹">
+                        <td><span class="catid">ANMLAquat</span></td>
+                        <td class="subcategory-name">水生动物</td>
+                        <td class="subcategory-desc">Aquatic / Marine</td>
+                        <td><div class="keywords"><span class="keyword-tag">海豚</span><span class="keyword-tag">鲸鱼</span><span class="keyword-tag">海豹</span></div></td>
+                    </tr>
+                    <tr data-keywords="蝙蝠 蝙蝠叫">
+                        <td><span class="catid">ANMLBat</span></td>
+                        <td class="subcategory-name">蝙蝠</td>
+                        <td class="subcategory-desc">Bat</td>
+                        <td><div class="keywords"><span class="keyword-tag">蝙蝠</span><span class="keyword-tag">超声波</span></div></td>
+                    </tr>
+                    <tr data-keywords="动物 其他 通用">
+                        <td><span class="catid">ANMLMisc</span></td>
+                        <td class="subcategory-name">动物-其他</td>
+                        <td class="subcategory-desc">Animal Misc</td>
+                        <td><div class="keywords"><span class="keyword-tag">动物</span><span class="keyword-tag">通用</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 鸟类 -->
+        <section class="category-section" id="birds">
+            <div class="category-header">
+                <div class="category-icon">🦅</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">BIRDS | 鸟类</h2>
+                    <p class="category-desc">各种鸟类的叫声和翅膀拍动声</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="鸣鸟 小鸟 麻雀 燕子 画眉">
+                        <td><span class="catid">BRDSong</span></td>
+                        <td class="subcategory-name">鸣鸟</td>
+                        <td class="subcategory-desc">Songbird</td>
+                        <td><div class="keywords"><span class="keyword-tag">小鸟</span><span class="keyword-tag">麻雀</span><span class="keyword-tag">燕子</span><span class="keyword-tag">啾啾</span></div></td>
+                    </tr>
+                    <tr data-keywords="猛禽 老鹰 鹰 隼 猫头鹰">
+                        <td><span class="catid">BRDRapt</span></td>
+                        <td class="subcategory-name">猛禽</td>
+                        <td class="subcategory-desc">Bird of Prey / Raptor</td>
+                        <td><div class="keywords"><span class="keyword-tag">老鹰</span><span class="keyword-tag">鹰</span><span class="keyword-tag">隼</span><span class="keyword-tag">猫头鹰</span></div></td>
+                    </tr>
+                    <tr data-keywords="水鸟 鸭子 鹅 天鹅 鹈鹕">
+                        <td><span class="catid">BRDWater</span></td>
+                        <td class="subcategory-name">水鸟</td>
+                        <td class="subcategory-desc">Waterfowl</td>
+                        <td><div class="keywords"><span class="keyword-tag">鸭子</span><span class="keyword-tag">鹅</span><span class="keyword-tag">天鹅</span><span class="keyword-tag">嘎嘎</span></div></td>
+                    </tr>
+                    <tr data-keywords="海鸟 海鸥 信天翁 海鹦">
+                        <td><span class="catid">BRDSeab</span></td>
+                        <td class="subcategory-name">海鸟</td>
+                        <td class="subcategory-desc">Seabird</td>
+                        <td><div class="keywords"><span class="keyword-tag">海鸥</span><span class="keyword-tag">信天翁</span></div></td>
+                    </tr>
+                    <tr data-keywords="乌鸦 渡鸦 八哥">
+                        <td><span class="catid">BRDCrow</span></td>
+                        <td class="subcategory-name">乌鸦/鸦科</td>
+                        <td class="subcategory-desc">Crow / Raven</td>
+                        <td><div class="keywords"><span class="keyword-tag">乌鸦</span><span class="keyword-tag">渡鸦</span><span class="keyword-tag">呱呱</span></div></td>
+                    </tr>
+                    <tr data-keywords="家禽 鸡 公鸡 母鸡 火鸡">
+                        <td><span class="catid">BRDDom</span></td>
+                        <td class="subcategory-name">家禽</td>
+                        <td class="subcategory-desc">Domestic / Poultry</td>
+                        <td><div class="keywords"><span class="keyword-tag">鸡</span><span class="keyword-tag">公鸡</span><span class="keyword-tag">母鸡</span><span class="keyword-tag">咯咯</span><span class="keyword-tag">喔喔</span></div></td>
+                    </tr>
+                    <tr data-keywords="热带鸟 鹦鹉 巨嘴鸟 孔雀">
+                        <td><span class="catid">BRDTrop</span></td>
+                        <td class="subcategory-name">热带鸟</td>
+                        <td class="subcategory-desc">Tropical Bird</td>
+                        <td><div class="keywords"><span class="keyword-tag">鹦鹉</span><span class="keyword-tag">巨嘴鸟</span><span class="keyword-tag">学舌</span></div></td>
+                    </tr>
+                    <tr data-keywords="鸟翅膀 翅膀拍打 飞翔 扑腾">
+                        <td><span class="catid">BRDWing</span></td>
+                        <td class="subcategory-name">鸟翅膀/飞翔</td>
+                        <td class="subcategory-desc">Bird Wings / Flapping</td>
+                        <td><div class="keywords"><span class="keyword-tag">翅膀</span><span class="keyword-tag">拍打</span><span class="keyword-tag">飞翔</span><span class="keyword-tag">扑腾</span></div></td>
+                    </tr>
+                    <tr data-keywords="鸟 其他 通用">
+                        <td><span class="catid">BRDMisc</span></td>
+                        <td class="subcategory-name">鸟类-其他</td>
+                        <td class="subcategory-desc">Bird Misc</td>
+                        <td><div class="keywords"><span class="keyword-tag">鸟叫</span><span class="keyword-tag">通用</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 生物/奇幻生物 -->
+        <section class="category-section" id="creatures">
+            <div class="category-header">
+                <div class="category-icon">🐉</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">CREATURES | 奇幻生物/怪兽</h2>
+                    <p class="category-desc">科幻、奇幻作品中的虚构生物音效</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="怪兽 怪物 怪兽叫 哥斯拉">
+                        <td><span class="catid">CREAMons</span></td>
+                        <td class="subcategory-name">怪兽/怪物</td>
+                        <td class="subcategory-desc">Monster</td>
+                        <td><div class="keywords"><span class="keyword-tag">怪兽</span><span class="keyword-tag">怪物</span><span class="keyword-tag">巨兽</span><span class="keyword-tag">哥斯拉</span></div></td>
+                    </tr>
+                    <tr data-keywords="龙 巨龙 飞龙 龙吼">
+                        <td><span class="catid">CREADrag</span></td>
+                        <td class="subcategory-name">龙</td>
+                        <td class="subcategory-desc">Dragon</td>
+                        <td><div class="keywords"><span class="keyword-tag">龙</span><span class="keyword-tag">巨龙</span><span class="keyword-tag">飞龙</span><span class="keyword-tag">龙吼</span><span class="keyword-tag">喷火</span></div></td>
+                    </tr>
+                    <tr data-keywords="外星人 ET 外星生物">
+                        <td><span class="catid">CREAAlien</span></td>
+                        <td class="subcategory-name">外星人</td>
+                        <td class="subcategory-desc">Alien / ET</td>
+                        <td><div class="keywords"><span class="keyword-tag">外星人</span><span class="keyword-tag">ET</span><span class="keyword-tag">异形</span></div></td>
+                    </tr>
+                    <tr data-keywords="僵尸 丧尸 不死">
+                        <td><span class="catid">CREAZomb</span></td>
+                        <td class="subcategory-name">僵尸/丧尸</td>
+                        <td class="subcategory-desc">Zombie / Undead</td>
+                        <td><div class="keywords"><span class="keyword-tag">僵尸</span><span class="keyword-tag">丧尸</span><span class="keyword-tag">低吼</span></div></td>
+                    </tr>
+                    <tr data-keywords="幽灵 鬼魂 鬼 灵异">
+                        <td><span class="catid">CREAGhost</span></td>
+                        <td class="subcategory-name">幽灵/鬼魂</td>
+                        <td class="subcategory-desc">Ghost / Spirit</td>
+                        <td><div class="keywords"><span class="keyword-tag">幽灵</span><span class="keyword-tag">鬼魂</span><span class="keyword-tag">鬼</span><span class="keyword-tag">灵异</span></div></td>
+                    </tr>
+                    <tr data-keywords="机器人 机械生命">
+                        <td><span class="catid">CREARobo</span></td>
+                        <td class="subcategory-name">机器人</td>
+                        <td class="subcategory-desc">Robot</td>
+                        <td><div class="keywords"><span class="keyword-tag">机器人</span><span class="keyword-tag">机械</span><span class="keyword-tag">电子</span></div></td>
+                    </tr>
+                    <tr data-keywords="生物 其他 通用">
+                        <td><span class="catid">CREAMisc</span></td>
+                        <td class="subcategory-name">生物-其他</td>
+                        <td class="subcategory-desc">Creature Misc</td>
+                        <td><div class="keywords"><span class="keyword-tag">生物</span><span class="keyword-tag">通用</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 破坏/毁坏 -->
+        <section class="category-section" id="destruction">
+            <div class="category-header">
+                <div class="category-icon">💥</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">DESTRUCTION | 破坏/毁坏</h2>
+                    <p class="category-desc">倒塌、破碎、断裂等破坏类音效</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="倒塌 坍塌 崩塌 建筑倒塌">
+                        <td><span class="catid">DESTColl</span></td>
+                        <td class="subcategory-name">倒塌/坍塌</td>
+                        <td class="subcategory-desc">Collapse / Falling</td>
+                        <td><div class="keywords"><span class="keyword-tag">倒塌</span><span class="keyword-tag">坍塌</span><span class="keyword-tag">崩塌</span><span class="keyword-tag">建筑</span></div></td>
+                    </tr>
+                    <tr data-keywords="破碎 摔碎 破裂 碎片">
+                        <td><span class="catid">DESTShat</span></td>
+                        <td class="subcategory-name">破碎/摔碎</td>
+                        <td class="subcategory-desc">Shatter / Break</td>
+                        <td><div class="keywords"><span class="keyword-tag">破碎</span><span class="keyword-tag">摔碎</span><span class="keyword-tag">碎片</span><span class="keyword-tag">玻璃碎</span></div></td>
+                    </tr>
+                    <tr data-keywords="断裂 折断 断裂声 咔嚓">
+                        <td><span class="catid">DESTSnap</span></td>
+                        <td class="subcategory-name">断裂/折断</td>
+                        <td class="subcategory-desc">Snap / Break</td>
+                        <td><div class="keywords"><span class="keyword-tag">断裂</span><span class="keyword-tag">折断</span><span class="keyword-tag">咔嚓</span><span class="keyword-tag">木材</span></div></td>
+                    </tr>
+                    <tr data-keywords="碎片 碎屑 瓦砾">
+                        <td><span class="catid">DEBRIS</span></td>
+                        <td class="subcategory-name">碎片/瓦砾</td>
+                        <td class="subcategory-desc">Debris / Rubble</td>
+                        <td><div class="keywords"><span class="keyword-tag">碎片</span><span class="keyword-tag">瓦砾</span><span class="keyword-tag">掉落</span></div></td>
+                    </tr>
+                    <tr data-keywords="压碎 压扁 挤压 碾压">
+                        <td><span class="catid">DESTCrsh</span></td>
+                        <td class="subcategory-name">压碎/压扁</td>
+                        <td class="subcategory-desc">Crush / Squash</td>
+                        <td><div class="keywords"><span class="keyword-tag">压碎</span><span class="keyword-tag">碾压</span><span class="keyword-tag">挤压</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 门 -->
+        <section class="category-section" id="doors">
+            <div class="category-header">
+                <div class="category-icon">🚪</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">DOORS | 门</h2>
+                    <p class="category-desc">各类门的开关、撞击、嘎吱声</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="木门 木门的 实木门">
+                        <td><span class="catid">DOORWood</span></td>
+                        <td class="subcategory-name">木门</td>
+                        <td class="subcategory-desc">Wood Door</td>
+                        <td><div class="keywords"><span class="keyword-tag">木门</span><span class="keyword-tag">开关</span><span class="keyword-tag">嘎吱</span></div></td>
+                    </tr>
+                    <tr data-keywords="金属门 铁门 钢门">
+                        <td><span class="catid">DOORMetl</span></td>
+                        <td class="subcategory-name">金属门</td>
+                        <td class="subcategory-desc">Metal Door</td>
+                        <td><div class="keywords"><span class="keyword-tag">铁门</span><span class="keyword-tag">钢门</span><span class="keyword-tag">金属</span></div></td>
+                    </tr>
+                    <tr data-keywords="玻璃门 推拉门 自动门">
+                        <td><span class="catid">DOORGlas</span></td>
+                        <td class="subcategory-name">玻璃门</td>
+                        <td class="subcategory-desc">Glass Door</td>
+                        <td><div class="keywords"><span class="keyword-tag">玻璃门</span><span class="keyword-tag">推拉门</span><span class="keyword-tag">滑动</span></div></td>
+                    </tr>
+                    <tr data-keywords="车库门 卷帘门 卷闸门">
+                        <td><span class="catid">DOORGar</span></td>
+                        <td class="subcategory-name">车库门</td>
+                        <td class="subcategory-desc">Garage Door</td>
+                        <td><div class="keywords"><span class="keyword-tag">车库</span><span class="keyword-tag">卷帘门</span><span class="keyword-tag">卷闸</span></div></td>
+                    </tr>
+                    <tr data-keywords="门把手 门把手转动 门闩 锁">
+                        <td><span class="catid">DOORHand</span></td>
+                        <td class="subcategory-name">门把手/门锁</td>
+                        <td class="subcategory-desc">Door Handle / Lock</td>
+                        <td><div class="keywords"><span class="keyword-tag">把手</span><span class="keyword-tag">门锁</span><span class="keyword-tag">转动</span><span class="keyword-tag">门闩</span></div></td>
+                    </tr>
+                    <tr data-keywords="敲门 叩门 拍门">
+                        <td><span class="catid">DOORKnoc</span></td>
+                        <td class="subcategory-name">敲门</td>
+                        <td class="subcategory-desc">Knock / Rapping</td>
+                        <td><div class="keywords"><span class="keyword-tag">敲门</span><span class="keyword-tag">叩门</span><span class="keyword-tag">拍门</span></div></td>
+                    </tr>
+                    <tr data-keywords="门铃 门钟声 叮咚">
+                        <td><span class="catid">DOORBell</span></td>
+                        <td class="subcategory-name">门铃</td>
+                        <td class="subcategory-desc">Doorbell</td>
+                        <td><div class="keywords"><span class="keyword-tag">门铃</span><span class="keyword-tag">叮咚</span><span class="keyword-tag">钟声</span></div></td>
+                    </tr>
+                    <tr data-keywords="大门 城门 栅栏门">
+                        <td><span class="catid">DOORGate</span></td>
+                        <td class="subcategory-name">大门/城门</td>
+                        <td class="subcategory-desc">Gate</td>
+                        <td><div class="keywords"><span class="keyword-tag">大门</span><span class="keyword-tag">城门</span><span class="keyword-tag">栅栏</span></div></td>
+                    </tr>
+                    <tr data-keywords="门 其他 通用">
+                        <td><span class="catid">DOORMisc</span></td>
+                        <td class="subcategory-name">门-其他</td>
+                        <td class="subcategory-desc">Door Misc</td>
+                        <td><div class="keywords"><span class="keyword-tag">门</span><span class="keyword-tag">通用</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 电力/电子 -->
+        <section class="category-section" id="electricity">
+            <div class="category-header">
+                <div class="category-icon">⚡</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">ELECTRICITY | 电力/电子</h2>
+                    <p class="category-desc">电弧、电火花、静电、电流声</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="电火花 电弧 放电 电击">
+                        <td><span class="catid">ELECSprk</span></td>
+                        <td class="subcategory-name">电火花</td>
+                        <td class="subcategory-desc">Electric Spark / Arc</td>
+                        <td><div class="keywords"><span class="keyword-tag">电火花</span><span class="keyword-tag">电弧</span><span class="keyword-tag">放电</span><span class="keyword-tag">电击</span></div></td>
+                    </tr>
+                    <tr data-keywords="电击 触电 电击声 电流">
+                        <td><span class="catid">ELECShck</span></td>
+                        <td class="subcategory-name">电击</td>
+                        <td class="subcategory-desc">Electric Shock / Zap</td>
+                        <td><div class="keywords"><span class="keyword-tag">电击</span><span class="keyword-tag">触电</span><span class="keyword-tag">电流</span></div></td>
+                    </tr>
+                    <tr data-keywords="静电 静电放电 静电声">
+                        <td><span class="catid">ELECStat</span></td>
+                        <td class="subcategory-name">静电</td>
+                        <td class="subcategory-desc">Static Electricity</td>
+                        <td><div class="keywords"><span class="keyword-tag">静电</span><span class="keyword-tag">放电</span></div></td>
+                    </tr>
+                    <tr data-keywords="电流声 电流噪声 嗡嗡声">
+                        <td><span class="catid">ELECHum</span></td>
+                        <td class="subcategory-name">电流声/嗡嗡声</td>
+                        <td class="subcategory-desc">Electric Hum / Buzz</td>
+                        <td><div class="keywords"><span class="keyword-tag">电流</span><span class="keyword-tag">嗡嗡</span><span class="keyword-tag">噪声</span></div></td>
+                    </tr>
+                    <tr data-keywords="短路 电路故障 电火花">
+                        <td><span class="catid">ELECSht</span></td>
+                        <td class="subcategory-name">短路</td>
+                        <td class="subcategory-desc">Short Circuit</td>
+                        <td><div class="keywords"><span class="keyword-tag">短路</span><span class="keyword-tag">故障</span></div></td>
+                    </tr>
+                    <tr data-keywords="电力 其他 通用">
+                        <td><span class="catid">ELECMisc</span></td>
+                        <td class="subcategory-name">电力-其他</td>
+                        <td class="subcategory-desc">Electricity Misc</td>
+                        <td><div class="keywords"><span class="keyword-tag">电力</span><span class="keyword-tag">通用</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 爆炸 -->
+        <section class="category-section" id="explosions">
+            <div class="category-header">
+                <div class="category-icon">💣</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">EXPLOSIONS | 爆炸</h2>
+                    <p class="category-desc">各类爆炸音效，从小型到核爆</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="爆炸 大爆炸 剧烈爆炸">
+                        <td><span class="catid">EXPLHuge</span></td>
+                        <td class="subcategory-name">大型爆炸</td>
+                        <td class="subcategory-desc">Huge / Massive Explosion</td>
+                        <td><div class="keywords"><span class="keyword-tag">大爆炸</span><span class="keyword-tag">剧烈</span><span class="keyword-tag">核爆</span></div></td>
+                    </tr>
+                    <tr data-keywords="中型爆炸 普通爆炸 标准爆炸">
+                        <td><span class="catid">EXPLMed</span></td>
+                        <td class="subcategory-name">中型爆炸</td>
+                        <td class="subcategory-desc">Medium Explosion</td>
+                        <td><div class="keywords"><span class="keyword-tag">爆炸</span><span class="keyword-tag">标准</span><span class="keyword-tag">中等</span></div></td>
+                    </tr>
+                    <tr data-keywords="小型爆炸 小爆炸 轻微爆炸">
+                        <td><span class="catid">EXPLSmal</span></td>
+                        <td class="subcategory-name">小型爆炸</td>
+                        <td class="subcategory-desc">Small Explosion</td>
+                        <td><div class="keywords"><span class="keyword-tag">小爆炸</span><span class="keyword-tag">轻微</span></div></td>
+                    </tr>
+                    <tr data-keywords="连环爆炸 多重爆炸 连续">
+                        <td><span class="catid">EXPLSeq</span></td>
+                        <td class="subcategory-name">连环爆炸</td>
+                        <td class="subcategory-desc">Sequential / Series</td>
+                        <td><div class="keywords"><span class="keyword-tag">连环</span><span class="keyword-tag">连续</span><span class="keyword-tag">多重</span></div></td>
+                    </tr>
+                    <tr data-keywords="地下爆炸 闷闷的 闷响">
+                        <td><span class="catid">EXPLUndr</span></td>
+                        <td class="subcategory-name">地下/闷爆</td>
+                        <td class="subcategory-desc">Underground / Muffled</td>
+                        <td><div class="keywords"><span class="keyword-tag">地下</span><span class="keyword-tag">闷响</span><span class="keyword-tag">闷闷的</span></div></td>
+                    </tr>
+                    <tr data-keywords="爆炸碎片 弹片 飞散">
+                        <td><span class="catid">EXPLDebr</span></td>
+                        <td class="subcategory-name">爆炸碎片</td>
+                        <td class="subcategory-desc">Explosion Debris</td>
+                        <td><div class="keywords"><span class="keyword-tag">碎片</span><span class="keyword-tag">弹片</span><span class="keyword-tag">飞散</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 枪械 -->
+        <section class="category-section" id="guns">
+            <div class="category-header">
+                <div class="category-icon">🔫</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">GUNS | 枪械</h2>
+                    <p class="category-desc">各类枪械的射击、装填、操作音效</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="手枪 手枪射击 手枪上膛">
+                        <td><span class="catid">GUNHand</span></td>
+                        <td class="subcategory-name">手枪</td>
+                        <td class="subcategory-desc">Handgun / Pistol</td>
+                        <td><div class="keywords"><span class="keyword-tag">手枪</span><span class="keyword-tag">射击</span><span class="keyword-tag">上膛</span><span class="keyword-tag">格洛克</span></div></td>
+                    </tr>
+                    <tr data-keywords="步枪 步枪射击 栓动步枪">
+                        <td><span class="catid">GUNRifl</span></td>
+                        <td class="subcategory-name">步枪</td>
+                        <td class="subcategory-desc">Rifle</td>
+                        <td><div class="keywords"><span class="keyword-tag">步枪</span><span class="keyword-tag">栓动</span><span class="keyword-tag">射击</span></div></td>
+                    </tr>
+                    <tr data-keywords="突击步枪 自动步枪 AK M4">
+                        <td><span class="catid">GUNAuto</span></td>
+                        <td class="subcategory-name">自动/突击步枪</td>
+                        <td class="subcategory-desc">Automatic / Assault Rifle</td>
+                        <td><div class="keywords"><span class="keyword-tag">AK47</span><span class="keyword-tag">M4</span><span class="keyword-tag">突击</span><span class="keyword-tag">全自动</span></div></td>
+                    </tr>
+                    <tr data-keywords="冲锋枪 机枪 SMG">
+                        <td><span class="catid">GUNSMG</span></td>
+                        <td class="subcategory-name">冲锋枪/SMG</td>
+                        <td class="subcategory-desc">Submachine Gun / SMG</td>
+                        <td><div class="keywords"><span class="keyword-tag">冲锋枪</span><span class="keyword-tag">MP5</span><span class="keyword-tag">乌兹</span></div></td>
+                    </tr>
+                    <tr data-keywords="机枪 重机枪 机关枪">
+                        <td><span class="catid">GUNMach</span></td>
+                        <td class="subcategory-name">机枪</td>
+                        <td class="subcategory-desc">Machine Gun</td>
+                        <td><div class="keywords"><span class="keyword-tag">机枪</span><span class="keyword-tag">重机枪</span><span class="keyword-tag">M249</span></div></td>
+                    </tr>
+                    <tr data-keywords="霰弹枪 猎枪 散弹枪">
+                        <td><span class="catid">GUNShot</span></td>
+                        <td class="subcategory-name">霰弹枪</td>
+                        <td class="subcategory-desc">Shotgun</td>
+                        <td><div class="keywords"><span class="keyword-tag">霰弹</span><span class="keyword-tag">猎枪</span><span class="keyword-tag">泵动</span></div></td>
+                    </tr>
+                    <tr data-keywords="狙击枪 狙击步枪 大口径">
+                        <td><span class="catid">GUNSnip</span></td>
+                        <td class="subcategory-name">狙击枪</td>
+                        <td class="subcategory-desc">Sniper Rifle</td>
+                        <td><div class="keywords"><span class="keyword-tag">狙击</span><span class="keyword-tag">AWP</span><span class="keyword-tag">大口径</span></div></td>
+                    </tr>
+                    <tr data-keywords="火炮 大炮 榴弹炮">
+                        <td><span class="catid">GUNCann</span></td>
+                        <td class="subcategory-name">火炮/大炮</td>
+                        <td class="subcategory-desc">Cannon / Artillery</td>
+                        <td><div class="keywords"><span class="keyword-tag">火炮</span><span class="keyword-tag">大炮</span><span class="keyword-tag">榴弹</span></div></td>
+                    </tr>
+                    <tr data-keywords="子弹 弹壳 上膛 换弹">
+                        <td><span class="catid">GUNMech</span></td>
+                        <td class="subcategory-name">枪械机械</td>
+                        <td class="subcategory-desc">Gun Mechanism</td>
+                        <td><div class="keywords"><span class="keyword-tag">上膛</span><span class="keyword-tag">换弹</span><span class="keyword-tag">弹壳</span><span class="keyword-tag">拉栓</span></div></td>
+                    </tr>
+                    <tr data-keywords="子弹飞过 子弹呼啸 破空">
+                        <td><span class="catid">GUNBy</span></td>
+                        <td class="subcategory-name">子弹飞过</td>
+                        <td class="subcategory-desc">Bullet Flyby / Whiz</td>
+                        <td><div class="keywords"><span class="keyword-tag">飞过</span><span class="keyword-tag">呼啸</span><span class="keyword-tag">破空</span></div></td>
+                    </tr>
+                    <tr data-keywords="子弹击中 弹着 命中">
+                        <td><span class="catid">GUNImpt</span></td>
+                        <td class="subcategory-name">子弹击中</td>
+                        <td class="subcategory-desc">Bullet Impact</td>
+                        <td><div class="keywords"><span class="keyword-tag">击中</span><span class="keyword-tag">命中</span><span class="keyword-tag">弹着</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 人类 -->
+        <section class="category-section" id="human">
+            <div class="category-header">
+                <div class="category-icon">👤</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">HUMAN | 人类</h2>
+                    <p class="category-desc">人声、身体动作、生理声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="人声 说话 语音">
+                        <td><span class="catid">VOX\u003c/span></td>
+                        <td class="subcategory-name">人声/语音</td>
+                        <td class="subcategory-desc">Voice / Vocal</td>
+                        <td><div class="keywords"><span class="keyword-tag">说话</span><span class="keyword-tag">语音</span><span class="keyword-tag">人声</span></div></td>
+                    </tr>
+                    <tr data-keywords="尖叫 惨叫 大喊">
+                        <td><span class="catid">VOXScrm</span></td>
+                        <td class="subcategory-name">尖叫</td>
+                        <td class="subcategory-desc">Scream</td>
+                        <td><div class="keywords"><span class="keyword-tag">尖叫</span><span class="keyword-tag">惨叫</span><span class="keyword-tag">大喊</span></div></td>
+                    </tr>
+                    <tr data-keywords="笑声 笑 咯咯笑">
+                        <td><span class="catid">VOXLaugh</span></td>
+                        <td class="subcategory-name">笑声</td>
+                        <td class="subcategory-desc">Laugh / Laughter</td>
+                        <td><div class="keywords"><span class="keyword-tag">笑</span><span class="keyword-tag">笑声</span><span class="keyword-tag">咯咯</span></div></td>
+                    </tr>
+                    <tr data-keywords="哭声 哭泣 呜咽">
+                        <td><span class="catid">VOXCry</span></td>
+                        <td class="subcategory-name">哭声</td>
+                        <td class="subcategory-desc">Cry / Weeping</td>
+                        <td><div class="keywords"><span class="keyword-tag">哭</span><span class="keyword-tag">哭泣</span><span class="keyword-tag">呜咽</span></div></td>
+                    </tr>
+                    <tr data-keywords="咳嗽 咳 清嗓子">
+                        <td><span class="catid">HMNCoigh</span></td>
+                        <td class="subcategory-name">咳嗽</td>
+                        <td class="subcategory-desc">Cough</td>
+                        <td><div class="keywords"><span class="keyword-tag">咳嗽</span><span class="keyword-tag">清嗓</span></div></td>
+                    </tr>
+                    <tr data-keywords="打喷嚏 喷嚏 阿嚏">
+                        <td><span class="catid">HMNSneeze</span></td>
+                        <td class="subcategory-name">打喷嚏</td>
+                        <td class="subcategory-desc">Sneeze</td>
+                        <td><div class="keywords"><span class="keyword-tag">喷嚏</span><span class="keyword-tag">阿嚏</span></div></td>
+                    </tr>
+                    <tr data-keywords="呼吸 喘气 呼吸声">
+                        <td><span class="catid">HMNBrth</span></td>
+                        <td class="subcategory-name">呼吸</td>
+                        <td class="subcategory-desc">Breath / Breathing</td>
+                        <td><div class="keywords"><span class="keyword-tag">呼吸</span><span class="keyword-tag">喘气</span><span class="keyword-tag">气息</span></div></td>
+                    </tr>
+                    <tr data-keywords="心跳 心脏 脉搏">
+                        <td><span class="catid">HMNHrtbt</span></td>
+                        <td class="subcategory-name">心跳</td>
+                        <td class="subcategory-desc">Heartbeat</td>
+                        <td><div class="keywords"><span class="keyword-tag">心跳</span><span class="keyword-tag">心脏</span><span class="keyword-tag">脉搏</span></div></td>
+                    </tr>
+                    <tr data-keywords="打嗝 呃逆">
+                        <td><span class="catid">HMNHiccup</span></td>
+                        <td class="subcategory-name">打嗝</td>
+                        <td class="subcategory-desc">Hiccup / Burp</td>
+                        <td><div class="keywords"><span class="keyword-tag">打嗝</span><span class="keyword-tag">呃逆</span></div></td>
+                    </tr>
+                    <tr data-keywords="打鼾 打呼噜">
+                        <td><span class="catid">HMNSnore</span></td>
+                        <td class="subcategory-name">打鼾</td>
+                        <td class="subcategory-desc">Snore</td>
+                        <td><div class="keywords"><span class="keyword-tag">打鼾</span><span class="keyword-tag">呼噜</span></div></td>
+                    </tr>
+                    <tr data-keywords="亲吻 接吻 亲嘴">
+                        <td><span class="catid">HMNKiss</span></td>
+                        <td class="subcategory-name">亲吻</td>
+                        <td class="subcategory-desc">Kiss</td>
+                        <td><div class="keywords"><span class="keyword-tag">亲吻</span><span class="keyword-tag">接吻</span></div></td>
+                    </tr>
+                    <tr data-keywords="打斗 打架 搏击">
+                        <td><span class="catid">HMNFight</span></td>
+                        <td class="subcategory-name">打斗</td>
+                        <td class="subcategory-desc">Fight / Combat</td>
+                        <td><div class="keywords"><span class="keyword-tag">打斗</span><span class="keyword-tag">打架</span><span class="keyword-tag">搏击</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 脚步 -->
+        <section class="category-section" id="footsteps">
+            <div class="category-header">
+                <div class="category-icon">👣</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">FOOTSTEPS | 脚步声</h2>
+                    <p class="category-desc">不同材质和鞋类的脚步声</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="木地板 木头地板 木质">
+                        <td><span class="catid">FSTWood</span></td>
+                        <td class="subcategory-name">木地板</td>
+                        <td class="subcategory-desc">Wood Floor</td>
+                        <td><div class="keywords"><span class="keyword-tag">木地板</span><span class="keyword-tag">木头</span><span class="keyword-tag">木质</span></div></td>
+                    </tr>
+                    <tr data-keywords="混凝土地板 水泥地 水泥">
+                        <td><span class="catid">FSTConc</span></td>
+                        <td class="subcategory-name">混凝土地板</td>
+                        <td class="subcategory-desc">Concrete Floor</td>
+                        <td><div class="keywords"><span class="keyword-tag">水泥地</span><span class="keyword-tag">混凝土</span><span class="keyword-tag">水泥</span></div></td>
+                    </tr>
+                    <tr data-keywords="金属地板 钢板 铁地板">
+                        <td><span class="catid">FSTMetl</span></td>
+                        <td class="subcategory-name">金属地板</td>
+                        <td class="subcategory-desc">Metal Floor</td>
+                        <td><div class="keywords"><span class="keyword-tag">金属</span><span class="keyword-tag">钢板</span><span class="keyword-tag">铁</span></div></td>
+                    </tr>
+                    <tr data-keywords="草地 土地 泥地 泥">
+                        <td><span class="catid">FSTGras</span></td>
+                        <td class="subcategory-name">草地/泥地</td>
+                        <td class="subcategory-desc">Grass / Dirt</td>
+                        <td><div class="keywords"><span class="keyword-tag">草地</span><span class="keyword-tag">泥地</span><span class="keyword-tag">土地</span></div></td>
+                    </tr>
+                    <tr data-keywords="碎石 砂石 沙子">
+                        <td><span class="catid">FSTGrvl</span></td>
+                        <td class="subcategory-name">碎石/砂石</td>
+                        <td class="subcategory-desc">Gravel / Stone</td>
+                        <td><div class="keywords"><span class="keyword-tag">碎石</span><span class="keyword-tag">砂石</span><span class="keyword-tag">沙子</span></div></td>
+                    </tr>
+                    <tr data-keywords="楼梯 上楼 下楼">
+                        <td><span class="catid">FSTStair</span></td>
+                        <td class="subcategory-name">楼梯</td>
+                        <td class="subcategory-desc">Stairs</td>
+                        <td><div class="keywords"><span class="keyword-tag">楼梯</span><span class="keyword-tag">上楼</span><span class="keyword-tag">下楼</span></div></td>
+                    </tr>
+                    <tr data-keywords="雪 雪地 雪 footsteps snow">
+                        <td><span class="catid">FSTSnow</span></td>
+                        <td class="subcategory-name">雪地</td>
+                        <td class="subcategory-desc">Snow</td>
+                        <td><div class="keywords"><span class="keyword-tag">雪地</span><span class="keyword-tag">雪</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 机器 -->
+        <section class="category-section" id="machines">
+            <div class="category-header">
+                <div class="category-icon">⚙️</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">MACHINES | 机器</h2>
+                    <p class="category-desc">各类机械设备的运行声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="电梯 升降机 电梯门">
+                        <td><span class="catid">MACHElev</span></td>
+                        <td class="subcategory-name">电梯</td>
+                        <td class="subcategory-desc">Elevator / Lift</td>
+                        <td><div class="keywords"><span class="keyword-tag">电梯</span><span class="keyword-tag">升降机</span></div></td>
+                    </tr>
+                    <tr data-keywords="自动扶梯 扶梯 扶手电梯">
+                        <td><span class="catid">MACHEsc</span></td>
+                        <td class="subcategory-name">自动扶梯</td>
+                        <td class="subcategory-desc">Escalator</td>
+                        <td><div class="keywords"><span class="keyword-tag">扶梯</span><span class="keyword-tag">扶手电梯</span></div></td>
+                    </tr>
+                    <tr data-keywords="风扇 排气扇 换气扇">
+                        <td><span class="catid">MACHFan</span></td>
+                        <td class="subcategory-name">风扇</td>
+                        <td class="subcategory-desc">Fan / Ventilator</td>
+                        <td><div class="keywords"><span class="keyword-tag">风扇</span><span class="keyword-tag">排气</span><span class="keyword-tag">换气</span></div></td>
+                    </tr>
+                    <tr data-keywords="空调 中央空调 空调外机">
+                        <td><span class="catid">MACHAC</span></td>
+                        <td class="subcategory-name">空调</td>
+                        <td class="subcategory-desc">Air Conditioner</td>
+                        <td><div class="keywords"><span class="keyword-tag">空调</span><span class="keyword-tag">中央空调</span></div></td>
+                    </tr>
+                    <tr data-keywords="冰箱 冰柜 制冷">
+                        <td><span class="catid">MACHFrdg</span></td>
+                        <td class="subcategory-name">冰箱</td>
+                        <td class="subcategory-desc">Refrigerator / Fridge</td>
+                        <td><div class="keywords"><span class="keyword-tag">冰箱</span><span class="keyword-tag">冰柜</span></div></td>
+                    </tr>
+                    <tr data-keywords="洗衣机 滚筒 脱水">
+                        <td><span class="catid">MACHWash</span></td>
+                        <td class="subcategory-name">洗衣机</td>
+                        <td class="subcategory-desc">Washing Machine</td>
+                        <td><div class="keywords"><span class="keyword-tag">洗衣机</span><span class="keyword-tag">滚筒</span></div></td>
+                    </tr>
+                    <tr data-keywords="打印机 复印机 扫描仪">
+                        <td><span class="catid">MACHPrnt</span></td>
+                        <td class="subcategory-name">打印机/复印机</td>
+                        <td class="subcategory-desc">Printer / Copier</td>
+                        <td><div class="keywords"><span class="keyword-tag">打印</span><span class="keyword-tag">复印</span></div></td>
+                    </tr>
+                    <tr data-keywords="电脑 主机 硬盘">
+                        <td><span class="catid">MACHComp</span></td>
+                        <td class="subcategory-name">电脑/计算机</td>
+                        <td class="subcategory-desc">Computer</td>
+                        <td><div class="keywords"><span class="keyword-tag">电脑</span><span class="keyword-tag">主机</span><span class="keyword-tag">硬盘</span></div></td>
+                    </tr>
+                    <tr data-keywords="马达 电机 发动机">
+                        <td><span class="catid">MOTR\u003c/span></td>
+                        <td class="subcategory-name">马达/电机</td>
+                        <td class="subcategory-desc">Motor / Engine</td>
+                        <td><div class="keywords"><span class="keyword-tag">马达</span><span class="keyword-tag">电机</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 金属 -->
+        <section class="category-section" id="metal">
+            <div class="category-header">
+                <div class="category-icon">🔩</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">METAL | 金属</h2>
+                    <p class="category-desc">金属材质的各种声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead>
+                    <tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-keywords="金属撞击 金属碰撞 哐当">
+                        <td><span class="catid">METLImpt</span></td>
+                        <td class="subcategory-name">金属撞击</td>
+                        <td class="subcategory-desc">Metal Impact / Hit</td>
+                        <td><div class="keywords"><span class="keyword-tag">撞击</span><span class="keyword-tag">碰撞</span><span class="keyword-tag">哐当</span></div></td>
+                    </tr>
+                    <tr data-keywords="金属摩擦 金属刮擦 刺耳">
+                        <td><span class="catid">METLScra</span></td>
+                        <td class="subcategory-name">金属摩擦</td>
+                        <td class="subcategory-desc">Metal Scrape / Scratch</td>
+                        <td><div class="keywords"><span class="keyword-tag">摩擦</span><span class="keyword-tag">刮擦</span><span class="keyword-tag">刺耳</span></div></td>
+                    </tr>
+                    <tr data-keywords="金属吱嘎 金属门 生锈">
+                        <td><span class="catid">METLSque</span></td>
+                        <td class="subcategory-name">金属吱嘎</td>
+                        <td class="subcategory-desc">Metal Squeak / Creak</td>
+                        <td><div class="keywords"><span class="keyword-tag">吱嘎</span><span class="keyword-tag">生锈</span><span class="keyword-tag">门轴</span></div></td>
+                    </tr>
+                    <tr data-keywords="链条 铁链 锁链">
+                        <td><span class="catid">CHAIN\u003c/span></td>
+                        <td class="subcategory-name">链条</td>
+                        <td class="subcategory-desc">Chain</td>
+                        <td><div class="keywords"><span class="keyword-tag">链条</span><span class="keyword-tag">铁链</span><span class="keyword-tag">锁链</span></div></td>
+                    </tr>
+                    <tr data-keywords="金属掉落 叮当 掉落">
+                        <td><span class="catid">METLDrop</span></td>
+                        <td class="subcategory-name">金属掉落</td>
+                        <td class="subcategory-desc">Metal Drop / Fall</td>
+                        <td><div class="keywords"><span class="keyword-tag">掉落</span><span class="keyword-tag">叮当</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 车辆 -->
+        <section class="category-section" id="vehicles">
+            <div class="category-header">
+                <div class="category-icon">🚗</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">VEHICLES | 车辆</h2>
+                    <p class="category-desc">各类陆地交通工具</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead><tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr></thead>
+                <tbody>
+                    <tr data-keywords="轿车 小汽车 私家车"><td><span class="catid">VEHCars</span></td><td class="subcategory-name">轿车</td><td class="subcategory-desc">Car / Sedan</td><td><div class="keywords"><span class="keyword-tag">轿车</span><span class="keyword-tag">小汽车</span></div></td></tr>
+                    <tr data-keywords="卡车 货车 大卡车"><td><span class="catid">VEHTruck</span></td><td class="subcategory-name">卡车/货车</td><td class="subcategory-desc">Truck / Lorry</td><td><div class="keywords"><span class="keyword-tag">卡车</span><span class="keyword-tag">货车</span></div></td></tr�e
+                    <tr data-keywords="摩托车 机车 摩托"><td><span class="catid">VEHMoto</span></td><td class="subcategory-name">摩托车</td><td class="subcategory-desc">Motorcycle</td><td><div class="keywords"><span class="keyword-tag">摩托车</span><span class="keyword-tag">机车</span></div></td></tr>
+                    <tr data-keywords="公交车 巴士 公共汽车"><td><span class="catid">VEHBus</span></td><td class="subcategory-name">公交车</td><td class="subcategory-desc">Bus</td><td><div class="keywords"><span class="keyword-tag">公交</span><span class="keyword-tag">巴士</span></div></td></tr>
+                    <tr data-keywords="火车 列车 铁轨 高铁"><td><span class="catid">VEHRail</span></td><td class="subcategory-name">火车</td><td class="subcategory-desc">Train / Railway</td><td><div class="keywords"><span class="keyword-tag">火车</span><span class="keyword-tag">高铁</span><span class="keyword-tag">铁轨</span></div></td></tr>
+                    <tr data-keywords="自行车 单车 脚踏车"><td><span class="catid">VEHBike</span></td><td class="subcategory-name">自行车</td><td class="subcategory-desc">Bicycle</td><td><div class="keywords"><span class="keyword-tag">自行车</span><span class="keyword-tag">单车</span></div></td></tr>
+                    <tr data-keywords="船 轮船 引擎"><td><span class="catid">VEHBoat</span></td><td class="subcategory-name">船舶</td><td class="subcategory-desc">Boat / Ship</td><td><div class="keywords"><span class="keyword-tag">船</span><span class="keyword-tag">轮船</span></div></td></tr>
+                    <tr data-keywords="警车 救护车 消防车"><td><span class="catid">VEHSiren</span></td><td class="subcategory-name">警笛/应急车辆</td><td class="subcategory-desc">Siren / Emergency</td><td><div class="keywords"><span class="keyword-tag">警笛</span><span class="keyword-tag">警车</span><span class="keyword-tag">救护车</span></div></td></tr>
+                    <tr data-keywords="刹车 刹车声 制动"><td><span class="catid">VEHSKids</span></td><td class="subcategory-name">刹车</td><td class="subcategory-desc">Brake / Skid</td><td><div class="keywords"><span class="keyword-tag">刹车</span><span class="keyword-tag">制动</span></div></td></tr>
+                    <tr data-keywords="引擎 发动机 汽车引擎"><td><span class="catid">VEHEng</span></td><td class="subcategory-name">汽车引擎</td><td class="subcategory-desc">Car Engine</td><td><div class="keywords"><span class="keyword-tag">引擎</span><span class="keyword-tag">发动机</span></div></td></tr>
+                    <tr data-keywords="车门 后备箱 引擎盖"><td><span class="catid">VEHDoor</span></td><td class="subcategory-name">车门</td><td class="subcategory-desc">Car Door</td><td><div class="keywords"><span class="keyword-tag">车门</span><span class="keyword-tag">后备箱</span></div></td></tr�e
+                    <tr data-keywords="喇叭 车喇叭 鸣笛"><td><span class="catid">VEHHorn</span></td><td class="subcategory-name">车喇叭</td><td class="subcategory-desc">Car Horn</td><td><div class="keywords"><span class="keyword-tag">喇叭</span><span class="keyword-tag">鸣笛</span></div></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 水 -->
+        <section class="category-section" id="water">
+            <div class="category-header">
+                <div class="category-icon">💧</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">WATER | 水</h2>
+                    <p class="category-desc">各种水声和液体声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead><tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr></thead>
+                <tbody>
+                    <tr data-keywords="水滴 滴水 滴答"><td><span class="catid">WATRDrip</span></td><td class="subcategory-name">水滴</td><td class="subcategory-desc">Water Drip</td><td><div class="keywords"><span class="keyword-tag">滴水</span><span class="keyword-tag">滴答</span></div></td></tr>
+                    <tr data-keywords="流水 水流 溪 小河"><td><span class="catid">WATRFlow</span></td><td class="subcategory-name">流水</td><td class="subcategory-desc">Water Flow / Stream</td><td><div class="keywords"><span class="keyword-tag">流水</span><span class="keyword-tag">溪流</span></div></td></tr>
+                    <tr data-keywords="溅水 水花 飞溅"><td><span class="catid">WATRSpls</span></td><td class="subcategory-name">溅水</td><td class="subcategory-desc">Splash / Splatter</td><td><div class="keywords"><span class="keyword-tag">溅水</span><span class="keyword-tag">水花</span></div></td></tr>
+                    <tr data-keywords="波浪 海浪 波涛"><td><span class="catid">WATRWave</span></td><td class="subcategory-name">波浪</td><td class="subcategory-desc">Wave / Surf</td><td><div class="keywords"><span class="keyword-tag">波浪</span><span class="keyword-tag">海浪</span></div></td></tr>
+                    <tr data-keywords="水下 水下环境 潜水"><td><span class="catid">WATRUndr</span></td><td class="subcategory-name">水下</td><td class="subcategory-desc">Underwater</td><td><div class="keywords"><span class="keyword-tag">水下</span><span class="keyword-tag">潜水</span></div></td></tr>
+                    <tr data-keywords="气泡 冒泡 水中气泡"><td><span class="catid">WATRBubl</span></td><td class="subcategory-name">气泡</td><td class="subcategory-desc">Bubble</td><td><div class="keywords"><span class="keyword-tag">气泡</span><span class="keyword-tag">冒泡</span></div></td></tr>
+                    <tr data-keywords="游泳 划水 戏水"><td><span class="catid">WATRSwim</span></td><td class="subcategory-name">游泳</td><td class="subcategory-desc">Swimming</td><td><div class="keywords"><span class="keyword-tag">游泳</span><span class="keyword-tag">划水</span></div></td></tr>
+                    <tr data-keywords="瀑布 水坝 倾泻"><td><span class="catid">WATRFall</span></td><td class="subcategory-name">瀑布</td><td class="subcategory-desc">Waterfall</td><td><div class="keywords"><span class="keyword-tag">瀑布</span><span class="keyword-tag">水坝</span></div></td></tr>
+                    <tr data-keywords="淋浴 洗澡 喷头"><td><span class="catid">WATRShwr</span></td><td class="subcategory-name">淋浴</td><td class="subcategory-desc">Shower</td><td><div class="keywords"><span class="keyword-tag">淋浴</span><span class="keyword-tag">洗澡</span></div></td></tr>
+                    <tr data-keywords="马桶 冲水 厕所"><td><span class="catid">WATRToil</span></td><td class="subcategory-name">马桶/冲水</td><td class="subcategory-desc">Toilet / Flush</td><td><div class="keywords"><span class="keyword-tag">马桶</span><span class="keyword-tag">冲水</span></div></td></tr�e
+                    <tr data-keywords="开水 倒水 水壶"><td><span class="catid">WATRPour</span></td><td class="subcategory-name">倒水/倾倒</td><td class="subcategory-desc">Pour</td><td><div class="keywords"><span class="keyword-tag">倒水</span><span class="keyword-tag">倾倒</span></div></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 天气 -->
+        <section class="category-section" id="weather">
+            <div class="category-header">
+                <div class="category-icon">🌤️</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">WEATHER | 天气</h2>
+                    <p class="category-desc">自然天气现象的声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead><tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr></thead>
+                <tbody>
+                    <tr data-keywords="雷声 打雷 雷鸣"><td><span class="catid">WEATHThnd</span></td><td class="subcategory-name">雷声</td><td class="subcategory-desc">Thunder</td><td><div class="keywords"><span class="keyword-tag">打雷</span><span class="keyword-tag">雷鸣</span></div></td></tr>
+                    <tr data-keywords="雨 下雨 雨滴"><td><span class="catid">WEATHRain</span></td><td class="subcategory-name">雨</td><td class="subcategory-desc">Rain</td><td><div class="keywords"><span class="keyword-tag">下雨</span><span class="keyword-tag">雨滴</span><span class="keyword-tag">大雨</span><span class="keyword-tag">小雨</span></div></td></tr>
+                    <tr data-keywords="风 风声 刮风"><td><span class="catid">WEATHWind</span></td><td class="subcategory-name">风</td><td class="subcategory-desc">Wind</td><td><div class="keywords"><span class="keyword-tag">风声</span><span class="keyword-tag">刮风</span></div></td></tr�e
+                    <tr data-keywords="暴风 狂风 风暴"><td><span class="catid">WEATHStor</span></td><td class="subcategory-name">暴风雨</td><td class="subcategory-desc">Storm / Gale</td><td><div class="keywords"><span class="keyword-tag">暴风</span><span class="keyword-tag">狂风</span></div></td></tr>
+                    <tr data-keywords="冰雹 下冰雹"><td><span class="catid">WEATHHail</span></td><td class="subcategory-name">冰雹</td><td class="subcategory-desc">Hail</td><td><div class="keywords"><span class="keyword-tag">冰雹</span></div></td></tr�e
+                    <tr data-keywords="雪 下雪 雪花"><td><span class="catid">WEATHSnow</span></td><td class="subcategory-name">雪</td><td class="subcategory-desc">Snow</td><td><div class="keywords"><span class="keyword-tag">下雪</span><span class="keyword-tag">雪花</span></div></td></tr�3
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 武器 -->
+        <section class="category-section" id="weapons">
+            <div class="category-header">
+                <div class="category-icon">⚔️</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">WEAPONS | 武器（冷兵器）</h2>
+                    <p class="category-desc">刀剑、弓箭等冷兵器声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead><tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr></thead>
+                <tbody>
+                    <tr data-keywords="剑 刀剑 拔剑 挥剑"><td><span class="catid">WEAPSwd</span></td><td class="subcategory-name">剑</td><td class="subcategory-desc">Sword</td><td><div class="keywords"><span class="keyword-tag">剑</span><span class="keyword-tag">拔剑</span><span class="keyword-tag">挥剑</span></div></td></tr�3
+                    <tr data-keywords="刀 匕首 小刀"><td><span class="catid">WEAPKnif</span></td><td class="subcategory-name">刀/匕首</td><td class="subcategory-desc">Knife / Dagger</td><td><div class="keywords"><span class="keyword-tag">刀</span><span class="keyword-tag">匕首</span></div></td></tr�3
+                    <tr data-keywords="弓箭 射箭 弓"><td><span class="catid">WEAPBow</span></td><td class="subcategory-name">弓箭</td><td class="subcategory-desc">Bow / Arrow</td><td><div class="keywords"><span class="keyword-tag">弓箭</span><span class="keyword-tag">射箭</span></div></td></tr�3
+                    <tr data-keywords="斧 斧头 战斧"><td><span class="catid">WEAPAxe</span></td><td class="subcategory-name">斧</td><td class="subcategory-desc">Axe</td><td><div class="keywords"><span class="keyword-tag">斧头</span><span class="keyword-tag">战斧</span></div></td></tr�3
+                    <tr data-keywords="锤子 锤 战锤"><td><span class="catid">WEAPHamm</span></td><td class="subcategory-name">锤子</td><td class="subcategory-desc">Hammer / Mace</td><td><div class="keywords"><span class="keyword-tag">锤子</span><span class="keyword-tag">战锤</span></div></td></tr�3
+                    <tr data-keywords="盾牌 盾 格挡"><td><span class="catid">WEAPShld</span></td><td class="subcategory-name">盾牌</td><td class="subcategory-desc">Shield</td><td><div class="keywords"><span class="keyword-tag">盾牌</span><span class="keyword-tag">格挡</span></div></td></tr�3
+                    <tr data-keywords="鞭子 鞭 皮鞭"><td><span class="catid">WEAPWhip</span></td><td class="subcategory-name">鞭子</td><td class="subcategory-desc">Whip</td><td><div class="keywords"><span class="keyword-tag">鞭子</span><span class="keyword-tag">皮鞭</span></div></td></tr�3
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 木头 -->
+        <section class="category-section" id="wood">
+            <div class="category-header">
+                <div class="category-icon">🪵</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">WOOD | 木头</h2>
+                    <p class="category-desc">木质材料的各种声音</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead><tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr></thead>
+                <tbody>
+                    <tr data-keywords="木头撞击 木槌 敲击"><td><span class="catid">WOODImpt</span></td><td class="subcategory-name">木头撞击</td><td class="subcategory-desc">Wood Impact / Hit</td><td><div class="keywords"><span class="keyword-tag">敲击</span><span class="keyword-tag">撞击</span></div></td></tr�3
+                    <tr data-keywords="木头断裂 折断 劈柴"><td><span class="catid">WOODSnap</span></td><td class="subcategory-name">木头断裂</td><td class="subcategory-desc">Wood Snap / Break</td><td><div class="keywords"><span class="keyword-tag">断裂</span><span class="keyword-tag">劈柴</span></div></td></tr�3
+                    <tr data-keywords="木头摩擦 摩擦 刮擦"><td><span class="catid">WOODScra</span></td><td class="subcategory-name">木头摩擦</td><td class="subcategory-desc">Wood Scrape</td><td><div class="keywords"><span class="keyword-tag">摩擦</span><span class="keyword-tag">刮擦</span></div></td></tr�3
+                    <tr data-keywords="木头嘎吱 地板 门轴"><td><span class="catid">WOODCrk</span></td><td class="subcategory-name">木头嘎吱</td><td class="subcategory-desc">Wood Creak</td><td><div class="keywords"><span class="keyword-tag">嘎吱</span><span class="keyword-tag">地板响</span></div></td></tr�3
+                    <tr data-keywords="木头掉落 掉落"><td><span class="catid">WOODDrop</span></td><td class="subcategory-name">木头掉落</td><td class="subcategory-desc">Wood Drop</td><td><div class="keywords"><span class="keyword-tag">掉落</span></div></td></tr�3
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 拟音 -->
+        <section class="category-section" id="foley">
+            <div class="category-header">
+                <div class="category-icon">🎬</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">FOLEY | 拟音</h2>
+                    <p class="category-desc">影视后期人工配制的动作音效</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead><tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr></thead>
+                <tbody>
+                    <tr data-keywords="布料 衣服 布料摩擦"><td><span class="catid">FOLCloth</span></td><td class="subcategory-name">布料/衣服</td><td class="subcategory-desc">Cloth / Fabric</td><td><div class="keywords"><span class="keyword-tag">布料</span><span class="keyword-tag">衣服</span><span class="keyword-tag">摩擦</span></div></td></tr�3
+                    <tr data-keywords="皮革 皮包 皮夹克"><td><span class="catid">FOLLeath</span></td><td class="subcategory-name">皮革</td><td class="subcategory-desc">Leather</td><td><div class="keywords"><span class="keyword-tag">皮革</span><span class="keyword-tag">皮包</span></div></td></tr�3
+                    <tr data-keywords="纸张 纸 翻书"><td><span class="catid">FOLPaper</span></td><td class="subcategory-name">纸张</td><td class="subcategory-desc">Paper</td><td><div class="keywords"><span class="keyword-tag">纸</span><span class="keyword-tag">翻书</span></div></td></tr�3
+                    <tr data-keywords="塑料 塑料袋 塑料膜"><td><span class="catid">FOLPlas</span></td><td class="subcategory-name">塑料</td><td class="subcategory-desc">Plastic</td><td><div class="keywords"><span class="keyword-tag">塑料</span><span class="keyword-tag">塑料袋</span></div></td></tr�3
+                    <tr data-keywords="道具 一般道具"><td><span class="catid">FOLProp</span></td><td class="subcategory-name">道具</td><td class="subcategory-desc">Prop Handling</td><td><div class="keywords"><span class="keyword-tag">道具</span><span class="keyword-tag">物品</span></div></td></tr�3
+                </tbody>
+            </table>
+        </section>
+
+        <!-- UI音效 -->
+        <section class="category-section" id="ui">
+            <div class="category-header">
+                <div class="category-icon">📱</div>
+                <div class="category-title-wrap">
+                    <h2 class="category-title">UI / INTERFACE | 界面音效</h2>
+                    <p class="category-desc">游戏和应用的用户界面音效</p>
+                </div>
+            </div>
+            <table class="subcategory-table">
+                <thead><tr><th width="120">CatID</th><th width="180">中文名称</th><th width="280">英文名称</th><th>描述/关键词</th></tr></thead>
+                <tbody>
+                    <tr data-keywords="点击 按钮 确认"><td><span class="catid">UIClick</span></td><td class="subcategory-name">点击/确认</td><td class="subcategory-desc">Click / Confirm</td><td><div class="keywords"><span class="keyword-tag">点击</span><span class="keyword-tag">按钮</span><span class="keyword-tag">确认</span></div></td></tr�3
+                    <tr data-keywords="悬停 滑过 经过"><td><span class="catid">UIHover</span></td><td class="subcategory-name">悬停</td><td class="subcategory-desc">Hover / Rollover</td><td><div class="keywords"><span class="keyword-tag">悬停</span><span class="keyword-tag">滑过</span></div></td></tr�3
+                    <tr data-keywords="取消 返回 关闭"><td><span class="catid">UIBack</span></td><td class="subcategory-name">取消/返回</td><td class="subcategory-desc">Cancel / Back</td><td><div class="keywords"><span class="keyword-tag">取消</span><span class="keyword-tag">返回</span><span class="keyword-tag">关闭</span></div></td></tr�3
+                    <tr data-keywords="提示音 通知 提醒"><td><span class="catid">UINoti</span></td><td class="subcategory-name">提示/通知</td><td class="subcategory-desc">Notification</td><td><div class="keywords"><span class="keyword-tag">提示</span><span class="keyword-tag">通知</span></div></td></tr�3
+                    <tr data-keywords="错误 警告 失败"><td><span class="catid">UIError</span></td><td class="subcategory-name">错误/失败</td><td class="subcategory-desc">Error / Fail</td><td><div class="keywords"><span class="keyword-tag">错误</span><span class="keyword-tag">失败</span></div></td></tr�3
+                    <tr data-keywords="成功 完成 达成"><td><span class="catid">UISucc</span></td><td class="subcategory-name">成功/完成</td><td class="subcategory-desc">Success / Complete</td><td><div class="keywords"><span class="keyword-tag">成功</span><span class="keyword-tag">完成</span></div></td></tr�3
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>⚡ 我的工作站 | 国际音效名词表 (UCS 8.2 标准)</p>
+        <p style="margin-top: 10px; font-size: 0.85rem;">基于 Universal Category System (UCS) 国际标准 | 共收录 25+ 大类，200+ 子类 | 最后更新：2026-03-17</p>
+    </footer>
+
+    <script>
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const allRows = document.querySelectorAll('.subcategory-table tbody tr');
+        const allSections = document.querySelectorAll('.category-section');
+
+        // 关键词映射
+        const keywordMap = {
+            '枪': 'GUN Rifle Pistol Shotgun',
+            '武器': 'GUN WEAPON Sword Knife',
+            '车': 'VEH Car Truck Motorcycle',
+            '车辆': 'VEH',
+            '动物': 'ANML Dog Cat',
+            '鸟': 'BRD Bird',
+            '水': 'WATR Water',
+            '火': 'Fire WEATH',
+            '爆炸': 'EXPL Explosion',
+            '金属': 'METL Metal',
+            '木头': 'WOOD',
+            '门': 'DOOR',
+            '警报': 'ALRM',
+            '机械': 'MACH',
+            '科幻': 'UI Laser Sci',
+            'UI': 'UIClick UIHover',
+        };
+
+        function search(query) {
+            if (!query.trim()) {
+                allRows.forEach(row => row.classList.remove('hidden'));
+                allSections.forEach(sec => sec.style.display = 'block');
+                resultsInfo.innerHTML = '';
+                return;
+            }
+
+            // 扩展查询
+            let expandedQuery = query.toLowerCase();
+            for (let [key, value] of Object.entries(keywordMap)) {
+                if (query.includes(key)) {
+                    expandedQuery += ' ' + value.toLowerCase();
+                }
+            }
+
+            const keywords = expandedQuery.split(/\s+/).filter(k => k.length > 0);
+            let matchCount = 0;
+            const matchedSections = new Set();
+
+            allRows.forEach(row => {
+                const rowKeywords = (row.dataset.keywords || '').toLowerCase();
+                const catId = row.querySelector('.catid')?.textContent.toLowerCase() || '';
+                const text = row.textContent.toLowerCase();
+                const content = rowKeywords + ' ' + catId + ' ' + text;
+
+                const isMatch = keywords.some(keyword => content.includes(keyword));
+
+                if (isMatch) {
+                    row.classList.remove('hidden');
+                    matchCount++;
+                    // 标记所属section
+                    const section = row.closest('.category-section');
+                    if (section) matchedSections.add(section);
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+
+            // 显示/隐藏section
+            allSections.forEach(sec => {
+                sec.style.display = matchedSections.has(sec) ? 'block' : 'none';
+            });
+
+            // 结果信息
+            if (matchCount === 0) {
+                resultsInfo.innerHTML = '没有找到相关音效，试试其他关键词 🤔';
+            } else {
+                resultsInfo.innerHTML = `找到 <span>${matchCount}</span> 个音效分类 ✨`;
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            search(e.target.value);
+        });
+
+        function quickSearch(term) {
+            searchInput.value = term;
+            search(term);
+            searchInput.focus();
+        }
+
+        // 导航高亮
+        const navLinks = document.querySelectorAll('.category-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                navLinks.forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+    </script>
+    
+    <footer style="text-align: center; padding: 20px; background: var(--bg-card); border-top: 1px solid var(--border); margin-top: 40px;">
+        <p data-version>⚡ 我的工作站 v2.6.0 | 🎵 国际音效名词表</p>
+    </footer>
+    <script src="../nav-config.js"></script>
+  <script src="../assets/js/music-global.js?v=2.8.9"></script>
+</body>
+</html>
