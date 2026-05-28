@@ -654,21 +654,36 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            gap: 3px;
-            height: 40px;
-            margin-top: 6px;
-            padding: 6px;
+            gap: 2px;
+            height: 60px;
+            margin-top: 8px;
+            padding: 4px 8px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .spectrum-bar {
-            width: 6px;
+            flex: 1;
+            max-width: 8px;
+            min-width: 3px;
             background: linear-gradient(to top, var(--primary), var(--secondary));
-            border-radius: 2px;
-            transition: height 0.05s ease;
-            opacity: 0.8;
+            border-radius: 3px 3px 1px 1px;
+            transition: height 0.08s ease-out;
+            opacity: 0.85;
+            box-shadow: 0 0 4px rgba(78, 205, 196, 0.3);
         }
+
+        .spectrum-bar:nth-child(1),
+        .spectrum-bar:nth-child(24) { opacity: 0.4; }
+        .spectrum-bar:nth-child(2),
+        .spectrum-bar:nth-child(23) { opacity: 0.5; }
+        .spectrum-bar:nth-child(3),
+        .spectrum-bar:nth-child(22) { opacity: 0.6; }
+        .spectrum-bar:nth-child(4),
+        .spectrum-bar:nth-child(21) { opacity: 0.7; }
+        .spectrum-bar:nth-child(5),
+        .spectrum-bar:nth-child(20) { opacity: 0.8; }
 
         /* 音符显示 */
         .notes-display {
@@ -1952,8 +1967,8 @@
                         <button id="btn-export-wav" class="btn" style="flex: 1; background: linear-gradient(135deg, #00d4aa, #00a8e8);">💾 导出 WAV</button>
                         <button id="btn-export-midi" class="btn" onclick="exportMIDI()" style="flex: 1; background: linear-gradient(135deg, #9b5de5, #ff6b6b);">🎹 导出 MIDI</button>
                         <select id="exportSampleRate" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 6px; font-size: 0.8rem;">
-                            <option value="44100">44.1kHz</option>
-                            <option value="48000" selected>48kHz</option>
+                            <option value="44100" selected>44.1kHz</option>
+                            <option value="48000">48kHz</option>
                             <option value="96000">96kHz</option>
                         </select>
                     </div>
@@ -4395,10 +4410,10 @@
         function createSpectrumBars() {
             const spectrum = document.getElementById('spectrum');
             spectrum.innerHTML = '';
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 24; i++) {
                 const bar = document.createElement('div');
                 bar.className = 'spectrum-bar';
-                bar.style.height = '5px';
+                bar.style.height = '4px';
                 spectrum.appendChild(bar);
             }
         }
@@ -5318,10 +5333,11 @@
 
             console.log(`[playNoteKey] instrument=${currentInstrument}, note=${playNote}, freq=${playFreq}, samplesLoaded=${samplesLoaded}`);
 
-            // 基础演奏力度 * 全局音量 * 用户调节
+            // 基础演奏力度 * 全局音量 * 用户调节 * 响度补偿
             const baseVelocity = 0.7;
             const userVolume = (noteVolumes[currentInstrument][playNote] !== undefined) ? noteVolumes[currentInstrument][playNote] : 1.0;
-            const finalVelocity = baseVelocity * params.masterVolume * userVolume;
+            const loudnessComp = getInstrumentLoudnessCompensation(targetInstrument);
+            const finalVelocity = baseVelocity * params.masterVolume * userVolume * loudnessComp;
 
             // 所有乐器统一走 playTone（内部已处理采样/合成逻辑和 loading 提示）
             playTone(playFreq, playNote, 500, finalVelocity);
@@ -6668,14 +6684,35 @@
             const osc = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
 
-            osc.type = 'triangle';
+            // 根据当前乐器选择波形
+            const waveforms = {
+                'guitar': 'sawtooth',
+                'xylophone': 'triangle',
+                'waterdrop': 'square',
+                'mouthtrumpet': 'square',
+                'kalimba': 'triangle',
+                'smallrobot': 'square',
+                'bigrobot': 'sawtooth',
+                'cuckoo': 'triangle',
+                'cowbell': 'square',
+                'nylon_guitar': 'triangle',
+                'wahguitar': 'sawtooth',
+                'synth': 'sawtooth',
+                'otamatone': 'square'
+            };
+            osc.type = waveforms[currentInstrument] || 'triangle';
             osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+
+            // 响度补偿：乐器补偿 × 波形补偿
+            const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
+            const waveformComp = getWaveformLoudnessCompensation(osc.type);
+            const finalVelocity = velocity * loudnessComp * waveformComp;
 
             const now = audioContext.currentTime;
             const attackTime = Math.max(0.001, (vs.attackMs + (attackMsOverride || 0)) / 1000);
             const releaseTime = Math.max(0.05, vs.releaseMs / 1000);
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(velocity * 0.3, now + attackTime);
+            gainNode.gain.linearRampToValueAtTime(finalVelocity, now + attackTime);
             gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration + releaseTime);
 
             // ===== 声音塑形：EQ 链 =====
@@ -6817,11 +6854,13 @@
                 const now = audioContext.currentTime;
 
                 // 设置增益包络 - 带淡出的平滑停止
-                gainNode.gain.setValueAtTime(velocity * params.masterVolume, now);
+                const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
+                const chordVol = velocity * params.masterVolume * loudnessComp;
+                gainNode.gain.setValueAtTime(chordVol, now);
 
                 // 如果不是完整播放，在结束前淡出
                 if (params.chordDuration < 1.0) {
-                    gainNode.gain.setValueAtTime(velocity * params.masterVolume, now + fadeStart);
+                    gainNode.gain.setValueAtTime(chordVol, now + fadeStart);
                     gainNode.gain.exponentialRampToValueAtTime(0.001, now + actualDuration);
                 }
 
@@ -8093,11 +8132,22 @@
             });
         }
 
-        // 更新频谱
+        // 更新频谱（对称频谱效果：中间高两边低 + 随机波动）
         function updateSpectrum() {
             const bars = document.querySelectorAll('.spectrum-bar');
-            bars.forEach(bar => {
-                const height = Math.random() * 50 + 5;
+            const barCount = bars.length;
+            const center = (barCount - 1) / 2;
+            const maxHeight = 56; // 容器 60px 减去 padding
+
+            bars.forEach((bar, i) => {
+                // 距离中心的距离（0 = 中心，1 = 边缘）
+                const distFromCenter = Math.abs(i - center) / center;
+                // 基础高度：中心高边缘低（抛物线分布）
+                const baseHeight = maxHeight * (1 - distFromCenter * distFromCenter);
+                // 随机波动（±20%）
+                const randomFactor = 0.8 + Math.random() * 0.4;
+                // 最小高度 4px
+                const height = Math.max(4, baseHeight * randomFactor);
                 bar.style.height = height + 'px';
             });
         }
@@ -8341,7 +8391,7 @@
                     exportBtn.textContent = '🎵 渲染中...';
                 }
 
-                const sampleRate = parseInt(document.getElementById('exportSampleRate')?.value || '48000', 10);
+                const sampleRate = parseInt(document.getElementById('exportSampleRate')?.value || '44100', 10);
                 const duration = calculateSongMidiDurationAtCurrentBPM(songMidi) + 1.0;
 
                 const offlineContext = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
@@ -9452,7 +9502,9 @@
                             const freq = freqMap[note.note];
                             if (freq) {
                                 const noteDur = (note.durationMs / finalPlaybackRate) / 1000;
-                                const noteVel = note.velocity * params.masterVolume * exprVelocity;
+                                const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
+                                const waveformComp = getWaveformLoudnessCompensation('triangle');
+                                const noteVel = note.velocity * params.masterVolume * exprVelocity * loudnessComp * waveformComp;
                                 // 使用合成音色渲染（不受采样加载状态影响）
                                 const oscillator = offlineContext.createOscillator();
                                 const noteGain = offlineContext.createGain();
@@ -9698,10 +9750,13 @@
 
             // ===== 增益计算：与 playSampleTone() 严格对齐 =====
             const sampleInfo = config.samples[sampleNote];
-            const baseGain = sampleInfo?.gain || 1.0;
+            // 音量计算：演奏力度 * 响度补偿（-18 LUFS 标准化）
+            const baseGain = 1.0; // 采样增益已统一归一化
+            const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
+            // 确保 velocity 是有效数字
             const safeVelocity = (typeof overrideVelocity === 'number' && isFinite(overrideVelocity))
                 ? overrideVelocity : (note.velocity || 0.5);
-            const finalVelocity = safeVelocity * baseGain;
+            const finalVelocity = safeVelocity * baseGain * loudnessComp;
             const maxGain = 3.0;
             const clampedVelocity = Math.min(finalVelocity, maxGain);
 
@@ -9814,9 +9869,11 @@
             oscillator.type = waveforms[currentInstrument] || 'sine';
             oscillator.frequency.value = note.frequency;
 
-            // 包络（与实时版本一致 + Voice Shaping + articulation attack offset）
+            // 包络（与实时版本一致 + Voice Shaping + articulation attack offset + 响度补偿）
             const baseVelocity = overrideVelocity !== undefined ? overrideVelocity : (note.velocity || 0.5);
-            const velocity = baseVelocity * params.masterVolume;
+            const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
+            const waveformComp = getWaveformLoudnessCompensation(oscillator.type);
+            const velocity = baseVelocity * params.masterVolume * loudnessComp * waveformComp;
             const vs = params.voiceShaping;
             const attack = Math.max(0.001, (vs.attackMs + (attackMsOverride || 0)) / 1000);
             const release = Math.max(0.05, vs.releaseMs / 1000);
