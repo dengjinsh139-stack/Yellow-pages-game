@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.37.9';
+        const APP_VERSION = 'v3.38.0';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -2096,7 +2096,7 @@
             tempoMin: 300,      // 最小间隔 (ms)
             tempoMax: 500,      // 最大间隔 (ms)
             tempoRandom: true,  // 是否启用随机间隔
-            masterVolume: 1.0,  // 全局音量 (0-2)
+            masterVolume: 100.0,  // 全局音量 (0-2)
             noteDuration: 400,  // 音符时长
             reverb: 0,        // 混响
             chordDuration: 1.0, // 和弦播放长度比例
@@ -2551,6 +2551,48 @@
             return id;
         }
 
+        // ==================== 响度标准化系统 ====================
+        // 目标: -18 LUFS 基准，切换乐器时感知响度一致
+        // 基于采样特性和波形 crest factor 的经验补偿值
+        const instrumentLoudnessCompensation = {
+            piano:        1.00,  // 基准参考
+            xylophone:    0.75,  // 木琴采样很亮/高频能量多
+            flute:        0.70,  // 长笛采样偏响
+            saxophone:    0.85,
+            synth:        0.95,  // 合成器采样
+            train:        0.95,  // 火车采样
+            guitar:       1.00,  // 虚拟人声
+            waterdrop:    0.85,  // 水滴采样
+            mouthtrumpet: 0.85,  // 嘴巴小号
+            kalimba:      0.85,  // 钢片琴
+            smallrobot:   0.85,  // Small机器人
+            bigrobot:     0.85,  // Big机器人
+            cuckoo:       0.85,  // 布谷鸟
+            cowbell:      0.85,  // 牛铃
+            wahguitar:    0.85,  // Wah吉他
+            nylon_guitar: 0.85,  // 尼龙吉他
+            otamatone:    0.85,  // 电音蝌蚪
+        };
+
+        // 合成器波形 crest factor 补偿（sawtooth/square 比 sine 响得多）
+        const waveformLoudnessCompensation = {
+            sine:      1.00,  // 基准
+            triangle:  0.63,  // -4.0dB 补偿
+            square:    0.63,  // -4.0dB 补偿
+            sawtooth:  0.40,  // -8.0dB 补偿
+        };
+
+        // 获取当前乐器的响度补偿值
+        function getInstrumentLoudnessCompensation(instrument) {
+            return instrumentLoudnessCompensation[instrument] || 1.0;
+        }
+
+        // 获取波形响度补偿值
+        function getWaveformLoudnessCompensation(waveform) {
+            return waveformLoudnessCompensation[waveform] || 1.0;
+        }
+        // ==================== 响度标准化 END ====================
+
         // ==================== 乐器注册表 END ====================
 
         const instrumentDefaults = {
@@ -2568,7 +2610,7 @@
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             },
             xylophone: {
-                masterVolume: 110,      // 全局音量: 110%
+                masterVolume: 100,      // 全局音量: 110%
                 audioOffset: 0,         // 音频偏移: 0ms
                 tempoMin: 100,          // 播放间隔最小: 100ms
                 tempoMax: 200,          // 播放间隔最大: 200ms
@@ -2581,7 +2623,7 @@
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             },
             flute: {
-                masterVolume: 120,      // 全局音量: 120%
+                masterVolume: 100,      // 全局音量: 120%
                 audioOffset: 90,        // 音频偏移: 90ms
                 tempoMin: 81,           // 播放间隔最小: 81ms
                 tempoMax: 218,          // 播放间隔最大: 218ms
@@ -2607,7 +2649,7 @@
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             },
             synth: {
-                masterVolume: 88,       // 全局音量: 88%
+                masterVolume: 100,       // 全局音量: 88%
                 audioOffset: 80,        // 音频偏移: 80ms
                 tempoMin: 14,           // 播放间隔最小: 14ms
                 tempoMax: 135,          // 播放间隔最大: 135ms
@@ -2620,7 +2662,7 @@
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             },
             train: {
-                masterVolume: 88,       // 全局音量: 88%
+                masterVolume: 100,       // 全局音量: 88%
                 audioOffset: 140,       // 音频偏移: 140ms
                 tempoMin: 81,           // 播放间隔最小: 81ms
                 tempoMax: 218,          // 播放间隔最大: 218ms
@@ -2888,16 +2930,16 @@
                 basePath: '../assets/audio/samples/xylophone/',
                 samples: {
                     // 木琴五声音阶采样 - 全部10个音符都有真实采样！
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.01,
                 release: 0.2,
@@ -2909,16 +2951,16 @@
                 basePath: '../assets/audio/samples/piano/',
                 samples: {
                     // 优化后的增益值，避免削波同时保持音量平衡
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.5 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.5 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.5 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.5 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.5 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.8 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.01,
                 release: 0.3
@@ -2929,16 +2971,16 @@
                 basePath: '../assets/audio/samples/saxophone/',
                 samples: {
                     // 萨克斯五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.05,
                 release: 0.5
@@ -2949,16 +2991,16 @@
                 basePath: '../assets/audio/samples/flute/',
                 samples: {
                     // 长笛五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.03,
                 release: 0.4
@@ -2969,16 +3011,16 @@
                 basePath: '../assets/audio/samples/synth/',
                 samples: {
                     // 合成器五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -2989,16 +3031,16 @@
                 basePath: '../assets/audio/samples/train/',
                 samples: {
                     // 火车五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3009,16 +3051,16 @@
                 basePath: '../assets/audio/samples/waterdrop/',
                 samples: {
                     // 水滴合成器五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.01,
                 release: 0.3
@@ -3029,16 +3071,16 @@
                 basePath: '../assets/audio/samples/mouthtrumpet/',
                 samples: {
                     // 嘴巴小号五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3049,16 +3091,16 @@
                 basePath: '../assets/audio/samples/kalimba/',
                 samples: {
                     // 钢片琴五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3069,16 +3111,16 @@
                 basePath: '../assets/audio/samples/smallrobot/',
                 samples: {
                     // Small机器人五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3089,16 +3131,16 @@
                 basePath: '../assets/audio/samples/bigrobot/',
                 samples: {
                     // Big机器人五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3109,16 +3151,16 @@
                 basePath: '../assets/audio/samples/vocal/',
                 samples: {
                     // 虚拟人声五声音阶采样 - 支持随机采样
-                    'D4': { files: ['D4_01.wav', 'D4_02.wav', 'D4_03.wav', 'D4_04.wav'], freq: 293.66, gain: 1.5, random: true },
-                    'E4': { files: ['E4_01.wav', 'E4_02.wav', 'E4_03.wav', 'E4_04.wav'], freq: 329.63, gain: 1.5, random: true },
-                    'F4': { files: ['F4_01.wav', 'F4_02.wav', 'F4_03.wav', 'F4_04.wav'], freq: 349.23, gain: 1.5, random: true },
-                    'A4': { files: ['A4_01.wav', 'A4_02.wav', 'A4_03.wav', 'A4_04.wav'], freq: 440.00, gain: 1.5, random: true },
-                    'B4': { files: ['B4_01.wav', 'B4_02.wav', 'B4_03.wav', 'B4_04.wav'], freq: 493.88, gain: 1.5, random: true },
-                    'D5': { files: ['D5_01.wav', 'D5_02.wav', 'D5_03.wav', 'D5_04.wav'], freq: 587.33, gain: 1.5, random: true },
-                    'E5': { files: ['E5_01.wav', 'E5_02.wav', 'E5_03.wav', 'E5_04.wav'], freq: 659.25, gain: 1.5, random: true },
-                    'F5': { files: ['F5_01.wav', 'F5_02.wav', 'F5_03.wav', 'F5_04.wav'], freq: 698.46, gain: 1.5, random: true },
-                    'A5': { files: ['A5_01.wav', 'A5_02.wav', 'A5_03.wav', 'A5_04.wav'], freq: 880.00, gain: 1.5, random: true },
-                    'B5': { files: ['B5_01.wav', 'B5_02.wav', 'B5_03.wav', 'B5_04.wav'], freq: 987.77, gain: 1.5, random: true }
+                    'D4': { files: ['D4_01.wav', 'D4_02.wav', 'D4_03.wav', 'D4_04.wav'], freq: 293.66, gain: 1.0, random: true },
+                    'E4': { files: ['E4_01.wav', 'E4_02.wav', 'E4_03.wav', 'E4_04.wav'], freq: 329.63, gain: 1.0, random: true },
+                    'F4': { files: ['F4_01.wav', 'F4_02.wav', 'F4_03.wav', 'F4_04.wav'], freq: 349.23, gain: 1.0, random: true },
+                    'A4': { files: ['A4_01.wav', 'A4_02.wav', 'A4_03.wav', 'A4_04.wav'], freq: 440.00, gain: 1.0, random: true },
+                    'B4': { files: ['B4_01.wav', 'B4_02.wav', 'B4_03.wav', 'B4_04.wav'], freq: 493.88, gain: 1.0, random: true },
+                    'D5': { files: ['D5_01.wav', 'D5_02.wav', 'D5_03.wav', 'D5_04.wav'], freq: 587.33, gain: 1.0, random: true },
+                    'E5': { files: ['E5_01.wav', 'E5_02.wav', 'E5_03.wav', 'E5_04.wav'], freq: 659.25, gain: 1.0, random: true },
+                    'F5': { files: ['F5_01.wav', 'F5_02.wav', 'F5_03.wav', 'F5_04.wav'], freq: 698.46, gain: 1.0, random: true },
+                    'A5': { files: ['A5_01.wav', 'A5_02.wav', 'A5_03.wav', 'A5_04.wav'], freq: 880.00, gain: 1.0, random: true },
+                    'B5': { files: ['B5_01.wav', 'B5_02.wav', 'B5_03.wav', 'B5_04.wav'], freq: 987.77, gain: 1.0, random: true }
                 },
                 attack: 0.02,
                 release: 0.3,
@@ -3130,16 +3172,16 @@
                 basePath: '../assets/audio/samples/cuckoo/',
                 samples: {
                     // 布谷鸟五声音阶采样
-                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.wav', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.wav', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.wav', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.wav', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.wav', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.wav', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.wav', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.wav', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.wav', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.wav', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.wav', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.wav', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3150,16 +3192,16 @@
                 basePath: '../assets/audio/samples/cowbell/',
                 samples: {
                     // 牛铃五声音阶采样
-                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.wav', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.wav', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.wav', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.wav', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.wav', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.wav', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.wav', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.wav', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.wav', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.wav', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.wav', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.wav', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3170,16 +3212,16 @@
                 basePath: '../assets/audio/samples/wahguitar/',
                 samples: {
                     // Wah吉他五声音阶采样
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -3189,16 +3231,16 @@
                 emoji: '🎸',
                 basePath: '../assets/audio/samples/nylon_guitar/',
                 samples: {
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.01,
                 release: 0.4
@@ -3208,16 +3250,16 @@
                 emoji: '🎶',
                 basePath: '../assets/audio/samples/otamatone/',
                 samples: {
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.8 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.8 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.8 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.8 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 2.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 2.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 2.2 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 2.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 2.2 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 2.0 }
+                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
+                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
+                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
+                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
+                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
+                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
+                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
+                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
+                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
+                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
                 },
                 attack: 0.02,
                 release: 0.3
@@ -5318,10 +5360,11 @@
 
             console.log(`[playNoteKey] instrument=${currentInstrument}, note=${playNote}, freq=${playFreq}, samplesLoaded=${samplesLoaded}`);
 
-            // 基础演奏力度 * 全局音量 * 用户调节
+            // 基础演奏力度 * 全局音量 * 用户调节 * 响度补偿
             const baseVelocity = 0.7;
             const userVolume = (noteVolumes[currentInstrument][playNote] !== undefined) ? noteVolumes[currentInstrument][playNote] : 1.0;
-            const finalVelocity = baseVelocity * params.masterVolume * userVolume;
+            const loudnessComp = getInstrumentLoudnessCompensation(targetInstrument);
+            const finalVelocity = baseVelocity * params.masterVolume * userVolume * loudnessComp;
 
             // 所有乐器统一走 playTone（内部已处理采样/合成逻辑和 loading 提示）
             playTone(playFreq, playNote, 500, finalVelocity);
@@ -9901,7 +9944,8 @@
             source.buffer = randomChord;
 
             const gainNode = offlineContext.createGain();
-            const vol = velocity * params.masterVolume;
+            const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
+            const vol = velocity * params.masterVolume * loudnessComp;
             gainNode.gain.setValueAtTime(vol, startTime);
 
             // 如果不是完整播放，应用淡出
