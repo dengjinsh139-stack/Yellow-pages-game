@@ -6555,13 +6555,14 @@
             const playbackRate = targetFrequency / nearestFreq;
             source.playbackRate.value = playbackRate;
 
-            // 音量计算：基础补偿 * 演奏力度
-            const baseGain = sampleInfo.gain || 1.0;
+            // 音量计算：演奏力度 * 响度补偿（-18 LUFS 标准化）
+            const baseGain = 1.0; // 采样增益已统一归一化
+            const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
             // 确保 velocity 是有效数字
             const safeVelocity = (typeof velocity === 'number' && isFinite(velocity)) ? velocity : 0.5;
-            const finalVelocity = safeVelocity * baseGain;
+            const finalVelocity = safeVelocity * baseGain * loudnessComp;
 
-            console.log(`Playing ${currentInstrument} ${targetNoteName}: sample=${sampleNote}, baseGain=${baseGain}, velocity=${velocity}, final=${finalVelocity}`);
+            console.log(`Playing ${currentInstrument} ${targetNoteName}: loudnessComp=${loudnessComp.toFixed(2)}, velocity=${velocity}, final=${finalVelocity.toFixed(3)}`);
 
             // 增益节点
             const gainNode = audioContext.createGain();

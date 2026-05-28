@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-27T02:15:30.984Z",
+  "updatedAt": "2026-05-28T02:52:42.131Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -694,6 +694,161 @@
         "play",
         "unlimited",
         "simultaneous"
+      ]
+    },
+    "memory:memory/2026-03-24.md:40:85": {
+      "key": "memory:memory/2026-03-24.md:40:85",
+      "path": "memory/2026-03-24.md",
+      "startLine": 40,
+      "endLine": 85,
+      "source": "memory",
+      "snippet": "- 网站显示 v2.5.8/2.4.9，但仓库已更新到 v2.5.9 - 多设备一致显示旧版本 → CDN 缓存问题 ### 解决方案 1. 回滚到 v2.5.7 (commit 36286f2) 2. 统一全站版本号到 v2.5.7 3. 触发强制重新部署 (`git commit --allow-empty`) ### 文件变更 - index.html, capabilities.html, finance.html, projects.html, nav-config.js ### 用户偏好 - 喜欢详细记录，要求每次操作带链接 - **硬性要求：每次反馈/回复必须带链接** (GitHub提交、网站等) - **必须附带的链接**：GitHub提交链接、网站链接、相关文件链接 - 偏好分步骤排查问题 - 需要 Feishu 文档记录版本历史 --- *自动记录 - 预压缩存储* --- ## QA 质量保障流程约定 **时间**: 18:28 **主题**: 建立 QA 检查流程作为标准操作 ### 用户要求 每次修改内容或新增内容，必须按照 QA 技能执行： 1. **影响评估** → 制定计划 2. **整体跑测** → 问题发现 3. **修复验证** → 回归测试 ### QA 检查清单 **修改全局配置时（如 nav-config.js）：** - [ ] 评估影响范围（哪些页面受影响） - [ ] 检查所有引用页面是否引入配置 - [ ] 测试所有相关页面链接 - [ ] 验证子页面导航正常工作 **修改版本号时：** - [ ]",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4577216118574142,
+      "maxScore": 0.4577216118574142,
+      "firstRecalledAt": "2026-05-28T02:52:42.131Z",
+      "lastRecalledAt": "2026-05-28T02:52:42.131Z",
+      "queryHashes": [
+        "5a99c5035a73"
+      ],
+      "recallDays": [
+        "2026-05-28"
+      ],
+      "conceptTags": [
+        "v2.5.8/2.4.9",
+        "v2.5.9",
+        "v2.5.7",
+        "allow-empty",
+        "index.html",
+        "capabilities.html",
+        "finance.html",
+        "projects.html"
+      ]
+    },
+    "memory:memory/2026-05-05.md:1:35": {
+      "key": "memory:memory/2026-05-05.md:1:35",
+      "path": "memory/2026-05-05.md",
+      "startLine": 1,
+      "endLine": 35,
+      "source": "memory",
+      "snippet": "# 2026-05-05 工作日志 ## 乐器语言合成器 QA 修复 ### v3.15.9 (2026-05-05 00:23) P0 修复 A/B 播放报错： - `testPlayText()` 返回 Promise (`return playText()`) - `playVoiceShapingSlot()` 改为 `async/await playText()` + `try/finally` - 保证播放结束后必定恢复原始参数 ### v3.15.8 (2026-05-05 00:10) 合并冲突导致版本号异常进位到 v3.15.8，nav-config.js 显示 v3.15.8 但实际 commit 标记为 v3.15.7。 ### v3.15.7 (2026-05-05 00:01) v3.15.6 QA 三项修复： 1. `calculateAudioDuration()` 改为时间线算法（currentTime + lastAudioEndTime），消除 double count 2. 清理 UI 重复区块：空间/Effects 和导出按钮各只保留一份 3. `testPlayText()` 返回 Promise（后续在 v3.15.9 中改为 async/await 方案） ## 待办 - [ ] 版本号管理混乱：需要统一 nav-config.js 和 git commit message 中的版本号 - [ ] GitHub Pages CDN 缓存仍然滞后（显示旧版本），需提醒用户等待或强制刷新 - [ ] 后续 QA：验证 A/B",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4250568747520447,
+      "maxScore": 0.4250568747520447,
+      "firstRecalledAt": "2026-05-28T02:52:42.131Z",
+      "lastRecalledAt": "2026-05-28T02:52:42.131Z",
+      "queryHashes": [
+        "5a99c5035a73"
+      ],
+      "recallDays": [
+        "2026-05-28"
+      ],
+      "conceptTags": [
+        "v3.15.9",
+        "a/b",
+        "async/await",
+        "try/finally",
+        "v3.15.8",
+        "nav-config.js",
+        "v3.15.7",
+        "v3.15.6"
+      ]
+    },
+    "memory:memory/2026-05-27.md:195:231": {
+      "key": "memory:memory/2026-05-27.md:195:231",
+      "path": "memory/2026-05-27.md",
+      "startLine": 195,
+      "endLine": 231,
+      "source": "memory",
+      "snippet": "JS 引擎解析 `<<<<<<< HEAD` 会报 SyntaxError，导致 `APP_VERSION` 变量未定义 页面标题回退到硬编码版本 `v3.36.13` **修复**: 1. 清理 nav-config.js 中的 merge conflict 标记 2. 将 `instrument-language-synth.html` 中的 `<script src=\"../nav-config.js?v=373\"></script>` 改为 `?v=376` 3. 建议用户用**无痕模式**或手动 URL 后加 `?v=376` 强制刷新 **版本号**: v3.37.4 → v3.37.5 **教训**: - GitHub Pages CDN 缓存非常顽固，query string cache bust 不保证有效 - 无痕/隐私模式是验证真实版本的可靠方式 - 推送后必须检查文件是否有 merge conflict（尤其是 `git pull` 后） --- ## 虚拟人声采样映射逻辑（三层架构） 给用户详细解释了虚拟人声（guitar）与其他乐器的映射差异。 ### 第1层：采样文件 → audioBuffers ```javascript sampleConfig.vocal = { basePath: '../assets/audio/samples/vocal/', samples: { 'D4': { files: ['D4_01.wav', 'D4_02.wav', 'D4_03.wav', 'D",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4212694257497787,
+      "maxScore": 0.4212694257497787,
+      "firstRecalledAt": "2026-05-28T02:52:42.131Z",
+      "lastRecalledAt": "2026-05-28T02:52:42.131Z",
+      "queryHashes": [
+        "5a99c5035a73"
+      ],
+      "recallDays": [
+        "2026-05-28"
+      ],
+      "conceptTags": [
+        "app-version",
+        "v3.36.13",
+        "nav-config.js",
+        "instrument-language-synth.html",
+        "v3.37.4",
+        "v3.37.5",
+        "无痕/隐私模式是验证真实版本的可靠方式",
+        "sampleconfig.vocal"
+      ]
+    },
+    "memory:memory/2026-04-10.md:258:283": {
+      "key": "memory:memory/2026-04-10.md:258:283",
+      "path": "memory/2026-04-10.md",
+      "startLine": 258,
+      "endLine": 283,
+      "source": "memory",
+      "snippet": "### 版本号格式 **v[MAJOR].[MINOR].[PATCH]** - MAJOR: 主版本号（重大更新） - MINOR: 次版本号（功能更新） - PATCH: 补丁版本号（bug修复） ### 进位规则 - **PATCH ≥ 40 时自动进位** - PATCH 重置为 0 - MINOR + 1 - 示例：v3.3.40 → v3.4.0 ### 同步机制 - **文件位置**: `nav-config.js` - **全局变量**: `const APP_VERSION = 'vX.X.X'` - **同步方式**: 所有页面引用 `nav-config.js`，通过 `APP_VERSION` 变量显示统一版本号 - **自动更新**: git pre-commit 钩子自动递增版本号 ### 更新记录 - v3.3.40 → v3.3.52: 音符音量优化、清晰度修复、情绪功能开发 - v3.3.52 → v3.4.0: 版本号进位（PATCH ≥ 40） - v3.4.0 → v3.4.5: 回滚到 v3.3.51 稳定版本 --- *Last updated: 2026-04-10 22:59*",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4156911730766296,
+      "maxScore": 0.4156911730766296,
+      "firstRecalledAt": "2026-05-28T02:52:42.131Z",
+      "lastRecalledAt": "2026-05-28T02:52:42.131Z",
+      "queryHashes": [
+        "5a99c5035a73"
+      ],
+      "recallDays": [
+        "2026-05-28"
+      ],
+      "conceptTags": [
+        "v3.3.40",
+        "v3.4.0",
+        "nav-config.js",
+        "app-version",
+        "vx.x.x",
+        "pre-commit",
+        "v3.3.52",
+        "v3.4.5"
+      ]
+    },
+    "memory:memory/2026-05-27.md:170:200": {
+      "key": "memory:memory/2026-05-27.md:170:200",
+      "path": "memory/2026-05-27.md",
+      "startLine": 170,
+      "endLine": 200,
+      "source": "memory",
+      "snippet": "5. `chordVolumes` — 和弦音量 - 不能只更新 UI + instrumentDefaults + chordVolumes 就以为万事大吉 - sampleConfig 是采样乐器最核心的配置，缺失会导致 loader 函数直接崩溃 --- ## v3.37.5: 修复 GitHub Pages CDN 缓存导致的版本号错乱 **问题**: 用户访问乐器页面时，页脚和页面标题始终显示 **v3.36.13**，看不到新增的乐器（电音蝌蚪、尼龙吉他、Wah吉他等）。 **根因排查**: 1. 仓库本地 `nav-config.js` 显示 `v3.37.5`，代码完整正确 2. 线上 `nav-config.js?v=373`（带 cache bust）**仍然返回 v3.36.13** 3. 线上 `instrument-language-synth.html`（不带参数）也返回旧版 HTML 4. GitHub Pages CDN 对 `?v=373` query string cache bust **完全无效** 5. 更深层：文件末尾有 `/* Cache bust: 1774409381 */` 注释，但这不影响版本号 6. **最终发现 `nav-config.js` 有 git merge conflict**： ``` <<<<<<< HEAD const APP_VERSION = 'v3.37.4'; ======= const APP_VERSION = 'v3.37.5'; >>>>>",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4150774240493774,
+      "maxScore": 0.4150774240493774,
+      "firstRecalledAt": "2026-05-28T02:52:42.131Z",
+      "lastRecalledAt": "2026-05-28T02:52:42.131Z",
+      "queryHashes": [
+        "5a99c5035a73"
+      ],
+      "recallDays": [
+        "2026-05-28"
+      ],
+      "conceptTags": [
+        "v3.37.5",
+        "v3.36.13",
+        "nav-config.js",
+        "instrument-language-synth.html",
+        "app-version",
+        "v3.37.4",
+        "chordvolumes",
+        "和弦"
       ]
     }
   }
