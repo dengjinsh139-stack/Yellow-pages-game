@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.38.6';
+        const APP_VERSION = 'v3.38.7';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -6901,7 +6901,7 @@
             }
 
             // 新乐器：采样未到位前使用合成器 fallback
-            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'toy_piano'].includes(currentInstrument)) {
+            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell'].includes(currentInstrument)) {
                 return playSynthTone(frequency, duration / 1000, velocity, attackMsOverride);
             }
 
