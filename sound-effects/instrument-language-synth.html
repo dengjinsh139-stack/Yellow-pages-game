@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.38.9';
+        const APP_VERSION = 'v3.39.3';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -513,6 +513,43 @@
         .instrument-btn.active .name {
             color: var(--primary);
             font-weight: 600;
+        }
+
+        .instrument-more {
+            display: contents;
+        }
+
+        .instrument-more[hidden] {
+            display: none;
+        }
+
+        .instrument-fold-toggle {
+            width: 100%;
+            margin: -4px 0 12px;
+            padding: 7px 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.055);
+            color: var(--text-dim);
+            font-size: 0.74rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .instrument-fold-toggle:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+        .instrument-fold-toggle .chevron {
+            display: inline-block;
+            margin-right: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .instrument-fold-toggle[aria-expanded="true"] .chevron {
+            transform: rotate(180deg);
         }
 
         /* 控制器 */
@@ -1491,6 +1528,7 @@
                             <span class="icon">🚂</span>
                             <span class="name">火车</span>
                         </div>
+                        <div class="instrument-more" id="instrumentMore" hidden>
                         <div class="instrument-btn" data-instrument="mouthtrumpet">
                             <span class="icon">🎺</span>
                             <span class="name">嘴巴小号</span>
@@ -1535,7 +1573,11 @@
                             <span class="icon">🎛️</span>
                             <span class="name">玩具簧片</span>
                         </div>
+                        </div>
                     </div>
+                    <button type="button" class="instrument-fold-toggle" id="instrumentFoldToggle" aria-controls="instrumentMore" aria-expanded="false">
+                        <span class="chevron">⌄</span><span class="instrument-fold-label">更多乐器（11）</span>
+                    </button>
 
                     <div class="panel-title">基础演奏</div>
 
@@ -4604,6 +4646,23 @@
             return await instrumentLoadPromises[instrument];
         }
 
+        function setInstrumentMoreExpanded(expanded) {
+            const more = document.getElementById('instrumentMore');
+            const toggle = document.getElementById('instrumentFoldToggle');
+            const label = toggle?.querySelector('.instrument-fold-label');
+            if (!more || !toggle) return;
+            more.hidden = !expanded;
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            if (label) label.textContent = expanded ? '收起乐器' : '更多乐器（11）';
+        }
+
+        function revealInstrumentIfFolded(instrument) {
+            const btn = document.querySelector(`[data-instrument="${instrument}"]`);
+            if (btn && btn.closest('#instrumentMore')) {
+                setInstrumentMoreExpanded(true);
+            }
+        }
+
         async function selectInstrument(instrument) {
             // P0修复：音频引擎未初始化时，阻止进入 loadInstrumentSamples()
             if (!audioContext) {
@@ -4615,6 +4674,7 @@
                 });
                 const targetBtn = document.querySelector(`[data-instrument="${instrument}"]`);
                 if (targetBtn) targetBtn.classList.add('active');
+                revealInstrumentIfFolded(instrument);
 
                 // 应用默认参数、更新滑块、生成键盘（让用户提前看到乐器参数）
                 applyInstrumentDefaults(instrument);
@@ -4628,7 +4688,8 @@
                     'piano':'钢琴','saxophone':'萨克斯','flute':'长笛','synth':'合成器',
                     'train':'火车','xylophone':'木琴','guitar':'虚拟人声',
                     'waterdrop':'水滴合成器','mouthtrumpet':'嘴巴小号',
-                    'kalimba':'钢片琴','smallrobot':'Small机器人','bigrobot':'Big机器人','wahguitar':'Wah吉他','cuckoo':'布谷鸟','cowbell':'牛铃','nylon_guitar':'尼龙Gitar'
+                    'kalimba':'钢片琴','smallrobot':'Small机器人','bigrobot':'Big机器人','wahguitar':'Wah吉他','cuckoo':'布谷鸟','cowbell':'牛铃','nylon_guitar':'尼龙Gitar',
+                    'otamatone':'电音蝌蚪','toy_piano':'玩具钢琴','toy_reed':'玩具簧片'
                 })[instrument] || instrument}，请先启动音频引擎`;
                 console.log(`[selectInstrument] audioContext 未初始化，延迟加载 ${instrument}`);
                 return;
@@ -4644,6 +4705,7 @@
             });
             const targetBtn = document.querySelector(`[data-instrument="${instrument}"]`);
             if (targetBtn) targetBtn.classList.add('active');
+            revealInstrumentIfFolded(instrument);
 
             // 3. 加载采样（期间 currentInstrument 仍是旧的，播放被禁用）
             const ok = await ensureInstrumentReady(instrument);
@@ -10617,6 +10679,14 @@
                         const instrument = btn.dataset.instrument;
                         if (instrument) await selectInstrument(instrument);
                     }
+                });
+            }
+
+            const instrumentFoldToggle = document.getElementById('instrumentFoldToggle');
+            if (instrumentFoldToggle) {
+                instrumentFoldToggle.addEventListener('click', () => {
+                    const expanded = instrumentFoldToggle.getAttribute('aria-expanded') === 'true';
+                    setInstrumentMoreExpanded(!expanded);
                 });
             }
 
