@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-28T02:52:42.131Z",
+  "updatedAt": "2026-06-01T06:29:21.320Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -9,20 +9,22 @@
       "endLine": 10,
       "source": "memory",
       "snippet": "# 2026-05-12 ## 布谷鸟乐器添加完成 - 在 `sound-effects/instrument-language-synth.html` 中添加了新乐器 `cuckoo` - 完成 17 个配置点接入：CSS 颜色、sampleConfig、instrumentDefaults、instrumentOffsets、noteVolumes、chordVolumes、instrumentPresetConfig、instrumentMetadata、instrumentNames、instrumentColors、hasInstrumentSamples、instrument-grid 按钮、loaders + loadCuckooSamples、playTone fallback、renderAudioToBuffer WAV 导出、waveforms 合成器波形、updateOffsetDisplay 名称映射 - 采样路径：`../assets/audio/samples/cuckoo/`，10 键 `.mp3` 占位（D4 E4 F4 A4 B4 D5 E5 F5 A5 B5） - 🎨 键盘主题色：绿色 `#22c55e` - 🔊 fallback 波形：`triangle` - **状态：等待用户提供十个真实采样文件**",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1.2612174928188322,
+      "totalScore": 1.6221814662218093,
       "maxScore": 0.45235153734683986,
       "firstRecalledAt": "2026-05-27T02:14:36.577Z",
-      "lastRecalledAt": "2026-05-27T02:15:30.984Z",
+      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
       "queryHashes": [
         "246907819e8d",
         "e47c3e497228",
-        "46197e179ce4"
+        "46197e179ce4",
+        "b3e17031f3c2"
       ],
       "recallDays": [
-        "2026-05-27"
+        "2026-05-27",
+        "2026-06-01"
       ],
       "conceptTags": [
         "instrument-grid",
@@ -42,19 +44,21 @@
       "endLine": 40,
       "source": "memory",
       "snippet": "# 2026-05-26 工作日志 ## 哇音吉他 (Wah Guitar) 乐器入库 **乐器信息：** - 名称：哇音吉他 - ID：`wahguitar` - Emoji：🎸 - 仓库：`dengjinsh139-stack/Yellow-pages-game` - 主文件：`sound-effects/instrument-language-synth.html` **版本迭代：** - `v3.36.6` → `v3.36.7`（代码骨架搭建，synth fallback）→ `v3.36.8`（真实采样接入） **采样文件（10个）：** ``` D4.mp3, E4.mp3, F4.mp3, A4.mp3, B4.mp3, D5.mp3, E5.mp3, F5.mp3, A5.mp3, B5.mp3 ``` - 路径：`assets/audio/samples/wahguitar/` **代码修改位置（instrument-language-synth.html）：** 1. `:root` CSS 变量 `--wahguitar` 2. UI 乐器选择按钮区 `.instrument-btn` 3. `instrumentDefaults` 默认参数 4. `instrumentRegistry` 乐器注册（type: sample, readyKey: wahguitar_D4） 5. `sampleConfig` 采样配置（basePath, samples, attack, release） 6. `instrumentOffsets` 偏移量",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.7523662894964218,
+      "totalScore": 1.1256699770689012,
       "maxScore": 0.39769973158836364,
       "firstRecalledAt": "2026-05-27T02:14:36.577Z",
-      "lastRecalledAt": "2026-05-27T02:15:00.403Z",
+      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
       "queryHashes": [
         "246907819e8d",
-        "a0b8f2212ce3"
+        "a0b8f2212ce3",
+        "b3e17031f3c2"
       ],
       "recallDays": [
-        "2026-05-27"
+        "2026-05-27",
+        "2026-06-01"
       ],
       "conceptTags": [
         "v3.36.6",
@@ -172,19 +176,21 @@
       "endLine": 187,
       "source": "memory",
       "snippet": "- 左栏三个手风琴面板：🎹 乐器选择（默认展开）、🎭 角色声纹（折叠）、🎯 语义分类（折叠） - 基础演奏参数（BPM/发音密度/音量）和高级设置从左栏移到右栏 - 导出按钮从右栏移到中间操作区，与演奏/清空/停止并排（4 按钮） ### v3.18.3 回退 用户反馈\"破坏了我们最开始的结构\"，立即回退到 `.bak` 备份。 **教训**：结构性改动必须等用户确认后再推进，不能自行决定。 --- ## 2026-05-05 21:14 ~ 22:00（第五轮：钢琴音色诊断） ### 问题现象 选择钢琴后，音符键盘播放的是默认合成器音色，而非钢琴真实采样。 ### 诊断过程 - Console 日志显示 `[playNoteKey] samplesLoaded=false` - 状态栏显示\"就绪 (真实钢琴音色)\"，说明 `initAudio()` 已成功执行 - 但 `playText()` 的自动初始化路径（`if (!audioContext)`）里只创建了 audioContext，**没有调用 `loadSamples()`** - 结果：用户点击音符键盘时走的是自动初始化路径，`samplesLoaded` 永远是 false ### 修复 - 在 `playText()` 的 `if (!audioContext)` 自动初始化块中加入 `await loadSamples()` - 版本：**v3.19.7** --- ## 2026-05-05 22:06 ~ 22:32（第六轮：三项修复 + Race Condition 全面修复）",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.7709701657295227,
+      "totalScore": 1.1293399542570115,
       "maxScore": 0.39558876454830166,
       "firstRecalledAt": "2026-05-27T02:14:36.577Z",
-      "lastRecalledAt": "2026-05-27T02:15:12.147Z",
+      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
       "queryHashes": [
         "246907819e8d",
-        "43312cd65cf7"
+        "43312cd65cf7",
+        "b3e17031f3c2"
       ],
       "recallDays": [
-        "2026-05-27"
+        "2026-05-27",
+        "2026-06-01"
       ],
       "conceptTags": [
         "备份",
@@ -268,18 +274,20 @@
       "endLine": 75,
       "source": "memory",
       "snippet": "- **教训：ID 必须统一！** ### v3.24.1：P0 修复 - canonical ID 统一为 waterdrop - 所有 trumpet 统一为 waterdrop（22处替换） - playSampleTone / renderSampleToBuffer 移除特殊 case - hasInstrumentSamples('waterdrop') 检查 waterdrop_D4 - instrumentDefaults.waterdrop 默认参数 - **新增 INSTRUMENT_REGISTRY** - 所有乐器唯一 canonical ID 注册表 - normalizeInstrumentId('trumpet') → 'waterdrop'（向后兼容旧存档） ### 正确的乐器入库步骤（以后必须按此执行）： 1. UI data-instrument=\"instrument_id\" 2. INSTRUMENT_REGISTRY 注册 3. instrumentDefaults[instrument_id] 默认参数 4. sampleConfig[instrument_id] 采样配置（到位后） 5. loadInstrumentSamples 注册 loader 6. hasInstrumentSamples(instrument_id) 检查 7. instrumentOffsets / voiceRegistry / noteVolumes / chordVolumes 注册 8. instrumentColors / activeCo",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.3934070974588394,
+      "totalScore": 0.7623368114233017,
       "maxScore": 0.3934070974588394,
       "firstRecalledAt": "2026-05-27T02:15:00.387Z",
-      "lastRecalledAt": "2026-05-27T02:15:00.387Z",
+      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
       "queryHashes": [
-        "9843c96d5194"
+        "9843c96d5194",
+        "b3e17031f3c2"
       ],
       "recallDays": [
-        "2026-05-27"
+        "2026-05-27",
+        "2026-06-01"
       ],
       "conceptTags": [
         "v3.24.1",
@@ -392,18 +400,20 @@
       "endLine": 42,
       "source": "memory",
       "snippet": "## 2026-04-10 乐器语言合成器开发 ### 上午会话 (11:00-11:24) **项目**: 乐器语言合成器 (Instrument Language Synth) **版本**: v1.2 #### 完成的功能 1. **真实钢琴采样集成** - 接收并处理了用户提供的10个WAV采样文件 - 采样范围: D4, E4, F4, A4, B4, D5, E5, F5, A5, B5 - 存储位置: `assets/audio/samples/piano/` 2. **五声音阶设计** - 采用中国传统五声音阶 (宫商角徵羽) - 对应音符: D(1)、E(2)、G(3)、A(5)、B(6) - 不包含4和7，旋律更和谐流畅 3. **10键音符键盘** - 5×2 网格布局 - 固定UI，切换乐器时布局不变 - 支持鼠标点击和触摸操作 - 视觉反馈: 按下时缩放和发光效果 4. **多乐器支持架构** - 钢琴: 使用真实采样 (playbackRate音高调整) - 其他乐器: Web Audio API合成音色 - `getCurrentInstrumentNotes()` 函数管理10个音符数据 - 切换乐器自动切换音色，UI布局保持不变 #### 技术实现要点 - 采样预加载机制 - 最近采样匹配 + playbackRate音高微调 - 情感分析调整演奏参数 - 实时波形可视化 #### 文件位置 - 主文件: `sound-effects/in",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.3622927963733673,
-      "maxScore": 0.3622927963733673,
+      "totalScore": 0.7313012421131133,
+      "maxScore": 0.36900844573974606,
       "firstRecalledAt": "2026-05-27T02:15:00.403Z",
-      "lastRecalledAt": "2026-05-27T02:15:00.403Z",
+      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
       "queryHashes": [
-        "a0b8f2212ce3"
+        "a0b8f2212ce3",
+        "b3e17031f3c2"
       ],
       "recallDays": [
-        "2026-05-27"
+        "2026-05-27",
+        "2026-06-01"
       ],
       "conceptTags": [
         "00-11",
@@ -423,18 +433,20 @@
       "endLine": 161,
       "source": "memory",
       "snippet": "- 但 `animationId` 只在 `visualize()` 函数内部被赋值（`animationId = requestAnimationFrame(draw)`），**从未在全局作用域 `let` 声明** - 浏览器严格模式下抛出 `ReferenceError: animationId is not defined`，整个 `playText()` 在第一行检查就中断 - 修复：在全局作用域添加 `let animationId = null;` ### 全局乐器路径验证 - 放开 `canPlayNormalNotes = true`，所有乐器都能进入音符事件循环 - 采样未加载时 `playTone()` 内部自动回退到 `playSynthTone()` - 8 种乐器全部验证通过：piano/xylophone/guitar(s vocal)/saxophone/flute/synth/train/trumpet ### v3.17.6 追加修复 - `updateParams()` 中引用已删除的 DOM ID（`currentInstrumentForOffset`、`currentOffsetMs`）导致 `TypeError` - 修复：全部 `getElementById + textContent` 操作加防御性 `if (el) el.textContent = ...` ### 修复后状态 - 用户最终确认：演奏文字有声音了 ✅ - 版本号最终状态：**v3.17.6** --- ## 2026-05-05 16:00 ~ 17",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.42031978368759154,
+      "totalScore": 0.8044485062360763,
       "maxScore": 0.42031978368759154,
       "firstRecalledAt": "2026-05-27T02:15:12.147Z",
-      "lastRecalledAt": "2026-05-27T02:15:12.147Z",
+      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
       "queryHashes": [
-        "43312cd65cf7"
+        "43312cd65cf7",
+        "b3e17031f3c2"
       ],
       "recallDays": [
-        "2026-05-27"
+        "2026-05-27",
+        "2026-06-01"
       ],
       "conceptTags": [
         "piano/xylophone/guitar",
