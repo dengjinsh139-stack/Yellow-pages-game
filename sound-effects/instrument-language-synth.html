@@ -120,7 +120,6 @@
             --toy_keyboard: #FFB6C1;
             --glass_piano: #A8D8EA;
             --violin2: #8B0000;
-            --cello: #8B4513;
             --cello2: #A0522D;
             --hanpan: #9B59B6;
             --wahguitar: #e040fb;
@@ -1591,10 +1590,6 @@
                             <span class="icon">🎻</span>
                             <span class="name">小提琴2</span>
                         </div>
-                        <div class="instrument-btn" data-instrument="cello">
-                            <span class="icon">🎻</span>
-                            <span class="name">大提琴</span>
-                        </div>
                         <div class="instrument-btn" data-instrument="cello2">
                             <span class="icon">🎻</span>
                             <span class="name">大提琴2</span>
@@ -1606,7 +1601,7 @@
                         </div>
                     </div>
                     <button type="button" class="instrument-fold-toggle" id="instrumentFoldToggle" aria-controls="instrumentMore" aria-expanded="false">
-                        <span class="chevron">⌄</span><span class="instrument-fold-label">更多乐器（14）</span>
+                        <span class="chevron">⌄</span><span class="instrument-fold-label">更多乐器（13）</span>
                     </button>
 
                     <div class="panel-title">基础演奏</div>
@@ -2645,7 +2640,6 @@
             toy_keyboard: { id: 'Toy Keyboard', name: '玩具键盘', emoji: '🧸', type: 'sample', sampleConfigKey: 'toy_keyboard', readyKey: 'toy_keyboard_D4', uiLabel: '真实玩具键盘采样 🧸' },
             glass_piano:  { id: 'Glass Piano',  name: '玻璃钢琴', emoji: '🎹', type: 'sample', sampleConfigKey: 'glass_piano',  readyKey: 'glass_piano_D4',  uiLabel: '真实玻璃钢琴采样 🎹' },
             violin2:      { id: 'Violin2',        name: '小提琴2',    emoji: '🎻', type: 'sample', sampleConfigKey: 'violin2',      readyKey: 'violin2_D4',      uiLabel: '真实小提琴2采样 🎻' },
-            cello:        { id: 'Cello',          name: '大提琴',     emoji: '🎻', type: 'sample', sampleConfigKey: 'cello',        readyKey: 'cello_D4',        uiLabel: '真实大提琴采样 🎻' },
             cello2:       { id: 'Cello2',         name: '大提琴2',    emoji: '🎻', type: 'sample', sampleConfigKey: 'cello2',       readyKey: 'cello2_D4',       uiLabel: '真实大提琴2采样 🎻' },
             hanpan:       { id: 'Hanpan',         name: '手碟',       emoji: '🛸', type: 'sample', sampleConfigKey: 'hanpan',       readyKey: 'hanpan_D4',       uiLabel: '真实手碟采样 🛸' },
         };
@@ -2682,7 +2676,6 @@
             toy_keyboard: 0.90,  // 玩具键盘（柔和采样）
             glass_piano:  0.90,  // 玻璃钢琴
             violin2:      0.90,  // 小提琴2
-            cello:        0.90,  // 大提琴
             cello2:       0.90,  // 大提琴2
             hanpan:       0.90,  // 手碟
         };
@@ -2990,19 +2983,6 @@
                 tempoMax: 220,          // 播放间隔最大: 220ms
                 tempoRandom: true,      // 启用随机波动: 开启
                 noteDuration: 900,      // 音符时长: 偏长（小提琴2 sustain 较长）
-                reverb: 0,             // 混响效果: 0%
-                chordDuration: 0,       // 和弦长度: 静音(0%)
-                bpm: 120,               // BPM速度: 120
-                notesPerBeat: 1,        // 每拍音符数: 1个
-                rhythmRandom: false     // 启用节奏随机: 未勾选
-            },
-            cello: {
-                masterVolume: 100,      // 全局音量: 100%
-                audioOffset: 0,         // 音频偏移: 0ms
-                tempoMin: 100,          // 播放间隔最小: 100ms
-                tempoMax: 240,          // 播放间隔最大: 240ms
-                tempoRandom: true,      // 启用随机波动: 开启
-                noteDuration: 1000,     // 音符时长: 偏长（大提琴 sustain 很长）
                 reverb: 0,             // 混响效果: 0%
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 120,               // BPM速度: 120
@@ -3578,25 +3558,6 @@
                 attack: 0.05,
                 release: 0.8
             },
-            cello: {
-                name: '大提琴',
-                emoji: '🎻',
-                basePath: '../assets/audio/samples/cello/',
-                samples: {
-                    'D4': { file: 'D4.mp3', freq: 293.66, gain: 1.0 },
-                    'E4': { file: 'E4.mp3', freq: 329.63, gain: 1.0 },
-                    'F4': { file: 'F4.mp3', freq: 349.23, gain: 1.0 },
-                    'A4': { file: 'A4.mp3', freq: 440.00, gain: 1.0 },
-                    'B4': { file: 'B4.mp3', freq: 493.88, gain: 1.0 },
-                    'D5': { file: 'D5.mp3', freq: 587.33, gain: 1.0 },
-                    'E5': { file: 'E5.mp3', freq: 659.25, gain: 1.0 },
-                    'F5': { file: 'F5.mp3', freq: 698.46, gain: 1.0 },
-                    'A5': { file: 'A5.mp3', freq: 880.00, gain: 1.0 },
-                    'B5': { file: 'B5.mp3', freq: 987.77, gain: 1.0 }
-                },
-                attack: 0.08,
-                release: 1.0
-            },
             cello2: {
                 name: '大提琴2',
                 emoji: '🎻',
@@ -3678,7 +3639,6 @@
             toy_keyboard:   { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             glass_piano:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             violin2:        { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            cello:          { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             cello2:         { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             hanpan:         { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
         };
@@ -3687,7 +3647,7 @@
         const chordVolumes = {
             piano: 1.0, xylophone: 1.0, guitar: 1.0, flute: 1.0,
             waterdrop: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0,
-            mouthtrumpet: 1.0, kalimba: 1.0, smallrobot: 1.0, bigrobot: 1.0, wahguitar: 1.0, cuckoo: 1.0, cowbell: 1.0, nylon_guitar: 1.0, otamatone: 1.0, toy_reed: 1.0, toy_piano: 1.0, toy_keyboard: 1.0, glass_piano: 1.0, violin2: 1.0, cello: 1.0, cello2: 1.0, hanpan: 1.0
+            mouthtrumpet: 1.0, kalimba: 1.0, smallrobot: 1.0, bigrobot: 1.0, wahguitar: 1.0, cuckoo: 1.0, cowbell: 1.0, nylon_guitar: 1.0, otamatone: 1.0, toy_reed: 1.0, toy_piano: 1.0, toy_keyboard: 1.0, glass_piano: 1.0, violin2: 1.0, cello2: 1.0, hanpan: 1.0
         };
 
         // 音符频率表
@@ -4850,7 +4810,6 @@
                 'toy_keyboard': loadToyKeyboardSamples,
                 'glass_piano': loadGlassPianoSamples,
                 'violin2': loadViolin2Samples,
-                'cello': loadCelloSamples,
                 'cello2': loadCello2Samples,
                 'hanpan': loadHanpanSamples,
             };
@@ -4869,7 +4828,7 @@
                     const names = {
                         'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
                         'synth': '合成器', 'train': '火车', 'xylophone': '木琴',
-                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'wahguitar': 'Wah吉他', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘', 'glass_piano': '玻璃钢琴', 'violin2': '小提琴2', 'cello': '大提琴', 'cello2': '大提琴2', 'hanpan': '手碟'
+                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'wahguitar': 'Wah吉他', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘', 'glass_piano': '玻璃钢琴', 'violin2': '小提琴2', 'cello2': '大提琴2', 'hanpan': '手碟'
                     };
                     document.getElementById('statusText').textContent = `正在加载 ${names[instrument] || instrument} 采样，请稍候...`;
                     try {
@@ -4901,7 +4860,7 @@
             if (!more || !toggle) return;
             more.hidden = !expanded;
             toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-            if (label) label.textContent = expanded ? '收起乐器' : '更多乐器（14）';
+            if (label) label.textContent = expanded ? '收起乐器' : '更多乐器（13）';
         }
 
         function revealInstrumentIfFolded(instrument) {
@@ -4937,7 +4896,7 @@
                     'train':'火车','xylophone':'木琴','guitar':'虚拟人声',
                     'waterdrop':'水滴合成器','mouthtrumpet':'嘴巴小号',
                     'kalimba':'钢片琴','smallrobot':'Small机器人','bigrobot':'Big机器人','wahguitar':'Wah吉他','cuckoo':'布谷鸟','cowbell':'牛铃','nylon_guitar':'尼龙Gitar',
-                    'otamatone':'电音蝌蚪','toy_reed':'玩具簧片','toy_piano':'玩具钢琴','toy_keyboard':'玩具键盘','glass_piano':'玻璃钢琴','violin2':'小提琴2','cello':'大提琴','cello2':'大提琴2','hanpan':'手碟'
+                    'otamatone':'电音蝌蚪','toy_reed':'玩具簧片','toy_piano':'玩具钢琴','toy_keyboard':'玩具键盘','glass_piano':'玻璃钢琴','violin2':'小提琴2','cello2':'大提琴2','hanpan':'手碟'
                 })[instrument] || instrument}，请先启动音频引擎`;
                 console.log(`[selectInstrument] audioContext 未初始化，延迟加载 ${instrument}`);
                 return;
@@ -4987,7 +4946,6 @@
                 'otamatone': '真实电音蝌蚪采样 🎶',
                 'glass_piano': '真实玻璃钢琴采样 🎹',
                 'violin2': '真实小提琴2采样 🎻',
-                'cello': '真实大提琴采样 🎻',
                 'cello2': '真实大提琴2采样 🎻',
                 'hanpan': '真实手碟采样 🛸'
             };
@@ -5600,29 +5558,6 @@
             await Promise.all(loadPromises);
         }
 
-        // 加载大提琴采样（占位 - 采样文件由用户提供后替换为真实加载）
-        async function loadCelloSamples() {
-            if (audioBuffers['cello_D4']) return; // 已加载
-
-            const config = sampleConfig.cello;
-            const loadPromises = [];
-
-            for (const [note, info] of Object.entries(config.samples)) {
-                const promise = fetch(config.basePath + info.file)
-                    .then(response => response.arrayBuffer())
-                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-                    .then(audioBuffer => {
-                        audioBuffers['cello_' + note] = audioBuffer;
-                        console.log(`Loaded cello: ${note}`);
-                    })
-                    .catch(err => console.error(`Failed to load cello ${note}:`, err));
-
-                loadPromises.push(promise);
-            }
-
-            await Promise.all(loadPromises);
-        }
-
         // 加载大提琴2采样（占位 - 采样文件由用户提供后替换为真实加载）
         async function loadCello2Samples() {
             if (audioBuffers['cello2_D4']) return; // 已加载
@@ -5740,8 +5675,7 @@
                     , 'toy_keyboard': 'rgba(255, 182, 193, 0.15)'    // 玩具键盘浅粉
                     , 'glass_piano': 'rgba(168, 216, 234, 0.15)'       // 玻璃钢琴冰蓝
                                         , 'violin2': 'rgba(139, 0, 0, 0.15)'              // 小提琴2暗红
-                    , 'cello': 'rgba(139, 69, 19, 0.15)'              // 大提琴马鞍棕
-                    , 'cello2': 'rgba(160, 82, 45, 0.15)'             // 大提琴2赭石
+                                        , 'cello2': 'rgba(160, 82, 45, 0.15)'             // 大提琴2赭石
                     , 'hanpan': 'rgba(155, 89, 182, 0.15)'             // 手碟紫
                 };
                 const activeColors = {
@@ -5767,8 +5701,7 @@
                     , 'toy_keyboard': 'rgba(255, 182, 193, 0.4)'    // 玩具键盘浅粉
                     , 'glass_piano': 'rgba(168, 216, 234, 0.4)'       // 玻璃钢琴冰蓝
                                         , 'violin2': 'rgba(139, 0, 0, 0.4)'              // 小提琴2暗红
-                    , 'cello': 'rgba(139, 69, 19, 0.4)'               // 大提琴马鞍棕
-                    , 'cello2': 'rgba(160, 82, 45, 0.4)'              // 大提琴2赭石
+                                        , 'cello2': 'rgba(160, 82, 45, 0.4)'              // 大提琴2赭石
                     , 'hanpan': 'rgba(155, 89, 182, 0.4)'               // 手碟紫
                 };
                 key.style.background = `linear-gradient(145deg, ${instrumentColors[currentInstrument] || 'rgba(255, 107, 107, 0.15)'}, rgba(0, 0, 0, 0.2))`;
@@ -6051,9 +5984,6 @@
                 return true;
             }
             if (instrument === 'violin2' && audioBuffers['violin2_D4']) {
-                return true;
-            }
-            if (instrument === 'cello' && audioBuffers['cello_D4']) {
                 return true;
             }
             if (instrument === 'cello2' && audioBuffers['cello2_D4']) {
@@ -6449,7 +6379,6 @@
                 cowbell: '牛铃',
                 glass_piano: '玻璃钢琴',
                 violin2: '小提琴2',
-                cello: '大提琴',
                 cello2: '大提琴2',
                 hanpan: '手碟',
             };
@@ -7467,7 +7396,7 @@
             // 采样未就绪，不 silent fallback
             console.warn(`[${currentInstrument}] 采样未就绪，跳过`);
             const names = { 'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
-                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'wahguitar': 'Wah吉他', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘', 'glass_piano': '玻璃钢琴', 'violin2': '小提琴2', 'cello': '大提琴', 'cello2': '大提琴2', 'hanpan': '手碟' };
+                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'wahguitar': 'Wah吉他', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘', 'glass_piano': '玻璃钢琴', 'violin2': '小提琴2', 'cello2': '大提琴2', 'hanpan': '手碟' };
             document.getElementById('statusText').textContent = '正在加载 ' + (names[currentInstrument] || currentInstrument) + ' 采样，请稍候...';
             return;
         }
@@ -8351,7 +8280,6 @@
             'nylon_guitar': '尼龙Gitar',
             'otamatone': '电音蝌蚪',
             'violin2': '小提琴2',
-            'cello': '大提琴',
             'cello2': '大提琴2',
             'hanpan': '手碟'
         };
@@ -10263,7 +10191,7 @@
 
                         // 乐器分支判断（与实时播放一致）
                         const isPiano = currentInstrument === 'piano';
-                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard', 'glass_piano', 'violin2', 'cello', 'cello2', 'hanpan'].includes(currentInstrument);
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard', 'glass_piano', 'violin2', 'cello2', 'hanpan'].includes(currentInstrument);
                         const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                         const hasSample = noteObj.sampleNote && samplesLoaded;
 
@@ -10308,7 +10236,7 @@
 
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard', 'glass_piano', 'violin2', 'cello', 'cello2', 'hanpan'].includes(currentInstrument);
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard', 'glass_piano', 'violin2', 'cello2', 'hanpan'].includes(currentInstrument);
                 const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                 const hasSample = note.sampleNote && samplesLoaded;
 
@@ -10544,7 +10472,6 @@
                 'toy_keyboard': 'triangle',
                 'glass_piano': 'triangle',
                 'violin2': 'triangle',
-                'cello': 'triangle',
                 'cello2': 'triangle',
                 'hanpan': 'triangle',
             };
