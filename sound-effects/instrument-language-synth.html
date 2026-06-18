@@ -118,7 +118,6 @@
             --toy_reed: #D2691E;
             --toy_piano: #FF69B4;
             --toy_keyboard: #FFB6C1;
-            --glass_piano: #A8D8EA;
             --wahguitar: #e040fb;
             --otamatone: #FF69B4;
         }
@@ -1579,10 +1578,6 @@
                             <span class="icon">🧸</span>
                             <span class="name">玩具键盘</span>
                         </div>
-                        <div class="instrument-btn" data-instrument="glass_piano">
-                            <span class="icon">🎹</span>
-                            <span class="name">玻璃钢琴</span>
-                        </div>
                         </div>
                     </div>
                     <button type="button" class="instrument-fold-toggle" id="instrumentFoldToggle" aria-controls="instrumentMore" aria-expanded="false">
@@ -2623,7 +2618,6 @@
             toy_reed:     { id: 'toy_reed',     name: '玩具簧片',   emoji: '🎛️', type: 'sample', sampleConfigKey: 'toy_reed',     readyKey: 'toy_reed_D4',     uiLabel: '真实玩具簧片采样 🎛️' },
             toy_piano:    { id: 'Toy Piano',    name: '玩具钢琴',   emoji: '🎹', type: 'sample', sampleConfigKey: 'toy_piano',    readyKey: 'toy_piano_D4',    uiLabel: '真实玩具钢琴采样 🎹' },
             toy_keyboard: { id: 'Toy Keyboard', name: '玩具键盘', emoji: '🧸', type: 'sample', sampleConfigKey: 'toy_keyboard', readyKey: 'toy_keyboard_D4', uiLabel: '真实玩具键盘采样 🧸' },
-            glass_piano:  { id: 'Glass Piano',  name: '玻璃钢琴', emoji: '🎹', type: 'sample', sampleConfigKey: 'glass_piano',  readyKey: 'glass_piano_D4',  uiLabel: '真实玻璃钢琴采样 🎹' },
         };
 
         // 向后兼容：旧存档中可能出现 'trumpet'，映射到 waterdrop
@@ -2656,7 +2650,6 @@
             nylon_guitar: 0.85,  // 尼龙吉他
             otamatone:    0.85,  // 电音蝌蚪
             toy_keyboard: 0.90,  // 玩具键盘（柔和采样）
-            glass_piano:  0.90,  // 玻璃钢琴
         };
 
         // 合成器波形 crest factor 补偿（sawtooth/square 比 sine 响得多）
@@ -2939,19 +2932,6 @@
                 reverb: 0,             // 混响效果: 0%
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 135,               // BPM速度: 120
-                notesPerBeat: 1,        // 每拍音符数: 1个
-                rhythmRandom: false     // 启用节奏随机: 未勾选
-            },
-            glass_piano: {
-                masterVolume: 100,      // 全局音量: 100%
-                audioOffset: 0,         // 音频偏移: 0ms
-                tempoMin: 100,          // 播放间隔最小: 100ms
-                tempoMax: 200,          // 播放间隔最大: 200ms
-                tempoRandom: true,      // 启用随机波动: 开启
-                noteDuration: 800,      // 音符时长: 偏长（玻璃钢琴 sustain 较长）
-                reverb: 0,             // 混响效果: 0%
-                chordDuration: 0,       // 和弦长度: 静音(0%)
-                bpm: 120,               // BPM速度: 120
                 notesPerBeat: 1,        // 每拍音符数: 1个
                 rhythmRandom: false     // 启用节奏随机: 未勾选
             }
@@ -3459,25 +3439,6 @@
                 },
                 attack: 0.01,
                 release: 0.3
-            },
-            glass_piano: {
-                name: '玻璃钢琴',
-                emoji: '🎹',
-                basePath: '../assets/audio/samples/glass_piano/',
-                samples: {
-                    'D4': { file: 'D4.wav', freq: 293.66, gain: 1.0 },
-                    'E4': { file: 'E4.wav', freq: 329.63, gain: 1.0 },
-                    'F4': { file: 'F4.wav', freq: 349.23, gain: 1.0 },
-                    'A4': { file: 'A4.wav', freq: 440.00, gain: 1.0 },
-                    'B4': { file: 'B4.wav', freq: 493.88, gain: 1.0 },
-                    'D5': { file: 'D5.wav', freq: 587.33, gain: 1.0 },
-                    'E5': { file: 'E5.wav', freq: 659.25, gain: 1.0 },
-                    'F5': { file: 'F5.wav', freq: 698.46, gain: 1.0 },
-                    'A5': { file: 'A5.wav', freq: 880.00, gain: 1.0 },
-                    'B5': { file: 'B5.wav', freq: 987.77, gain: 1.0 }
-                },
-                attack: 0.02,
-                release: 0.5
             }
         };
 
@@ -3520,14 +3481,13 @@
             toy_reed:       { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             toy_piano:      { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
             toy_keyboard:   { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
-            glass_piano:    { 'D4': 1.0, 'E4': 1.0, 'F4': 1.0, 'A4': 1.0, 'B4': 1.0, 'D5': 1.0, 'E5': 1.0, 'F5': 1.0, 'A5': 1.0, 'B5': 1.0 },
         };
 
         // 每个乐器的 Chord 按钮独立音量 (默认1.0)
         const chordVolumes = {
             piano: 1.0, xylophone: 1.0, guitar: 1.0, flute: 1.0,
             waterdrop: 1.0, saxophone: 1.0, synth: 1.0, train: 1.0,
-            mouthtrumpet: 1.0, kalimba: 1.0, smallrobot: 1.0, bigrobot: 1.0, wahguitar: 1.0, cuckoo: 1.0, cowbell: 1.0, nylon_guitar: 1.0, otamatone: 1.0, toy_reed: 1.0, toy_piano: 1.0, toy_keyboard: 1.0, glass_piano: 1.0
+            mouthtrumpet: 1.0, kalimba: 1.0, smallrobot: 1.0, bigrobot: 1.0, wahguitar: 1.0, cuckoo: 1.0, cowbell: 1.0, nylon_guitar: 1.0, otamatone: 1.0, toy_reed: 1.0, toy_piano: 1.0, toy_keyboard: 1.0
         };
 
         // 音符频率表
@@ -4688,7 +4648,6 @@
                 'toy_reed': loadToyReedSamples,
                 'toy_piano': loadToyPianoSamples,
                 'toy_keyboard': loadToyKeyboardSamples,
-                'glass_piano': loadGlassPianoSamples,
             };
             const loader = loaders[instrument];
             if (loader) {
@@ -4705,7 +4664,7 @@
                     const names = {
                         'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
                         'synth': '合成器', 'train': '火车', 'xylophone': '木琴',
-                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'wahguitar': 'Wah吉他', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘', 'glass_piano': '玻璃钢琴'
+                        'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'wahguitar': 'Wah吉他', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘'
                     };
                     document.getElementById('statusText').textContent = `正在加载 ${names[instrument] || instrument} 采样，请稍候...`;
                     try {
@@ -4773,7 +4732,7 @@
                     'train':'火车','xylophone':'木琴','guitar':'虚拟人声',
                     'waterdrop':'水滴合成器','mouthtrumpet':'嘴巴小号',
                     'kalimba':'钢片琴','smallrobot':'Small机器人','bigrobot':'Big机器人','wahguitar':'Wah吉他','cuckoo':'布谷鸟','cowbell':'牛铃','nylon_guitar':'尼龙Gitar',
-                    'otamatone':'电音蝌蚪','toy_reed':'玩具簧片','toy_piano':'玩具钢琴','toy_keyboard':'玩具键盘','glass_piano':'玻璃钢琴'
+                    'otamatone':'电音蝌蚪','toy_reed':'玩具簧片','toy_piano':'玩具钢琴','toy_keyboard':'玩具键盘'
                 })[instrument] || instrument}，请先启动音频引擎`;
                 console.log(`[selectInstrument] audioContext 未初始化，延迟加载 ${instrument}`);
                 return;
@@ -4821,7 +4780,6 @@
                 'cowbell': '真实牛铃采样 🔔',
                 'wahguitar': '真实Wah吉他采样 🎸',
                 'otamatone': '真实电音蝌蚪采样 🎶',
-                'glass_piano': '真实玻璃钢琴采样 🎹'
             };
             const waveInfo = document.getElementById('waveInfo');
             if (waveInfo) {
@@ -5386,29 +5344,6 @@
             await Promise.all(loadPromises);
         }
 
-        // 加载玻璃钢琴采样（占位 - 采样文件由用户提供后替换为真实加载）
-        async function loadGlassPianoSamples() {
-            if (audioBuffers['glass_piano_D4']) return; // 已加载
-
-            const config = sampleConfig.glass_piano;
-            const loadPromises = [];
-
-            for (const [note, info] of Object.entries(config.samples)) {
-                const promise = fetch(config.basePath + info.file)
-                    .then(response => response.arrayBuffer())
-                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-                    .then(audioBuffer => {
-                        audioBuffers['glass_piano_' + note] = audioBuffer;
-                        console.log(`Loaded glass_piano: ${note}`);
-                    })
-                    .catch(err => console.error(`Failed to load glass_piano ${note}:`, err));
-
-                loadPromises.push(promise);
-            }
-
-            await Promise.all(loadPromises);
-        }
-
         // 加载木琴采样（只加载真实采样文件，其他音符用合成）
         async function loadXylophoneSamples() {
             if (audioBuffers['xylophone_A5']) return; // 已加载
@@ -5478,7 +5413,6 @@
                     , 'toy_reed': 'rgba(210, 105, 30, 0.15)'       // 玩具簧片暖铜
                     , 'toy_piano': 'rgba(255, 105, 180, 0.15)'      // 玩具钢琴粉色
                     , 'toy_keyboard': 'rgba(255, 182, 193, 0.15)'    // 玩具键盘浅粉
-                    , 'glass_piano': 'rgba(168, 216, 234, 0.15)'       // 玻璃钢琴冰蓝
                 };
                 const activeColors = {
                     'piano': 'rgba(255, 107, 107, 0.4)',
@@ -5501,7 +5435,6 @@
                     , 'toy_reed': 'rgba(210, 105, 30, 0.4)'       // 玩具簧片暖铜
                     , 'toy_piano': 'rgba(255, 105, 180, 0.4)'        // 玩具钢琴粉色
                     , 'toy_keyboard': 'rgba(255, 182, 193, 0.4)'    // 玩具键盘浅粉
-                    , 'glass_piano': 'rgba(168, 216, 234, 0.4)'       // 玻璃钢琴冰蓝
                 };
                 key.style.background = `linear-gradient(145deg, ${instrumentColors[currentInstrument] || 'rgba(255, 107, 107, 0.15)'}, rgba(0, 0, 0, 0.2))`;
                 key.style.borderColor = activeColors[currentInstrument] || 'rgba(255, 107, 107, 0.4)';
@@ -5777,9 +5710,6 @@
                 return true;
             }
             if (instrument === 'toy_keyboard' && audioBuffers['toy_keyboard_D4']) {
-                return true;
-            }
-            if (instrument === 'glass_piano' && audioBuffers['glass_piano_D4']) {
                 return true;
             }
             return false;
@@ -6167,7 +6097,6 @@
                 wahguitar: 'Wah吉他',
                 cuckoo: '布谷鸟',
                 cowbell: '牛铃',
-                glass_piano: '玻璃钢琴'
             };
             const offsetEl = document.getElementById('offsetValue');
             if (offsetEl) offsetEl.textContent = offsetValue + 'ms';
@@ -7181,7 +7110,7 @@
             // 采样未就绪，不 silent fallback
             console.warn(`[${currentInstrument}] 采样未就绪，跳过`);
             const names = { 'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
-                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'wahguitar': 'Wah吉他', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘', 'glass_piano': '玻璃钢琴' };
+                'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'wahguitar': 'Wah吉他', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘' };
             document.getElementById('statusText').textContent = '正在加载 ' + (names[currentInstrument] || currentInstrument) + ' 采样，请稍候...';
             return;
         }
@@ -8064,7 +7993,6 @@
             'cowbell': '牛铃',
             'nylon_guitar': '尼龙Gitar',
             'otamatone': '电音蝌蚪',
-            'glass_piano': '玻璃钢琴'
         };
 
         // MIDI 音符到频率的映射（与 10 键音符键盘保持一致：D/E/F/A/B × 两个八度）
@@ -9974,7 +9902,7 @@
 
                         // 乐器分支判断（与实时播放一致）
                         const isPiano = currentInstrument === 'piano';
-                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard', 'glass_piano'].includes(currentInstrument);
+                        const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard'].includes(currentInstrument);
                         const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                         const hasSample = noteObj.sampleNote && samplesLoaded;
 
@@ -10019,7 +9947,7 @@
 
                 // 乐器分支判断（与实时播放一致）
                 const isPiano = currentInstrument === 'piano';
-                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard', 'glass_piano'].includes(currentInstrument);
+                const isSampleInstrument = ['saxophone', 'flute', 'synth', 'train', 'xylophone', 'waterdrop', 'mouthtrumpet', 'kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'nylon_guitar', 'wahguitar', 'otamatone', 'toy_reed', 'toy_piano', 'toy_keyboard'].includes(currentInstrument);
                 const isVirtualVoice = currentInstrument === 'guitar' && audioBuffers['vocal_D4_01'];
                 const hasSample = note.sampleNote && samplesLoaded;
 
@@ -10253,7 +10181,6 @@
                 'toy_reed': 'triangle',
                 'toy_piano': 'triangle',
                 'toy_keyboard': 'triangle',
-                'glass_piano': 'triangle'
             };
             oscillator.type = waveforms[currentInstrument] || 'sine';
             oscillator.frequency.value = note.frequency;
