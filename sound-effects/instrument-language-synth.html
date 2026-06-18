@@ -7389,7 +7389,7 @@
             }
 
             // 新乐器：采样未到位前使用合成器 fallback
-            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'toy_piano', 'hanpan'].includes(currentInstrument)) {
+            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'toy_piano'].includes(currentInstrument)) {
                 return playSynthTone(frequency, duration / 1000, velocity, attackMsOverride);
             }
 
