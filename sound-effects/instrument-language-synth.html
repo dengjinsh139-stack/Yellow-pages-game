@@ -4947,7 +4947,13 @@
                 'glass_piano': '真实玻璃钢琴采样 🎹',
                 'violin2': '真实小提琴2采样 🎻',
                 'cello2': '真实大提琴2采样 🎻',
-                'hanpan': '真实手碟采样 🛸'
+                'hanpan': '真实手碟采样 🛸',
+                'kalimba': '真实钢片琴采样 🎵',
+                'smallrobot': '真实Small机器人采样 🤖',
+                'bigrobot': '真实Big机器人采样 🦾',
+                'toy_reed': '真实玩具簧片采样 🎛️',
+                'toy_piano': '真实玩具钢琴采样 🎹',
+                'toy_keyboard': '真实玩具键盘采样 🧸'
             };
             const waveInfo = document.getElementById('waveInfo');
             if (waveInfo) {
@@ -6381,6 +6387,11 @@
                 violin2: '小提琴2',
                 cello2: '大提琴2',
                 hanpan: '手碟',
+                nylon_guitar: '尼龙吉他',
+                otamatone: '电音蝌蚪',
+                toy_reed: '玩具簧片',
+                toy_piano: '玩具钢琴',
+                toy_keyboard: '玩具键盘',
             };
             const offsetEl = document.getElementById('offsetValue');
             if (offsetEl) offsetEl.textContent = offsetValue + 'ms';
@@ -7388,12 +7399,7 @@
                 return playSampleTone(frequency, noteName, duration / 1000, velocity, attackMsOverride, sampleOffsetMsOverride);
             }
 
-            // 新乐器：采样未到位前使用合成器 fallback
-            if (['kalimba', 'smallrobot', 'bigrobot', 'cuckoo', 'cowbell', 'toy_piano'].includes(currentInstrument)) {
-                return playSynthTone(frequency, duration / 1000, velocity, attackMsOverride);
-            }
-
-            // 采样未就绪，不 silent fallback
+            // 已移除：kalimba, smallrobot, bigrobot, cuckoo, cowbell, toy_piano 采样已到位，不再走 synth fallback
             console.warn(`[${currentInstrument}] 采样未就绪，跳过`);
             const names = { 'piano': '钢琴', 'saxophone': '萨克斯', 'flute': '长笛',
                 'synth': '合成器', 'train': '火车', 'guitar': '虚拟人声', 'waterdrop': '水滴合成器', 'mouthtrumpet': '嘴巴小号', 'kalimba': '钢片琴', 'smallrobot': 'Small机器人', 'bigrobot': 'Big机器人', 'cuckoo': '布谷鸟', 'cowbell': '牛铃', 'nylon_guitar': '尼龙Gitar', 'wahguitar': 'Wah吉他', 'otamatone': '电音蝌蚪', 'toy_reed': '玩具簧片', 'toy_piano': '玩具钢琴', 'toy_keyboard': '玩具键盘', 'glass_piano': '玻璃钢琴', 'violin2': '小提琴2', 'cello2': '大提琴2', 'hanpan': '手碟' };
@@ -11250,4 +11256,4 @@
     <script src="../js/semantic-player.js"></script>
 </body>
 </html>
-<!-- v3.39.11 cache-bust: 1779892028 -->
+<!-- v3.49.4 cache-bust: 1782145024 -->
