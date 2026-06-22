@@ -5581,7 +5581,7 @@
             await Promise.all(loadPromises);
         }
 
-        // 加载手碟采样（占位 - 采样文件由用户提供后替换为真实加载）
+        // 加载手碟采样
         async function loadHanpanSamples() {
             if (audioBuffers['hanpan_D4']) return; // 已加载
 
