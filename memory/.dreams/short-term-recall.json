@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-01T06:29:21.320Z",
+  "updatedAt": "2026-06-23T03:23:22.156Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -113,18 +113,20 @@
       "endLine": 27,
       "source": "memory",
       "snippet": "# Memory Flush - 2026-05-15 ## Session Summary - **Time**: 2026-05-15 21:50 GMT+8 - **Project**: Yellow-pages-game / 乐器语音合成器 - **Current Version**: v3.29.3 --- ## Completed Work - 布谷鸟乐器：10/10 采样全部到位，格式 `.wav`，配置已改，已推送 v3.29.3 - 已读取完整 `instrument-language-synth.html` 代码结构，了解 playText / computeEventTiming / renderAudioToBuffer / playTone / playSampleTone / playSynthTone / renderSampleToBuffer / renderSynthToBuffer 等核心函数的当前实现 --- ## Phrase Articulation Shaper 施工单 **状态**: 施工单已交付给用户，用户将转交另一AI执行。 **文件**: `/root/.openclaw/workspace/sound-effects/instrument-language-synth.html`（单一文件修改） **核心施工步骤（17步）**: 1. UI 插入：左栏\"发音密度模式\"和\"输出音量\"之间插入 `<select id=\"phraseArticulationMode\">` 2. params 参数初始化：`phra",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.38565329015254973,
-      "maxScore": 0.38565329015254973,
+      "totalScore": 0.8020164370536804,
+      "maxScore": 0.41636314690113063,
       "firstRecalledAt": "2026-05-27T02:14:36.577Z",
-      "lastRecalledAt": "2026-05-27T02:14:36.577Z",
+      "lastRecalledAt": "2026-06-23T03:23:22.156Z",
       "queryHashes": [
-        "246907819e8d"
+        "246907819e8d",
+        "fe497043a55b"
       ],
       "recallDays": [
-        "2026-05-27"
+        "2026-05-27",
+        "2026-06-23"
       ],
       "conceptTags": [
         "yellow-pages-game",
@@ -400,20 +402,22 @@
       "endLine": 42,
       "source": "memory",
       "snippet": "## 2026-04-10 乐器语言合成器开发 ### 上午会话 (11:00-11:24) **项目**: 乐器语言合成器 (Instrument Language Synth) **版本**: v1.2 #### 完成的功能 1. **真实钢琴采样集成** - 接收并处理了用户提供的10个WAV采样文件 - 采样范围: D4, E4, F4, A4, B4, D5, E5, F5, A5, B5 - 存储位置: `assets/audio/samples/piano/` 2. **五声音阶设计** - 采用中国传统五声音阶 (宫商角徵羽) - 对应音符: D(1)、E(2)、G(3)、A(5)、B(6) - 不包含4和7，旋律更和谐流畅 3. **10键音符键盘** - 5×2 网格布局 - 固定UI，切换乐器时布局不变 - 支持鼠标点击和触摸操作 - 视觉反馈: 按下时缩放和发光效果 4. **多乐器支持架构** - 钢琴: 使用真实采样 (playbackRate音高调整) - 其他乐器: Web Audio API合成音色 - `getCurrentInstrumentNotes()` 函数管理10个音符数据 - 切换乐器自动切换音色，UI布局保持不变 #### 技术实现要点 - 采样预加载机制 - 最近采样匹配 + playbackRate音高微调 - 情感分析调整演奏参数 - 实时波形可视化 #### 文件位置 - 主文件: `sound-effects/in",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.7313012421131133,
-      "maxScore": 0.36900844573974606,
+      "totalScore": 1.1893011063337324,
+      "maxScore": 0.45799986422061917,
       "firstRecalledAt": "2026-05-27T02:15:00.403Z",
-      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
+      "lastRecalledAt": "2026-06-23T03:23:22.156Z",
       "queryHashes": [
         "a0b8f2212ce3",
-        "b3e17031f3c2"
+        "b3e17031f3c2",
+        "fe497043a55b"
       ],
       "recallDays": [
         "2026-05-27",
-        "2026-06-01"
+        "2026-06-01",
+        "2026-06-23"
       ],
       "conceptTags": [
         "00-11",
@@ -861,6 +865,99 @@
         "v3.37.4",
         "chordvolumes",
         "和弦"
+      ]
+    },
+    "memory:memory/2026-04-20.md:1:32": {
+      "key": "memory:memory/2026-04-20.md:1:32",
+      "path": "memory/2026-04-20.md",
+      "startLine": 1,
+      "endLine": 32,
+      "source": "memory",
+      "snippet": "# 2026-04-20 工作记录 ## 乐器语言合成器 - 标点符号气口系统（v3.5.0 → v3.6.13） ### 上午：标点符号气口系统设计 - 用户提供了完整的标点符号气口设计规格 - 三层停顿体系：空格(0.25拍) / 短气口(逗号/顿号/分号/冒号) / 句尾落点(句号/问号/感叹号/省略号) - BPM自适应、前后音修饰、统一事件模型（note + pause） ### 下午：实现与修复 #### v3.6.5 - 标点符号气口系统 - 新增 punctuationRules 配置（17种标点） - 新增 phrasingConfig 可调参数 - tokenizeText() 分词 + getPunctuationRule() BPM自适应 - textToNotes() 统一事件模型 - 实时播放支持 pause 事件 #### v3.6.7 - 修复高亮错位与漏音 - playText() 改用真实事件索引 i 驱动高亮 - noteDuration 增加最短可听下限 110ms（后改为 BPM 动态计算） - velocityMultiplier 仅对 noteDuration >= 160ms 生效 - 四声默认值从 32 改为 16 分音符 - 音符时长滑块文案改为\"音色衰减/包络长度\" #### v3.6.8 - 最短可听下限 BPM 动态 - minAudibleMs = (60000 / bpm) * 0.23 #### v3.6.9 - WAV 导出修复（钢琴静音） - 修复钢琴导出 buffer key 错误（piano_",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.41077619493007655,
+      "maxScore": 0.41077619493007655,
+      "firstRecalledAt": "2026-06-23T03:23:22.156Z",
+      "lastRecalledAt": "2026-06-23T03:23:22.156Z",
+      "queryHashes": [
+        "fe497043a55b"
+      ],
+      "recallDays": [
+        "2026-06-23"
+      ],
+      "conceptTags": [
+        "v3.5.0",
+        "v3.6.13",
+        "0.25拍",
+        "逗号/顿号/分号/冒号",
+        "句号/问号/感叹号/省略号",
+        "v3.6.5",
+        "v3.6.7",
+        "音色衰减/包络长度"
+      ]
+    },
+    "memory:memory/2026-05-15.md:63:91": {
+      "key": "memory:memory/2026-05-15.md:63:91",
+      "path": "memory/2026-05-15.md",
+      "startLine": 63,
+      "endLine": 91,
+      "source": "memory",
+      "snippet": "- **预期结果**: 17步完成后，UI有\"发音颗粒\"控制，实时播放和WAV导出一律使用同一套 articulation 结果 --- ## Important Notes - **推送约定**: 每次 git push 时必须主动报出当前版本号 - **版本号来源**: `nav-config.js` 中的 `APP_VERSION`，由 pre-commit hook 自动管理 - **测试地址**: `https://dengjinsh139-stack.github.io/Yellow-pages-game/sound-effects/instrument-language-synth.html` - **GitHub Token**: 在环境变量 `GITHUB_TOKEN` 中 - **导航栏隐藏项永久保留**: 项目(projects-login.html)、项目能力(capabilities.html)、理财(finance-login.html) 不恢复 --- ## 施工单文件保存位置 施工单内容已存储在 memory/2026-05-15.md（本文件）中，作为 future sessions 的参考。如果另一AI执行遇到问题，可从此文件获取完整施工指令。 --- ## Phrase Articulation Shaper 实际执行记录 **执行者**: 本AI（非转交另一AI） **时间**: 2026-05-15 22:04 - 22:29 GMT+8 ### 已完成的实现步骤（v3.31.5） 1. ✅ UI 控件：左栏\"发音密度",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.40768544077873226,
+      "maxScore": 0.40768544077873226,
+      "firstRecalledAt": "2026-06-23T03:23:22.156Z",
+      "lastRecalledAt": "2026-06-23T03:23:22.156Z",
+      "queryHashes": [
+        "fe497043a55b"
+      ],
+      "recallDays": [
+        "2026-06-23"
+      ],
+      "conceptTags": [
+        "nav-config.js",
+        "app-version",
+        "pre-commit",
+        "github-token",
+        "projects-login.html",
+        "capabilities.html",
+        "finance-login.html",
+        "memory/2026-05-15.md"
+      ]
+    },
+    "memory:memory/2026-04-23.md:22:39": {
+      "key": "memory:memory/2026-04-23.md:22:39",
+      "path": "memory/2026-04-23.md",
+      "startLine": 22,
+      "endLine": 39,
+      "source": "memory",
+      "snippet": "1. **WAV 导出仍有音符缺失** — 需要用户测试导出功能，查看控制台日志确认哪些音符被跳过/渲染 2. **声纹并行 v3.9.3** — 已修复（添加 await），需确认是否还有重叠问题 ## 乐器语言合成器 - 音符键盘音量控制按乐器独立生效 (v3.9.7) **需求**: 用户要求音量设置按乐器独立生效，切换乐器时各自的音量互不影响。 **改动**: 1. `noteVolumes` 从全局扁平结构改为按乐器分层对象：`noteVolumes.piano['D4']`, `noteVolumes.xylophone['D4']` 等 2. `chordVolumes` 同样按乐器独立：`chordVolumes.piano`, `chordVolumes.xylophone` 等 3. 滑块初始化、事件绑定、实时播放、文本播放、导出渲染全部读取 `noteVolumes[currentInstrument][note]` 4. 切换乐器时 `generateNoteKeyboard()` 重新生成键盘，滑块自动同步当前乐器音量 **文件**: `sound-effects/instrument-language-synth.html`, `nav-config.js` **状态**: 已推送 v3.9.7 ---",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.40611643791198726,
+      "maxScore": 0.40611643791198726,
+      "firstRecalledAt": "2026-06-23T03:23:22.156Z",
+      "lastRecalledAt": "2026-06-23T03:23:22.156Z",
+      "queryHashes": [
+        "fe497043a55b"
+      ],
+      "recallDays": [
+        "2026-06-23"
+      ],
+      "conceptTags": [
+        "查看控制台日志确认哪些音符被跳过/渲染",
+        "v3.9.3",
+        "v3.9.7",
+        "notevolumes.piano",
+        "notevolumes.xylophone",
+        "chordvolumes.piano",
+        "chordvolumes.xylophone",
+        "nav-config.js"
       ]
     }
   }
