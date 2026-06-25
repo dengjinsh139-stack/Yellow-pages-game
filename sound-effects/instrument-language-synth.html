@@ -7209,7 +7209,7 @@
             // 手碟 Voice Stealing：新音符快速截断上一个，避免多音叠加浑浊
             if (currentInstrument === 'handpan' && activeHandpanNode) {
                 const now = audioContext.currentTime;
-                const stealMs = (params.instrumentDefaults.handpan && params.instrumentDefaults.handpan.voiceStealingMs) || 120;
+                const stealMs = (instrumentDefaults.handpan && instrumentDefaults.handpan.voiceStealingMs) || 120;
                 const fadeSec = Math.max(stealMs / 1000, 0.01);
                 const stopDelay = fadeSec + 0.03;
                 activeHandpanNode.gain.gain.cancelScheduledValues(now);
