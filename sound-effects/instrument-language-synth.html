@@ -3008,7 +3008,7 @@
                 tempoMin: 120,          // 播放间隔最小: 120ms
                 tempoMax: 250,          // 播放间隔最大: 250ms
                 tempoRandom: true,      // 启用随机波动: 开启
-                noteDuration: 1200,     // 音符时长: 偏长（手碟 sustain 很长）
+                noteDuration: 2800,     // 音符时长: 偏长（手碟 sustain 很长，延音自然衰减）
                 reverb: 0,             // 混响效果: 0%
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 120,               // BPM速度: 120
@@ -7276,7 +7276,13 @@
             const startOffsetSec = (offsetMs / 1000) + safeOffsetSec;
             source.start(now, startOffsetSec);
             // 尾音受 releaseMs 影响
-            source.stop(now + duration + Math.max(releaseTime, 0.5));
+            // 手碟：不强制截断采样，让延音自然衰减到结束
+            if (currentInstrument === 'handpan') {
+                const sampleNaturalEnd = now + (buffer.duration / playbackRate);
+                source.stop(Math.max(sampleNaturalEnd, now + duration + releaseTime));
+            } else {
+                source.stop(now + duration + Math.max(releaseTime, 0.5));
+            }
 
             // 更新频谱
             updateSpectrum();
@@ -10444,7 +10450,14 @@
 
             // ===== stop 尾部余量：受 releaseMs 影响 =====
             source.start(startTime, startOffsetSec);
-            source.stop(startTime + duration + Math.max(releaseTime, 0.5));
+            // 手碟：不强制截断采样，让延音自然衰减到结束
+            if (currentInstrument === 'handpan') {
+                const playbackRateVal = (note.frequency !== nearestFreq) ? (note.frequency / nearestFreq) : 1;
+                const sampleNaturalEnd = startTime + (buffer.duration / playbackRateVal);
+                source.stop(Math.max(sampleNaturalEnd, startTime + duration + releaseTime));
+            } else {
+                source.stop(startTime + duration + Math.max(releaseTime, 0.5));
+            }
         }
 
         // 渲染合成音色到 buffer
