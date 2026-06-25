@@ -2003,6 +2003,15 @@
                         <small style="color: var(--text-dim); font-size: 0.65rem;">紧凑 ←→ 宽松</small>
                     </div>
 
+                    <div class="control-group" id="handpanVoiceStealingGroup" style="display: none;">
+                        <div class="control-label">
+                            <span>🛸 手碟截断速度</span>
+                            <span class="control-value" id="vsHandpanStealValue">120ms</span>
+                        </div>
+                        <input type="range" id="vsHandpanSteal" min="0" max="500" value="120" oninput="updateVoiceShaping()">
+                        <small style="color: var(--text-dim); font-size: 0.65rem;">叠加(0ms) ←→ 清晰(500ms)</small>
+                    </div>
+
                     <!-- A/B 对比 -->
                     <div class="ab-compact">
                         <div style="font-size: 0.75rem; color: var(--secondary); margin-bottom: 6px;">🎚️ A/B 对比</div>
@@ -3013,7 +3022,8 @@
                 chordDuration: 0,       // 和弦长度: 静音(0%)
                 bpm: 120,               // BPM速度: 120
                 notesPerBeat: 1,        // 每拍音符数: 1个
-                rhythmRandom: false     // 启用节奏随机: 未勾选
+                rhythmRandom: false,    // 启用节奏随机: 未勾选
+                voiceStealingMs: 120    // Voice Stealing fade out 时间
             }
         };
 
@@ -4971,7 +4981,13 @@
             // 7. 启用播放控件
             enablePlaybackControls();
 
-            // 8. 播放试听音（采样已就绪，必定走 sample）
+            // 8. 手碟 Voice Stealing 控件显隐切换
+            const handpanStealGroup = document.getElementById('handpanVoiceStealingGroup');
+            if (handpanStealGroup) {
+                handpanStealGroup.style.display = (instrument === 'handpan') ? 'block' : 'none';
+            }
+
+            // 9. 播放试听音（采样已就绪，必定走 sample）
             const hasSamples = hasInstrumentSamples(instrument);
             if (hasSamples) {
                 playSampleTone(440, 'A4', 0.3, 0.5);
@@ -5122,6 +5138,14 @@
 
             // 更新显示标签
             updateParams();
+
+            // 手碟 Voice Stealing 控件初始值
+            if (instrument === 'handpan' && defaults.voiceStealingMs !== undefined) {
+                const stealEl = document.getElementById('vsHandpanSteal');
+                if (stealEl) stealEl.value = defaults.voiceStealingMs;
+                const stealValEl = document.getElementById('vsHandpanStealValue');
+                if (stealValEl) stealValEl.textContent = defaults.voiceStealingMs + 'ms';
+            }
 
             console.log(`Applied default params for ${instrument}:`, defaults);
         }
@@ -6508,6 +6532,16 @@
             document.getElementById('vsReleaseValue').textContent = vs.releaseMs + 'ms';
             document.getElementById('vsOverlapValue').textContent = vs.overlapMs + 'ms';
             document.getElementById('vsSemanticValue').textContent = vs.semanticGap + 'ms';
+
+            // 手碟 Voice Stealing
+            const handpanStealEl = document.getElementById('vsHandpanSteal');
+            if (handpanStealEl) {
+                const stealMs = parseInt(handpanStealEl.value);
+                document.getElementById('vsHandpanStealValue').textContent = stealMs + 'ms';
+                if (params.instrumentDefaults.handpan) {
+                    params.instrumentDefaults.handpan.voiceStealingMs = stealMs;
+                }
+            }
         }
 
         // A/B 对比：保存当前到 Slot A
@@ -7175,10 +7209,13 @@
             // 手碟 Voice Stealing：新音符快速截断上一个，避免多音叠加浑浊
             if (currentInstrument === 'handpan' && activeHandpanNode) {
                 const now = audioContext.currentTime;
+                const stealMs = (params.instrumentDefaults.handpan && params.instrumentDefaults.handpan.voiceStealingMs) || 120;
+                const fadeSec = Math.max(stealMs / 1000, 0.01);
+                const stopDelay = fadeSec + 0.03;
                 activeHandpanNode.gain.gain.cancelScheduledValues(now);
                 activeHandpanNode.gain.gain.setValueAtTime(activeHandpanNode.gain.gain.value, now);
-                activeHandpanNode.gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-                activeHandpanNode.source.stop(now + 0.15);
+                activeHandpanNode.gain.gain.exponentialRampToValueAtTime(0.001, now + fadeSec);
+                activeHandpanNode.source.stop(now + stopDelay);
             }
 
             // 创建音频源
