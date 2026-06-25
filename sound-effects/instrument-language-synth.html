@@ -7207,10 +7207,19 @@
 
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, now + attackTime);
-            gainNode.gain.setValueAtTime(clampedVelocity, now + attackTime + holdTime);
-            const totalTime = now + attackTime + holdTime + releaseTime;
-            if (isFinite(totalTime) && totalTime > now) {
-                gainNode.gain.exponentialRampToValueAtTime(0.001, totalTime);
+            // 手碟：在 duration 时间内保持满音量，duration 后才开始 release fade
+            if (currentInstrument === 'handpan') {
+                gainNode.gain.setValueAtTime(clampedVelocity, now + attackTime);
+                gainNode.gain.setValueAtTime(clampedVelocity, now + duration);
+                if (isFinite(now + duration + releaseTime)) {
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration + releaseTime);
+                }
+            } else {
+                gainNode.gain.setValueAtTime(clampedVelocity, now + attackTime + holdTime);
+                const totalTime = now + attackTime + holdTime + releaseTime;
+                if (isFinite(totalTime) && totalTime > now) {
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, totalTime);
+                }
             }
 
             // ===== 声音塑形：EQ 链（HPF → Mud Cut → High Shelf）=====
@@ -10385,10 +10394,19 @@
             gainNode.gain.value = clampedVelocity;
             gainNode.gain.setValueAtTime(0, startTime);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, startTime + attackTime);
-            gainNode.gain.setValueAtTime(clampedVelocity, startTime + attackTime + holdTime);
-            const totalDecayEnd = startTime + attackTime + holdTime + releaseTime;
-            if (isFinite(totalDecayEnd) && totalDecayEnd > startTime) {
-                gainNode.gain.exponentialRampToValueAtTime(0.001, totalDecayEnd);
+            // 手碟：在 duration 时间内保持满音量，duration 后才开始 release fade
+            if (currentInstrument === 'handpan') {
+                gainNode.gain.setValueAtTime(clampedVelocity, startTime + attackTime);
+                gainNode.gain.setValueAtTime(clampedVelocity, startTime + duration);
+                if (isFinite(startTime + duration + releaseTime)) {
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration + releaseTime);
+                }
+            } else {
+                gainNode.gain.setValueAtTime(clampedVelocity, startTime + attackTime + holdTime);
+                const totalDecayEnd = startTime + attackTime + holdTime + releaseTime;
+                if (isFinite(totalDecayEnd) && totalDecayEnd > startTime) {
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, totalDecayEnd);
+                }
             }
 
             // ===== 声音塑形：EQ 链（HPF → Mud Cut → High Shelf）=====
