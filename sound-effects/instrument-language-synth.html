@@ -7213,6 +7213,7 @@
                     ? instrumentDefaults.handpan.voiceStealingMs : 120;
                 const fadeSec = Math.max(stealMs / 1000, 0.01);
                 const stopDelay = fadeSec + 0.03;
+                console.log(`[Handpan Voice Stealing] stealMs=${stealMs}, fadeSec=${fadeSec.toFixed(3)}, prev gain=${activeHandpanNode.gain.gain.value.toFixed(3)}`);
                 activeHandpanNode.gain.gain.cancelScheduledValues(now);
                 activeHandpanNode.gain.gain.setValueAtTime(activeHandpanNode.gain.gain.value, now);
                 activeHandpanNode.gain.gain.exponentialRampToValueAtTime(0.001, now + fadeSec);
