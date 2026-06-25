@@ -7167,8 +7167,20 @@
             return playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride, sampleOffsetMsOverride);
         }
 
+        // 手碟 Voice Stealing：追踪当前活跃的手碟音源，新音符启动时快速 fade out 上一个
+        let activeHandpanNode = null;
+
         // 内部采样播放函数（与实时播放 playSampleTone() 严格对齐）
         function playSampleToneInternal(targetFrequency, targetNoteName, duration, velocity, buffer, sampleNote, config, attackMsOverride, sampleOffsetMs) {
+            // 手碟 Voice Stealing：新音符快速截断上一个，避免多音叠加浑浊
+            if (currentInstrument === 'handpan' && activeHandpanNode) {
+                const now = audioContext.currentTime;
+                activeHandpanNode.gain.gain.cancelScheduledValues(now);
+                activeHandpanNode.gain.gain.setValueAtTime(activeHandpanNode.gain.gain.value, now);
+                activeHandpanNode.gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                activeHandpanNode.source.stop(now + 0.15);
+            }
+
             // 创建音频源
             const source = audioContext.createBufferSource();
             source.buffer = buffer;
@@ -7296,6 +7308,11 @@
 
             // 更新频谱
             updateSpectrum();
+
+            // 手碟：记录当前活跃音源供下次截断
+            if (currentInstrument === 'handpan') {
+                activeHandpanNode = { source, gain: gainNode };
+            }
 
             return { source, gainNode };
         }
