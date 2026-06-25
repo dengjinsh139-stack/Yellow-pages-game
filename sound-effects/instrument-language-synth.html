@@ -7258,14 +7258,15 @@
 
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.linearRampToValueAtTime(clampedVelocity, now + attackTime);
-            // 手碟：增益包络基于采样自然长度，不受传入 duration 限制
-            // 文字演奏的 duration 通常只有 200-500ms，但采样有 4s+ 的延音
+            // 手碟：增益包络基于"截断时间"控制的最大持续时间
             if (currentInstrument === 'handpan') {
-                const sampleDuration = buffer.duration / playbackRate;
-                const releaseStart = Math.max(now + attackTime, now + sampleDuration - 0.5);
+                const stealMs = (instrumentDefaults.handpan && typeof instrumentDefaults.handpan.voiceStealingMs === 'number')
+                    ? instrumentDefaults.handpan.voiceStealingMs : 120;
+                const maxDurationSec = duration + (stealMs / 1000);
+                const releaseStart = Math.max(now + attackTime, now + maxDurationSec - 0.05);
                 gainNode.gain.setValueAtTime(clampedVelocity, now + attackTime);
                 gainNode.gain.setValueAtTime(clampedVelocity, releaseStart);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + sampleDuration + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + maxDurationSec + 0.1);
             } else {
                 gainNode.gain.setValueAtTime(clampedVelocity, now + attackTime + holdTime);
                 const totalTime = now + attackTime + holdTime + releaseTime;
@@ -7337,10 +7338,12 @@
             const startOffsetSec = (offsetMs / 1000) + safeOffsetSec;
             source.start(now, startOffsetSec);
             // 尾音受 releaseMs 影响
-            // 手碟：不强制截断采样，让延音自然衰减到结束
+            // 手碟：每个音最长持续时间 = duration + voiceStealingMs，然后自动 fade out
             if (currentInstrument === 'handpan') {
-                const sampleNaturalEnd = now + (buffer.duration / playbackRate);
-                source.stop(Math.max(sampleNaturalEnd, now + duration + releaseTime));
+                const stealMs = (instrumentDefaults.handpan && typeof instrumentDefaults.handpan.voiceStealingMs === 'number')
+                    ? instrumentDefaults.handpan.voiceStealingMs : 120;
+                const maxDurationSec = duration + (stealMs / 1000) + 0.15;
+                source.stop(now + maxDurationSec);
             } else {
                 source.stop(now + duration + Math.max(releaseTime, 0.5));
             }
