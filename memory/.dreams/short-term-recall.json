@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-23T03:23:22.156Z",
+  "updatedAt": "2026-06-29T08:15:08.869Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -178,21 +178,23 @@
       "endLine": 187,
       "source": "memory",
       "snippet": "- 左栏三个手风琴面板：🎹 乐器选择（默认展开）、🎭 角色声纹（折叠）、🎯 语义分类（折叠） - 基础演奏参数（BPM/发音密度/音量）和高级设置从左栏移到右栏 - 导出按钮从右栏移到中间操作区，与演奏/清空/停止并排（4 按钮） ### v3.18.3 回退 用户反馈\"破坏了我们最开始的结构\"，立即回退到 `.bak` 备份。 **教训**：结构性改动必须等用户确认后再推进，不能自行决定。 --- ## 2026-05-05 21:14 ~ 22:00（第五轮：钢琴音色诊断） ### 问题现象 选择钢琴后，音符键盘播放的是默认合成器音色，而非钢琴真实采样。 ### 诊断过程 - Console 日志显示 `[playNoteKey] samplesLoaded=false` - 状态栏显示\"就绪 (真实钢琴音色)\"，说明 `initAudio()` 已成功执行 - 但 `playText()` 的自动初始化路径（`if (!audioContext)`）里只创建了 audioContext，**没有调用 `loadSamples()`** - 结果：用户点击音符键盘时走的是自动初始化路径，`samplesLoaded` 永远是 false ### 修复 - 在 `playText()` 的 `if (!audioContext)` 自动初始化块中加入 `await loadSamples()` - 版本：**v3.19.7** --- ## 2026-05-05 22:06 ~ 22:32（第六轮：三项修复 + Race Condition 全面修复）",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1.1293399542570115,
-      "maxScore": 0.39558876454830166,
+      "totalScore": 1.5418045848608017,
+      "maxScore": 0.41246463060379024,
       "firstRecalledAt": "2026-05-27T02:14:36.577Z",
-      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
+      "lastRecalledAt": "2026-06-29T08:15:00.000Z",
       "queryHashes": [
         "246907819e8d",
         "43312cd65cf7",
-        "b3e17031f3c2"
+        "b3e17031f3c2",
+        "38f71f496af7"
       ],
       "recallDays": [
         "2026-05-27",
-        "2026-06-01"
+        "2026-06-01",
+        "2026-06-29"
       ],
       "conceptTags": [
         "备份",
@@ -402,22 +404,24 @@
       "endLine": 42,
       "source": "memory",
       "snippet": "## 2026-04-10 乐器语言合成器开发 ### 上午会话 (11:00-11:24) **项目**: 乐器语言合成器 (Instrument Language Synth) **版本**: v1.2 #### 完成的功能 1. **真实钢琴采样集成** - 接收并处理了用户提供的10个WAV采样文件 - 采样范围: D4, E4, F4, A4, B4, D5, E5, F5, A5, B5 - 存储位置: `assets/audio/samples/piano/` 2. **五声音阶设计** - 采用中国传统五声音阶 (宫商角徵羽) - 对应音符: D(1)、E(2)、G(3)、A(5)、B(6) - 不包含4和7，旋律更和谐流畅 3. **10键音符键盘** - 5×2 网格布局 - 固定UI，切换乐器时布局不变 - 支持鼠标点击和触摸操作 - 视觉反馈: 按下时缩放和发光效果 4. **多乐器支持架构** - 钢琴: 使用真实采样 (playbackRate音高调整) - 其他乐器: Web Audio API合成音色 - `getCurrentInstrumentNotes()` 函数管理10个音符数据 - 切换乐器自动切换音色，UI布局保持不变 #### 技术实现要点 - 采样预加载机制 - 最近采样匹配 + playbackRate音高微调 - 情感分析调整演奏参数 - 实时波形可视化 #### 文件位置 - 主文件: `sound-effects/in",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1.1893011063337324,
+      "totalScore": 1.62446810901165,
       "maxScore": 0.45799986422061917,
       "firstRecalledAt": "2026-05-27T02:15:00.403Z",
-      "lastRecalledAt": "2026-06-23T03:23:22.156Z",
+      "lastRecalledAt": "2026-06-29T08:15:00.000Z",
       "queryHashes": [
         "a0b8f2212ce3",
         "b3e17031f3c2",
-        "fe497043a55b"
+        "fe497043a55b",
+        "38f71f496af7"
       ],
       "recallDays": [
         "2026-05-27",
         "2026-06-01",
-        "2026-06-23"
+        "2026-06-23",
+        "2026-06-29"
       ],
       "conceptTags": [
         "00-11",
@@ -437,20 +441,22 @@
       "endLine": 161,
       "source": "memory",
       "snippet": "- 但 `animationId` 只在 `visualize()` 函数内部被赋值（`animationId = requestAnimationFrame(draw)`），**从未在全局作用域 `let` 声明** - 浏览器严格模式下抛出 `ReferenceError: animationId is not defined`，整个 `playText()` 在第一行检查就中断 - 修复：在全局作用域添加 `let animationId = null;` ### 全局乐器路径验证 - 放开 `canPlayNormalNotes = true`，所有乐器都能进入音符事件循环 - 采样未加载时 `playTone()` 内部自动回退到 `playSynthTone()` - 8 种乐器全部验证通过：piano/xylophone/guitar(s vocal)/saxophone/flute/synth/train/trumpet ### v3.17.6 追加修复 - `updateParams()` 中引用已删除的 DOM ID（`currentInstrumentForOffset`、`currentOffsetMs`）导致 `TypeError` - 修复：全部 `getElementById + textContent` 操作加防御性 `if (el) el.textContent = ...` ### 修复后状态 - 用户最终确认：演奏文字有声音了 ✅ - 版本号最终状态：**v3.17.6** --- ## 2026-05-05 16:00 ~ 17",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.8044485062360763,
+      "totalScore": 1.2234329164028166,
       "maxScore": 0.42031978368759154,
       "firstRecalledAt": "2026-05-27T02:15:12.147Z",
-      "lastRecalledAt": "2026-06-01T06:29:21.320Z",
+      "lastRecalledAt": "2026-06-29T08:15:00.000Z",
       "queryHashes": [
         "43312cd65cf7",
-        "b3e17031f3c2"
+        "b3e17031f3c2",
+        "38f71f496af7"
       ],
       "recallDays": [
         "2026-05-27",
-        "2026-06-01"
+        "2026-06-01",
+        "2026-06-29"
       ],
       "conceptTags": [
         "piano/xylophone/guitar",
@@ -958,6 +964,291 @@
         "chordvolumes.piano",
         "chordvolumes.xylophone",
         "nav-config.js"
+      ]
+    },
+    "memory:memory/2026-04-10.md:221:270": {
+      "key": "memory:memory/2026-04-10.md:221:270",
+      "path": "memory/2026-04-10.md",
+      "startLine": 221,
+      "endLine": 270,
+      "source": "memory",
+      "snippet": "- sad: ['伤', '悲', '泪', '痛', '难过', '伤心'] - excited: ['兴奋', '激动', '惊', '哇', '太棒了'] - calm: ['静', '宁', '平', '安静', '平静'] - mysterious: ['神', '秘', '奇', '神秘'] ### 默认情绪音频 (v3.3.52) **用户上传**: - 文件: `happy.wav` (156KB) - 位置: `assets/audio/emotions/happy.wav` - 功能: 检测到\"开心\"文案时自动播放 **加载机制**: - 网页启动时自动加载默认情绪音频 - 用户上传的文件会覆盖默认音频 - 异步加载，不影响钢琴采样加载 ### 提交记录 ``` 8efce3f - 一声区间修正 D4→F4 aab6203 - 区间内随机洗牌，移除滑音 822e917 - 整体音量提升2x f142f61 - 修复文本播放音量问题 872607d - 优化音频清晰度 277d983 - 添加开心预设和MIDI导入 4e01c2c - 情绪专属文件上传系统 37b1f1f - 智能情绪预设自动检测 3084602 - 添加'开心'等情绪关键词 77ebe5b - 添加情感分析调试日志 4597b99 - 添加'开心'情绪默认音频文件 ``` --- ## 版本号管理规则 ### 版本号格式 **v[MAJOR].[MINOR].[PATCH]** - MAJOR: 主版本号（重大更新） - MINOR: 次版本号（功能更新） - PATCH:",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1.3158822327852249,
+      "maxScore": 0.4504906594753265,
+      "firstRecalledAt": "2026-06-29T08:15:00.000Z",
+      "lastRecalledAt": "2026-06-29T08:15:08.869Z",
+      "queryHashes": [
+        "38f71f496af7",
+        "7033ce3cbe84",
+        "7cd5735cf2b1"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "v3.3.52",
+        "happy.wav",
+        "assets/audio/emotions/happy.wav",
+        "sad",
+        "难过",
+        "伤心",
+        "excited",
+        "兴奋"
+      ]
+    },
+    "memory:memory/2026-04-24.md:1:29": {
+      "key": "memory:memory/2026-04-24.md:1:29",
+      "path": "memory/2026-04-24.md",
+      "startLine": 1,
+      "endLine": 29,
+      "source": "memory",
+      "snippet": "# 2026-04-24 工作日志 ## Yellow-pages-game 语义 MIDI 系统 ### 版本迭代 - v3.7.0 → v3.11.x (多次迭代) - 当前: v3.11.8 (语义 MIDI 导出修复) ### 核心改动 1. **新增 semantic-player.js** — MIDI 解析器 + 语义播放器 2. **新增 7 个语义 MIDI** (semantic_01-07.mid) - 01: 感谢 | 02: 打招呼 | 03: 道歉 | 04: 请求 - 05: 告别 | 06: 赞美 | 07: 确认 3. **修复启动崩溃** — 函数名冲突 + 404 阻断 4. **UI 重构** — 删除快速预设，替换为语义分类触发面板 5. **实时检测** — 语义分类 + 角色声纹实时 badge 提示 6. **导出修复** — phraseMidi 使用与实时播放一致的采样渲染 7. **高亮效果** — phraseMidi 青色发光 + 右侧卡片闪烁反馈 ### 待确认问题 - 木琴 xylophone 播放时有 8bit 合成音色混入（已加调试日志，等待用户反馈） - 可能原因：某个音符采样加载失败回退到合成器 ### 技术要点 - `phraseTriggerCategories` 只保留有 MIDI 文件的分类 - `textToEvents()` 只匹配 `parsedMidi` 存在的分类 - `renderAudioToBuffer()` 中 phraseMidi 使用 `renderSamp",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4123530834913254,
+      "maxScore": 0.4123530834913254,
+      "firstRecalledAt": "2026-06-29T08:15:00.000Z",
+      "lastRecalledAt": "2026-06-29T08:15:00.000Z",
+      "queryHashes": [
+        "38f71f496af7"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "yellow-pages-game",
+        "v3.7.0",
+        "v3.11.x",
+        "v3.11.8",
+        "semantic-player.js",
+        "semantic-01-07.mid",
+        "工作",
+        "日志"
+      ]
+    },
+    "memory:memory/2026-04-10.md:193:230": {
+      "key": "memory:memory/2026-04-10.md:193:230",
+      "path": "memory/2026-04-10.md",
+      "startLine": 193,
+      "endLine": 230,
+      "source": "memory",
+      "snippet": "- 限制最大增益为3x（避免削波） - 优化ADSR包络（起音+保持+衰减） - 降低采样增益到1.5x-2.5x - 音符时长从300ms增加到400ms - 播放间隔从200-400ms调整到300-500ms - 混响从30%降低到20% ### 情绪专属文件系统 (v3.3.48) **新增功能**: 1. **情绪专属上传面板** - 点击情绪按钮显示文件上传界面 2. **支持格式** - MIDI (.mid/.midi) 和音频 (任意音频格式) 3. **播放优先级** - 音频 > MIDI > 文字转音乐 4. **数据结构** - `emotionFiles[emotionKey]` 存储每个情绪的专属文件 **实现的情绪**: - happy (开心) 😊 - 彩虹渐变按钮 ### 智能情绪预设 (v3.3.49) **自动检测流程**: 1. 输入文本时自动分析情感关键词 2. 检测到有情绪专属文件时自动播放 3. 打开对应情绪面板 4. 等待播放完成后结束 **情绪关键词**: - happy: ['好', '棒', '喜', '乐', '爱', '开心', '快乐', '高兴', '愉快', '幸福'] - sad: ['伤', '悲', '泪', '痛', '难过', '伤心'] - excited: ['兴奋', '激动', '惊', '哇', '太棒了'] - calm: ['静', '宁', '平', '安静', '平静'] - mysterious: ['神', '秘', '奇', '神秘'] ### 默认情绪音频 (v",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1.2705757677555085,
+      "maxScore": 0.45120406448841094,
+      "firstRecalledAt": "2026-06-29T08:15:00.000Z",
+      "lastRecalledAt": "2026-06-29T08:15:08.869Z",
+      "queryHashes": [
+        "38f71f496af7",
+        "7033ce3cbe84",
+        "7cd5735cf2b1"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "降低采样增益到1.5x-2.5x",
+        "播放间隔从200-400ms调整到300-500ms",
+        "v3.3.48",
+        "v3.3.49",
+        "限制",
+        "最大",
+        "增益",
+        "避免"
+      ]
+    },
+    "memory:memory/2026-05-07.md:45:69": {
+      "key": "memory:memory/2026-05-07.md:45:69",
+      "path": "memory/2026-05-07.md",
+      "startLine": 45,
+      "endLine": 69,
+      "source": "memory",
+      "snippet": "- 事件对象保留 expressionTempoScale / expressionVelocityScale / expressionPauseAfterMs ### 两种映射模式测试句 - dialogue-fixed：主要输出 A4/B4/D5/E5 - legacy-tone-region：一声 D4/E4/F4，二声 F4/A4/B4，三声 D5/E5/F5，四声 F5/A5/B5，轻声 rest - 同一句连续跑两次结果必须一致 ### QA 清单 - 基础：UI选择器、名称正确、不报error、切换不卡死 - 播放：文字演奏、MIDI、语义触发、角色声纹、实时使用新乐器、第一颗音不是 synth fallback - 导出：WAV成功、非空、使用新音色、时长一致、Expression Segment生效 - 映射：dialogue-fixed 正常、legacy 正常且稳定、缺采样用 nearest sample - 布局：LayoutGuard 通过（workbench 3子、right-panel 父正确、tabs可见、mappingMode可见） ### 交付报告格式 必须包含：新增乐器列表、采样覆盖情况、已验证功能、LayoutGuard结果、已知限制 --- ## 今日代码变更 - 早期音区标点规则统一为对白模式（v3.23.6 已推送） - 移除标点处理对 dialogueVoiceMode 的条件限制 - 早期音区使用 dialoguePunctuationPauses 呼吸暂停 - 问号/感叹号效果对早期音区生效 - app",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.8673250496387481,
+      "maxScore": 0.4515175938606262,
+      "firstRecalledAt": "2026-06-29T08:15:05.151Z",
+      "lastRecalledAt": "2026-06-29T08:15:08.869Z",
+      "queryHashes": [
+        "7033ce3cbe84",
+        "7cd5735cf2b1"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "dialogue-fixed",
+        "a4/b4/d5/e5",
+        "legacy-tone-region",
+        "d4/e4/f4",
+        "f4/a4/b4",
+        "d5/e5/f5",
+        "f5/a5/b5",
+        "right-panel"
+      ]
+    },
+    "memory:memory/2026-05-06.md:1:36": {
+      "key": "memory:memory/2026-05-06.md:1:36",
+      "path": "memory/2026-05-06.md",
+      "startLine": 1,
+      "endLine": 36,
+      "source": "memory",
+      "snippet": "--- ## 2026-05-06 Evening - characterVoice Expression Segment + Mapping Mode ### v3.22.5 → v3.22.6：characterVoice 全链路 Expression Segment **问题**：Expression Segment 对 characterVoice 事件无效（实时播放和导出都不生效）。 **修复清单**： 1. `textToNotes` 创建 characterVoice 事件时补 `sourceCharIndex: index` 2. `applyExpressionSegments` 映射改为 `evt.sourceCharIndex ?? evt.position ?? -1`，支持 characterVoice 事件 3. `playText` 循环中 `await playCharacterVoice(event.character, event)` 传入完整 event 4. `playCharacterVoice(characterName, event=null)` 应用 expression： - `playbackRate = Math.max(0.25, Math.min(4, exprTempo * curve))` - `gainNode.gain.value = params.masterVolume * exprVelocity` 5. `calculateAudioDuration` characterVoice",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.8333031594753264,
+      "maxScore": 0.43174734413623805,
+      "firstRecalledAt": "2026-06-29T08:15:05.151Z",
+      "lastRecalledAt": "2026-06-29T08:15:08.869Z",
+      "queryHashes": [
+        "7033ce3cbe84",
+        "7cd5735cf2b1"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "v3.22.5",
+        "v3.22.6",
+        "evt.sourcecharindex",
+        "evt.position",
+        "event.character",
+        "math.max",
+        "0.25",
+        "math.min"
+      ]
+    },
+    "memory:memory/2026-04-10.md:133:168": {
+      "key": "memory:memory/2026-04-10.md:133:168",
+      "path": "memory/2026-04-10.md",
+      "startLine": 133,
+      "endLine": 168,
+      "source": "memory",
+      "snippet": "- 添加常用汉字声调映射表 (toneMap) - 实现 `getCharTone()` 函数检测字符声调 - 实现 `getToneRegion()` 函数映射到音高区域 - 滑音效果：二声、三声、四声使用双音符连奏模拟音高变化 - 轻声：返回休止符 (isRest: true) - 音符显示添加声调标记（̄ ́ ̌ ̀）和滑音符号（↗） **代码结构：** ```javascript // 声调检测 const toneMap = { '一': 1, '二': 4, '你': 3, '我': 3, ... }; // 音高区域映射 const regions = { 0: { base: 'D4', range: 0, glide: false, rest: true }, // 轻声 1: { base: 'D4', range: 1, glide: false, rest: false }, // 阴平 2: { base: 'F4', range: 3, glide: true, rest: false }, // 阳平 3: { base: 'D5', range: 2, glide: true, rest: false }, // 上声 4: { base: 'F5', range: 3, glide: true, rest: false } // 去声 }; ``` #### E5音量问题QA **用户反馈**: E5音量不够大，即使增益加到+10dB (3.16x) 仍感觉和其他音符一样 **浏览器调试结果：**",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4282677292823791,
+      "maxScore": 0.4282677292823791,
+      "firstRecalledAt": "2026-06-29T08:15:05.151Z",
+      "lastRecalledAt": "2026-06-29T08:15:05.151Z",
+      "queryHashes": [
+        "7033ce3cbe84"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "3.16x",
+        "添加",
+        "常用",
+        "汉字",
+        "声调",
+        "映射",
+        "tonemap",
+        "实现"
+      ]
+    },
+    "memory:memory/2026-05-04.md:30:50": {
+      "key": "memory:memory/2026-05-04.md:30:50",
+      "path": "memory/2026-05-04.md",
+      "startLine": 30,
+      "endLine": 50,
+      "source": "memory",
+      "snippet": "- resolveVoiceShaping() 继承顺序：global < voiceDefault < characterOverride - A/B 播放等待完整播放结束后再恢复参数 ### v3.15.6 - UI 面板重组： - 主界面：乐器选择 → 当前 Voice 徽章 → 基础参数(BPM/发音密度/音量) → Voice Shaping → 空间/Effects(混响) → 导出 - 高级区折叠：声调时值映射、实验性节奏随机⚠️、Sample Trim、和弦长度 - Legacy 区折叠：播放间隔、包络长度（提示已被 Voice Shaping 覆盖） - 频谱显示移到中间面板音符序列下方 ## 待办 - [ ] v3.15.6 QA 剩余 3 项修复（待推送）： 1. testPlayText() 返回 undefined → 改为 return playText() 2. calculateAudioDuration() double count → 改为时间线算法 (currentTime + lastAudioEndTime) 3. UI 重复区块：空间/Effects 和导出按钮各出现 2 次 ## 约定 - 每次 git push 后必须主动报出版本号 - 导航栏隐藏项（projects/caps/finance）已记入 MEMORY.md，后续更新 nav-config.js 时需检查不再恢复",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.42593646347522734,
+      "maxScore": 0.42593646347522734,
+      "firstRecalledAt": "2026-06-29T08:15:05.151Z",
+      "lastRecalledAt": "2026-06-29T08:15:05.151Z",
+      "queryHashes": [
+        "7033ce3cbe84"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "a/b",
+        "v3.15.6",
+        "bpm/发音密度/音量",
+        "空间/effects",
+        "projects/caps/finance",
+        "memory.md",
+        "nav-config.js",
+        "resolvevoiceshaping"
+      ]
+    },
+    "memory:memory/2026-05-11.md:117:141": {
+      "key": "memory:memory/2026-05-11.md:117:141",
+      "path": "memory/2026-05-11.md",
+      "startLine": 117,
+      "endLine": 141,
+      "source": "memory",
+      "snippet": "2. **minimal mode dropping negation**: The protected phrase \"不太对劲\" was detected by `scanProtectedPhrases()` on the original text, but the individual note for \"不\" was scored normally (+80 for negation) alongside other semantic notes. When minimal mode kept only top 4, \"对\" and \"劲\" from protected phrases had no extra boost over regular emotion keywords, so \"不\" could be dropped. Semantic inversion: \"不太对劲\" → \"对劲\". ### Fix applied (v3.28.3) Rewrote `applyNoteDensityReduction()` with **global scoring + hard priority tiers** instead of anchor-based + quota layering: **Priority tiers (highest → lowest)**: 1. **Protected phrases**: +10000 (essentially un-droppable unless extreme case >100 notes) 2.",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.41634097099304196,
+      "maxScore": 0.41634097099304196,
+      "firstRecalledAt": "2026-06-29T08:15:08.869Z",
+      "lastRecalledAt": "2026-06-29T08:15:08.869Z",
+      "queryHashes": [
+        "7cd5735cf2b1"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "v3.28.3",
+        "anchor-based",
+        "un-droppable",
+        "minimal",
+        "mode",
+        "dropping",
+        "negation",
+        "the"
+      ]
+    },
+    "memory:memory/2026-05-11.md:137:153": {
+      "key": "memory:memory/2026-05-11.md:137:153",
+      "path": "memory/2026-05-11.md",
+      "startLine": 137,
+      "endLine": 153,
+      "source": "memory",
+      "snippet": "| 你不要过去那里好像有点不太对劲 | natural | 10 notes | ✅ | | 你不要过去那里好像有点不太对劲 | compact | 7 notes | ✅ (was 10) | | 别担心小牧现在这里好像有点不太对劲 | minimal | \"不\" + \"对\" + \"劲\" retained | ✅ (no semantic inversion) | ### All 19 original QA items preserved - full no compression, natural ~10 notes, short text no reduce, punctuated no reduce - characterVoice / phraseMidi / pause preserved - Real-time and WAV same events - 3-column layout intact - No global errors ### Key lesson learned Anchor-based (head/tail fixed) + quota layering seems logical but fails when the \"important middle\" is larger than the allocated quota. Global scoring with massive priority gaps is simpler and more reliable. Protected phrases need **extreme**",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4020592480897903,
+      "maxScore": 0.4020592480897903,
+      "firstRecalledAt": "2026-06-29T08:15:08.869Z",
+      "lastRecalledAt": "2026-06-29T08:15:08.869Z",
+      "queryHashes": [
+        "7cd5735cf2b1"
+      ],
+      "recallDays": [
+        "2026-06-29"
+      ],
+      "conceptTags": [
+        "real-time",
+        "3-column",
+        "anchor-based",
+        "head/tail",
+        "不要",
+        "过去",
+        "那里",
+        "好像"
       ]
     }
   }
