@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.50.0';
+        const APP_VERSION = 'v3.50.1';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -4595,14 +4595,14 @@
         // 情绪转折词：暗示前后情绪对比
         const TRANSITION_WORDS = ['但是', '然而', '不过', '可是', '却', '只是', '偏偏', '没想到', '谁知', '不料', '反而', '反倒', '尽管', '虽然', '即使', '即便', '哪怕', '无论', '不管', '不论', '可惜', '遗憾', '可悲', '可叹', '不幸的是', '令人难过的是', '令人遗憾的是'];
 
-        // 情绪 → 音乐参数映射表（V2 分层映射）
+        // 情绪 → 音乐参数映射表（V2 增强版，更激进的表现力）
         const EMOTION_MUSIC_PARAMS = {
-            happy:   { tempoScale: 1.15, velocityScale: 1.20, curveType: 'accelerate',  pauseAfterMs: 220, pitchRangeScale: 1.25, articulationMode: 'staccato' },
-            sad:     { tempoScale: 0.72, velocityScale: 0.65, curveType: 'decelerate',  pauseAfterMs: 550, pitchRangeScale: 0.70, articulationMode: 'legato' },
-            excited: { tempoScale: 1.25, velocityScale: 1.35, curveType: 'accelerate',  pauseAfterMs: 180, pitchRangeScale: 1.35, articulationMode: 'staccato' },
-            calm:    { tempoScale: 0.82, velocityScale: 0.70, curveType: 'easeInOut',   pauseAfterMs: 450, pitchRangeScale: 0.85, articulationMode: 'legato' },
-            mysterious: { tempoScale: 0.78, velocityScale: 0.80, curveType: 'hesitate', pauseAfterMs: 650, pitchRangeScale: 0.90, articulationMode: 'legato' },
-            comfort: { tempoScale: 0.75, velocityScale: 0.55, curveType: 'easeInOut',   pauseAfterMs: 480, pitchRangeScale: 0.75, articulationMode: 'legato' }
+            happy:   { tempoScale: 1.35, velocityScale: 1.40, curveType: 'accelerate',  pauseAfterMs: 180, pitchRangeScale: 1.35, articulationMode: 'staccato' },
+            sad:     { tempoScale: 0.55, velocityScale: 0.40, curveType: 'decelerate',  pauseAfterMs: 650, pitchRangeScale: 0.60, articulationMode: 'legato' },
+            excited: { tempoScale: 1.50, velocityScale: 1.55, curveType: 'accelerate',  pauseAfterMs: 150, pitchRangeScale: 1.50, articulationMode: 'staccato' },
+            calm:    { tempoScale: 0.70, velocityScale: 0.55, curveType: 'easeInOut',   pauseAfterMs: 500, pitchRangeScale: 0.80, articulationMode: 'legato' },
+            mysterious: { tempoScale: 0.60, velocityScale: 0.65, curveType: 'hesitate', pauseAfterMs: 750, pitchRangeScale: 0.85, articulationMode: 'legato' },
+            comfort: { tempoScale: 0.65, velocityScale: 0.35, curveType: 'easeInOut',   pauseAfterMs: 550, pitchRangeScale: 0.65, articulationMode: 'legato' }
         };
 
         // 中性参数（无情绪时的默认）
@@ -6243,11 +6243,11 @@
                     }
                 }
 
-                // 6. V2 边界放宽（更大的表现力范围）
-                tempoScale = Math.max(0.60, Math.min(1.40, tempoScale));
-                velocityScale = Math.max(0.50, Math.min(1.40, velocityScale));
-                pauseAfterMs = Math.max(0, Math.min(1000, pauseAfterMs));
-                pitchRangeScale = Math.max(0.50, Math.min(1.50, pitchRangeScale));
+                // 6. V2 边界大幅放宽（更激进的表现力范围）
+                tempoScale = Math.max(0.30, Math.min(1.70, tempoScale));
+                velocityScale = Math.max(0.20, Math.min(1.70, velocityScale));
+                pauseAfterMs = Math.max(0, Math.min(1200, pauseAfterMs));
+                pitchRangeScale = Math.max(0.40, Math.min(1.70, pitchRangeScale));
 
                 // 保留用户手动覆盖值（如果有）
                 const existing = expressionSegments && expressionSegments[i];
@@ -8205,18 +8205,18 @@
                             factor = 1.0;
                             break;
                         case 'accelerate':
-                            factor = 0.9 + (1.15 - 0.9) * (j / Math.max(1, n - 1));
+                            factor = 0.75 + (1.45 - 0.75) * (j / Math.max(1, n - 1));
                             break;
                         case 'decelerate':
-                            factor = 1.15 - (1.15 - 0.85) * (j / Math.max(1, n - 1));
+                            factor = 1.45 - (1.45 - 0.55) * (j / Math.max(1, n - 1));
                             break;
                         case 'hesitate':
-                            factor = 0.75;
+                            factor = 0.55;
                             break;
                         case 'easeInOut':
                             {
                                 const t = j / Math.max(1, n - 1);
-                                factor = 0.85 + 0.3 * Math.sin(t * Math.PI);
+                                factor = 0.70 + 0.6 * Math.sin(t * Math.PI);
                             }
                             break;
                         default:
