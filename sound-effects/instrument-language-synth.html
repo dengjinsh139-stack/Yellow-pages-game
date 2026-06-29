@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.39.11';
+        const APP_VERSION = 'v3.50.0';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -4529,14 +4529,85 @@
             });
         }
 
-        // 情感关键词
+        // 情感关键词 V2（带权重，1-3分，3分最强）
         const emotionKeywords = {
-            happy: ['好', '棒', '喜', '乐', '爱', '开心', '快乐', '高兴', '愉快', '幸福', 'happy', 'good', 'great', 'love', 'wonderful', 'joy'],
-            sad: ['伤', '悲', '泪', '痛', '难过', '伤心', 'sad', 'cry', 'tear', 'sorry', 'miss'],
-            excited: ['兴奋', '激动', '惊', '哇', 'wow', 'amazing', 'excited', 'awesome', '太棒了'],
-            calm: ['静', '宁', '平', 'calm', 'peace', 'quiet', 'relax', '安静', '平静'],
-            mysterious: ['神', '秘', '奇', 'mystery', 'magic', 'wonder', '神秘'],
-            comfort: ['安慰', '抱抱', '没事', '别怕', '放心', '我在', '陪你', '好了好了', '没事的', '别担心', '抱抱你', '心疼', '没事没事', '没关系', '会好的', '不要难过', '别伤心', '我在呢', '不怕', '乖', '摸摸头', '给你抱抱', '加油', '坚持住', '一切都会好', '别担心了', '有我在', '我陪着你', '放松', '深呼吸', '平静下来', 'comfort', 'hug', 'dont worry', 'its okay', 'there there', 'calm down', 'take it easy']
+            happy: {
+                '开心': 3.0, '快乐': 3.0, '高兴': 2.5, '幸福': 2.5, '愉快': 2.5, '喜悦': 2.5, '欢乐': 2.5,
+                '棒': 1.5, '好': 1.0, '喜': 1.0, '乐': 1.0, '爱': 1.5, '喜欢': 2.0, 'good': 1.5, 'great': 2.0,
+                'love': 2.0, 'wonderful': 2.0, 'joy': 2.0, 'happy': 1.5, '哈哈': 2.0, '嘻嘻': 1.5, '嘿嘿': 1.5,
+                '太棒了': 2.5, '真棒': 2.0, '不错': 1.5, '完美': 2.0, '赞': 1.5, '满足': 1.5, '欣慰': 2.0
+            },
+            sad: {
+                '伤心': 3.0, '难过': 3.0, '悲伤': 3.0, '悲痛': 3.0, '哀伤': 2.5, '凄婉': 2.5, '凄凉': 2.5,
+                '哭': 2.5, '泪': 2.5, '流泪': 2.5, '哭泣': 2.5, '哽咽': 2.5, '抽泣': 2.0, '啜泣': 2.0,
+                '痛': 2.0, '痛苦': 2.5, '伤痛': 2.5, '心痛': 2.5, '痛彻': 2.5, '失去': 2.0, '逝去': 2.5,
+                'sad': 2.0, 'cry': 2.0, 'tear': 2.0, 'sorry': 1.5, 'miss': 1.5, '孤独': 2.5, '寂寞': 2.5,
+                '寂寞': 2.5, '孤寂': 2.5, '孤单': 2.0, '冷清': 2.0, '绝望': 2.5, '无望': 2.0, '灰心': 1.5,
+                '惆怅': 2.0, '忧郁': 2.0, '郁闷': 1.5, '失落': 2.0, '落空': 1.5, '失望': 1.5, '心碎': 2.5
+            },
+            excited: {
+                '兴奋': 3.0, '激动': 3.0, '激动人心': 3.0, '振奋': 2.5, '激动万分': 3.0, '热血沸腾': 3.0,
+                '惊': 2.0, '惊喜': 2.5, '惊讶': 2.0, '震惊': 2.5, '惊叹': 2.0, '震撼': 2.5,
+                '哇': 2.0, '哇哦': 2.0, 'wow': 2.0, 'amazing': 2.5, 'excited': 2.0, 'awesome': 2.5,
+                '太棒了': 2.5, '太厉害了': 2.5, '难以置信': 2.5, '不可思议': 2.0, '超': 1.5, '超级': 2.0,
+                '冲': 2.0, '冲啊': 2.5, '杀': 2.0, '冲杀': 2.5, '冲锋': 2.0, '冲上去': 2.5, '猛': 2.0,
+                '猛烈': 2.5, '激烈': 2.5, '极速': 2.0, '急速': 2.0, '飞速': 2.0, '快速': 1.5, '迫不及待': 2.5
+            },
+            calm: {
+                '静': 2.0, '宁静': 2.5, '安静': 2.0, '平静': 2.5, ' tranquil': 2.0, 'peace': 2.0, 'quiet': 1.5,
+                '宁': 1.5, '安宁': 2.5, '平和': 2.5, '温和': 2.0, '柔和': 2.0, '温顺': 2.0, '恬淡': 2.5,
+                'relax': 1.5, 'calm': 2.0, '放松': 2.0, '舒缓': 2.0, '缓和': 1.5, '慢': 1.0, '慢下来': 2.0,
+                '从容': 2.0, '淡定': 2.0, '沉稳': 2.0, '稳重': 2.0, '沉着': 2.0, '镇静': 2.0, '冷静': 2.0,
+                '休息': 1.5, '歇': 1.5, '停': 1.0, '停下来': 1.5, '歇歇': 1.5, '歇会儿': 1.5
+            },
+            mysterious: {
+                '神秘': 3.0, '神秘莫测': 3.0, '诡异': 2.5, '诡秘': 2.5, '离奇': 2.0, '古怪': 2.0, '怪异': 2.0,
+                '神': 1.5, '秘': 1.5, '奇': 1.5, '奇特': 2.0, '奇异': 2.0, '奇妙': 2.0, '不可思议': 2.0,
+                'mystery': 2.0, 'magic': 2.0, 'wonder': 1.5, 'magical': 2.0, 'enchanted': 2.5, 'spell': 2.0,
+                '未知': 2.0, '未解': 2.0, '谜': 2.0, '谜团': 2.5, '谜题': 2.0, '悬念': 2.0, '悬疑': 2.5,
+                '隐藏': 2.0, '潜伏': 2.0, '暗藏': 2.0, '暗中': 2.0, '隐秘': 2.5, '秘密': 2.0, '机密': 2.0
+            },
+            comfort: {
+                '安慰': 3.0, '安抚': 3.0, '慰藉': 2.5, '宽慰': 2.5, '劝慰': 2.5, '抚慰': 2.5, '慰问': 2.0,
+                '抱抱': 2.5, '拥抱': 2.5, '没事': 2.0, '别怕': 2.5, '别害怕': 2.5, '放心': 2.5, '安心': 2.5,
+                '我在': 2.0, '陪你': 2.0, '陪着你': 2.5, '好了好了': 2.0, '没事的': 2.0, '别担心': 2.5,
+                '抱抱你': 2.5, '心疼': 2.5, '没事没事': 2.0, '没关系': 2.0, '会好的': 2.5, '一切都会好': 2.5,
+                '不要难过': 2.5, '别伤心': 2.5, '我在呢': 2.5, '不怕': 2.0, '乖': 2.0, '摸摸头': 2.0,
+                '给你抱抱': 2.5, '加油': 2.0, '坚持住': 2.5, '别担心了': 2.0, '有我在': 2.5, '我陪着你': 2.5,
+                '放松': 2.0, '深呼吸': 2.0, '平静下来': 2.5, 'comfort': 2.0, 'hug': 2.0, 'dont worry': 2.0,
+                'its okay': 2.0, 'there there': 2.0, 'calm down': 2.0, 'take it easy': 2.0, '温柔的': 1.5,
+                '柔声': 2.0, '轻轻': 1.5, '轻轻说': 2.0, '温和': 2.0, '暖暖': 2.0, '温暖': 2.0, '暖': 1.5
+            }
+        };
+
+        // 否定词：翻转情绪极性
+        const NEGATION_WORDS = new Set(['不', '没', '无', '别', '未', '不要', '不是', '不会', '不能', '不可以', '不行', '不该', '不该', '不许', '不准', '不得', '不必', '无须', '不用', '从未', '从来没有', '再也不', '永不', '绝不', '从不', '一点也', '一点都']);
+
+        // 程度词：调节情绪强度
+        const INTENSIFIER_WORDS = {
+            '非常': 1.4, '很': 1.2, '特别': 1.3, '太': 1.25, '实在': 1.2, '真的': 1.15, '确实': 1.15, '十分': 1.3,
+            '极其': 1.5, '极度': 1.5, '极端': 1.4, '万分': 1.5, '特别': 1.3, '超级': 1.3, '格外': 1.3, '分外': 1.3,
+            '无比': 1.4, '难以': 1.2, '无法': 1.2, '不禁': 1.15, '不由自主': 1.2, '控制不住': 1.3, '不由自主': 1.2,
+            '有点': 0.6, '稍微': 0.5, '略': 0.5, '略微': 0.55, '稍': 0.5, '稍微': 0.5, '稍许': 0.55, '一点点': 0.45,
+            '不太': 0.4, '不怎么': 0.4, '说不上': 0.5, '不算': 0.5, '勉强': 0.5, '似乎': 0.6, '好像': 0.6, '大概': 0.6
+        };
+
+        // 情绪转折词：暗示前后情绪对比
+        const TRANSITION_WORDS = ['但是', '然而', '不过', '可是', '却', '只是', '偏偏', '没想到', '谁知', '不料', '反而', '反倒', '尽管', '虽然', '即使', '即便', '哪怕', '无论', '不管', '不论', '可惜', '遗憾', '可悲', '可叹', '不幸的是', '令人难过的是', '令人遗憾的是'];
+
+        // 情绪 → 音乐参数映射表（V2 分层映射）
+        const EMOTION_MUSIC_PARAMS = {
+            happy:   { tempoScale: 1.15, velocityScale: 1.20, curveType: 'accelerate',  pauseAfterMs: 220, pitchRangeScale: 1.25, articulationMode: 'staccato' },
+            sad:     { tempoScale: 0.72, velocityScale: 0.65, curveType: 'decelerate',  pauseAfterMs: 550, pitchRangeScale: 0.70, articulationMode: 'legato' },
+            excited: { tempoScale: 1.25, velocityScale: 1.35, curveType: 'accelerate',  pauseAfterMs: 180, pitchRangeScale: 1.35, articulationMode: 'staccato' },
+            calm:    { tempoScale: 0.82, velocityScale: 0.70, curveType: 'easeInOut',   pauseAfterMs: 450, pitchRangeScale: 0.85, articulationMode: 'legato' },
+            mysterious: { tempoScale: 0.78, velocityScale: 0.80, curveType: 'hesitate', pauseAfterMs: 650, pitchRangeScale: 0.90, articulationMode: 'legato' },
+            comfort: { tempoScale: 0.75, velocityScale: 0.55, curveType: 'easeInOut',   pauseAfterMs: 480, pitchRangeScale: 0.75, articulationMode: 'legato' }
+        };
+
+        // 中性参数（无情绪时的默认）
+        const NEUTRAL_MUSIC_PARAMS = {
+            tempoScale: 1.0, velocityScale: 1.0, curveType: 'flat', pauseAfterMs: 0, pitchRangeScale: 1.0, articulationMode: 'normal'
         };
 
         // ===== Note Density Reducer v2: 模式配置 =====
@@ -6064,7 +6135,7 @@
         }
 
         // ===== Expression Segment Auto Curve V1 =====
-        // 关键词库（保守 V1）
+        // 关键词库（保留用于兼容，但情绪分析优先使用 V2）
         const AUTO_CURVE_KEYWORDS = {
             command:   ['来', '去', '快', '上', '下', '走', '跑', '冲', '杀', '打', '接', '放', '按', '开', '关'],
             danger:      ['小心', '危险', '警报', '警告', '逃', '死', '伤', '火', '爆炸', '毒', '凶', '杀'],
@@ -6072,10 +6143,9 @@
             hesitate:    ['嗯', '呃', '啊', '那个', '可能', '也许', '大概', '好像', '似乎', '犹豫', '纠结', '想'],
         };
 
+        // ===== Expression Segment Auto Curve V2 =====
+        // 核心改进：逐句情绪分析 → 参数映射，情绪变化更自然
         function autoCurveExpressionSegments(segments) {
-            // 收集全文用于重复字检测
-            const fullText = segments.map(s => s.text).join('');
-
             return segments.map((seg, i) => {
                 const txt = seg.text;
                 const len = txt.length;
@@ -6085,75 +6155,73 @@
                 let velocityScale = 1.0;
                 let pauseAfterMs = 0;
                 let curveType = 'flat';
+                let pitchRangeScale = 1.0;
+                let articulationMode = 'normal';
+                let emotion = 'calm';
+                let intensity = 0;
 
-                // 1. 标点驱动（最优先）
+                // 1. 标点驱动（最优先，直接覆盖基础值）
                 if (seg.type === 'question') {
-                    // 疑问句：迟疑+尾音上扬
-                    tempoScale = 0.88;
-                    velocityScale = 1.05;
-                    pauseAfterMs = 350;
-                    curveType = 'hesitate';
+                    tempoScale = 0.88; velocityScale = 1.05; pauseAfterMs = 350; curveType = 'hesitate';
                 } else if (seg.type === 'exclamation') {
-                    // 惊叹句：加速+力度提升
-                    tempoScale = 1.08;
-                    velocityScale = 1.18;
-                    pauseAfterMs = 420;
-                    curveType = 'accelerate';
+                    tempoScale = 1.08; velocityScale = 1.18; pauseAfterMs = 420; curveType = 'accelerate';
                 } else if (seg.type === 'ellipsis') {
-                    // 省略号：大幅减速迟疑
-                    tempoScale = 0.78;
-                    velocityScale = 0.85;
-                    pauseAfterMs = 650;
-                    curveType = 'hesitate';
+                    tempoScale = 0.78; velocityScale = 0.85; pauseAfterMs = 650; curveType = 'hesitate';
                 } else if (seg.type === 'comma') {
-                    // 逗号：轻微减速，小停顿
-                    tempoScale = 0.95;
-                    velocityScale = 0.95;
-                    pauseAfterMs = 180;
-                    curveType = 'decelerate';
+                    tempoScale = 0.95; velocityScale = 0.95; pauseAfterMs = 180; curveType = 'decelerate';
                 } else if (seg.type === 'semicolon') {
-                    // 分号：中等停顿
-                    tempoScale = 0.92;
-                    velocityScale = 0.98;
-                    pauseAfterMs = 280;
-                    curveType = 'easeInOut';
+                    tempoScale = 0.92; velocityScale = 0.98; pauseAfterMs = 280; curveType = 'easeInOut';
                 } else if (seg.type === 'period') {
-                    // 句号：收束
-                    tempoScale = 0.92;
-                    velocityScale = 0.88;
-                    pauseAfterMs = 300;
-                    curveType = 'decelerate';
+                    tempoScale = 0.92; velocityScale = 0.88; pauseAfterMs = 300; curveType = 'decelerate';
                 }
 
-                // 2. 关键词叠加（normal 段才检测文本内容）
+                // 2. V2 核心：逐句情绪分析（normal 段）
                 if (seg.type === 'normal') {
-                    // 命令/催促
-                    if (AUTO_CURVE_KEYWORDS.command.some(k => txt.includes(k))) {
-                        tempoScale = Math.max(tempoScale, 1.12);
-                        velocityScale = Math.max(velocityScale, 1.15);
-                        curveType = 'accelerate';
-                    }
-                    // 危险/紧张
-                    if (AUTO_CURVE_KEYWORDS.danger.some(k => txt.includes(k))) {
-                        tempoScale = Math.min(tempoScale, 0.85);
-                        velocityScale = Math.max(velocityScale, 1.22);
-                        pauseAfterMs = Math.max(pauseAfterMs, 250);
-                        curveType = 'hesitate';
-                    }
-                    // 安慰/柔和
-                    if (AUTO_CURVE_KEYWORDS.comfort.some(k => txt.includes(k))) {
-                        tempoScale = Math.min(tempoScale, 0.90);
-                        velocityScale = Math.min(velocityScale, 0.88);
-                        curveType = 'easeInOut';
-                    }
-                    // 犹豫/迟疑
-                    if (AUTO_CURVE_KEYWORDS.hesitate.some(k => txt.includes(k))) {
-                        tempoScale = Math.min(tempoScale, 0.88);
-                        velocityScale = Math.max(velocityScale, 0.82);
-                        curveType = 'hesitate';
+                    const emotionResult = analyzeEmotionSegment(txt);
+                    emotion = emotionResult.emotion;
+                    intensity = emotionResult.intensity;
+
+                    if (intensity > 0) {
+                        const params = getMusicParamsByEmotion(emotion, intensity);
+                        // 与标点驱动值混合（标点已经设置了基础值，情绪在此基础上叠加）
+                        tempoScale      = params.tempoScale;
+                        velocityScale   = params.velocityScale;
+                        curveType       = params.curveType;
+                        pauseAfterMs    = Math.max(pauseAfterMs, params.pauseAfterMs);
+                        pitchRangeScale = params.pitchRangeScale;
+                        articulationMode = params.articulationMode;
                     }
 
-                    // 3. 重复字检测（连续重复≥3字）
+                    // 3. 关键词叠加（保守 V1 保留，用于情绪分析未覆盖到的场景）
+                    if (intensity < 0.3) {
+                        // 命令/催促
+                        if (AUTO_CURVE_KEYWORDS.command.some(k => txt.includes(k))) {
+                            tempoScale = Math.max(tempoScale, 1.12);
+                            velocityScale = Math.max(velocityScale, 1.15);
+                            curveType = 'accelerate';
+                        }
+                        // 危险/紧张
+                        if (AUTO_CURVE_KEYWORDS.danger.some(k => txt.includes(k))) {
+                            tempoScale = Math.min(tempoScale, 0.85);
+                            velocityScale = Math.max(velocityScale, 1.22);
+                            pauseAfterMs = Math.max(pauseAfterMs, 250);
+                            curveType = 'hesitate';
+                        }
+                        // 安慰/柔和
+                        if (AUTO_CURVE_KEYWORDS.comfort.some(k => txt.includes(k))) {
+                            tempoScale = Math.min(tempoScale, 0.90);
+                            velocityScale = Math.min(velocityScale, 0.88);
+                            curveType = 'easeInOut';
+                        }
+                        // 犹豫/迟疑
+                        if (AUTO_CURVE_KEYWORDS.hesitate.some(k => txt.includes(k))) {
+                            tempoScale = Math.min(tempoScale, 0.88);
+                            velocityScale = Math.max(velocityScale, 0.82);
+                            curveType = 'hesitate';
+                        }
+                    }
+
+                    // 4. 重复字检测（连续重复≥3字）
                     let repeatCount = 0;
                     for (let c = 0; c < txt.length - 2; c++) {
                         if (txt[c] === txt[c+1] && txt[c] === txt[c+2]) {
@@ -6161,13 +6229,12 @@
                         }
                     }
                     if (repeatCount > 0) {
-                        // 重复字：机械感，匀速或渐快
                         tempoScale = Math.max(tempoScale, 1.08);
                         velocityScale = Math.max(velocityScale, 1.05);
                         if (curveType === 'flat') curveType = 'accelerate';
                     }
 
-                    // 4. 段长度影响（长句自然减速）
+                    // 5. 段长度影响（长句自然减速）
                     if (len >= 12) {
                         tempoScale = Math.min(tempoScale, 0.95);
                     }
@@ -6176,10 +6243,11 @@
                     }
                 }
 
-                // 5. 保守钳制（V1 边界）
-                tempoScale = Math.max(0.75, Math.min(1.25, tempoScale));
-                velocityScale = Math.max(0.75, Math.min(1.30, velocityScale));
-                pauseAfterMs = Math.max(0, Math.min(800, pauseAfterMs));
+                // 6. V2 边界放宽（更大的表现力范围）
+                tempoScale = Math.max(0.60, Math.min(1.40, tempoScale));
+                velocityScale = Math.max(0.50, Math.min(1.40, velocityScale));
+                pauseAfterMs = Math.max(0, Math.min(1000, pauseAfterMs));
+                pitchRangeScale = Math.max(0.50, Math.min(1.50, pitchRangeScale));
 
                 // 保留用户手动覆盖值（如果有）
                 const existing = expressionSegments && expressionSegments[i];
@@ -6191,6 +6259,10 @@
                         velocityScale: existing.velocityScale,
                         pauseAfterMs: existing.pauseAfterMs,
                         curveType: existing.curveType,
+                        pitchRangeScale: existing.pitchRangeScale ?? 1.0,
+                        articulationMode: existing.articulationMode ?? 'normal',
+                        _emotion: existing._emotion || emotion,
+                        _intensity: existing._intensity || intensity,
                         _auto: false,
                         _manual: true
                     };
@@ -6203,6 +6275,10 @@
                     velocityScale: parseFloat(velocityScale.toFixed(2)),
                     pauseAfterMs: Math.round(pauseAfterMs),
                     curveType,
+                    pitchRangeScale: parseFloat(pitchRangeScale.toFixed(2)),
+                    articulationMode,
+                    _emotion: emotion,
+                    _intensity: intensity,
                     _auto: true,
                     _manual: false
                 };
@@ -6244,11 +6320,24 @@
                 return;
             }
 
-            container.innerHTML = expressionSegments.map((seg, i) => `
+            const emotionEmoji = {
+                happy: '😊', sad: '😢', excited: '🔥', calm: '🌿', mysterious: '✨', comfort: '💝', calm: '🌿'
+            };
+
+            container.innerHTML = expressionSegments.map((seg, i) => {
+                const emoji = emotionEmoji[seg._emotion] || '🌿';
+                const intensityBar = seg._intensity > 0
+                    ? `<div style="margin-top:4px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+                        <div style="width:${Math.round(seg._intensity * 100)}%;height:100%;background:linear-gradient(90deg, var(--secondary), var(--primary));border-radius:2px;"></div>
+                       </div>`
+                    : '';
+                return `
                 <div class="segment-card" data-segment-id="${seg.id}">
                     <div class="segment-text">
                         ${i+1}. 「${seg.text}」
+                        ${seg._emotion && seg._intensity > 0 ? `<span style="font-size:0.75rem;margin-left:6px;">${emoji} ${seg._emotion} ${(seg._intensity*100).toFixed(0)}%</span>` : ''}
                         ${seg._manual ? '<span style="font-size:0.7rem;color:var(--accent);margin-left:6px;">✏️手动</span>' : (seg._auto ? '<span style="font-size:0.7rem;color:var(--secondary);margin-left:6px;">⚡自动</span>' : '')}
+                        ${intensityBar}
                     </div>
                     <div class="segment-controls">
                         <div class="segment-control">
@@ -6258,12 +6347,12 @@
                         </div>
                         <div class="segment-control">
                             <label>力度倍率</label>
-                            <input type="range" min="0.8" max="1.3" step="0.1" value="${seg.velocityScale}" onchange="updateSegment(${i}, 'velocityScale', this.value)">
+                            <input type="range" min="0.5" max="1.4" step="0.1" value="${seg.velocityScale}" onchange="updateSegment(${i}, 'velocityScale', this.value)">
                             <div class="segment-value">${seg.velocityScale.toFixed(1)}x</div>
                         </div>
                         <div class="segment-control">
                             <label>停顿 (ms)</label>
-                            <input type="range" min="0" max="800" step="50" value="${seg.pauseAfterMs}" onchange="updateSegment(${i}, 'pauseAfterMs', this.value)">
+                            <input type="range" min="0" max="1000" step="50" value="${seg.pauseAfterMs}" onchange="updateSegment(${i}, 'pauseAfterMs', this.value)">
                             <div class="segment-value">${seg.pauseAfterMs}ms</div>
                         </div>
                         <div class="segment-control">
@@ -6276,14 +6365,27 @@
                                 <option value="hesitate" ${seg.curveType==='hesitate'?'selected':''}>迟疑</option>
                             </select>
                         </div>
+                        <div class="segment-control">
+                            <label>音域范围</label>
+                            <input type="range" min="0.5" max="1.5" step="0.1" value="${seg.pitchRangeScale ?? 1.0}" onchange="updateSegment(${i}, 'pitchRangeScale', this.value)">
+                            <div class="segment-value">${(seg.pitchRangeScale ?? 1.0).toFixed(1)}x</div>
+                        </div>
+                        <div class="segment-control">
+                            <label>发音方式</label>
+                            <select onchange="updateSegment(${i}, 'articulationMode', this.value)">
+                                <option value="normal" ${(seg.articulationMode||'normal')==='normal'?'selected':''}>普通</option>
+                                <option value="staccato" ${seg.articulationMode==='staccato'?'selected':''}>短促</option>
+                                <option value="legato" ${seg.articulationMode==='legato'?'selected':''}>连贯</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function updateSegment(index, field, value) {
             if (!expressionSegments[index]) return;
-            if (field === 'tempoScale' || field === 'velocityScale') {
+            if (field === 'tempoScale' || field === 'velocityScale' || field === 'pitchRangeScale') {
                 expressionSegments[index][field] = parseFloat(value);
             } else if (field === 'pauseAfterMs') {
                 expressionSegments[index][field] = parseInt(value);
@@ -6303,6 +6405,8 @@
                 velocityScale: 1.0,
                 pauseAfterMs: 0,
                 curveType: 'flat',
+                pitchRangeScale: 1.0,
+                articulationMode: 'normal',
                 _manual: false,
                 _auto: false
             }));
@@ -6671,19 +6775,41 @@
         }
 
         // 分析情感
-        function analyzeEmotion(text) {
-            let scores = { happy: 0, sad: 0, excited: 0, calm: 0, mysterious: 0 };
+        // ===== 逐句情绪分析 V2 =====
+        function analyzeEmotionSegment(text) {
+            const lowerText = text.toLowerCase();
+            const scores = { happy: 0, sad: 0, excited: 0, calm: 0, mysterious: 0, comfort: 0 };
+            let maxWeight = 0;
 
-            for (const [emotion, keywords] of Object.entries(emotionKeywords)) {
-                for (const keyword of keywords) {
-                    if (text.toLowerCase().includes(keyword)) {
-                        scores[emotion]++;
-                        console.log(`Emotion match: ${emotion} - '${keyword}' found in text`);
+            // 1. 关键词匹配（带权重）
+            for (const [emotion, keywordMap] of Object.entries(emotionKeywords)) {
+                for (const [keyword, weight] of Object.entries(keywordMap)) {
+                    if (lowerText.includes(keyword.toLowerCase())) {
+                        scores[emotion] += weight;
+                        if (weight > maxWeight) maxWeight = weight;
                     }
                 }
             }
 
-            // 找到最高分的情感
+            // 2. 否定词翻转：检测否定词是否直接修饰情绪关键词
+            for (const neg of NEGATION_WORDS) {
+                if (!lowerText.includes(neg)) continue;
+                // 否定词通常把正向情绪转为 sad，把负向转为 calm
+                if (scores.happy > 0) { scores.sad += scores.happy * 0.7; scores.happy = 0; }
+                if (scores.excited > 0) { scores.calm += scores.excited * 0.6; scores.excited = 0; }
+                if (scores.comfort > 0) { scores.sad += scores.comfort * 0.5; scores.comfort = 0; }
+            }
+
+            // 3. 程度词调节
+            let intensityMultiplier = 1.0;
+            for (const [word, mult] of Object.entries(INTENSIFIER_WORDS)) {
+                if (lowerText.includes(word.toLowerCase())) {
+                    intensityMultiplier *= mult;
+                }
+            }
+            intensityMultiplier = Math.max(0.3, Math.min(1.5, intensityMultiplier));
+
+            // 4. 找最高分
             let maxEmotion = 'calm';
             let maxScore = 0;
             for (const [emotion, score] of Object.entries(scores)) {
@@ -6693,8 +6819,47 @@
                 }
             }
 
-            console.log('Emotion analysis:', { text, scores, result: maxEmotion });
-            return maxEmotion;
+            // 5. 计算 intensity (0~1)
+            const rawIntensity = maxWeight > 0 ? (maxScore / (maxWeight + 1)) : 0;
+            const intensity = Math.min(1.0, rawIntensity * intensityMultiplier);
+
+            // 6. 检测是否有转折
+            const hasTransition = TRANSITION_WORDS.some(w => text.includes(w));
+
+            // 7. 标点辅助判断
+            if (/[！!]{2,}/.test(text) || /\?{2,}/.test(text)) {
+                // 多问号/感叹号 → 强烈
+                if (intensity < 0.6) maxScore *= 1.3;
+            }
+            if (/……/.test(text) && maxScore < 1.0) {
+                // 省略号暗示迟疑/悲伤
+                if (maxEmotion === 'calm') maxEmotion = 'sad';
+            }
+
+            console.log('[EmotionV2]', { text: text.substring(0, 30), emotion: maxEmotion, intensity: intensity.toFixed(2), hasTransition, scores });
+            return { emotion: maxEmotion, intensity, hasTransition, scores };
+        }
+
+        // 兼容旧版的全文分析（用于全局情绪徽章）
+        function analyzeEmotion(text) {
+            const result = analyzeEmotionSegment(text);
+            return result.emotion;
+        }
+
+        // 根据情绪参数映射生成音乐参数（支持插值）
+        function getMusicParamsByEmotion(emotion, intensity) {
+            const target = EMOTION_MUSIC_PARAMS[emotion] || EMOTION_MUSIC_PARAMS.calm;
+            const neutral = NEUTRAL_MUSIC_PARAMS;
+            const t = Math.max(0, Math.min(1, intensity));
+
+            return {
+                tempoScale:      neutral.tempoScale + (target.tempoScale - neutral.tempoScale) * t,
+                velocityScale:   neutral.velocityScale + (target.velocityScale - neutral.velocityScale) * t,
+                curveType:       target.curveType,
+                pauseAfterMs:    Math.round(neutral.pauseAfterMs + (target.pauseAfterMs - neutral.pauseAfterMs) * t),
+                pitchRangeScale: neutral.pitchRangeScale + (target.pitchRangeScale - neutral.pitchRangeScale) * t,
+                articulationMode: target.articulationMode
+            };
         }
 
         // 获取情感样式
@@ -8006,6 +8171,12 @@
                 evt.expressionCurveType = seg.curveType;
                 evt.expressionSegmentId = seg.id;
 
+                // V2 新增：音域范围 + 发音方式 + 情绪标签
+                evt.expressionPitchRangeScale = seg.pitchRangeScale ?? 1.0;
+                evt.expressionArticulationMode = seg.articulationMode ?? 'normal';
+                evt.expressionEmotion = seg._emotion ?? 'calm';
+                evt.expressionIntensity = seg._intensity ?? 0;
+
                 // 收集该 segment 的 event 索引
                 const indices = segEventMap.get(seg.id) || [];
                 indices.push(i);
@@ -8052,6 +8223,58 @@
                             factor = 1.0;
                     }
                     evt.expressionCurveFactor = factor;
+                }
+            }
+
+            // V2 新增：根据 articulationMode 调整段内 note 的 duration 和 overlap
+            for (const [segId, indices] of segEventMap) {
+                const seg = segments.find(s => s.id === segId);
+                if (!seg || !indices.length) continue;
+                const articulation = seg.articulationMode ?? 'normal';
+                if (articulation === 'normal') continue;
+
+                for (const idx of indices) {
+                    const evt = events[idx];
+                    if (evt.type !== 'note') continue;
+
+                    if (articulation === 'staccato') {
+                        evt.articulationDurationScale = (evt.articulationDurationScale || 1.0) * 0.7;
+                        evt.articulationOverlapMs = (evt.articulationOverlapMs || 0) - 30;
+                    } else if (articulation === 'legato') {
+                        evt.articulationDurationScale = (evt.articulationDurationScale || 1.0) * 1.3;
+                        evt.articulationOverlapMs = (evt.articulationOverlapMs || 0) + 40;
+                    }
+                }
+            }
+
+            // V2 新增：根据 pitchRangeScale 限制可选 note 范围
+            for (const [segId, indices] of segEventMap) {
+                const seg = segments.find(s => s.id === segId);
+                if (!seg || !indices.length) continue;
+                const prs = seg.pitchRangeScale ?? 1.0;
+                if (prs === 1.0) continue;
+
+                const noteEvents = indices.map(idx => events[idx]).filter(e => e.type === 'note' && e.note);
+                if (noteEvents.length < 2) continue;
+
+                const noteOrder = ['D4', 'E4', 'F4', 'A4', 'B4', 'D5', 'E5', 'F5', 'A5', 'B5'];
+                const noteIndices = noteEvents.map(e => noteOrder.indexOf(e.note)).filter(i => i >= 0);
+                if (noteIndices.length < 2) continue;
+
+                const minIdx = Math.min(...noteIndices);
+                const maxIdx = Math.max(...noteIndices);
+                const center = (minIdx + maxIdx) / 2;
+                const originalRange = maxIdx - minIdx;
+                const targetRange = Math.max(1, originalRange * prs);
+                const newMin = Math.max(0, Math.round(center - targetRange / 2));
+                const newMax = Math.min(noteOrder.length - 1, Math.round(center + targetRange / 2));
+
+                for (const evt of noteEvents) {
+                    const idx = noteOrder.indexOf(evt.note);
+                    if (idx < newMin || idx > newMax) {
+                        evt._pitchRangeRemap = true;
+                        evt._pitchRangeTarget = noteOrder[Math.max(newMin, Math.min(newMax, idx))];
+                    }
                 }
             }
         }
