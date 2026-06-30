@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.50.2';
+        const APP_VERSION = 'v3.50.3';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -6877,10 +6877,11 @@
 
         // 文本转音符序列（统一事件模型：note + pause）
         function textToNotes(text, offset = 0) {
-            // 先检测角色名并替换为标记
+            // 【角色声纹已屏蔽】让角色名用当前乐器正常演奏
             const characterVoiceEvents = [];
+            const processedText = text;
+            /* 原角色声纹检测逻辑（已屏蔽）：
             let processedText = text;
-
             for (const [name, config] of Object.entries(characterVoiceConfig)) {
                 let index = processedText.indexOf(name);
                 while (index !== -1) {
@@ -6890,14 +6891,12 @@
                         position: index,
                         sourceCharIndex: index
                     });
-                    // 替换为占位符避免重复检测
                     processedText = processedText.substring(0, index) + '\0'.repeat(name.length) + processedText.substring(index + name.length);
                     index = processedText.indexOf(name);
                 }
             }
-
-            // 按位置排序
             characterVoiceEvents.sort((a, b) => a.position - b.position);
+            */
 
             const tokens = tokenizeText(processedText);
             const events = [];
@@ -7970,13 +7969,15 @@
                         continue;
                     }
 
-                    // ===== 角色声纹检测 =====
+                    // ===== 角色声纹检测（已屏蔽，走当前乐器演奏）=====
+                    /*
                     if (event.type === 'characterVoice') {
                         console.log(`第 ${i+1} 个是角色声纹 [${event.character}]`);
                         highlightNote(i);
                         await playCharacterVoice(event.character, event);
                         continue;
                     }
+                    */
 
                     // ===== 停顿事件处理 =====
                     if (event.type === 'pause') {
@@ -9523,12 +9524,12 @@
                     continue;
                 }
 
-                // 角色声纹事件
+                // 角色声纹事件（已屏蔽，走当前乐器导出）
+                /*
                 if (evt.type === 'characterVoice') {
                     const config = characterVoiceConfig[evt.character];
                     if (!config) continue;
 
-                    // ===== Expression Segment：计算 playbackRate（含 BPM 缩放）=====
                     const bpmScale = (params.bpm || 120) / CHARACTER_VOICE_BASE_BPM;
                     const exprTempo = evt.expressionTempoScale || 1;
                     const curve = evt.expressionCurveFactor || 1;
@@ -9544,7 +9545,6 @@
                         }
                     }
 
-                    // ===== Expression Segment：段后停顿计入时长 =====
                     if (evt.expressionPauseAfterMs > 0) {
                         voiceDuration += evt.expressionPauseAfterMs / 1000;
                     }
@@ -9554,6 +9554,7 @@
                     lastAudioEndTime = Math.max(lastAudioEndTime, currentTime + (params.voiceShaping.overlapMs / 1000));
                     continue;
                 }
+                */
 
                 // 普通 note 事件
                 const timing = evt._timing || computeEventTiming(evt, 60000 / params.bpm, params.bpm);
@@ -9847,8 +9848,8 @@
                     const overlapMs = timing.overlapMs || 0;
                     const overlapTicks = msToTicks(Math.max(0, overlapMs), bpm, ppq);
                     currentTick += Math.max(durationTicks - overlapTicks, Math.round(ppq / 8));
+                /* 角色声纹已屏蔽
                 } else if (evt.type === 'characterVoice') {
-                    // ===== Marker: characterVoice =====
                     const config = characterVoiceConfig[evt.character];
                     let voiceDurationMs = 0;
 
@@ -9866,7 +9867,6 @@
                                 voiceDurationMs += (note.durationMs / finalPlaybackRate) + 50;
                             }
                         }
-                        // 段后停顿
                         voiceDurationMs += (evt.expressionPauseAfterMs || 0);
                     }
 
@@ -9881,6 +9881,7 @@
                     });
 
                     currentTick += Math.max(msToTicks(advanceMs, bpm, ppq), Math.round(ppq / 8));
+                */
                 } else if (evt.type === 'phraseMidi') {
                     // ===== Marker: phraseMidi =====
                     let blockDurationMs = 0;
@@ -10105,13 +10106,13 @@
                     });
 
                     currentTimeMs += timing.duration || 200;
+                /* 角色声纹已屏蔽
                 } else if (evt.type === 'characterVoice') {
                     markers.push({
                         type: 'characterVoice',
                         character: evt.character,
                         timeMs: currentTimeMs
                     });
-                    // 推进时间线（保守估计，与 MIDI 本体 tick 推进对齐）
                     const config = characterVoiceConfig[evt.character];
                     if (config) {
                         const bpmScale = bpm / CHARACTER_VOICE_BASE_BPM;
@@ -10133,6 +10134,7 @@
                     } else {
                         currentTimeMs += 500;
                     }
+                */
                 } else if (evt.type === 'phraseMidi') {
                     markers.push({
                         type: 'phraseMidi',
@@ -10325,24 +10327,22 @@
                     continue;
                 }
 
+                /* 角色声纹已屏蔽（走当前乐器演奏）
                 // ===== 角色声纹事件 =====
                 if (evt.type === 'characterVoice') {
                     const characterName = evt.character;
                     const config = characterVoiceConfig[characterName];
                     if (!config) continue;
 
-                    // ===== Expression Segment：计算 playbackRate（含 BPM 缩放）=====
                     const bpmScale = (params.bpm || 120) / CHARACTER_VOICE_BASE_BPM;
                     const exprTempo = evt.expressionTempoScale || 1;
                     const curve = evt.expressionCurveFactor || 1;
                     const finalPlaybackRate = Math.max(0.5, Math.min(2.0, bpmScale * exprTempo * curve));
                     const exprVelocity = evt.expressionVelocityScale || 1;
 
-                    // 优先加载真实角色音频（如果尚未缓存）
                     let audioBuffer = characterAudioBuffers[characterName];
                     if (!audioBuffer) {
                         console.log(`[RENDER] Character voice 未缓存，尝试加载: ${characterName}`);
-                        // 传入 offlineContext 避免依赖用户启动的实时 audioContext
                         audioBuffer = await loadCharacterVoiceAudio(characterName, offlineContext);
                     }
 
@@ -10353,7 +10353,6 @@
                         const gainNode = offlineContext.createGain();
                         gainNode.gain.value = params.masterVolume * exprVelocity;
 
-                        // ===== Voice Shaping：Envelope =====
                         const vs = resolveVoiceShaping(characterName);
                         const attackTime = Math.max(0.001, vs.attackMs / 1000);
                         const releaseTime = Math.max(0.05, vs.releaseMs / 1000);
@@ -10363,7 +10362,6 @@
                         gainNode.gain.setValueAtTime(params.masterVolume * exprVelocity, currentTime + scaledDuration - Math.min(releaseTime * 0.3, scaledDuration * 0.2));
                         gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + scaledDuration + releaseTime);
 
-                        // ===== Voice Shaping：EQ 链 =====
                         let eqChainEnd = gainNode;
                         if (vs.hpfFreq > 0) {
                             const hpf = offlineContext.createBiquadFilter();
@@ -10396,7 +10394,6 @@
                         currentTime += scaledDuration;
                         console.log(`[RENDER] Character voice (audio): ${characterName}, bpm=${params.bpm}, bpmScale=${bpmScale.toFixed(2)}, finalPlaybackRate=${finalPlaybackRate.toFixed(2)}x, duration=${scaledDuration.toFixed(2)}s`);
                     } else {
-                        // 音频加载失败，fallback 用乐器合成主题音
                         const originalInstrument = currentInstrument;
                         currentInstrument = config.instrument;
                         let motifDuration = 0;
@@ -10411,7 +10408,6 @@
                                 const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
                                 const waveformComp = getWaveformLoudnessCompensation('triangle');
                                 const noteVel = note.velocity * params.masterVolume * exprVelocity * loudnessComp * waveformComp;
-                                // 使用合成音色渲染（不受采样加载状态影响）
                                 const oscillator = offlineContext.createOscillator();
                                 const noteGain = offlineContext.createGain();
                                 oscillator.type = 'triangle';
@@ -10431,7 +10427,6 @@
                         console.log(`[RENDER] Character voice (synth fallback): ${characterName}, bpm=${params.bpm}, bpmScale=${bpmScale.toFixed(2)}, finalPlaybackRate=${finalPlaybackRate.toFixed(2)}x, duration=${motifDuration.toFixed(2)}s`);
                     }
 
-                    // ===== Expression Segment：段后停顿 =====
                     if (evt.expressionPauseAfterMs > 0) {
                         currentTime += evt.expressionPauseAfterMs / 1000;
                     }
@@ -10439,6 +10434,7 @@
                     notesRendered++;
                     continue;
                 }
+                */
 
                 // ===== 语义分类 MIDI 事件 =====
                 if (evt.type === 'phraseMidi') {
