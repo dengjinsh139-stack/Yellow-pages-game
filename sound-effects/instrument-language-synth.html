@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.50.1';
+        const APP_VERSION = 'v3.50.2';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -4098,7 +4098,7 @@
                         Math.min(originalText.length, pos + contextWindow + 1)
                     ).toLowerCase();
                     for (const [, keywords] of Object.entries(emotionKeywords)) {
-                        for (const kw of keywords) {
+                        for (const kw of Object.keys(keywords)) {
                             if (context.includes(kw.toLowerCase())) {
                                 score += 100;
                                 break;
