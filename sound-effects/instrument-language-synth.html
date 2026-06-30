@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.50.3';
+        const APP_VERSION = 'v3.50.4';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -10799,7 +10799,7 @@
             const baseVelocity = overrideVelocity !== undefined ? overrideVelocity : (note.velocity || 0.5);
             const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
             const waveformComp = getWaveformLoudnessCompensation(oscillator.type);
-            const velocity = baseVelocity * params.masterVolume * loudnessComp * waveformComp;
+            const velocity = baseVelocity * loudnessComp * waveformComp;
             const vs = params.voiceShaping;
             const attack = Math.max(0.001, (vs.attackMs + (attackMsOverride || 0)) / 1000);
             const release = Math.max(0.05, vs.releaseMs / 1000);
@@ -10886,7 +10886,7 @@
 
             const gainNode = offlineContext.createGain();
             const loudnessComp = getInstrumentLoudnessCompensation(currentInstrument);
-            const vol = velocity * params.masterVolume * loudnessComp;
+            const vol = velocity * loudnessComp;
             gainNode.gain.setValueAtTime(vol, startTime);
 
             // 如果不是完整播放，应用淡出
