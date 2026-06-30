@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-29T08:15:08.869Z",
+  "updatedAt": "2026-06-30T08:20:46.690Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -441,22 +441,24 @@
       "endLine": 161,
       "source": "memory",
       "snippet": "- 但 `animationId` 只在 `visualize()` 函数内部被赋值（`animationId = requestAnimationFrame(draw)`），**从未在全局作用域 `let` 声明** - 浏览器严格模式下抛出 `ReferenceError: animationId is not defined`，整个 `playText()` 在第一行检查就中断 - 修复：在全局作用域添加 `let animationId = null;` ### 全局乐器路径验证 - 放开 `canPlayNormalNotes = true`，所有乐器都能进入音符事件循环 - 采样未加载时 `playTone()` 内部自动回退到 `playSynthTone()` - 8 种乐器全部验证通过：piano/xylophone/guitar(s vocal)/saxophone/flute/synth/train/trumpet ### v3.17.6 追加修复 - `updateParams()` 中引用已删除的 DOM ID（`currentInstrumentForOffset`、`currentOffsetMs`）导致 `TypeError` - 修复：全部 `getElementById + textContent` 操作加防御性 `if (el) el.textContent = ...` ### 修复后状态 - 用户最终确认：演奏文字有声音了 ✅ - 版本号最终状态：**v3.17.6** --- ## 2026-05-05 16:00 ~ 17",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1.2234329164028166,
+      "totalScore": 1.6089456409215925,
       "maxScore": 0.42031978368759154,
       "firstRecalledAt": "2026-05-27T02:15:12.147Z",
-      "lastRecalledAt": "2026-06-29T08:15:00.000Z",
+      "lastRecalledAt": "2026-06-30T08:20:46.690Z",
       "queryHashes": [
         "43312cd65cf7",
         "b3e17031f3c2",
-        "38f71f496af7"
+        "38f71f496af7",
+        "a83dd957d64b"
       ],
       "recallDays": [
         "2026-05-27",
         "2026-06-01",
-        "2026-06-29"
+        "2026-06-29",
+        "2026-06-30"
       ],
       "conceptTags": [
         "piano/xylophone/guitar",
@@ -1102,19 +1104,21 @@
       "endLine": 36,
       "source": "memory",
       "snippet": "--- ## 2026-05-06 Evening - characterVoice Expression Segment + Mapping Mode ### v3.22.5 → v3.22.6：characterVoice 全链路 Expression Segment **问题**：Expression Segment 对 characterVoice 事件无效（实时播放和导出都不生效）。 **修复清单**： 1. `textToNotes` 创建 characterVoice 事件时补 `sourceCharIndex: index` 2. `applyExpressionSegments` 映射改为 `evt.sourceCharIndex ?? evt.position ?? -1`，支持 characterVoice 事件 3. `playText` 循环中 `await playCharacterVoice(event.character, event)` 传入完整 event 4. `playCharacterVoice(characterName, event=null)` 应用 expression： - `playbackRate = Math.max(0.25, Math.min(4, exprTempo * curve))` - `gainNode.gain.value = params.masterVolume * exprVelocity` 5. `calculateAudioDuration` characterVoice",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.8333031594753264,
+      "totalScore": 1.2223812401294707,
       "maxScore": 0.43174734413623805,
       "firstRecalledAt": "2026-06-29T08:15:05.151Z",
-      "lastRecalledAt": "2026-06-29T08:15:08.869Z",
+      "lastRecalledAt": "2026-06-30T08:20:46.690Z",
       "queryHashes": [
         "7033ce3cbe84",
-        "7cd5735cf2b1"
+        "7cd5735cf2b1",
+        "a83dd957d64b"
       ],
       "recallDays": [
-        "2026-06-29"
+        "2026-06-29",
+        "2026-06-30"
       ],
       "conceptTags": [
         "v3.22.5",
@@ -1165,18 +1169,20 @@
       "endLine": 50,
       "source": "memory",
       "snippet": "- resolveVoiceShaping() 继承顺序：global < voiceDefault < characterOverride - A/B 播放等待完整播放结束后再恢复参数 ### v3.15.6 - UI 面板重组： - 主界面：乐器选择 → 当前 Voice 徽章 → 基础参数(BPM/发音密度/音量) → Voice Shaping → 空间/Effects(混响) → 导出 - 高级区折叠：声调时值映射、实验性节奏随机⚠️、Sample Trim、和弦长度 - Legacy 区折叠：播放间隔、包络长度（提示已被 Voice Shaping 覆盖） - 频谱显示移到中间面板音符序列下方 ## 待办 - [ ] v3.15.6 QA 剩余 3 项修复（待推送）： 1. testPlayText() 返回 undefined → 改为 return playText() 2. calculateAudioDuration() double count → 改为时间线算法 (currentTime + lastAudioEndTime) 3. UI 重复区块：空间/Effects 和导出按钮各出现 2 次 ## 约定 - 每次 git push 后必须主动报出版本号 - 导航栏隐藏项（projects/caps/finance）已记入 MEMORY.md，后续更新 nav-config.js 时需检查不再恢复",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.42593646347522734,
+      "totalScore": 0.8093018174171447,
       "maxScore": 0.42593646347522734,
       "firstRecalledAt": "2026-06-29T08:15:05.151Z",
-      "lastRecalledAt": "2026-06-29T08:15:05.151Z",
+      "lastRecalledAt": "2026-06-30T08:20:46.690Z",
       "queryHashes": [
-        "7033ce3cbe84"
+        "7033ce3cbe84",
+        "a83dd957d64b"
       ],
       "recallDays": [
-        "2026-06-29"
+        "2026-06-29",
+        "2026-06-30"
       ],
       "conceptTags": [
         "a/b",
@@ -1249,6 +1255,99 @@
         "过去",
         "那里",
         "好像"
+      ]
+    },
+    "memory:memory/2026-05-04.md:1:35": {
+      "key": "memory:memory/2026-05-04.md:1:35",
+      "path": "memory/2026-05-04.md",
+      "startLine": 1,
+      "endLine": 35,
+      "source": "memory",
+      "snippet": "# 2026-05-04 工作日志 ## Voice Shaping 系统 ### v3.15.0 (2026-05-04) - 角色声纹 WAV 导出脱离实时 audioContext 依赖 - loadCharacterVoiceAudio() 新增 decodeContext 参数 ### v3.15.1 - phraseMidi 导出：MIDI 数字(62/64等)通过 noteNumberToName() 转为 D4/E4 等字符串音名 - 修复 findNearestSample() 防御性类型检查 ### v3.15.2 - phraseMidi 导出乐器判断加入 guitar 虚拟人声 (isVirtualVoice) ### v3.15.3 - 隐藏导航栏：📁 项目 / 📊 项目能力 / 💰 理财相关（永久移除，只保留首页/游戏/音频/任务管理器） ### v3.15.4 - Voice Shaping 完整实现： - voiceRegistry + characterVoiceRegistry + resolveVoiceShaping() - 6 个塑形参数：HPF / Mud Cut / High Shelf / Attack / Release / Overlap - A/B 对比 + Preset 按乐器保存/加载 - 实时播放、和弦、语义 MIDI、角色声纹、WAV 导出共用同一套参数 ### v3.15.5 - Voice Shaping QA 修复： - overlap 方向修正（让音符提前进入，不是增加",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4253492087125778,
+      "maxScore": 0.4253492087125778,
+      "firstRecalledAt": "2026-06-30T08:20:46.690Z",
+      "lastRecalledAt": "2026-06-30T08:20:46.690Z",
+      "queryHashes": [
+        "a83dd957d64b"
+      ],
+      "recallDays": [
+        "2026-06-30"
+      ],
+      "conceptTags": [
+        "v3.15.0",
+        "v3.15.1",
+        "62/64等",
+        "d4/e4",
+        "v3.15.2",
+        "v3.15.3",
+        "只保留首页/游戏/音频/任务管理器",
+        "v3.15.4"
+      ]
+    },
+    "memory:memory/2026-05-05.md:85:105": {
+      "key": "memory:memory/2026-05-05.md:85:105",
+      "path": "memory/2026-05-05.md",
+      "startLine": 85,
+      "endLine": 105,
+      "source": "memory",
+      "snippet": "- 底部辅助区：修复角色声纹和语义分类触发的 div 嵌套错误（角色声纹 `<div>` 未闭合导致语义分类在其内部） - 语义分类 grid 从 `repeat(2, 1fr)` 改为 `repeat(4, 1fr)` - 演奏历史/关于/技巧合并为折叠区块 `▼ 辅助信息（历史 / 关于 / 技巧）` - 底部 `.info-section`（真实钢琴采样 / 五声音阶 / 使用技巧）保留 **JS 层面：** - `DOMContentLoaded` 中新增 `generatePhraseTriggerCards()` 调用，不依赖音频引擎启动 - 语义分类卡片现在页面加载即渲染（之前只在 `initAudio()` 成功后才调用） ### 尚未完成 - [ ] 更新 nav-config.js 版本号（当前 v3.16.3，应进位到 v3.16.4） - [ ] git commit + git push - [ ] 推送后立即报出版本号 ### 嵌套 div 陷阱 底部辅助区 `character-voice-section` 缺少闭合 `</div>`，导致语义分类触发区成了角色声纹的子元素。 这种结构性错误不会触发 HTML 解析报错，但会导致 CSS 布局和子元素查找异常。 修复方法：在 `character-voice-grid` 结束后补 `</div>`，语义分类区独立为一个兄弟区块。 ### 作用域教训 `phraseTriggerCategories` 在第 2454 行定义，缩进 16 空格。通过 brace balance 分析确认它不在任",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.39190099239349363,
+      "maxScore": 0.39190099239349363,
+      "firstRecalledAt": "2026-06-30T08:20:46.690Z",
+      "lastRecalledAt": "2026-06-30T08:20:46.690Z",
+      "queryHashes": [
+        "a83dd957d64b"
+      ],
+      "recallDays": [
+        "2026-06-30"
+      ],
+      "conceptTags": [
+        "演奏历史/关于/技巧合并为折叠区块",
+        "info-section",
+        "nav-config.js",
+        "v3.16.3",
+        "v3.16.4",
+        "character-voice-section",
+        "character-voice-grid",
+        "底部"
+      ]
+    },
+    "memory:memory/2026-05-05.md:69:90": {
+      "key": "memory:memory/2026-05-05.md:69:90",
+      "path": "memory/2026-05-05.md",
+      "startLine": 69,
+      "endLine": 90,
+      "source": "memory",
+      "snippet": "4. 底部辅助区散乱（角色声纹 + 语义分类 + 历史/关于/技巧混在一起） ### 已执行修改（截至 pre-compaction flush） **CSS 层面：** - `.workbench` 从 `align-items: start` 改为 `align-items: stretch` - `.workbench > .panel` 添加 `display: flex; flex-direction: column; height: calc(100vh - 220px); min-height: 720px; overflow: hidden` - 响应式 `@media (max-width: 900px)` 中 panel 恢复 `height: auto; overflow: visible` - 新增 `.panel-scroll`（`flex:1; overflow-y:auto;` 带自定义滚动条） - 右栏 `.voice-shaping-core` 改为 `flex:1; overflow-y:auto; min-height:0`（内部可滚动） - 新增 `.right-panel-footer`（`flex-shrink:0`，固定底部） **HTML 结构：** - 左栏：乐器选择/基础参数/高级设置 全部包入 `.panel-scroll` - 中栏：演奏输入/可视化/按钮/键盘/序列 全部包入 `.panel-scroll` - 右栏：Voice Shaping 保持内部滚动；Effects + Export 移入 `.right-",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.38185899853706357,
+      "maxScore": 0.38185899853706357,
+      "firstRecalledAt": "2026-06-30T08:20:46.690Z",
+      "lastRecalledAt": "2026-06-30T08:20:46.690Z",
+      "queryHashes": [
+        "a83dd957d64b"
+      ],
+      "recallDays": [
+        "2026-06-30"
+      ],
+      "conceptTags": [
+        "历史/关于/技巧混在一起",
+        "pre-compaction",
+        "align-items",
+        "flex-direction",
+        "min-height",
+        "max-width",
+        "panel-scroll",
+        "overflow-y"
       ]
     }
   }
