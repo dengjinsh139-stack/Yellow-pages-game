@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-30T08:20:46.690Z",
+  "updatedAt": "2026-07-01T03:08:34.580Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -404,24 +404,26 @@
       "endLine": 42,
       "source": "memory",
       "snippet": "## 2026-04-10 乐器语言合成器开发 ### 上午会话 (11:00-11:24) **项目**: 乐器语言合成器 (Instrument Language Synth) **版本**: v1.2 #### 完成的功能 1. **真实钢琴采样集成** - 接收并处理了用户提供的10个WAV采样文件 - 采样范围: D4, E4, F4, A4, B4, D5, E5, F5, A5, B5 - 存储位置: `assets/audio/samples/piano/` 2. **五声音阶设计** - 采用中国传统五声音阶 (宫商角徵羽) - 对应音符: D(1)、E(2)、G(3)、A(5)、B(6) - 不包含4和7，旋律更和谐流畅 3. **10键音符键盘** - 5×2 网格布局 - 固定UI，切换乐器时布局不变 - 支持鼠标点击和触摸操作 - 视觉反馈: 按下时缩放和发光效果 4. **多乐器支持架构** - 钢琴: 使用真实采样 (playbackRate音高调整) - 其他乐器: Web Audio API合成音色 - `getCurrentInstrumentNotes()` 函数管理10个音符数据 - 切换乐器自动切换音色，UI布局保持不变 #### 技术实现要点 - 采样预加载机制 - 最近采样匹配 + playbackRate音高微调 - 情感分析调整演奏参数 - 实时波形可视化 #### 文件位置 - 主文件: `sound-effects/in",
-      "recallCount": 4,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1.62446810901165,
+      "totalScore": 2.024563255906105,
       "maxScore": 0.45799986422061917,
       "firstRecalledAt": "2026-05-27T02:15:00.403Z",
-      "lastRecalledAt": "2026-06-29T08:15:00.000Z",
+      "lastRecalledAt": "2026-07-01T03:08:34.580Z",
       "queryHashes": [
         "a0b8f2212ce3",
         "b3e17031f3c2",
         "fe497043a55b",
-        "38f71f496af7"
+        "38f71f496af7",
+        "0ecaa1864071"
       ],
       "recallDays": [
         "2026-05-27",
         "2026-06-01",
         "2026-06-23",
-        "2026-06-29"
+        "2026-06-29",
+        "2026-07-01"
       ],
       "conceptTags": [
         "00-11",
@@ -1348,6 +1350,130 @@
         "max-width",
         "panel-scroll",
         "overflow-y"
+      ]
+    },
+    "memory:memory/2026-05-27.md:71:122": {
+      "key": "memory:memory/2026-05-27.md:71:122",
+      "path": "memory/2026-05-27.md",
+      "startLine": 71,
+      "endLine": 122,
+      "source": "memory",
+      "snippet": "**现在删除了**：采样文件已上传，目录不再为空。 ### 新增乐器检查清单验证 | 检查项 | 状态 | |--------|------| | CSS 变量 | ✅ | | UI 按钮 | ✅ | | instrumentDefaults | ✅ | | instrumentMetadata shaping | ✅ | | sampleConfig | ✅ | | noteVolumes | ✅ | | chordVolumes | ✅ | | loadInstrumentSamples loader | ✅ | | instrumentColors / activeColors | ✅ | | hasInstrumentSamples | ✅ | | playTone synth fallback | ✅ 已移除（采样到位） | | ensureInstrumentReady names | ✅ | | renderAudioToBuffer isSampleInstrument | ✅ | | waveforms | ✅ | | loadOtamatoneSamples 函数 | ✅ | | 采样目录 + 10个文件 | ✅ | --- ## 教训总结（v3.36.11 ~ v3.37.3） **新增乐器入库 checklist（已验证）**： 1. CSS 变量 + UI 按钮 2. instrumentDefaults + shaping 3. sampleConfig（最容易漏！） 4. noteVolumes（最容易漏！） 5. chordVolumes",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4090488940477371,
+      "maxScore": 0.4090488940477371,
+      "firstRecalledAt": "2026-07-01T03:08:34.580Z",
+      "lastRecalledAt": "2026-07-01T03:08:34.580Z",
+      "queryHashes": [
+        "0ecaa1864071"
+      ],
+      "recallDays": [
+        "2026-07-01"
+      ],
+      "conceptTags": [
+        "v3.36.11",
+        "v3.37.3",
+        "现在",
+        "删除",
+        "采样",
+        "文件",
+        "目录",
+        "不再"
+      ]
+    },
+    "memory:memory/2026-06-18.md:1:23": {
+      "key": "memory:memory/2026-06-18.md:1:23",
+      "path": "memory/2026-06-18.md",
+      "startLine": 1,
+      "endLine": 23,
+      "source": "memory",
+      "snippet": "# 2026-06-18 - Yellow-pages-game 乐器入库 ## 玻璃钢琴 (Glass Piano) 🎹 - **代码骨架**: v3.46.7 - 16项全部到位，创建 `assets/audio/samples/glass_piano/.gitkeep` - **采样接入**: v3.46.8 - 10个真实 .mp3 采样全部到位，移除 synth fallback - **颜色**: #A8D8EA 冰蓝 ## 小提琴 (Violin) 🎻 - **代码骨架**: v3.46.9 - 16项全部到位，创建 `assets/audio/samples/violin/.gitkeep` - **采样接入**: v3.46.10 - 10个真实 .mp3 采样全部到位，移除 synth fallback - **颜色**: #B22222 深红 ## 小提琴2 (Violin2) 🎻 - **代码骨架**: v3.46.11 - 16项全部到位，创建 `assets/audio/samples/violin2/.gitkeep` - **状态**: 等待采样（用户说\"已入库\"但代码里还是 synth fallback，需确认） - **颜色**: #8B0000 暗红 - **注意**: 用户可能通过 GitHub 直接上传了采样，需下次执行 `git pull` 检查 ## 入库流程执行记录 - 按 MEMORY.md 中制定的入库流程严格执行：先代码骨架 → 推送 → 创建空目录 → 等采样 → 接入 → 移除 fallback - 每个乐",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.40546227991580963,
+      "maxScore": 0.40546227991580963,
+      "firstRecalledAt": "2026-07-01T03:08:34.580Z",
+      "lastRecalledAt": "2026-07-01T03:08:34.580Z",
+      "queryHashes": [
+        "0ecaa1864071"
+      ],
+      "recallDays": [
+        "2026-07-01"
+      ],
+      "conceptTags": [
+        "yellow-pages-game",
+        "v3.46.7",
+        "assets/audio/samples/glass-piano",
+        "v3.46.8",
+        "v3.46.9",
+        "assets/audio/samples/violin",
+        "v3.46.10",
+        "v3.46.11"
+      ]
+    },
+    "memory:memory/2026-05-27.md:222:262": {
+      "key": "memory:memory/2026-05-27.md:222:262",
+      "path": "memory/2026-05-27.md",
+      "startLine": 222,
+      "endLine": 262,
+      "source": "memory",
+      "snippet": "// ... 共10个音符，每个4个变体 } } ``` - 其他乐器：单采样（`piano_D4`） - 虚拟人声：**多采样随机池**（`vocal_D4_01` ~ `vocal_D4_04`） - 加载函数 `loadVocalSamples()` 循环 `files` 数组加载所有变体 ### 第2层：文字/MIDI → 音符事件 **文字输入**（`charToNote()`）：中文字符按**拼音声调**映射到固定音高 | 声调 | 映射度数 | 实际音符 | 频率 | |------|---------|---------|------| | 一声 | 3 | D5 | 587.33 | | 二声 | 4 | E5 | 659.25 | | 三声 | 2 | B4 | 493.88 | | 四声 | 1 | A4 | 440.00 | | 轻声 | 3 | D5 | 587.33 | **MIDI输入**（`mapMidiToVirtualVoiceScale()`）：12音→10采样槽就近映射 - 如 F#4 → 映射到 F4 采样（用 playbackRate 微调） - `inputName`（显示）和 `sampleNote`（实际播放）可以不同 ### 第3层：音符 → 采样播放 `playSampleTone()` 中的特殊分支： ```javascript if (currentInstrument === 'guitar') { const randomSample = getRandomSampleFil",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4023042470216751,
+      "maxScore": 0.4023042470216751,
+      "firstRecalledAt": "2026-07-01T03:08:34.580Z",
+      "lastRecalledAt": "2026-07-01T03:08:34.580Z",
+      "queryHashes": [
+        "0ecaa1864071"
+      ],
+      "recallDays": [
+        "2026-07-01"
+      ],
+      "conceptTags": [
+        "piano-d4",
+        "vocal-d4-01",
+        "vocal-d4-04",
+        "文字/midi",
+        "587.33",
+        "659.25",
+        "493.88",
+        "440.00"
+      ]
+    },
+    "memory:memory/2026-05-27.md:253:281": {
+      "key": "memory:memory/2026-05-27.md:253:281",
+      "path": "memory/2026-05-27.md",
+      "startLine": 253,
+      "endLine": 281,
+      "source": "memory",
+      "snippet": "return playSampleToneInternal(..., buffer, ...); } ``` **`findNearestSample()` 兜底**：如果目标音名没有精确采样，找半音距离最近的采样。 ### 完整映射链示例（「你好吗」） ``` \"你\"(ní, 二声) → charToNote() → tone=2 → degree=4 → dialogueVoiceScale[4]='E5' → createDialogueNoteEvent() → note='E5', sampleNote='E5' → playSampleTone('guitar') → getRandomSampleFile('E5', 'vocal') → 随机选 vocal_E5_03 → playSampleToneInternal(vocal_E5_03_buffer, 'E5', ...) → playbackRate=1.0 播放（频率正好匹配） ``` --- ## 乐器网站地址（当前最新） https://dengjinsh139-stack.github.io/Yellow-pages-game/sound-effects/instrument-language-synth.html 带 cache bust 参数（CDN缓存时强制刷新用）： https://dengjinsh139-stack.github.io/Yellow-pages-game/sound-effects/instrument-lan",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.39934744536876676,
+      "maxScore": 0.39934744536876676,
+      "firstRecalledAt": "2026-07-01T03:08:34.580Z",
+      "lastRecalledAt": "2026-07-01T03:08:34.580Z",
+      "queryHashes": [
+        "0ecaa1864071"
+      ],
+      "recallDays": [
+        "2026-07-01"
+      ],
+      "conceptTags": [
+        "vocal-e5-03",
+        "vocal-e5-03-buffer",
+        "1.0",
+        "return",
+        "playsampletoneinternal",
+        "buffer",
+        "findnearestsample",
+        "如果"
       ]
     }
   }
