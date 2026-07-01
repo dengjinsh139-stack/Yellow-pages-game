@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.50.5';
+        const APP_VERSION = 'v3.50.6';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -2739,6 +2739,34 @@
         function applyTextPerformanceGain(velocity, instrument = currentInstrument) {
             const safeVelocity = (typeof velocity === 'number' && isFinite(velocity)) ? velocity : 0.5;
             return safeVelocity * getTextPerformanceGain(instrument);
+        }
+
+        // Realtime 与 WAV 导出必须在节奏随机开启时仍然一致：
+        // 用稳定 hash 取代 Math.random()，同一句文本/乐器/事件序号得到同一组时值。
+        function seededUnitRandom(seed) {
+            const str = String(seed || '');
+            let hash = 2166136261;
+            for (let i = 0; i < str.length; i++) {
+                hash ^= str.charCodeAt(i);
+                hash = Math.imul(hash, 16777619);
+            }
+            return (hash >>> 0) / 4294967296;
+        }
+
+        function getEventTimingSeed(event, index = 0) {
+            const text = document.getElementById('textInput')?.value || '';
+            return [
+                currentInstrument,
+                text,
+                index,
+                event?.type || 'note',
+                event?.char || event?.symbol || event?.note || '',
+                event?.tone || '',
+                params.bpm,
+                params.notesPerBeat,
+                params.noteDensityMode,
+                params.phraseArticulationMode
+            ].join('|');
         }
 
         // 获取波形响度补偿值
@@ -7961,6 +7989,11 @@
             }
 
             events = events.filter(n => n !== null && n !== undefined);
+            events.forEach((event, index) => {
+                if (event && typeof event === 'object') {
+                    event._timingIndex = index;
+                }
+            });
             console.log('转换后的事件数量:', events.length);
             console.log('事件数据:', events);
 
@@ -8054,78 +8087,19 @@
                         continue;
                     }
 
-                    // ===== 节奏引擎计算 =====
-                    let currentNoteValue = params.toneNoteValues[note.tone] || '8';
-                    let currentNotesPerBeat = params.notesPerBeat;
-
-                    // 随机模式：随机变化时值和每拍音符数
-                    if (params.rhythmRandom) {
-                        const values = Object.keys(noteValueConfig);
-                        currentNoteValue = values[Math.floor(Math.random() * values.length)];
-                        currentNotesPerBeat = Math.floor(Math.random() * 3) + 1; // 1-3个
-                    }
-
-                    // 获取时值配置
-                    const noteValue = noteValueConfig[currentNoteValue];
-
-                    // 计算音符实际时长
-                    // 基础：一拍时间 × 时值比例 ÷ 每拍音符数
-                    let noteDuration = beatDuration * noteValue.duration / currentNotesPerBeat;
-
-                    // 三连音特殊处理：一个三连音组占一拍
-                    if (noteValue.isTriplet) {
-                        noteDuration = beatDuration / 3;
-                    }
-
-                    // 应用前音延长修饰（标点气口系统）
-                    if (note.durationMultiplier) {
-                        noteDuration *= note.durationMultiplier;
-                    }
-
-                    // ===== Phrase Articulation：应用时值缩放 =====
-                    const articulationDurationScale = note.articulationDurationScale || 1;
-                    if (articulationDurationScale !== 1) {
-                        noteDuration *= articulationDurationScale;
-                    }
-
-                    // ===== 最短可听下限保护（BPM 动态计算）=====
-                    const minAudibleMs = (60000 / params.bpm) * 0.23; // 约 0.23 拍
-                    noteDuration = Math.max(noteDuration, minAudibleMs);
-
-                    // 应用全局音量 + 音符独立音量
-                    let userVolume = (noteVolumes[currentInstrument][note.note] !== undefined) ? noteVolumes[currentInstrument][note.note] : 1.0;
-                    let velocityWithMaster = note.velocity * params.masterVolume * userVolume;
-
-                    // 应用 velocityScale（对白模式力度缩放）
-                    const eventVelocityScale = note.velocityScale || 1;
-                    velocityWithMaster *= eventVelocityScale;
-
-                    // ===== Expression Segment：应用表达段速度倍率 =====
+                    // ===== 统一 timing：realtime 与 WAV/export 共用 computeEventTiming =====
+                    // 这里不再手写一份节奏/力度逻辑，避免随机节奏、attack、文字补偿与离线导出漂移。
+                    const timing = note._timing || computeEventTiming(note, beatDuration, params.bpm);
+                    note._timing = timing;
+                    const noteDuration = timing.duration;
+                    const velocityWithMaster = timing.velocity;
                     const expressionTempo = (note.expressionTempoScale || 1) * (note.expressionCurveFactor || 1);
-                    if (expressionTempo !== 1) {
-                        noteDuration = noteDuration / expressionTempo;
-                    }
 
-                    // ===== Expression Segment：应用表达段力度倍率 =====
-                    velocityWithMaster *= note.expressionVelocityScale || 1;
+                    console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}, expressionTempo=${expressionTempo.toFixed(2)}x, duration=${noteDuration.toFixed(1)}ms, velocity=${velocityWithMaster.toFixed(3)}`);
 
-                    // ===== Phrase Articulation：应用力度缩放 =====
-                    velocityWithMaster *= note.articulationVelocityScale || 1;
-
-                    // 应用后音轻起修饰（仅对足够长的音生效，避免过短音被吞）
-                    if (note.velocityMultiplier && noteDuration >= 160) {
-                        velocityWithMaster *= note.velocityMultiplier;
-                    }
-
-                    console.log(`播放第 ${i+1}/${events.length} 个音符: ${note.note}, 声调=${note.tone}, expressionTempo=${expressionTempo.toFixed(2)}x`);
-
-                    // 播放单音（使用节奏引擎计算的时长）
-                    // 叠加 articulation attack offset
-                    const finalAttackMs = params.voiceShaping.attackMs + (note.articulationAttackMs || 0);
-                    const sampleOffsetMs = note.articulationSampleOffsetMs || 0;
-                    velocityWithMaster = applyTextPerformanceGain(velocityWithMaster, currentInstrument);
-
-                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster, finalAttackMs, sampleOffsetMs);
+                    // 播放单音：attackMs/sampleOffsetMs 直接使用 computeEventTiming 的结果，
+                    // 不额外叠加 voiceShaping.attackMs，保持与 renderAudioToBuffer 一致。
+                    playTone(note.frequency, note.note, noteDuration, velocityWithMaster, timing.attackMs, timing.sampleOffsetMs);
 
                     // 高亮当前事件（使用真实事件索引 i）
                     highlightNote(i);
@@ -9244,11 +9218,12 @@
                 console.log('🎵 [EXPORT] Step 2: Pre-computing all timings...');
                 const beatDuration = 60000 / params.bpm;
                 // 预计算所有timing，避免随机模式导致时长计算和渲染不一致
-                const eventsWithTiming = events.map(evt => {
-                    if (evt.type === 'pause') {
-                        return { ...evt, _timing: { duration: evt.pauseMs || 0, velocity: 0 } };
+                const eventsWithTiming = events.map((evt, index) => {
+                    const eventWithIndex = { ...evt, _timingIndex: index };
+                    if (eventWithIndex.type === 'pause') {
+                        return { ...eventWithIndex, _timing: { duration: eventWithIndex.pauseMs || 0, velocity: 0 } };
                     }
-                    return { ...evt, _timing: computeEventTiming(evt, beatDuration, params.bpm) };
+                    return { ...eventWithIndex, _timing: computeEventTiming(eventWithIndex, beatDuration, params.bpm) };
                 });
                 console.log(`🎵 [EXPORT] Step 2 done: ${eventsWithTiming.length} timings computed`);
 
@@ -9602,11 +9577,6 @@
                 let duration = timing.duration / 1000;
                 const overlapSec = params.voiceShaping.overlapMs / 1000;
 
-                // ===== Phrase Articulation：如果 _timing 缓存未包含 articulation，手动叠加 =====
-                if (evt._timing && evt.articulationDurationScale !== undefined) {
-                    duration *= evt.articulationDurationScale;
-                }
-
                 let advance = Math.max(0, duration - overlapSec);
 
                 // ===== Expression Segment：停顿计入时间线 =====
@@ -9653,11 +9623,13 @@
             let currentNotesPerBeat = params.notesPerBeat;
             let noteDuration;
 
-            // 随机模式：随机变化时值和每拍音符数
+            // 随机模式：使用稳定伪随机，确保 realtime 与 WAV/export 对同一句文本完全一致
             if (params.rhythmRandom) {
                 const values = Object.keys(noteValueConfig);
-                currentNoteValue = values[Math.floor(Math.random() * values.length)];
-                currentNotesPerBeat = Math.floor(Math.random() * 3) + 1;
+                const timingIndex = (typeof note._timingIndex === 'number') ? note._timingIndex : 0;
+                const seed = getEventTimingSeed(note, timingIndex);
+                currentNoteValue = values[Math.floor(seededUnitRandom(seed + '|value') * values.length)];
+                currentNotesPerBeat = Math.floor(seededUnitRandom(seed + '|perBeat') * 3) + 1;
             }
 
             // 获取时值配置
@@ -10363,6 +10335,9 @@
 
             for (let i = 0; i < events.length; i++) {
                 const evt = events[i];
+                if (evt && typeof evt === 'object' && typeof evt._timingIndex !== 'number') {
+                    evt._timingIndex = i;
+                }
 
                 // 停顿事件：只推进时间
                 if (evt.type === 'pause') {
@@ -10561,14 +10536,6 @@
                 const timing = evt._timing || computeEventTiming(evt, beatDuration, params.bpm);
                 let noteDuration = timing.duration / 1000;
                 let velocity = timing.velocity;
-
-                // ===== Phrase Articulation：如果 _timing 缓存未包含 articulation，手动叠加 =====
-                if (evt._timing && evt.articulationDurationScale !== undefined) {
-                    noteDuration *= evt.articulationDurationScale;
-                }
-                if (evt._timing && evt.articulationVelocityScale !== undefined) {
-                    velocity *= evt.articulationVelocityScale;
-                }
 
                 // ===== 防御：跳过无效参数的事件 =====
                 if (!isFinite(noteDuration) || noteDuration <= 0 || !isFinite(velocity)) {
