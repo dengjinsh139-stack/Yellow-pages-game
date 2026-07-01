@@ -11,7 +11,7 @@
         /**
          * 统一导航栏组件 v2.6.0 (内联版 - 绕过 CDN 缓存)
          */
-        const APP_VERSION = 'v3.50.4';
+        const APP_VERSION = 'v3.50.5';
         const NAV_CONFIG = {
             version: APP_VERSION,
             items: [
@@ -2520,7 +2520,7 @@
                     }[note.note];
                     if (freq) {
                         const noteDur = note.durationMs / finalPlaybackRate;
-                        const noteVel = note.velocity * params.masterVolume * exprVelocity;
+                        const noteVel = applyTextPerformanceGain(note.velocity * params.masterVolume * exprVelocity, currentInstrument);
                         playTone(freq, note.note, noteDur, noteVel);
                         await sleep(noteDur + 50 / finalPlaybackRate);
                     }
@@ -2700,6 +2700,45 @@
         // 获取当前乐器的响度补偿值
         function getInstrumentLoudnessCompensation(instrument) {
             return instrumentLoudnessCompensation[instrument] || 1.0;
+        }
+
+        // 文字演奏专用补偿：解决短音、对白力度缩放、发音颗粒弱化后，
+        // 不同采样乐器在“演奏文字/语义 MIDI/导出”里的感知响度不一致。
+        // 注意：音符键盘 playNoteKey() 不走这一层，保留单音试听原始大小。
+        const textPerformanceGain = {
+            piano:        1.00,
+            guitar:       1.08,
+            flute:        1.35,
+            xylophone:    1.25,
+            saxophone:    1.18,
+            synth:        1.08,
+            train:        1.08,
+            waterdrop:    1.18,
+            mouthtrumpet: 1.18,
+            kalimba:      1.18,
+            smallrobot:   1.18,
+            bigrobot:     1.18,
+            cuckoo:       1.18,
+            cowbell:      1.18,
+            wahguitar:    1.18,
+            toy_reed:     1.18,
+            toy_piano:    1.15,
+            nylon_guitar: 1.18,
+            otamatone:    1.18,
+            toy_keyboard: 1.15,
+            glass_piano:  1.15,
+            violin2:      1.28,
+            cello2:       1.35,
+            handpan:      1.25,
+        };
+
+        function getTextPerformanceGain(instrument) {
+            return textPerformanceGain[instrument] || 1.0;
+        }
+
+        function applyTextPerformanceGain(velocity, instrument = currentInstrument) {
+            const safeVelocity = (typeof velocity === 'number' && isFinite(velocity)) ? velocity : 0.5;
+            return safeVelocity * getTextPerformanceGain(instrument);
         }
 
         // 获取波形响度补偿值
@@ -4510,7 +4549,7 @@
                     }
 
                     if (freq) {
-                        const velocity = (note.velocity / 127) * params.masterVolume;
+                        const velocity = applyTextPerformanceGain((note.velocity / 127) * params.masterVolume, currentInstrument);
                         playTone(freq, noteName, noteDuration, velocity);
                     }
                 }
@@ -8084,6 +8123,8 @@
                     // 叠加 articulation attack offset
                     const finalAttackMs = params.voiceShaping.attackMs + (note.articulationAttackMs || 0);
                     const sampleOffsetMs = note.articulationSampleOffsetMs || 0;
+                    velocityWithMaster = applyTextPerformanceGain(velocityWithMaster, currentInstrument);
+
                     playTone(note.frequency, note.note, noteDuration, velocityWithMaster, finalAttackMs, sampleOffsetMs);
 
                     // 高亮当前事件（使用真实事件索引 i）
@@ -9680,6 +9721,9 @@
                 velocityWithMaster *= note.velocityMultiplier;
             }
 
+            // 文字演奏/导出专用跨乐器响度补偿。音符键盘不调用 computeEventTiming，避免误改单音试听。
+            velocityWithMaster = applyTextPerformanceGain(velocityWithMaster, currentInstrument);
+
             // ===== Phrase Articulation：计算 attack offset =====
             const articulationAttackMs = note.articulationAttackMs || 0;
 
@@ -10466,7 +10510,7 @@
                         const freq = midiToFreq[pentatonicNote];
                         if (!freq) continue;
 
-                        const noteVel = (mnote.velocity / 127) * params.masterVolume;
+                        const noteVel = applyTextPerformanceGain((mnote.velocity / 127) * params.masterVolume, currentInstrument);
                         // 使用共享函数计算音符时长，与实时一致
                         const noteDurMs = computeMidiNoteDurationMs(mnote, midiData);
                         const noteDur = noteDurMs / 1000;
