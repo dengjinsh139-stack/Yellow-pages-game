@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-01T03:08:34.580Z",
+  "updatedAt": "2026-07-04T16:55:22.442Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -729,18 +729,20 @@
       "endLine": 85,
       "source": "memory",
       "snippet": "- 网站显示 v2.5.8/2.4.9，但仓库已更新到 v2.5.9 - 多设备一致显示旧版本 → CDN 缓存问题 ### 解决方案 1. 回滚到 v2.5.7 (commit 36286f2) 2. 统一全站版本号到 v2.5.7 3. 触发强制重新部署 (`git commit --allow-empty`) ### 文件变更 - index.html, capabilities.html, finance.html, projects.html, nav-config.js ### 用户偏好 - 喜欢详细记录，要求每次操作带链接 - **硬性要求：每次反馈/回复必须带链接** (GitHub提交、网站等) - **必须附带的链接**：GitHub提交链接、网站链接、相关文件链接 - 偏好分步骤排查问题 - 需要 Feishu 文档记录版本历史 --- *自动记录 - 预压缩存储* --- ## QA 质量保障流程约定 **时间**: 18:28 **主题**: 建立 QA 检查流程作为标准操作 ### 用户要求 每次修改内容或新增内容，必须按照 QA 技能执行： 1. **影响评估** → 制定计划 2. **整体跑测** → 问题发现 3. **修复验证** → 回归测试 ### QA 检查清单 **修改全局配置时（如 nav-config.js）：** - [ ] 评估影响范围（哪些页面受影响） - [ ] 检查所有引用页面是否引入配置 - [ ] 测试所有相关页面链接 - [ ] 验证子页面导航正常工作 **修改版本号时：** - [ ]",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.4577216118574142,
+      "totalScore": 0.8111004441976547,
       "maxScore": 0.4577216118574142,
       "firstRecalledAt": "2026-05-28T02:52:42.131Z",
-      "lastRecalledAt": "2026-05-28T02:52:42.131Z",
+      "lastRecalledAt": "2026-07-04T16:55:10.997Z",
       "queryHashes": [
-        "5a99c5035a73"
+        "5a99c5035a73",
+        "d07136f3a087"
       ],
       "recallDays": [
-        "2026-05-28"
+        "2026-05-28",
+        "2026-07-05"
       ],
       "conceptTags": [
         "v2.5.8/2.4.9",
@@ -1474,6 +1476,225 @@
         "buffer",
         "findnearestsample",
         "如果"
+      ]
+    },
+    "memory:memory/2026-04-17.md:1:29": {
+      "key": "memory:memory/2026-04-17.md:1:29",
+      "path": "memory/2026-04-17.md",
+      "startLine": 1,
+      "endLine": 29,
+      "source": "memory",
+      "snippet": "## 2026-04-17 工作记录 ### Yellow-pages-game v3.4.2 发布 **修复内容：** - 乐器语言合成器 (instrument-language-synth.html) 全面 QA 修复 - 外星语言模拟器 (alien-language-synth.html) 音频连接修复 **具体修复项：** 1. textToNotes - 返回前过滤 null/undefined 音符 2. displayNotes - 添加 null 值检查，跳过无效音符 3. playText - 开头强制重置异常 isPlaying 状态 4. safeVelocity - 所有 velocity 使用添加有效性检查 5. stopPlaying - 彻底清理音频节点和状态 6. attackTime - 确保为正数，避免音频 API 错误 7. decayTime - 减小最小值，优化声音包络 8. exponentialRamp - 添加时间验证，防止非有限值错误 **GitHub 提交：** - Commit: 7181a29 - 推送状态：已推送到 origin/main - GitHub Pages 同步中 **遇到的问题：** - 浏览器缓存导致修复后仍显示旧版本错误 - 需要强制刷新 (Ctrl+Shift+R) 才能加载新版本",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.7095577538013458,
+      "maxScore": 0.35562277138233184,
+      "firstRecalledAt": "2026-07-04T16:55:10.997Z",
+      "lastRecalledAt": "2026-07-04T16:55:14.757Z",
+      "queryHashes": [
+        "d07136f3a087",
+        "e1d94e38a444"
+      ],
+      "recallDays": [
+        "2026-07-05"
+      ],
+      "conceptTags": [
+        "yellow-pages-game",
+        "v3.4.2",
+        "instrument-language-synth.html",
+        "alien-language-synth.html",
+        "null/undefined",
+        "origin/main",
+        "工作",
+        "记录"
+      ]
+    },
+    "memory:memory/2026-04-02.md:1:29": {
+      "key": "memory:memory/2026-04-02.md:1:29",
+      "path": "memory/2026-04-02.md",
+      "startLine": 1,
+      "endLine": 29,
+      "source": "memory",
+      "snippet": "# 2026-04-02 ## 10:18 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功 - 版本: v2.5.6 - 负载: 36% - 今日提交: 2 - 修改文件: 7 - 上次备份: 2026-04-02 00:07 - 下次检查: 2026-04-02 06:07 ## 18:56 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功 ## 19:51 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功 - 版本: v2.5.6 - 负载: 45% - 今日提交: 3 - 修改文件: 10",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.7085090398788452,
+      "maxScore": 0.35787294805049896,
+      "firstRecalledAt": "2026-07-04T16:55:10.997Z",
+      "lastRecalledAt": "2026-07-04T16:55:14.757Z",
+      "queryHashes": [
+        "d07136f3a087",
+        "e1d94e38a444"
+      ],
+      "recallDays": [
+        "2026-07-05"
+      ],
+      "conceptTags": [
+        "备份",
+        "openclaw/update-status.py",
+        "v2.5.6",
+        "cron",
+        "任务",
+        "执行",
+        "0d8b3c48",
+        "816d"
+      ]
+    },
+    "memory:memory/2026-03-30.md:1:8": {
+      "key": "memory:memory/2026-03-30.md:1:8",
+      "path": "memory/2026-03-30.md",
+      "startLine": 1,
+      "endLine": 8,
+      "source": "memory",
+      "snippet": "# 2026-03-30 ## 18:41 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 状态: ✅ 成功执行",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3708617091178894,
+      "maxScore": 0.3708617091178894,
+      "firstRecalledAt": "2026-07-04T16:55:14.757Z",
+      "lastRecalledAt": "2026-07-04T16:55:14.757Z",
+      "queryHashes": [
+        "e1d94e38a444"
+      ],
+      "recallDays": [
+        "2026-07-05"
+      ],
+      "conceptTags": [
+        "openclaw/update-status.py",
+        "cron",
+        "任务",
+        "执行",
+        "0d8b3c48",
+        "816d",
+        "4ce8",
+        "89bc"
+      ]
+    },
+    "memory:memory/2026-04-04.md:1:9": {
+      "key": "memory:memory/2026-04-04.md:1:9",
+      "path": "memory/2026-04-04.md",
+      "startLine": 1,
+      "endLine": 9,
+      "source": "memory",
+      "snippet": "# 2026-04-04 - Saturday ## 07:21 AM - [cron] 任务管理器状态自动更新 - 任务ID: 0d8b3c48-816d-4ce8-89bc-232a3a0248c2 - 脚本: /root/.openclaw/update_status.py - 状态: 已运行",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.362687999010086,
+      "maxScore": 0.362687999010086,
+      "firstRecalledAt": "2026-07-04T16:55:14.757Z",
+      "lastRecalledAt": "2026-07-04T16:55:14.757Z",
+      "queryHashes": [
+        "e1d94e38a444"
+      ],
+      "recallDays": [
+        "2026-07-05"
+      ],
+      "conceptTags": [
+        "openclaw/update-status.py",
+        "saturday",
+        "cron",
+        "任务",
+        "管理",
+        "状态",
+        "自动",
+        "更新"
+      ]
+    },
+    "memory:memory/2026-03-31.md:1:32": {
+      "key": "memory:memory/2026-03-31.md:1:32",
+      "path": "memory/2026-03-31.md",
+      "startLine": 1,
+      "endLine": 32,
+      "source": "memory",
+      "snippet": "# 2026-03-31 ## 06:11 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功 - 版本: v2.5.6 - 负载: 36% - 提交: 1 - 文件: 5 ## 22:46 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功 - 版本: v2.5.6 - 负载: 33% - 提交: 1 - 文件: 6 ## 23:11 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功 - 版本: v2.5.6 - 负载: 39% - 提交: 1 - 文件: 6",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3606792330741882,
+      "maxScore": 0.3606792330741882,
+      "firstRecalledAt": "2026-07-04T16:55:14.757Z",
+      "lastRecalledAt": "2026-07-04T16:55:14.757Z",
+      "queryHashes": [
+        "e1d94e38a444"
+      ],
+      "recallDays": [
+        "2026-07-05"
+      ],
+      "conceptTags": [
+        "openclaw/update-status.py",
+        "v2.5.6",
+        "cron",
+        "任务",
+        "执行",
+        "0d8b3c48",
+        "816d",
+        "4ce8"
+      ]
+    },
+    "memory:memory/2026-04-01.md:1:20": {
+      "key": "memory:memory/2026-04-01.md:1:20",
+      "path": "memory/2026-04-01.md",
+      "startLine": 1,
+      "endLine": 20,
+      "source": "memory",
+      "snippet": "# 2026-04-01 ## 18:41 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功执行 ## 16:26 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功执行 ## 05:01 - Cron任务执行 - 任务ID: `0d8b3c48-816d-4ce8-89bc-232a3a0248c2` - 描述: 状态自动更新 - 执行操作: 运行 `/root/.openclaw/update_status.py` 更新任务管理器状态文件 - 结果: ✅ 成功执行",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3570104449987411,
+      "maxScore": 0.3570104449987411,
+      "firstRecalledAt": "2026-07-04T16:55:14.757Z",
+      "lastRecalledAt": "2026-07-04T16:55:14.757Z",
+      "queryHashes": [
+        "e1d94e38a444"
+      ],
+      "recallDays": [
+        "2026-07-05"
+      ],
+      "conceptTags": [
+        "openclaw/update-status.py",
+        "cron",
+        "任务",
+        "执行",
+        "0d8b3c48",
+        "816d",
+        "4ce8",
+        "89bc"
+      ]
+    },
+    "memory:memory/2026-05-05.md:287:307": {
+      "key": "memory:memory/2026-05-05.md:287:307",
+      "path": "memory/2026-05-05.md",
+      "startLine": 287,
+      "endLine": 307,
+      "source": "memory",
+      "snippet": "- 重写 `.workbench`、删除其 3 个子元素 - 把 `.right-panel` 移出 `.workbench` - 合并三栏、用单列替代 grid - 回退 v3.20.0/v3.20.1 的 race condition 修复 ### 第一次尝试（失败） Python 脚本 `/tmp/fix_layout.py`： - 意图：在 `panel-scroll` 闭合之前插入 `secondary-workspace` - 行号定位错误：`CENTER_SCROLL_END = 1505` 实际上对应的是 `spectrum-display` 的 `</div>` - 真实 `panel-scroll` 闭合在第 1506 行（与 `spectrum-display` 的 `</div>` 合并在同一行 `</div></div>`） - 结果：`secondary-workspace` 被插入到了中栏 `.panel` 闭合之后、右栏开始之前 - 更严重的后果：右栏 `<div class=\"panel right-panel\">` 被脚本当作 `lines[1506:BOTTOM_START]` 的一部分错误处理，实际上整个右栏被吞进了中栏 - `.workbench` 只剩 2 个直接子元素（左栏 + 中栏），右栏消失 ### 回退 `git checkout sound-effects/instrument-language-synth.html` 恢复文件。 ### 关键教训 1. **HTML 嵌套 div 的闭合标签经常合",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3553277045488357,
+      "maxScore": 0.3553277045488357,
+      "firstRecalledAt": "2026-07-04T16:55:22.442Z",
+      "lastRecalledAt": "2026-07-04T16:55:22.442Z",
+      "queryHashes": [
+        "c694b147d9e9"
+      ],
+      "recallDays": [
+        "2026-07-05"
+      ],
+      "conceptTags": [
+        "right-panel",
+        "v3.20.0/v3.20.1",
+        "tmp/fix-layout.py",
+        "panel-scroll",
+        "secondary-workspace",
+        "center-scroll-end",
+        "spectrum-display",
+        "bottom-start"
       ]
     }
   }
