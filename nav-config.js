@@ -5,7 +5,11 @@
  */
 
 // 全局版本号 - 修改这里即可同步全站
+<<<<<<< HEAD
 const APP_VERSION = 'v3.56.4';
+=======
+const APP_VERSION = 'v3.50.6';
+>>>>>>> 6107e0169831f55704c4433a60b23b11579e869e
 
 // 导航配置 - 修改这里即可同步全站
 const NAV_CONFIG = {
