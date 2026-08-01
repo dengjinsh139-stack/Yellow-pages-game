@@ -25,10 +25,10 @@
   ],
   "backup": {
     "last_backup": "18\u65f624\u5206",
-    "next_check": "12:00",
+    "next_check": "18:00",
     "changes_detected": false,
     "total_backups": 72,
-    "last_check": "2026-08-01 06:24:39"
+    "last_check": "2026-08-01 12:24:45"
   },
   "stats": {
     "commits_today": 17,
