@@ -7,7 +7,7 @@
 // 全局版本号 - 修改这里即可同步全站
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
-const APP_VERSION = 'v3.69.0';
+const APP_VERSION = 'v3.69.1';
 =======
 const APP_VERSION = 'v3.56.5';
 >>>>>>> Stashed changes
