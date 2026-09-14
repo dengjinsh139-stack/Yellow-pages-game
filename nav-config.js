@@ -8,7 +8,7 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
-const APP_VERSION = 'v3.75.2';
+const APP_VERSION = 'v3.75.3';
 =======
 const APP_VERSION = 'v3.56.5';
 >>>>>>> Stashed changes
