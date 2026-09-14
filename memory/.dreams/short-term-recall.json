@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-04T16:55:22.442Z",
+  "updatedAt": "2026-09-14T16:25:19.322Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -729,20 +729,22 @@
       "endLine": 85,
       "source": "memory",
       "snippet": "- 网站显示 v2.5.8/2.4.9，但仓库已更新到 v2.5.9 - 多设备一致显示旧版本 → CDN 缓存问题 ### 解决方案 1. 回滚到 v2.5.7 (commit 36286f2) 2. 统一全站版本号到 v2.5.7 3. 触发强制重新部署 (`git commit --allow-empty`) ### 文件变更 - index.html, capabilities.html, finance.html, projects.html, nav-config.js ### 用户偏好 - 喜欢详细记录，要求每次操作带链接 - **硬性要求：每次反馈/回复必须带链接** (GitHub提交、网站等) - **必须附带的链接**：GitHub提交链接、网站链接、相关文件链接 - 偏好分步骤排查问题 - 需要 Feishu 文档记录版本历史 --- *自动记录 - 预压缩存储* --- ## QA 质量保障流程约定 **时间**: 18:28 **主题**: 建立 QA 检查流程作为标准操作 ### 用户要求 每次修改内容或新增内容，必须按照 QA 技能执行： 1. **影响评估** → 制定计划 2. **整体跑测** → 问题发现 3. **修复验证** → 回归测试 ### QA 检查清单 **修改全局配置时（如 nav-config.js）：** - [ ] 评估影响范围（哪些页面受影响） - [ ] 检查所有引用页面是否引入配置 - [ ] 测试所有相关页面链接 - [ ] 验证子页面导航正常工作 **修改版本号时：** - [ ]",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.8111004441976547,
+      "totalScore": 1.1791997402906418,
       "maxScore": 0.4577216118574142,
       "firstRecalledAt": "2026-05-28T02:52:42.131Z",
-      "lastRecalledAt": "2026-07-04T16:55:10.997Z",
+      "lastRecalledAt": "2026-09-14T16:25:19.322Z",
       "queryHashes": [
         "5a99c5035a73",
-        "d07136f3a087"
+        "d07136f3a087",
+        "50a16fa56058"
       ],
       "recallDays": [
         "2026-05-28",
-        "2026-07-05"
+        "2026-07-05",
+        "2026-09-15"
       ],
       "conceptTags": [
         "v2.5.8/2.4.9",
@@ -1695,6 +1697,161 @@
         "center-scroll-end",
         "spectrum-display",
         "bottom-start"
+      ]
+    },
+    "memory:memory/2026-06-26.md:1:7": {
+      "key": "memory:memory/2026-06-26.md:1:7",
+      "path": "memory/2026-06-26.md",
+      "startLine": 1,
+      "endLine": 7,
+      "source": "memory",
+      "snippet": "## 23:50 - 自动备份 (Cron) - ✅ 本地备份成功: Kimi_Claw_记忆备份_2026年06月26日_23时50分.tar.gz (37M) - ✅ Git 自动提交成功: \"自动备份: 2026年06月26日 23时50分\" (版本 v3.52.2 → v3.52.3) - ❌ GitHub 推送失败: `Invalid username or token` — GitHub Personal Access Token 已过期或失效 - 需修复: 更新 GitHub token 或改用 SSH 密钥认证",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.46403659284114834,
+      "maxScore": 0.46403659284114834,
+      "firstRecalledAt": "2026-09-14T16:25:19.322Z",
+      "lastRecalledAt": "2026-09-14T16:25:19.322Z",
+      "queryHashes": [
+        "50a16fa56058"
+      ],
+      "recallDays": [
+        "2026-09-15"
+      ],
+      "conceptTags": [
+        "备份",
+        "v3.52.2",
+        "v3.52.3",
+        "自动",
+        "cron",
+        "本地",
+        "成功",
+        "kimi-claw"
+      ]
+    },
+    "memory:memory/2026-07-11.md:1:10": {
+      "key": "memory:memory/2026-07-11.md:1:10",
+      "path": "memory/2026-07-11.md",
+      "startLine": 1,
+      "endLine": 10,
+      "source": "memory",
+      "snippet": "# 自动备份日志 - 2026-07-11 ## 17:50 备份 (cron 触发) - **备份文件**: Kimi_Claw_记忆备份_2026年07月11日_17时50分.tar.gz - **文件大小**: 40M - **GitHub 推送**: ✅ 成功 (main → main, 0eedb2b) - **版本号**: v3.58.7 → v3.58.8 (status.json 已自动更新) - **旧备份清理**: ✅ 已清理，保留最近 10 个",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3966470956802368,
+      "maxScore": 0.3966470956802368,
+      "firstRecalledAt": "2026-09-14T16:25:19.322Z",
+      "lastRecalledAt": "2026-09-14T16:25:19.322Z",
+      "queryHashes": [
+        "50a16fa56058"
+      ],
+      "recallDays": [
+        "2026-09-15"
+      ],
+      "conceptTags": [
+        "备份",
+        "v3.58.7",
+        "v3.58.8",
+        "status.json",
+        "自动",
+        "日志",
+        "cron",
+        "触发"
+      ]
+    },
+    "memory:memory/2026-06-19.md:1:10": {
+      "key": "memory:memory/2026-06-19.md:1:10",
+      "path": "memory/2026-06-19.md",
+      "startLine": 1,
+      "endLine": 10,
+      "source": "memory",
+      "snippet": "# 2026-06-19 日志 ## 23:50 - 自动备份完成 - **备份文件**: Kimi_Claw_记忆备份_2026年06月19日_23时50分.tar.gz - **文件大小**: 37M - **备份路径**: `/root/.openclaw/backups/` - **GitHub推送**: ✅ 成功 (版本号已更新: v3.47.10 → v3.48.0) - **触发方式**: cron 定时任务 (d5b302a6-9ebd-4996-ada5-a9adad1bc47a)",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.38037607073783875,
+      "maxScore": 0.38037607073783875,
+      "firstRecalledAt": "2026-09-14T16:25:19.322Z",
+      "lastRecalledAt": "2026-09-14T16:25:19.322Z",
+      "queryHashes": [
+        "50a16fa56058"
+      ],
+      "recallDays": [
+        "2026-09-15"
+      ],
+      "conceptTags": [
+        "backup",
+        "backups",
+        "备份",
+        "openclaw/backups",
+        "v3.47.10",
+        "v3.48.0",
+        "日志",
+        "自动"
+      ]
+    },
+    "memory:memory/2026-07-12.md:1:11": {
+      "key": "memory:memory/2026-07-12.md:1:11",
+      "path": "memory/2026-07-12.md",
+      "startLine": 1,
+      "endLine": 11,
+      "source": "memory",
+      "snippet": "# 2026-07-12 ## 自动备份 (05:50) - cron 任务 `kimi-claw-备份` 触发 - 运行 `/root/.openclaw/backup.sh` - ✅ 本地备份: `Kimi_Claw_记忆备份_2026年07月12日_05时50分.tar.gz` (40M) - ✅ GitHub 推送成功: `dengjinsh139-stack/Yellow-pages-game` - ⚠️ pre-commit hook 有警告（整数表达式/sed 错误），但不影响推送 - 版本号自动更新: v3.58.9",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3792324155569076,
+      "maxScore": 0.3792324155569076,
+      "firstRecalledAt": "2026-09-14T16:25:19.322Z",
+      "lastRecalledAt": "2026-09-14T16:25:19.322Z",
+      "queryHashes": [
+        "50a16fa56058"
+      ],
+      "recallDays": [
+        "2026-09-15"
+      ],
+      "conceptTags": [
+        "backup",
+        "备份",
+        "kimi-claw-备份",
+        "openclaw/backup.sh",
+        "pre-commit",
+        "整数表达式/sed",
+        "v3.58.9",
+        "自动"
+      ]
+    },
+    "memory:memory/2026-03-26.md:1:40": {
+      "key": "memory:memory/2026-03-26.md:1:40",
+      "path": "memory/2026-03-26.md",
+      "startLine": 1,
+      "endLine": 40,
+      "source": "memory",
+      "snippet": "# 2026-03-26 工作记录 ## 部署平台变更 - **重要**：以后所有部署只在 **GitHub Pages**，不再使用 Vercel - 用户明确要求：\"以后我们的部署都在pages上 不会在verbal上\" ## 版本号更新协议 - 每次代码更新后，必须明确告知版本号变更（从 X → Y） - 用户要求每次更新回复都要带版本号 ## 修复的问题 ### 1. 游戏链接404 - 修复\"来组乐队吧\"游戏链接错误 - 问题：`band-game-v2.9.0html` 缺少 `.` 号 - 修复为：`band-game-v2.7.html` ### 2. 音效中心404（重要） - **根本原因**：`sound-effects-hub.html` 文件末尾有多余的注释 `/* Cache bust: 1774373732 */` 在 `</html>` 标签外面 - 导致 GitHub Pages 无法正确解析文件 - 修复：移除多余的注释代码 ## 新增功能 ### 1. 翻译助手（translator.html） - 位置：音效中心内 - 功能：离线音频专业术语翻译 - 60+ 条术语库，中英互译 ### 2. PRISM 合成器（prism-synth.html） - 物理建模合成器 - 6种水晶模型，8个参数维度 - 模拟水晶/风铃/玻璃等共鸣体音色 - **状态**：因404问题调试，暂时回滚 ## 技术教训 - HTML文件必须确保所有内容都在 `<html>` 标签内 - 注释代码放在 `</html>` 后会导致GitHub P",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3648866683244705,
+      "maxScore": 0.3648866683244705,
+      "firstRecalledAt": "2026-09-14T16:25:19.322Z",
+      "lastRecalledAt": "2026-09-14T16:25:19.322Z",
+      "queryHashes": [
+        "50a16fa56058"
+      ],
+      "recallDays": [
+        "2026-09-15"
+      ],
+      "conceptTags": [
+        "band-game-v2.9.0html",
+        "band-game-v2.7.html",
+        "sound-effects-hub.html",
+        "translator.html",
+        "prism-synth.html",
+        "模拟水晶/风铃/玻璃等共鸣体音色",
+        "工作",
+        "记录"
       ]
     }
   }
