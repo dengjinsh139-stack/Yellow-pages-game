@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-27T22:25:06.834Z",
+  "updatedAt": "2026-10-01T04:24:42.145Z",
   "entries": {
     "memory:memory/2026-05-12.md:1:10": {
       "key": "memory:memory/2026-05-12.md:1:10",
@@ -1865,18 +1865,20 @@
       "endLine": 8,
       "source": "memory",
       "snippet": "# 2026-08-06 日志 ## 18:24 智能备份检查 - **触发方式**: cron 定时任务 (4ceea81c-1787-4681-afe1-b9ae7e9a8029) - **检查结果**: 无新内容，跳过备份 - **脚本**: `/root/.openclaw/smart_backup.py`",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.4753984600305557,
+      "totalScore": 0.9178315669298172,
       "maxScore": 0.4753984600305557,
       "firstRecalledAt": "2026-09-27T22:25:06.834Z",
-      "lastRecalledAt": "2026-09-27T22:25:06.834Z",
+      "lastRecalledAt": "2026-10-01T04:24:42.145Z",
       "queryHashes": [
-        "a58bf9066992"
+        "a58bf9066992",
+        "e732e0837a94"
       ],
       "recallDays": [
-        "2026-09-28"
+        "2026-09-28",
+        "2026-10-01"
       ],
       "conceptTags": [
         "backup",
@@ -1896,18 +1898,20 @@
       "endLine": 22,
       "source": "memory",
       "snippet": "# 2026-09-15 ## 00:24 - 智能备份 + 修复 GitHub 推送故障 (cron) ### 备份执行 - cron 触发 `smart_backup.py`，检测到新内容 - ✅ 本地备份: `Kimi_Claw_记忆备份_2026年09月15日_00时24分.tar.gz` (141.7 MB) - ✅ 版本号: v3.75.4 → v3.75.5（后随修复提交再到 v3.75.6） - ✅ 旧备份清理（保留10个） ### 发现并修复: smart_backup.py GitHub 推送失败 - **症状**: `could not read Username for 'https://github.com'` — push 失败 - **根因**: `~/.git-credentials` 为空（0字节，7月4日起），smart_backup.py 用裸 `git push`，无认证 - **对比**: `backup.sh` 内嵌 PAT token（临时 set-url 带 token 推送，推完恢复干净 URL），所以 23:51 的备份推送成功 - **修复**: 给 smart_backup.py 的 `push_to_github()` 加了 `get_github_token()`（从 backup.sh 解析 token，保持单一来源），推送前临时 set-url 带认证地址、推送后恢复干净 URL；同时把首次推送目标从不存在的 `master` 分支改为 `main`，并改为无论是否有新提交都尝试推送（避免漏推积压提交） -",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.43646705746650694,
+      "totalScore": 0.8545897364616394,
       "maxScore": 0.43646705746650694,
       "firstRecalledAt": "2026-09-27T22:25:06.834Z",
-      "lastRecalledAt": "2026-09-27T22:25:06.834Z",
+      "lastRecalledAt": "2026-10-01T04:24:42.145Z",
       "queryHashes": [
-        "a58bf9066992"
+        "a58bf9066992",
+        "e732e0837a94"
       ],
       "recallDays": [
-        "2026-09-28"
+        "2026-09-28",
+        "2026-10-01"
       ],
       "conceptTags": [
         "backup",
@@ -1980,6 +1984,130 @@
         "v3.75.2",
         "141.7",
         "git-credentials"
+      ]
+    },
+    "memory:memory/2026-09-28.md:1:18": {
+      "key": "memory:memory/2026-09-28.md:1:18",
+      "path": "memory/2026-09-28.md",
+      "startLine": 1,
+      "endLine": 18,
+      "source": "memory",
+      "snippet": "# 2026-09-28 ## 06:24 智能备份检查 (cron) - **触发方式**: cron 定时任务 (4ceea81c-1787-4681-afe1-b9ae7e9a8029) - **检查结果**: 检测到新内容，执行备份 - **备份文件**: `Kimi_Claw_记忆备份_2026年09月28日_06时24分.tar.gz` (142.4 MB) - **版本号**: v3.83.4 → v3.83.5 - **旧备份清理**: 已清理 09月26日 的旧备份 - **GitHub 推送**: ✅ 成功 - **状态**: 全部正常 - 11:50 自动备份完成：Kimi_Claw_记忆备份_2026年09月28日_11时50分.tar.gz (43M)，GitHub 推送成功 (cfbb78a..49487ca)，版本号自动更新 v3.83.5 → v3.83.6 ## 17:50 cron 备份运行记录 - tar.gz 备份成功 (43MB)，保留最近10份 - GitHub 推送成功 (c4b5187..2f565af，版本号 v3.83.8) - 发现 backup.sh 的坑：pre-commit 钩子会把版本号再 bump 一次(v3.83.9)留在工作区，下次运行时 stash/pop 会循环携带；脚本结束后 origin 被重置为无 token URL，手动 push 需先设回 token URL - workspace/Yellow-pages-game 子模块是自引用克隆（与主仓同一远程），本地停在 09-20 的 585148",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.429392546415329,
+      "maxScore": 0.429392546415329,
+      "firstRecalledAt": "2026-10-01T04:24:42.145Z",
+      "lastRecalledAt": "2026-10-01T04:24:42.145Z",
+      "queryHashes": [
+        "e732e0837a94"
+      ],
+      "recallDays": [
+        "2026-10-01"
+      ],
+      "conceptTags": [
+        "backup",
+        "备份",
+        "142.4",
+        "v3.83.4",
+        "v3.83.5",
+        "v3.83.6",
+        "tar.gz",
+        "v3.83.8"
+      ]
+    },
+    "memory:memory/2026-09-22.md:1:14": {
+      "key": "memory:memory/2026-09-22.md:1:14",
+      "path": "memory/2026-09-22.md",
+      "startLine": 1,
+      "endLine": 14,
+      "source": "memory",
+      "snippet": "# 2026-09-22 ## 05:50 自动备份 (cron) - 运行 backup.sh 成功 - 备份文件: Kimi_Claw_记忆备份_2026年09月22日_05时50分.tar.gz (43M)，保留最近10个 - GitHub 推送成功，版本号更新 v3.79.6 → v3.79.7 ## 06:24 智能备份检查 (cron) - 运行 smart_backup.py，检测到新内容 - 版本号自动更新: v3.79.7 → v3.79.8 - 新备份: Kimi_Claw_记忆备份_2026年09月22日_06时24分.tar.gz (142.1 MB) - 清理旧备份: 09月20日_23时51分 版本 - GitHub 推送成功",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.42123162448406215,
+      "maxScore": 0.42123162448406215,
+      "firstRecalledAt": "2026-10-01T04:24:42.145Z",
+      "lastRecalledAt": "2026-10-01T04:24:42.145Z",
+      "queryHashes": [
+        "e732e0837a94"
+      ],
+      "recallDays": [
+        "2026-10-01"
+      ],
+      "conceptTags": [
+        "backup",
+        "备份",
+        "backup.sh",
+        "v3.79.6",
+        "v3.79.7",
+        "smart-backup.py",
+        "v3.79.8",
+        "142.1"
+      ]
+    },
+    "memory:memory/2026-09-21.md:1:11": {
+      "key": "memory:memory/2026-09-21.md:1:11",
+      "path": "memory/2026-09-21.md",
+      "startLine": 1,
+      "endLine": 11,
+      "source": "memory",
+      "snippet": "- 00:24 智能备份检查：检测到新内容，已备份并推送 GitHub（v3.78.10，142.1 MB） - 05:50 cron 自动备份完成：tar.gz 43M 已存至 /root/.openclaw/backups/，workspace 已推送 GitHub main (253641e..6e3290f) - 06:24 智能备份检查：检测到新内容，已备份 /root/.openclaw/backups/Kimi_Claw_记忆备份_2026年09月21日_06时24分.tar.gz（142.1 MB），版本更新 v3.79.0 → v3.79.1，已推送 GitHub ## 12:24 - 智能备份检查 (cron) - 运行 smart_backup.py，检测到新内容 - 版本号自动更新: v3.79.2 → v3.79.3 - 新备份: Kimi_Claw_记忆备份_2026年09月21日_12时24分.tar.gz (142.1 MB) - 清理旧备份: 09月19日_23时50分 版本 - GitHub 推送成功",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4104161858558655,
+      "maxScore": 0.4104161858558655,
+      "firstRecalledAt": "2026-10-01T04:24:42.145Z",
+      "lastRecalledAt": "2026-10-01T04:24:42.145Z",
+      "queryHashes": [
+        "e732e0837a94"
+      ],
+      "recallDays": [
+        "2026-10-01"
+      ],
+      "conceptTags": [
+        "backup",
+        "backups",
+        "备份",
+        "v3.78.10",
+        "142.1",
+        "tar.gz",
+        "openclaw/backups",
+        "v3.79.0"
+      ]
+    },
+    "memory:memory/2026-09-26.md:1:18": {
+      "key": "memory:memory/2026-09-26.md:1:18",
+      "path": "memory/2026-09-26.md",
+      "startLine": 1,
+      "endLine": 18,
+      "source": "memory",
+      "snippet": "# 2026-09-26 ## 00:24 - 智能备份 (cron) - 版本号更新: v3.82.0 → v3.82.1 - 检测到新内容，自动备份完成 - 新备份: Kimi_Claw_记忆备份_2026年09月26日_00时24分.tar.gz (142.3 MB) - 清理旧备份: 2026年09月24日_11时50分 - GitHub 推送成功 ## 06:24 - 智能备份 (cron) - 版本号更新: v3.82.2 → v3.82.3 - 检测到新内容，自动备份完成 - 新备份: Kimi_Claw_记忆备份_2026年09月26日_06时24分.tar.gz (142.3 MB) - 清理旧备份: Kimi_Claw_记忆备份_2026年09月24日_17时50分.tar.gz - GitHub 推送成功 11:50 - 自动备份完成：Kimi_Claw_记忆备份_2026年09月26日_11时50分.tar.gz (43M)，已推送 GitHub (v3.82.4)，保留最近10个备份 17:50 - 自动备份完成：Kimi_Claw_记忆备份_2026年09月26日_17时50分.tar.gz (43M)，版本号 v3.82.5 → v3.82.6，GitHub 推送成功，保留最近10个备份",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.40724006593227385,
+      "maxScore": 0.40724006593227385,
+      "firstRecalledAt": "2026-10-01T04:24:42.145Z",
+      "lastRecalledAt": "2026-10-01T04:24:42.145Z",
+      "queryHashes": [
+        "e732e0837a94"
+      ],
+      "recallDays": [
+        "2026-10-01"
+      ],
+      "conceptTags": [
+        "备份",
+        "v3.82.0",
+        "v3.82.1",
+        "142.3",
+        "2026年09月24日-11时50分",
+        "v3.82.2",
+        "v3.82.3",
+        "v3.82.4"
       ]
     }
   }
